@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # 3.12 has stable CPU wheels for torch; the project itself runs on 3.10+.
+          python-version: "3.12"
+
+      - name: Install CPU-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install snntorch pytest
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Smoke self-test (CPU, ~1 min)
+        # The default config is the proven self-test: it reliably learns the demo
+        # corpus to < 1.5 bpc. (The `smoke` flags exist for faster local runs, but
+        # too-small a model doesn't clear the learning gate.)
+        run: python snn_char_lm.py smoke
