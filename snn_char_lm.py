@@ -256,6 +256,7 @@ class CharDataset:
 @dataclass
 class SNNConfig:
     vocab_size: int = 0          # filled in from the dataset
+    arch: str = "snn"            # "snn" (spiking LIF) | "gru" (non-spiking baseline)
     hidden: int = 512            # LIF neurons per recurrent layer
     num_layers: int = 2          # stacked Leaky layers
     num_steps: int = 5           # SNN micro-steps per character (rate-code length T)
@@ -294,7 +295,69 @@ def _make_surrogate(name: str):
     raise ValueError(f"unknown surrogate '{name}'")
 
 
-class SNNCharLM(nn.Module):
+class CharLMBase(nn.Module):
+    """Shared machinery for the character-LM architectures.
+
+    Subclasses provide ``init_state(batch, device) -> state`` and
+    ``step(char_onehot, state) -> (logits, state)`` plus ``self.cfg.vocab_size``.
+    The autoregressive sampler below is architecture-agnostic -- it drives the
+    spiking model and the GRU baseline alike.
+    """
+
+    @torch.no_grad()
+    def generate(self, dataset: "CharDataset", prompt: str, length: int,
+                 device: torch.device, temperature: float = 1.0,
+                 top_k: Optional[int] = None) -> str:
+        """Warm the recurrent state on ``prompt``, then sample ``length`` chars.
+
+        The recurrent state persists across the whole generation, exactly as
+        during training, so the memory conditions every new character on
+        everything generated so far.
+        """
+        self.eval()
+        state = self.init_state(1, device)
+        out_ids: List[int] = []
+
+        # Warm-up: feed the prompt so the recurrent state reflects it.
+        ids = dataset.encode(prompt).to(device)
+        last_logits = None
+        for cid in ids:
+            oh = F.one_hot(cid.view(1), self.cfg.vocab_size).float()
+            last_logits, state = self.step(oh, state)
+            out_ids.append(int(cid))
+
+        # If the prompt was empty, seed from a zero one-hot so we have logits.
+        if last_logits is None:
+            oh = torch.zeros(1, self.cfg.vocab_size, device=device)
+            last_logits, state = self.step(oh, state)
+
+        for _ in range(length):
+            # Guard: NaN/inf logits would make torch.multinomial trigger a CUDA
+            # device assert; sanitising keeps sampling robust on any checkpoint.
+            last_logits = torch.nan_to_num(last_logits)
+            logits = last_logits.squeeze(0) / max(temperature, 1e-6)
+            if top_k is not None and top_k > 0:
+                v, _ = torch.topk(logits, min(top_k, logits.numel()))
+                logits[logits < v[-1]] = float("-inf")
+            probs = F.softmax(logits, dim=-1)
+            next_id = int(torch.multinomial(probs, 1).item())
+            out_ids.append(next_id)
+            oh = F.one_hot(torch.tensor([next_id], device=device),
+                           self.cfg.vocab_size).float()
+            last_logits, state = self.step(oh, state)
+
+        return dataset.decode(out_ids)
+
+    def detach_state(self, state):
+        """Detach the recurrent state between TBPTT chunks (arch-agnostic): the
+        SNN carries a list of membrane tensors, the GRU a single hidden tensor.
+        """
+        if isinstance(state, (list, tuple)):
+            return [s.detach() for s in state]
+        return state.detach()
+
+
+class SNNCharLM(CharLMBase):
     """A stack of recurrent leaky integrate-and-fire layers with a linear
     rate-decoding head.
 
@@ -493,6 +556,19 @@ class SNNCharLM(nn.Module):
             spikes = spikegen.rate(onehot, num_steps=self.cfg.num_steps,
                                    gain=self.cfg.rate_gain)            # (T, B, L, V)
             cur0_all = self.fc_in[0](spikes)                           # (T, B, L, hidden)
+        return self._run_core(cur0_all, mems)
+
+    def _run_core(self, cur0_all: torch.Tensor, mems: List[torch.Tensor]
+                  ) -> Tuple[torch.Tensor, List[torch.Tensor]]:
+        """Sequential recurrent loop over a chunk's pre-encoded input currents.
+
+        cur0_all : (T, B, L, hidden) -- the (possibly RNG-dependent) encoder output
+                   computed in forward_seq BEFORE this call. Splitting it out keeps
+                   this core RNG-free and fixed-shape, which is exactly what a CUDA
+                   graph can capture and replay (see the `bench` command / TIER6.md).
+        Returns logits (B, L, vocab_size) and the membrane state after the last char.
+        """
+        L = cur0_all.shape[2]
         rates = []
         for pos in range(L):
             rate, mems = self._char_rate(cur0_all[:, :, pos, :], mems)
@@ -504,57 +580,67 @@ class SNNCharLM(nn.Module):
         """x: (B, L) ids -> logits (B, L, vocab_size), fresh state (for eval)."""
         return self.forward_seq(x, None)[0]
 
-    # -- autoregressive sampling --------------------------------------------
-    @torch.no_grad()
-    def generate(self, dataset: "CharDataset", prompt: str, length: int,
-                 device: torch.device, temperature: float = 1.0,
-                 top_k: Optional[int] = None) -> str:
-        """Warm the recurrent state on `prompt`, then sample `length` chars.
 
-        The membrane state persists across the whole generation, exactly as
-        during training, so the leaky memory conditions every new character on
-        everything generated so far.
-        """
-        self.eval()
-        mems = self.init_state(1, device)
-        out_ids: List[int] = []
+class GRUCharLM(CharLMBase):
+    """Non-spiking GRU character LM -- a matched in-harness baseline for the SNN.
 
-        # Warm-up: feed the prompt so the membrane state reflects it.
-        ids = dataset.encode(prompt).to(device)
-        last_logits = None
-        for cid in ids:
-            oh = F.one_hot(cid.view(1), self.cfg.vocab_size).float()
-            last_logits, mems = self.step(oh, mems)
-            out_ids.append(int(cid))
+    Same data pipeline, training loop, evaluation, and sampler, and the same
+    interface (init_state / forward_seq / step / forward) as SNNCharLM; the only
+    differences are a standard GRU core instead of the LIF stack and a learned
+    embedding instead of rate coding. It exists to give the README's "above the
+    best ANNs" comparison a same-corpus, same-budget control rather than a
+    cross-corpus figure. (The SNN-only cfg fields -- num_steps, beta, rate_gain,
+    the ablation knobs -- are simply ignored here.)
+    """
 
-        # If the prompt was empty, seed from a zero one-hot so we have logits.
-        if last_logits is None:
-            oh = torch.zeros(1, self.cfg.vocab_size, device=device)
-            last_logits, mems = self.step(oh, mems)
+    def __init__(self, cfg: SNNConfig):
+        super().__init__()
+        self.cfg = cfg
+        self.embed = nn.Embedding(cfg.vocab_size, cfg.hidden)
+        self.gru = nn.GRU(cfg.hidden, cfg.hidden, num_layers=cfg.num_layers,
+                          batch_first=True,
+                          dropout=cfg.dropout if cfg.num_layers > 1 else 0.0)
+        self.drop = nn.Dropout(cfg.dropout)
+        self.readout = nn.Linear(cfg.hidden, cfg.vocab_size)
 
-        for _ in range(length):
-            # Guard: NaN/inf logits would make torch.multinomial trigger a CUDA
-            # device assert; sanitising keeps sampling robust on any checkpoint.
-            last_logits = torch.nan_to_num(last_logits)
-            logits = last_logits.squeeze(0) / max(temperature, 1e-6)
-            if top_k is not None and top_k > 0:
-                v, _ = torch.topk(logits, min(top_k, logits.numel()))
-                logits[logits < v[-1]] = float("-inf")
-            probs = F.softmax(logits, dim=-1)
-            next_id = int(torch.multinomial(probs, 1).item())
-            out_ids.append(next_id)
-            oh = F.one_hot(torch.tensor([next_id], device=device),
-                           self.cfg.vocab_size).float()
-            last_logits, mems = self.step(oh, mems)
+    def init_state(self, batch_size: int, device: torch.device) -> torch.Tensor:
+        return torch.zeros(self.cfg.num_layers, batch_size, self.cfg.hidden,
+                           device=device)
 
-        return dataset.decode(out_ids)
+    def forward_seq(self, x: torch.Tensor, state: Optional[torch.Tensor] = None
+                    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        B, L = x.shape
+        if state is None:
+            state = self.init_state(B, x.device)
+        emb = self.drop(self.embed(x))                     # (B, L, hidden)
+        out, state = self.gru(emb, state)                  # (B, L, hidden)
+        return self.readout(self.drop(out)), state         # (B, L, vocab_size)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.forward_seq(x, None)[0]
+
+    def step(self, char_onehot: torch.Tensor, state: torch.Tensor
+             ) -> Tuple[torch.Tensor, torch.Tensor]:
+        # generate() hands us a one-hot; recover the id and embed it (one step).
+        ids = char_onehot.argmax(dim=-1)                   # (B,)
+        out, state = self.gru(self.embed(ids).unsqueeze(1), state)
+        return self.readout(out.squeeze(1)), state
+
+
+def build_model(cfg: SNNConfig) -> CharLMBase:
+    """Construct the model named by cfg.arch ("snn" | "gru")."""
+    if cfg.arch == "gru":
+        return GRUCharLM(cfg)
+    if cfg.arch == "snn":
+        return SNNCharLM(cfg)
+    raise ValueError(f"unknown arch '{cfg.arch}'; expected snn | gru")
 
 
 # ---------------------------------------------------------------------------
 # 3. Training loop
 # ---------------------------------------------------------------------------
 @torch.no_grad()
-def evaluate(model: SNNCharLM, dataset: CharDataset, split: str,
+def evaluate(model: CharLMBase, dataset: CharDataset, split: str,
              batch_size: int, n_batches: int, device: torch.device,
              deterministic: bool = False, encoder_seed: int = 1234) -> float:
     """Mean bits-per-character on held-out windows (lower is better).
@@ -639,7 +725,7 @@ def train(args) -> None:
         cfg = SNNConfig(**resume_ckpt["cfg"])
         cfg.dropout = args.dropout
         cfg.seq_len = args.seq_len
-        model = SNNCharLM(cfg).to(device)
+        model = build_model(cfg).to(device)
         model.load_state_dict(resume_ckpt["state_dict"])
     elif args.init_from:
         # Warm start: continue from saved WEIGHTS only (fresh optimizer + LR
@@ -652,13 +738,14 @@ def train(args) -> None:
         cfg = SNNConfig(**ckpt["cfg"])
         cfg.dropout = args.dropout
         cfg.seq_len = args.seq_len
-        model = SNNCharLM(cfg).to(device)
+        model = build_model(cfg).to(device)
         model.load_state_dict(ckpt["state_dict"])
         print(f"[init] warm start from {args.init_from} "
               f"(arch from checkpoint: hidden={cfg.hidden} layers={cfg.num_layers})")
     else:
         cfg = SNNConfig(
             vocab_size=dataset.vocab_size,
+            arch=args.arch,
             hidden=args.hidden,
             num_layers=args.layers,
             num_steps=args.num_steps,
@@ -674,10 +761,12 @@ def train(args) -> None:
             layernorm=args.layernorm,
             input_coding=args.input_coding,
         )
-        model = SNNCharLM(cfg).to(device)
+        model = build_model(cfg).to(device)
     n_params = sum(p.numel() for p in model.parameters())
-    print(f"[model] {n_params/1e6:.2f}M params | hidden={cfg.hidden} "
-          f"layers={cfg.num_layers} T={cfg.num_steps} beta={cfg.beta}")
+    arch_bits = (f"T={cfg.num_steps} beta={cfg.beta}" if cfg.arch == "snn"
+                 else "(non-spiking GRU baseline)")
+    print(f"[model] {n_params/1e6:.2f}M params | arch={cfg.arch} "
+          f"hidden={cfg.hidden} layers={cfg.num_layers} {arch_bits}")
     # Resolved-config echo: make every run's stdout fully record what produced it
     # (lr, weight-decay, warmup, dropout, grad-clip, seed, surrogate, ...). cfg
     # holds the EFFECTIVE architecture -- which on --resume/--init-from comes from
@@ -754,7 +843,7 @@ def train(args) -> None:
             for c0 in range(0, x.size(1), chunk):
                 if update >= args.steps:
                     break
-                mems = [m.detach() for m in mems]                      # cut the graph
+                mems = model.detach_state(mems)                        # cut the graph
                 for g in opt.param_groups:
                     g["lr"] = lr_at(update)
                 xc, yc = x[:, c0:c0 + chunk], y[:, c0:c0 + chunk]
@@ -957,7 +1046,7 @@ def _load_checkpoint(path: str, device: torch.device
     # shared or downloaded checkpoint (the payload is only tensors + plain dicts).
     ckpt = torch.load(path, map_location=device, weights_only=True)
     cfg = SNNConfig(**ckpt["cfg"])
-    model = SNNCharLM(cfg).to(device)
+    model = build_model(cfg).to(device)
     model.load_state_dict(ckpt["state_dict"])
     # Rebuild a lightweight, inference-only dataset that carries just the vocab
     # maps (enough for encode/decode/generate). It has no .data/.splits, so it
@@ -1126,7 +1215,7 @@ def smoke(args) -> None:
         for c0 in range(0, x.size(1), chunk):
             if update >= updates:
                 break
-            mems = [m.detach() for m in mems]
+            mems = model.detach_state(mems)
             logits, mems = model.forward_seq(x[:, c0:c0 + chunk], mems)
             loss = F.cross_entropy(logits.reshape(-1, cfg.vocab_size),
                                    y[:, c0:c0 + chunk].reshape(-1))
@@ -1160,6 +1249,85 @@ def smoke(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# 6b. CUDA-graph benchmark (Tier 6 performance lever)
+# ---------------------------------------------------------------------------
+def bench(args) -> None:
+    """Benchmark the recurrent inner loop: eager vs a CUDA-graph replay.
+
+    The SNN is launch-bound -- a long chain of tiny sequential kernels -- so the
+    real throughput lever is cutting per-kernel launch overhead, not faster math.
+    We capture the RNG-free, fixed-shape core (SNNCharLM._run_core over
+    pre-encoded currents) in a CUDA graph and replay it. Forward-only, no autograd
+    -- this is the isolated inner-loop measurement referenced in TIER6.md.
+    torch.compile is unavailable here (no Triton on Windows / Python 3.14), so a
+    CUDA graph is the Triton-free alternative. The stochastic encoder (spikegen)
+    is kept OUTSIDE the graph (RNG in a captured graph is not replay-safe).
+    """
+    device = pick_device(getattr(args, "device", "auto"))
+    if device.type != "cuda":
+        print("[bench] CUDA graphs need a GPU; got device=cpu -- nothing to do.")
+        return
+    import time as _time
+    set_seed(0)
+    cfg = SNNConfig(vocab_size=args.vocab, hidden=args.hidden,
+                    num_layers=args.layers, num_steps=args.num_steps,
+                    seq_len=args.seq_len, dropout=0.0)
+    model = SNNCharLM(cfg).to(device).eval()
+    B, L = args.batch_size, args.seq_len
+
+    # Pre-encode ONCE, outside the timed/captured region (RNG stays out of the graph).
+    with torch.no_grad():
+        x = torch.randint(0, cfg.vocab_size, (B, L), device=device)
+        onehot = F.one_hot(x, cfg.vocab_size).float()
+        spikes = spikegen.rate(onehot, num_steps=cfg.num_steps, gain=cfg.rate_gain)
+        cur0_all = model.fc_in[0](spikes).contiguous()          # (T, B, L, hidden)
+
+    def eager_once():
+        with torch.no_grad():
+            model._run_core(cur0_all, model.init_state(B, device))
+
+    def timed(fn, iters):
+        for _ in range(args.warmup):
+            fn()
+        torch.cuda.synchronize()
+        t0 = _time.time()
+        for _ in range(iters):
+            fn()
+        torch.cuda.synchronize()
+        return (_time.time() - t0) / iters * 1e3                 # ms per iteration
+
+    eager_ms = timed(eager_once, args.iters)
+
+    # Capture the core in a CUDA graph. graph_in_mems are the static input buffers
+    # and MUST stay alive for replay; passing a shallow copy to _run_core lets it
+    # reassign its local list without dropping our references.
+    graph_in_mems = model.init_state(B, device)
+    side = torch.cuda.Stream()
+    side.wait_stream(torch.cuda.current_stream())
+    with torch.cuda.stream(side):                               # warm up before capture
+        for _ in range(3):
+            with torch.no_grad():
+                model._run_core(cur0_all, [mm.clone() for mm in graph_in_mems])
+    torch.cuda.current_stream().wait_stream(side)
+
+    graph = torch.cuda.CUDAGraph()
+    with torch.no_grad(), torch.cuda.graph(graph):
+        static_out, _ = model._run_core(cur0_all, list(graph_in_mems))
+    keep_alive = (cur0_all, graph_in_mems, static_out)          # noqa: keep refs live
+    graph_ms = timed(graph.replay, args.iters)
+
+    speedup = eager_ms / graph_ms if graph_ms > 0 else float("nan")
+    print(f"[bench] {torch.cuda.get_device_name(0)} | arch=snn hidden={cfg.hidden} "
+          f"layers={cfg.num_layers} T={cfg.num_steps} B={B} L={L}")
+    print(f"[bench] forward inner-loop core (RNG-free, fixed shape), "
+          f"{args.iters} iters:")
+    print(f"[bench]   eager       {eager_ms:8.3f} ms/iter")
+    print(f"[bench]   cuda-graph  {graph_ms:8.3f} ms/iter")
+    print(f"[bench]   speedup     {speedup:8.2f}x")
+    del keep_alive
+
+
+# ---------------------------------------------------------------------------
 # 7. CLI
 # ---------------------------------------------------------------------------
 def _positive_int(s: str) -> int:
@@ -1179,6 +1347,8 @@ def build_parser() -> argparse.ArgumentParser:
     t = sub.add_parser("train", help="train the SNN language model")
     t.add_argument("--data", type=str, default=None,
                    help="path to a UTF-8 text file (default: built-in demo)")
+    t.add_argument("--arch", type=str, default="snn", choices=["snn", "gru"],
+                   help="snn (spiking LIF; default) | gru (non-spiking baseline)")
     t.add_argument("--ckpt", type=str, default="snn_char_lm.pt")
     warm = t.add_mutually_exclusive_group()
     warm.add_argument("--init-from", dest="init_from", type=str, default=None,
@@ -1314,6 +1484,22 @@ def build_parser() -> argparse.ArgumentParser:
     sm.add_argument("--device", type=str, default="auto",
                     help="auto | cpu | cuda | cuda:N")
     sm.set_defaults(func=smoke)
+
+    # -- bench --
+    b = sub.add_parser("bench",
+                       help="benchmark the recurrent inner loop: eager vs CUDA graph")
+    b.add_argument("--hidden", type=_positive_int, default=512)
+    b.add_argument("--layers", type=_positive_int, default=2)
+    b.add_argument("--num-steps", dest="num_steps", type=_positive_int, default=5)
+    b.add_argument("--seq-len", dest="seq_len", type=_positive_int, default=64,
+                   help="chunk length L benchmarked (the inner-loop length)")
+    b.add_argument("--batch-size", dest="batch_size", type=_positive_int, default=128)
+    b.add_argument("--vocab", type=_positive_int, default=65)
+    b.add_argument("--iters", type=_positive_int, default=50)
+    b.add_argument("--warmup", type=_positive_int, default=10)
+    b.add_argument("--device", type=str, default="auto",
+                   help="auto | cpu | cuda | cuda:N")
+    b.set_defaults(func=bench)
 
     return p
 

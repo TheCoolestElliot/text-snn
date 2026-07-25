@@ -222,15 +222,39 @@ off: a hidden-2048 model fits the training set better but generalizes *worse*
 wide-but-not-too-wide. The final model is wide and shallow, trained long with
 dropout.
 
+**Tier 6 revisited these knobs** with a deterministic-eval sweep (exactly
+reproducible bpc; see [`TIER6.md`](TIER6.md)) and found two changes the original
+sweep lacked that turn the depth story around:
+
+| Tier 6 ablation @ 2k (hidden 512) | val bpc |
+|-----------------------------------|:---:|
+| baseline (2 layers, rate coding) | 2.82 |
+| per-neuron learnable `beta` | 2.91 ✗ |
+| 3 layers | 3.05 ✗ |
+| **3 layers + LayerNorm on currents** | **2.78** ✓ |
+| **graded (deterministic) input coding** | **2.73** ✓ |
+| **all three together** | **2.65** ✓✓ |
+
+So **LayerNorm rescues depth** (3 layers goes 3.05 → 2.78, now *beating* the
+2-layer baseline) and **graded input coding helps** (2.73) — and they **stack**
+(2.65, a 0.17-bpc gain over baseline). A per-neuron learnable time constant still
+doesn't help at this budget. These are opt-in flags (`--layernorm`,
+`--input-coding graded`, `--beta-per-neuron`); the shipped checkpoints use none.
+
 For reference, this corpus's own entropy floors — computed on the shipped
 `input.txt` by `corpus_bpc_floors` in `snn_char_lm.py` — are **4.78 bpc**
 (unigram) and **3.54 bpc** (bigram, conditioning on the previous character).
 This spiking model at 2.44 bpc lands **well below the bigram floor** — it is
-genuinely modelling English from context, not just character frequencies. For a
-non-spiking point of comparison, classical LSTM/GRU character models reach
-~1.4 bpc, though that figure is from other corpora (e.g. PTB/enwik8), not a
-matched run on tiny-shakespeare — a same-harness ANN baseline is left as future
-work. Sitting above the best ANNs is the expected trade-off for an SNN.
+genuinely modelling English from context, not just character frequencies.
+
+For a non-spiking control, a **matched GRU baseline** — same corpus, same width
+(1024) and budget (16k updates), trainable with `--arch gru` — reaches
+**2.39 bpc**, only 0.06 below this SNN. But the GRU carries **~11× the
+parameters** (12.7M vs 1.18M): its dense recurrent matrices cost what the SNN
+gets for free from the parameter-less leak. So at matched width and budget the
+ANN's edge is small and the SNN is strikingly parameter-efficient. (The classical
+"~1.4 bpc" LSTM/GRU figure comes from much larger models trained far longer on
+other corpora such as PTB/enwik8.)
 
 ---
 
@@ -244,6 +268,13 @@ work. Sitting above the best ANNs is the expected trade-off for an SNN.
   spiking kernels, so the GPU is mostly waiting on kernel launches, not compute.
   Because of that, a large batch is nearly free (wall-clock barely changes) — so
   prefer a big batch and fewer optimizer updates over a small batch and many.
+- **The launch wall is beatable.** Because the cost is launch overhead, a
+  **CUDA-graph capture** of the fixed-shape inner loop replays it as a single
+  launch — the `bench` subcommand measures **~8× (hidden 1024) to ~12× (hidden
+  512)** on the forward inner-loop core. (`torch.compile` is not an option here —
+  Triton has no Windows / Python 3.14 build.) TF32 and AMP, by contrast, are *not*
+  levers: faster matmuls don't help a launch-bound net. Details in
+  [`TIER6.md`](TIER6.md).
 
 ---
 
