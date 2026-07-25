@@ -1,0 +1,20 @@
+# Character-level spiking neural network language model
+#
+# Verified on: Python 3.14, torch 2.12.1+cu130, snnTorch 1.0.0,
+#              NVIDIA RTX 5060 (8 GB), CUDA 13.
+#
+# Install PyTorch with the CUDA build that matches your driver from
+# https://pytorch.org/get-started/locally/  (the plain PyPI wheel below is
+# CPU-only). The RTX 5060 and other Blackwell (sm_120) GPUs need a CUDA 12.8+
+# build -- an older cu124-or-earlier wheel installs but has no kernels for them
+# and will fail at runtime. Example matching the verified stack above:
+#     pip install torch --index-url https://download.pytorch.org/whl/cu130
+#
+# To reproduce the verified stack exactly, pin the tested versions:
+#     torch==2.12.1+cu130   snntorch==1.0.0
+# (a CPU-only reproduction can use the plain `pip install torch` wheel.)
+#
+# Test dependencies live in requirements-dev.txt (pytest).
+
+torch>=2.2
+snntorch>=0.9

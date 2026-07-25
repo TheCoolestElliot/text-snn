@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snn-char-lm"
+version = "0.1.0"
+description = "Character-level spiking neural network language model (recurrent LIF, surrogate-gradient BPTT)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Elliot Asher Caudill" }]
+keywords = ["spiking-neural-network", "snn", "language-model", "snntorch", "pytorch"]
+dependencies = [
+    "torch>=2.2",
+    "snntorch>=0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+snn-char-lm = "snn_char_lm:main"
+
+[tool.setuptools]
+# Single-module (flat) layout: the whole project is one file at the repo root.
+py-modules = ["snn_char_lm"]
+
+[tool.pytest.ini_options]
+# Put the repo root on sys.path so `import snn_char_lm` works without install.
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

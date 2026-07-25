@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Claude Code local session state
+.claude/
+
+# Training artifacts.
+# Keep the two checkpoints the README ships and references; ignore ad-hoc
+# training outputs (the default --ckpt name, the quick-start scratch file, and
+# any other *.pt a training run produces).
+*.pt
+!demo.pt
+!shakespeare.pt
+snn_char_lm.pt
+my_shakespeare.pt

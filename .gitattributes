@@ -1,0 +1,6 @@
+# Normalize line endings: store text files as LF in the repository so the
+# Linux CI and Windows dev checkouts stay consistent.
+* text=auto eol=lf
+
+# Model checkpoints are binary: never touch line endings, never try to diff.
+*.pt binary
