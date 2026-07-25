@@ -343,3 +343,81 @@ def test_cli_learn_threshold_flag():
     args = m.build_parser().parse_args(["train", "--learn-threshold",
                                         "--threshold", "0.8"])
     assert args.learn_threshold is True and args.threshold == 0.8
+
+
+# --------------------------------------------------------------------------- #
+# Tier 6: ablation knobs + deterministic eval
+# --------------------------------------------------------------------------- #
+def _tiny_cfg(**kw):
+    base = dict(vocab_size=12, hidden=16, num_layers=2, num_steps=3, seq_len=16,
+                dropout=0.0)
+    base.update(kw)
+    return m.SNNConfig(**base)
+
+
+def test_defaults_have_no_ablations():
+    model = m.SNNCharLM(_tiny_cfg())
+    assert model.norms is None
+    assert model.cfg.input_coding == "rate"
+    assert model.cfg.beta_per_neuron is False
+
+
+def test_beta_per_neuron_param_shape():
+    model = m.SNNCharLM(_tiny_cfg(beta_per_neuron=True))
+    betas = sorted(tuple(p.shape) for n, p in model.named_parameters()
+                   if "beta" in n)
+    assert betas == [(16,), (16,)]         # one learnable [hidden] vector per layer
+
+
+def test_layernorm_ablation_builds_and_runs():
+    model = m.SNNCharLM(_tiny_cfg(layernorm=True)).eval()
+    assert model.norms is not None and len(model.norms) == 2
+    logits = model(torch.randint(0, 12, (2, 16)))
+    assert logits.shape == (2, 16, 12) and torch.isfinite(logits).all()
+
+
+def test_graded_coding_is_deterministic():
+    # Graded coding removes the stochastic encoder, so an eval-mode forward is
+    # deterministic with no seeding at all.
+    model = m.SNNCharLM(_tiny_cfg(input_coding="graded")).eval()
+    x = torch.randint(0, 12, (2, 16))
+    with torch.no_grad():
+        assert torch.equal(model(x), model(x))
+
+
+def test_ablation_checkpoint_roundtrip(tmp_path):
+    ds = m.CharDataset("hello world. the quick brown fox. " * 20, seq_len=16)
+    cfg = m.SNNConfig(vocab_size=ds.vocab_size, hidden=16, num_layers=2,
+                      num_steps=3, seq_len=16, dropout=0.0, beta_per_neuron=True,
+                      layernorm=True, input_coding="graded")
+    model = m.SNNCharLM(cfg).eval()
+    x, _ = ds.get_batch(2, CPU)
+    with torch.no_grad():
+        before = model(x)
+    p = str(tmp_path / "abl.pt")
+    m._save_checkpoint(p, model, cfg, ds)
+    model2, _ = m._load_checkpoint(p, CPU)     # cfg incl. ablation fields round-trips
+    model2.eval()
+    with torch.no_grad():
+        after = model2(x)
+    assert torch.equal(before, after)
+    assert model2.cfg.beta_per_neuron and model2.cfg.layernorm
+    assert model2.cfg.input_coding == "graded"
+
+
+def test_deterministic_eval_is_seed_invariant():
+    ds = m.CharDataset("abcdefghij " * 200, seq_len=12, val_split=0.3)
+    cfg = m.SNNConfig(vocab_size=ds.vocab_size, hidden=16, num_layers=2,
+                      num_steps=3, seq_len=12, dropout=0.0)
+    model = m.SNNCharLM(cfg).eval()
+    torch.manual_seed(1)
+    a = m.evaluate(model, ds, "val", 8, 5, CPU, deterministic=True)
+    torch.manual_seed(999)
+    b = m.evaluate(model, ds, "val", 8, 5, CPU, deterministic=True)
+    assert a == b                              # a true full-split number, seed-invariant
+    # The default stochastic estimate depends on the RNG (windows + encoder).
+    torch.manual_seed(1)
+    c = m.evaluate(model, ds, "val", 8, 5, CPU, deterministic=False)
+    torch.manual_seed(999)
+    e = m.evaluate(model, ds, "val", 8, 5, CPU, deterministic=False)
+    assert c != e
