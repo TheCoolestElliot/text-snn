@@ -54,6 +54,11 @@ Sample from a trained checkpoint::
 
     python snn_char_lm.py sample --ckpt shakespeare.pt --prompt "ROMEO:" --length 400
 
+Score a checkpoint's bits-per-character on a corpus (reproduce the metric)::
+
+    python snn_char_lm.py eval --ckpt shakespeare.pt --data input.txt \
+        --val-split 0.1 --split val
+
 Run a fast self-test (a short training run + a generation call)::
 
     python snn_char_lm.py smoke
@@ -63,7 +68,9 @@ from __future__ import annotations
 
 import argparse
 import collections
+import csv
 import math
+import os
 import sys
 import time
 from dataclasses import dataclass, asdict
@@ -93,8 +100,28 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def pick_device() -> torch.device:
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def pick_device(pref: str = "auto") -> torch.device:
+    """Resolve a device preference to a torch.device.
+
+    "auto" (default) uses CUDA when available, else CPU. "cpu", "cuda", or
+    "cuda:N" force a choice; if a CUDA device is requested but unavailable we warn
+    and fall back to CPU rather than crashing -- so a sample/eval command still
+    runs on a machine whose GPU is absent or busy.
+    """
+    pref = (pref or "auto").lower()
+    if pref == "auto":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Validate before handing to torch.device so a typo ("gpu", "0") raises a
+    # clean ValueError (main() formats it) rather than an opaque RuntimeError.
+    if not (pref in ("cpu", "cuda")
+            or (pref.startswith("cuda:") and pref[5:].isdigit())):
+        raise ValueError(
+            f"invalid --device '{pref}'; expected auto | cpu | cuda | cuda:N")
+    if pref.startswith("cuda") and not torch.cuda.is_available():
+        print(f"[device] '{pref}' requested but CUDA is unavailable; using CPU",
+              file=sys.stderr)
+        return torch.device("cpu")
+    return torch.device(pref)
 
 
 # ---------------------------------------------------------------------------
@@ -134,15 +161,6 @@ class CharDataset:
 
     def __init__(self, text: str, seq_len: int, val_split: float = 0.0):
         self.seq_len = seq_len
-        # We draw windows of `seq_len + 1` chars, so the corpus must contain at
-        # least one such window. Fail loudly here rather than with a cryptic
-        # torch.randint error inside get_batch.
-        if len(text) < seq_len + 1:
-            raise ValueError(
-                f"corpus has {len(text):,} chars but --seq-len {seq_len} needs "
-                f"at least {seq_len + 1}; use a longer --data file or a smaller "
-                f"--seq-len."
-            )
         # Sorted for determinism so a saved vocab maps ids consistently. The
         # vocabulary is built from the WHOLE text (before splitting) so the model
         # never meets an unseen character at validation time.
@@ -150,27 +168,59 @@ class CharDataset:
         self.stoi = {c: i for i, c in enumerate(chars)}
         self.itos = {i: c for i, c in enumerate(chars)}
         self.vocab_size = len(chars)
-        data = torch.tensor([self.stoi[c] for c in text], dtype=torch.long)
-        self.data = data
-        # Held-out split: the LAST `val_split` fraction is validation, so we can
-        # report generalization, not just how well the model memorized training
-        # text. A contiguous tail (not random windows) keeps train/val disjoint.
-        n_val = int(len(data) * val_split)
-        if n_val and n_val < seq_len + 1:
-            n_val = 0  # too small to sample a window; skip validation silently
-        if len(data) - n_val < seq_len + 1:
-            # A big --val-split on a small corpus can starve the train split of a
-            # full window. Fail loudly (as with the length guard above) rather
-            # than crash cryptically inside get_batch.
+        self.data = torch.tensor([self.stoi[c] for c in text], dtype=torch.long)
+        self._set_splits(val_split)
+
+    @classmethod
+    def with_vocab(cls, text: str, seq_len: int, stoi: dict, itos: dict,
+                   val_split: float = 0.0) -> "CharDataset":
+        """Build a dataset over ``text`` using an EXISTING vocabulary (e.g. one
+        loaded from a checkpoint) instead of deriving a fresh one, so a saved
+        model is scored through the exact character->id mapping it trained with.
+        Characters not in ``stoi`` are dropped (the model has no input neuron for
+        them); the caller is expected to report how many. Length and val-split
+        guards match ``__init__`` (both go through ``_set_splits``).
+        """
+        ds = cls.__new__(cls)
+        ds.seq_len = seq_len
+        ds.stoi = dict(stoi)
+        ds.itos = {int(k): v for k, v in itos.items()}
+        ds.vocab_size = len(ds.stoi)
+        ds.data = torch.tensor([ds.stoi[c] for c in text if c in ds.stoi],
+                               dtype=torch.long)
+        ds._set_splits(val_split)
+        return ds
+
+    def _set_splits(self, val_split: float) -> None:
+        """Guard corpus length and carve the contiguous validation tail.
+
+        We draw windows of ``seq_len + 1`` chars, so the (post-vocab) corpus must
+        contain at least one such window -- fail loudly here rather than with a
+        cryptic torch.randint error inside get_batch. The LAST ``val_split``
+        fraction is held out for validation; a contiguous tail (not random
+        windows) keeps train and val disjoint. An ``all`` split spans everything
+        (used by the ``eval`` command).
+        """
+        n = len(self.data)
+        if n < self.seq_len + 1:
             raise ValueError(
-                f"--val-split {val_split} leaves only {len(data) - n_val:,} "
-                f"chars for training, but --seq-len {seq_len} needs at least "
-                f"{seq_len + 1}; use a smaller --val-split, a longer --data "
-                f"file, or a smaller --seq-len."
-            )
+                f"corpus has {n:,} usable chars but --seq-len {self.seq_len} "
+                f"needs at least {self.seq_len + 1}; use a longer corpus or a "
+                f"smaller --seq-len.")
+        n_val = int(n * val_split)
+        if n_val and n_val < self.seq_len + 1:
+            n_val = 0  # too small to sample a window; skip validation silently
+        if n - n_val < self.seq_len + 1:
+            # A big --val-split on a small corpus can starve the train split.
+            raise ValueError(
+                f"--val-split {val_split} leaves only {n - n_val:,} chars for "
+                f"training, but --seq-len {self.seq_len} needs at least "
+                f"{self.seq_len + 1}; use a smaller --val-split, a longer corpus, "
+                f"or a smaller --seq-len.")
         self.splits = {
-            "train": data[: len(data) - n_val],
-            "val": data[len(data) - n_val:] if n_val else data[:0],
+            "all": self.data,
+            "train": self.data[: n - n_val],
+            "val": self.data[n - n_val:] if n_val else self.data[:0],
         }
 
     def has_val(self) -> bool:
@@ -496,8 +546,12 @@ def evaluate(model: SNNCharLM, dataset: CharDataset, split: str,
 
 
 def train(args) -> None:
-    set_seed(args.seed)
-    device = pick_device()
+    resume_from = getattr(args, "resume", None)
+    # On resume we restore the checkpoint's saved RNG below; seeding here would
+    # clobber it. A fresh or warm-started run seeds normally for reproducibility.
+    if not resume_from:
+        set_seed(args.seed)
+    device = pick_device(getattr(args, "device", "auto"))
 
     text = _load_text(args.data)
     dataset = CharDataset(text, seq_len=args.seq_len, val_split=args.val_split)
@@ -506,34 +560,34 @@ def train(args) -> None:
           f"| train={len(dataset.splits['train']):,} val={n_val:,} "
           f"| device={device}")
 
-    if args.init_from:
-        # Warm start: continue training from a saved model's weights (fresh
-        # optimizer and LR schedule). The architecture comes from the checkpoint
-        # -- CLI architecture flags are ignored -- but dropout and seq_len are
-        # taken from the CLI so a continuation can adjust regularization or
-        # context length without touching the weights.
-        # weights_only=True: the checkpoint is pure data (a tensor state_dict plus
-        # plain cfg/stoi/itos dicts), so it loads under torch's safe unpickler --
-        # we never execute arbitrary pickle code just to read a shared or
-        # downloaded .pt file. (See _load_checkpoint for the same guard.)
+    resume_ckpt = None
+    if resume_from:
+        # Resume: continue a previous run -- same weights, optimizer state, update
+        # counter, best-val, and RNG (weights_only=True: safe load). The LR
+        # schedule continues exactly only when --steps/--warmup are unchanged;
+        # raising --steps to extend a finished run redefines the cosine horizon
+        # and jumps the LR (an SGDR-style warm restart -- see the resume warning).
+        resume_ckpt = torch.load(resume_from, map_location=device, weights_only=True)
+        if "opt_state" not in resume_ckpt:
+            raise ValueError(
+                f"--resume {resume_from} has no saved training state (it was not "
+                f"written with --save-state); use --init-from for a fresh-optimizer "
+                f"warm start instead.")
+        _require_matching_vocab(resume_ckpt, dataset, "--resume")
+        cfg = SNNConfig(**resume_ckpt["cfg"])
+        cfg.dropout = args.dropout
+        cfg.seq_len = args.seq_len
+        model = SNNCharLM(cfg).to(device)
+        model.load_state_dict(resume_ckpt["state_dict"])
+    elif args.init_from:
+        # Warm start: continue from saved WEIGHTS only (fresh optimizer + LR
+        # schedule). Architecture comes from the checkpoint -- CLI architecture
+        # flags are ignored -- but dropout and seq_len are taken from the CLI so a
+        # continuation can retune those. weights_only=True: safe load (pure
+        # tensors + dicts; never executes pickle code from a shared .pt).
         ckpt = torch.load(args.init_from, map_location=device, weights_only=True)
+        _require_matching_vocab(ckpt, dataset, "--init-from")
         cfg = SNNConfig(**ckpt["cfg"])
-        if cfg.vocab_size != dataset.vocab_size:
-            raise ValueError(
-                f"--init-from checkpoint has vocab_size={cfg.vocab_size} but the "
-                f"corpus gives {dataset.vocab_size}; use the same --data file.")
-        # Same vocab SIZE is not enough: the weights are indexed by character id,
-        # so a different character->id mapping (same count, different set/order)
-        # would silently scramble fc_in[0] and the readout. Enforce the mapping.
-        ckpt_stoi = ckpt.get("stoi")
-        if ckpt_stoi is not None and ckpt_stoi != dataset.stoi:
-            n_diff = sum(1 for c in set(ckpt_stoi) | set(dataset.stoi)
-                         if ckpt_stoi.get(c) != dataset.stoi.get(c))
-            raise ValueError(
-                f"--init-from checkpoint's character->id mapping differs from the "
-                f"current corpus in {n_diff} symbol(s) (same vocab size, different "
-                f"characters/order); the warm-started weights would be indexed by "
-                f"mismatched ids. Use the same --data file.")
         cfg.dropout = args.dropout
         cfg.seq_len = args.seq_len
         model = SNNCharLM(cfg).to(device)
@@ -547,9 +601,11 @@ def train(args) -> None:
             num_layers=args.layers,
             num_steps=args.num_steps,
             beta=args.beta,
+            threshold=args.threshold,
             rate_gain=args.rate_gain,
             surrogate=args.surrogate,
             learn_beta=args.learn_beta,
+            learn_threshold=args.learn_threshold,
             dropout=args.dropout,
             seq_len=args.seq_len,
         )
@@ -557,6 +613,14 @@ def train(args) -> None:
     n_params = sum(p.numel() for p in model.parameters())
     print(f"[model] {n_params/1e6:.2f}M params | hidden={cfg.hidden} "
           f"layers={cfg.num_layers} T={cfg.num_steps} beta={cfg.beta}")
+    # Resolved-config echo: make every run's stdout fully record what produced it
+    # (lr, weight-decay, warmup, dropout, grad-clip, seed, surrogate, ...). cfg
+    # holds the EFFECTIVE architecture -- which on --resume/--init-from comes from
+    # the checkpoint, not the CLI arch flags -- so overlay it on the run args.
+    echo = {k: v for k, v in vars(args).items() if k != "func"}
+    echo.update(asdict(cfg))
+    echo["layers"] = cfg.num_layers   # arg dest is 'layers'; cfg field is 'num_layers'
+    print(f"[config] {echo}")
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr,
                             weight_decay=args.weight_decay)
@@ -565,117 +629,259 @@ def train(args) -> None:
     # settle before cosine-decaying to a fine polish.
     def lr_at(update: int) -> float:
         if update < args.warmup:
-            return args.lr * (update + 1) / args.warmup
+            return args.lr * (update + 1) / max(1, args.warmup)
         prog = (update - args.warmup) / max(1, args.steps - args.warmup)
         return args.lr * 0.5 * (1 + math.cos(math.pi * min(prog, 1.0)))
+
+    start_update = 0
+    best_val = float("inf")
+    if resume_from:
+        opt.load_state_dict(resume_ckpt["opt_state"])
+        # load_state_dict restored the checkpoint's param-group hyperparameters;
+        # re-apply the CLI weight decay so --weight-decay is honored on resume
+        # (consistent with --lr, which lr_at re-sets every step).
+        for g in opt.param_groups:
+            g["weight_decay"] = args.weight_decay
+        start_update = int(resume_ckpt.get("update", 0))
+        best_val = float(resume_ckpt.get("best_val", float("inf")))
+        _restore_rng(resume_ckpt)
+        shown_best = f"{best_val:.3f}" if best_val != float("inf") else "n/a"
+        print(f"[resume] from {resume_from} at update {start_update}/{args.steps} "
+              f"| best val bpc {shown_best}")
+        saved_steps = resume_ckpt.get("steps")
+        saved_warmup = resume_ckpt.get("warmup")
+        if saved_steps is not None and (saved_steps != args.steps
+                                        or saved_warmup != args.warmup):
+            print(f"[resume] WARNING: LR-schedule horizon changed (steps "
+                  f"{saved_steps}->{args.steps}, warmup {saved_warmup}->{args.warmup}); "
+                  f"the cosine curve is reshaped and the LR jumps at this boundary "
+                  f"(SGDR-style warm restart), so this run won't match the original "
+                  f"tail or an uninterrupted run of the new length.", file=sys.stderr)
+        if start_update >= args.steps:
+            print(f"[resume] already at/over --steps {args.steps}; raise --steps "
+                  f"to train further.")
 
     chunk = args.tbptt_chunk
     print(f"[train] truncated BPTT: window={args.seq_len} chunk={chunk} "
           f"-> backprop depth = chunk*T = {chunk * cfg.num_steps} spiking steps")
 
+    csv_writer, csv_file = _open_metrics_csv(getattr(args, "log_csv", None))
     do_val = dataset.has_val()
-    best_val = float("inf")
     model.train()
     running = 0.0
     n_since_log = 0
     t0 = time.time()
-    update = 0
-    while update < args.steps:
-        # A fresh random window of the corpus. The membrane is reset to zero at
-        # the window start; within the window it persists across chunks.
-        x, y = dataset.get_batch(args.batch_size, device)              # (B, L)
-        # DESIGN: truncated backpropagation through time (TBPTT).
-        # We walk the window in chunks of `chunk` characters. The membrane state
-        # is carried from one chunk to the next -- so the network still integrates
-        # context across the whole window -- but it is DETACHED at each boundary,
-        # so backprop only unrolls chunk*num_steps spiking steps instead of
-        # seq_len*num_steps. That bounds both memory and the length of the
-        # gradient path, letting --seq-len be long without blowing up either.
-        mems = model.init_state(args.batch_size, device)
-        for c0 in range(0, x.size(1), chunk):
-            if update >= args.steps:
-                break
-            mems = [m.detach() for m in mems]                          # cut the graph
-            for g in opt.param_groups:
-                g["lr"] = lr_at(update)
-            xc, yc = x[:, c0:c0 + chunk], y[:, c0:c0 + chunk]
-            logits, mems = model.forward_seq(xc, mems)                 # (B, chunk, V)
-            loss = F.cross_entropy(
-                logits.reshape(-1, cfg.vocab_size), yc.reshape(-1))
-            opt.zero_grad(set_to_none=True)
-            loss.backward()
-            # DESIGN: gradient clipping -- standard insurance for a recurrent net.
-            # The leaky membrane is contractive so gradients stay well-behaved
-            # (norms of order 1-10), but clipping the global norm cheaply caps the
-            # occasional larger step and keeps training smooth.
-            torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
-            opt.step()
-            update += 1
+    update = start_update
+    interrupted = False
+    try:
+        while update < args.steps:
+            # A fresh random window of the corpus. The membrane is reset to zero
+            # at the window start; within the window it persists across chunks.
+            x, y = dataset.get_batch(args.batch_size, device)          # (B, L)
+            # DESIGN: truncated backpropagation through time (TBPTT).
+            # We walk the window in chunks of `chunk` characters. The membrane
+            # state is carried from one chunk to the next -- so the network still
+            # integrates context across the whole window -- but it is DETACHED at
+            # each boundary, so backprop only unrolls chunk*num_steps spiking steps
+            # instead of seq_len*num_steps. That bounds both memory and the length
+            # of the gradient path, letting --seq-len be long without blowing up.
+            mems = model.init_state(args.batch_size, device)
+            for c0 in range(0, x.size(1), chunk):
+                if update >= args.steps:
+                    break
+                mems = [m.detach() for m in mems]                      # cut the graph
+                for g in opt.param_groups:
+                    g["lr"] = lr_at(update)
+                xc, yc = x[:, c0:c0 + chunk], y[:, c0:c0 + chunk]
+                logits, mems = model.forward_seq(xc, mems)             # (B, chunk, V)
+                loss = F.cross_entropy(
+                    logits.reshape(-1, cfg.vocab_size), yc.reshape(-1))
+                opt.zero_grad(set_to_none=True)
+                loss.backward()
+                # DESIGN: gradient clipping -- standard insurance for a recurrent
+                # net. The leaky membrane is contractive so gradients stay
+                # well-behaved (norms of order 1-10), but clipping the global norm
+                # cheaply caps the occasional larger step and keeps training smooth.
+                torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
+                opt.step()
+                update += 1
 
-            running += loss.item()
-            n_since_log += 1
-            if update % args.log_every == 0:
-                avg = running / n_since_log
-                running = 0.0
-                n_since_log = 0
-                bpc = avg / math.log(2)          # bits-per-character
-                speed = args.log_every / (time.time() - t0)
-                t0 = time.time()
-                mem = (torch.cuda.max_memory_allocated() / 1e9
-                       if device.type == "cuda" else 0.0)
-                print(f"upd {update:>6} | loss {avg:6.3f} | bpc {bpc:5.3f} "
-                      f"| ppl {math.exp(avg):8.2f} | {speed:4.1f} upd/s "
-                      f"| peakGPU {mem:4.2f}GB")
+                running += loss.item()
+                n_since_log += 1
+                if update % args.log_every == 0:
+                    avg = running / n_since_log
+                    running = 0.0
+                    n_since_log = 0
+                    bpc = avg / math.log(2)          # bits-per-character
+                    speed = args.log_every / (time.time() - t0)
+                    t0 = time.time()
+                    mem = (torch.cuda.max_memory_allocated() / 1e9
+                           if device.type == "cuda" else 0.0)
+                    print(f"upd {update:>6} | loss {avg:6.3f} | bpc {bpc:5.3f} "
+                          f"| ppl {math.exp(avg):8.2f} | {speed:4.1f} upd/s "
+                          f"| peakGPU {mem:4.2f}GB")
+                    _csv_row(csv_writer, csv_file, update, "train", bpc, speed, mem)
 
-            # Held-out evaluation. We report validation bpc (generalization) and
-            # keep the checkpoint with the best val score -- the last step is not
-            # necessarily the best once the model starts to overfit.
-            if do_val and args.eval_every and update % args.eval_every == 0:
-                val_bpc = evaluate(model, dataset, "val", args.batch_size,
-                                   args.eval_batches, device)
-                tag = ""
-                if val_bpc < best_val:
-                    best_val = val_bpc
-                    _save_checkpoint(args.ckpt, model, cfg, dataset)
-                    tag = "  <- best (saved)"
-                print(f"       val bpc {val_bpc:.3f} | ppl {2**val_bpc:6.2f}{tag}")
+                # Held-out evaluation. We report validation bpc (generalization)
+                # and keep the checkpoint with the best val score -- the last step
+                # is not necessarily best once the model starts to overfit.
+                if do_val and args.eval_every and update % args.eval_every == 0:
+                    val_bpc = evaluate(model, dataset, "val", args.batch_size,
+                                       args.eval_batches, device)
+                    tag = ""
+                    if val_bpc < best_val:
+                        best_val = val_bpc
+                        _save_checkpoint(args.ckpt, model, cfg, dataset)
+                        tag = "  <- best (saved)"
+                    print(f"       val bpc {val_bpc:.3f} | ppl {2**val_bpc:6.2f}{tag}")
+                    _csv_row(csv_writer, csv_file, update, "val", val_bpc, None, None)
+                    if args.save_state:
+                        _save_state(args.save_state, model, cfg, dataset, opt,
+                                    update, best_val, args.steps, args.warmup)
 
-            if args.sample_every and update % args.sample_every == 0:
-                sample = model.generate(dataset, prompt=args.prompt or "the ",
-                                        length=200, device=device,
-                                        temperature=0.8, top_k=args.top_k)
-                print("-" * 60)
-                print(sample)
-                print("-" * 60)
-                model.train()
+                if args.sample_every and update % args.sample_every == 0:
+                    preview = model.generate(dataset, prompt=args.prompt or "the ",
+                                             length=200, device=device,
+                                             temperature=0.8, top_k=args.top_k)
+                    print("-" * 60)
+                    print(preview)
+                    print("-" * 60)
+                    model.train()
+    except KeyboardInterrupt:
+        interrupted = True
+        print("\n[interrupt] Ctrl-C caught; saving current progress before exit...",
+              file=sys.stderr)
+    finally:
+        if csv_file is not None:
+            csv_file.close()
 
-    # Always finish with a checkpoint on disk. With validation we run one final
-    # eval and keep it if it beats the running best (this also covers the case
-    # where the schedule never triggered a mid-training eval, so best_val is
-    # still +inf and nothing has been saved yet).
+    # Finalization -- runs whether we finished or were interrupted. Always leave a
+    # checkpoint on disk (with validation, keep it only if it beats the running
+    # best; this also covers a run whose schedule never triggered a mid-run eval).
     if do_val:
         final_val = evaluate(model, dataset, "val", args.batch_size,
                              args.eval_batches, device)
         if final_val < best_val:
             best_val = final_val
             _save_checkpoint(args.ckpt, model, cfg, dataset)
+        elif not os.path.exists(args.ckpt):
+            # A resumed run can inherit a best_val that no in-run eval beats, so
+            # nothing was saved this run. Never leave --ckpt missing (or claim in
+            # the line below a file we didn't write) -- but don't clobber a better
+            # existing checkpoint at that path.
+            _save_checkpoint(args.ckpt, model, cfg, dataset)
         print(f"[done] best val bpc {best_val:.3f} | checkpoint -> {args.ckpt}")
     else:
         _save_checkpoint(args.ckpt, model, cfg, dataset)
         print(f"[done] saved checkpoint -> {args.ckpt}")
+    if args.save_state:
+        _save_state(args.save_state, model, cfg, dataset, opt, update, best_val,
+                    args.steps, args.warmup)
+        print(f"[state] resumable state ({update} updates) -> {args.save_state}")
+    if interrupted:
+        sys.exit(130)
 
 
 # ---------------------------------------------------------------------------
 # 4. Checkpoint I/O
 # ---------------------------------------------------------------------------
 def _save_checkpoint(path: str, model: SNNCharLM, cfg: SNNConfig,
-                     dataset: CharDataset) -> None:
-    torch.save({
+                     dataset: CharDataset, extra: Optional[dict] = None) -> None:
+    payload = {
+        "format_version": 1,          # so future schema changes can be detected
         "state_dict": model.state_dict(),
         "cfg": asdict(cfg),
         "stoi": dataset.stoi,
         "itos": dataset.itos,
-    }, path)
+    }
+    if extra:                          # optional resumable training state
+        payload.update(extra)
+    torch.save(payload, path)
+
+
+def _require_matching_vocab(ckpt: dict, dataset: CharDataset, flag: str) -> None:
+    """Raise unless a loaded checkpoint's vocabulary matches the current corpus.
+
+    The weights are indexed by character id, so both the vocab SIZE and the exact
+    character->id mapping must agree -- otherwise fc_in[0] and the readout would
+    be silently indexed by mismatched ids. Used by both --init-from and --resume.
+    """
+    ckpt_vocab = ckpt["cfg"]["vocab_size"]
+    if ckpt_vocab != dataset.vocab_size:
+        raise ValueError(
+            f"{flag} checkpoint has vocab_size={ckpt_vocab} but the corpus gives "
+            f"{dataset.vocab_size}; use the same --data file.")
+    ckpt_stoi = ckpt.get("stoi")
+    if ckpt_stoi is not None and ckpt_stoi != dataset.stoi:
+        n_diff = sum(1 for c in set(ckpt_stoi) | set(dataset.stoi)
+                     if ckpt_stoi.get(c) != dataset.stoi.get(c))
+        raise ValueError(
+            f"{flag} checkpoint's character->id mapping differs from the current "
+            f"corpus in {n_diff} symbol(s) (same vocab size, different characters "
+            f"or order); the weights would be indexed by mismatched ids. Use the "
+            f"same --data file.")
+
+
+def _save_state(path: str, model: SNNCharLM, cfg: SNNConfig, dataset: CharDataset,
+                opt: torch.optim.Optimizer, update: int, best_val: float,
+                steps: int, warmup: int) -> None:
+    """Write a FULL resumable training state: model + optimizer + progress + RNG.
+
+    Larger than a plain checkpoint (Adam's moments roughly double the size), so it
+    is written only when --save-state is given -- kept separate from the lean
+    best-val --ckpt deliverable that users sample from. The LR-schedule horizon
+    (steps, warmup) is recorded so --resume can warn if it is changed.
+    """
+    extra = {
+        "opt_state": opt.state_dict(),
+        "update": update,
+        "best_val": best_val,
+        "steps": steps,
+        "warmup": warmup,
+        "rng_state": torch.get_rng_state(),
+    }
+    if torch.cuda.is_available():
+        extra["cuda_rng_state"] = torch.cuda.get_rng_state_all()
+    _save_checkpoint(path, model, cfg, dataset, extra=extra)
+
+
+def _restore_rng(ckpt: dict) -> None:
+    """Restore CPU (and CUDA) RNG state saved by _save_state, so a resumed run
+    continues the same random stream. RNG state must live on the CPU as a
+    uint8 ByteTensor even though map_location may have moved it to the GPU.
+    """
+    rng = ckpt.get("rng_state")
+    if rng is not None:
+        torch.set_rng_state(rng.cpu() if torch.is_tensor(rng) else rng)
+    cuda_rng = ckpt.get("cuda_rng_state")
+    if cuda_rng is not None and torch.cuda.is_available():
+        torch.cuda.set_rng_state_all([s.cpu() for s in cuda_rng])
+
+
+def _open_metrics_csv(path: Optional[str]):
+    """Open a metrics CSV and write its header; return (writer, file), or
+    (None, None) when no --log-csv path was given. Rows are appended by _csv_row.
+    """
+    if not path:
+        return None, None
+    # Append mode so a --resume run extends the same curve; write the header only
+    # when the file is new/empty (in append mode tell() reports the file size).
+    f = open(path, "a", newline="", encoding="utf-8")
+    writer = csv.writer(f)
+    if f.tell() == 0:
+        writer.writerow(["update", "split", "bpc", "ppl", "upd_per_s", "peak_gpu_gb"])
+    return writer, f
+
+
+def _csv_row(writer, file, update: int, split: str, bpc: float,
+             speed: Optional[float], mem: Optional[float]) -> None:
+    """Append one long-format metrics row (no-op if CSV logging is off)."""
+    if writer is None:
+        return
+    writer.writerow([update, split, f"{bpc:.5f}", f"{2 ** bpc:.4f}",
+                     "" if speed is None else f"{speed:.3f}",
+                     "" if mem is None else f"{mem:.4f}"])
+    file.flush()
 
 
 def _load_checkpoint(path: str, device: torch.device
@@ -700,13 +906,78 @@ def _load_checkpoint(path: str, device: torch.device
 # ---------------------------------------------------------------------------
 # 5. Sampling entry point
 # ---------------------------------------------------------------------------
+def _warn_dropped_prompt_chars(dataset: CharDataset, prompt: str) -> None:
+    """Warn on stderr if prompt characters are not in the checkpoint's vocab.
+
+    encode() silently drops unknown characters, so "HELLO" against a lowercase
+    vocab would quietly condition on fewer chars than typed -- surface it.
+    """
+    if not prompt:
+        return
+    dropped = [c for c in prompt if c not in dataset.stoi]
+    if not dropped:
+        return
+    shown = " ".join(repr(c) for c in sorted(set(dropped)))
+    if len(dropped) == len(prompt):
+        print(f"warning: none of the {len(prompt)} prompt char(s) are in this "
+              f"checkpoint's vocab ({shown}); generating from an empty seed",
+              file=sys.stderr)
+    else:
+        print(f"warning: {len(dropped)} of {len(prompt)} prompt char(s) not in "
+              f"vocab, ignored: {shown}", file=sys.stderr)
+
+
 def sample(args) -> None:
-    device = pick_device()
+    # Sampling is stochastic (the rate encoder and the multinomial draw); seed
+    # only when asked, so the default stays fresh-each-run but a run is exactly
+    # reproducible on demand.
+    if args.seed is not None:
+        set_seed(args.seed)
+    device = pick_device(getattr(args, "device", "auto"))
     model, ds = _load_checkpoint(args.ckpt, device)
+    _warn_dropped_prompt_chars(ds, args.prompt)
     text = model.generate(ds, prompt=args.prompt, length=args.length,
                           device=device, temperature=args.temperature,
                           top_k=args.top_k)
     print(text)
+
+
+def eval_cmd(args) -> None:
+    """Score a saved checkpoint's bits-per-character on a corpus.
+
+    Reproduces / re-measures the headline metric without editing source. The
+    corpus is mapped through the CHECKPOINT's vocabulary (the mapping the model
+    trained with), and any characters outside that vocab are dropped with a
+    warning. A fixed --seed makes the (random-window, stochastic-encoder) estimate
+    repeatable; raise --eval-batches for a tighter number.
+    """
+    if args.seed is not None:
+        set_seed(args.seed)
+    device = pick_device(getattr(args, "device", "auto"))
+    model, meta = _load_checkpoint(args.ckpt, device)
+    text = _load_text(args.data)
+    oov = sorted({c for c in text if c not in meta.stoi})
+    if oov:
+        n_oov = sum(1 for c in text if c not in meta.stoi)
+        shown = " ".join(repr(c) for c in oov[:20]) + (" ..." if len(oov) > 20 else "")
+        print(f"warning: {n_oov:,} char(s) in the corpus ({len(oov)} distinct) are "
+              f"not in the checkpoint vocab and were dropped: {shown}",
+              file=sys.stderr)
+    seq_len = args.seq_len if args.seq_len is not None else meta.seq_len
+    # --val-split only matters for scoring train|val; ignore it for 'all' so a
+    # large val_split can't trip the (irrelevant) train-length guard in _set_splits.
+    val_split = args.val_split if args.split in ("train", "val") else 0.0
+    ds = CharDataset.with_vocab(text, seq_len=seq_len, stoi=meta.stoi,
+                                itos=meta.itos, val_split=val_split)
+    if args.split == "val" and not ds.has_val():
+        raise ValueError("--split val but the corpus and --val-split yield no "
+                         "validation window; use --split all or increase "
+                         "--val-split / the corpus size.")
+    bpc = evaluate(model, ds, args.split, args.batch_size, args.eval_batches, device)
+    where = args.data if args.data else "built-in demo corpus"
+    print(f"[eval] {args.ckpt} on {where} | split={args.split} seq_len={seq_len} "
+          f"| {args.eval_batches} x {args.batch_size} windows "
+          f"| bpc {bpc:.4f} | ppl {2 ** bpc:.2f}")
 
 
 # ---------------------------------------------------------------------------
@@ -759,7 +1030,7 @@ def smoke(args) -> None:
     run a shrunk, fast variant; defaults reproduce the historical self-test.
     """
     set_seed(0)
-    device = pick_device()
+    device = pick_device(getattr(args, "device", "auto"))
     updates = getattr(args, "updates", 400)
     hidden = getattr(args, "hidden", 256)
     batch = getattr(args, "batch_size", 64)
@@ -839,9 +1110,14 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--data", type=str, default=None,
                    help="path to a UTF-8 text file (default: built-in demo)")
     t.add_argument("--ckpt", type=str, default="snn_char_lm.pt")
-    t.add_argument("--init-from", dest="init_from", type=str, default=None,
-                   help="warm-start weights from this checkpoint (architecture "
-                        "is taken from it; fresh optimizer + LR schedule)")
+    warm = t.add_mutually_exclusive_group()
+    warm.add_argument("--init-from", dest="init_from", type=str, default=None,
+                      help="warm-start WEIGHTS from this checkpoint (architecture "
+                           "is taken from it; fresh optimizer + LR schedule)")
+    warm.add_argument("--resume", type=str, default=None,
+                      help="resume a run from a --save-state file: restores "
+                           "weights, optimizer, step, best-val and RNG, then "
+                           "continues toward --steps")
     t.add_argument("--steps", type=_positive_int, default=3000,
                    help="number of optimizer updates (one per TBPTT chunk)")
     t.add_argument("--val-split", dest="val_split", type=float, default=0.1,
@@ -868,7 +1144,13 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--rate-gain", dest="rate_gain", type=float, default=0.9)
     t.add_argument("--surrogate", type=str, default="atan",
                    choices=["atan", "fast_sigmoid", "sigmoid"])
-    t.add_argument("--learn-beta", dest="learn_beta", action="store_true")
+    t.add_argument("--learn-beta", dest="learn_beta", action="store_true",
+                   help="make the membrane time-constant beta trainable")
+    t.add_argument("--threshold", type=float, default=1.0,
+                   help="LIF firing threshold")
+    t.add_argument("--learn-threshold", dest="learn_threshold",
+                   action="store_true",
+                   help="make the firing threshold trainable")
     t.add_argument("--dropout", type=float, default=0.1)
     t.add_argument("--lr", type=float, default=3e-3)
     t.add_argument("--weight-decay", dest="weight_decay", type=float, default=1e-4)
@@ -879,6 +1161,15 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--prompt", type=str, default="the ")
     t.add_argument("--top-k", dest="top_k", type=int, default=None)
     t.add_argument("--seed", type=int, default=1337)
+    t.add_argument("--device", type=str, default="auto",
+                   help="auto | cpu | cuda | cuda:N")
+    t.add_argument("--save-state", dest="save_state", type=str, default=None,
+                   help="also write a full resumable training state "
+                        "(model+optimizer+RNG) here, refreshed each eval and at "
+                        "exit; load it with --resume")
+    t.add_argument("--log-csv", dest="log_csv", type=str, default=None,
+                   help="append metrics (update,split,bpc,ppl,upd/s,peakGPU) to "
+                        "this CSV for plotting the training curves")
     t.set_defaults(func=train)
 
     # -- sample --
@@ -888,7 +1179,37 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--length", type=_positive_int, default=400)
     s.add_argument("--temperature", type=float, default=0.8)
     s.add_argument("--top-k", dest="top_k", type=int, default=None)
+    s.add_argument("--seed", type=int, default=None,
+                   help="seed RNGs for reproducible generation (default: fresh "
+                        "output each run)")
+    s.add_argument("--device", type=str, default="auto",
+                   help="auto | cpu | cuda | cuda:N")
     s.set_defaults(func=sample)
+
+    # -- eval --
+    e = sub.add_parser("eval",
+                       help="score a checkpoint's bits-per-character on a corpus")
+    e.add_argument("--ckpt", type=str, default="snn_char_lm.pt")
+    e.add_argument("--data", type=str, default=None,
+                   help="UTF-8 text file to score on (default: built-in demo)")
+    e.add_argument("--split", type=str, default="all",
+                   choices=["all", "train", "val"],
+                   help="which split to score; train|val need --val-split > 0")
+    e.add_argument("--val-split", dest="val_split", type=float, default=0.0,
+                   help="held-out tail fraction (only for --split train|val)")
+    e.add_argument("--seq-len", dest="seq_len", type=_positive_int, default=None,
+                   help="window length (default: the checkpoint's training seq_len)")
+    e.add_argument("--batch-size", dest="batch_size", type=_positive_int,
+                   default=128)
+    e.add_argument("--eval-batches", dest="eval_batches", type=_positive_int,
+                   default=50,
+                   help="random windows averaged; more = tighter estimate")
+    e.add_argument("--seed", type=int, default=1337,
+                   help="seed so the (random-window, stochastic-encoder) number "
+                        "repeats; pass a different value to resample")
+    e.add_argument("--device", type=str, default="auto",
+                   help="auto | cpu | cuda | cuda:N")
+    e.set_defaults(func=eval_cmd)
 
     # -- smoke --
     sm = sub.add_parser("smoke", help="fast self-test")
@@ -901,6 +1222,8 @@ def build_parser() -> argparse.ArgumentParser:
     sm.add_argument("--num-steps", dest="num_steps", type=_positive_int,
                     default=5)
     sm.add_argument("--chunk", type=_positive_int, default=16)
+    sm.add_argument("--device", type=str, default="auto",
+                    help="auto | cpu | cuda | cuda:N")
     sm.set_defaults(func=smoke)
 
     return p
@@ -908,7 +1231,22 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    args.func(args)
+    # Turn the common, expected misuse into a clean one-line message instead of a
+    # raw traceback. train() handles its own Ctrl-C (to save); the KeyboardInterrupt
+    # catch here covers sample/eval. SystemExit (e.g. train's exit(130)) passes
+    # through untouched.
+    try:
+        args.func(args)
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except FileNotFoundError as e:
+        sys.exit(f"error: file not found: {e.filename or e}")
+    except IsADirectoryError as e:
+        sys.exit(f"error: expected a file but got a directory: {e.filename or e}")
+    except UnicodeDecodeError:
+        sys.exit("error: --data file is not valid UTF-8; re-save it as UTF-8.")
+    except ValueError as e:
+        sys.exit(f"error: {e}")
 
 
 if __name__ == "__main__":
