@@ -265,10 +265,30 @@ work. Sitting above the best ANNs is the expected trade-off for an SNN.
 | `--layers` | 2 | stacked `snn.Leaky` layers |
 | `--num-steps` | 5 | SNN micro-steps per character (`T`) |
 | `--beta` | 0.9 | membrane leak |
+| `--threshold` | 1.0 | LIF firing threshold |
 | `--surrogate` | atan | `atan` \| `fast_sigmoid` \| `sigmoid` |
 | `--lr` | 3e-3 | AdamW peak LR (warmup + cosine decay) |
+| `--device` | auto | `auto` \| `cpu` \| `cuda` \| `cuda:N` |
+| `--learn-beta` / `--learn-threshold` | off | make `beta` / the threshold trainable |
+| `--save-state <f>` | — | also write a full **resumable** state (model+optimizer+RNG), refreshed each eval and at exit |
+| `--resume <f>` | — | resume a run from a `--save-state` file (restores optimizer/step/RNG; continues toward `--steps`) |
+| `--init-from <f>` | — | warm-start **weights** only (fresh optimizer + schedule) |
+| `--log-csv <f>` | — | append `update,split,bpc,ppl,upd/s,peakGPU` rows for plotting |
 
-`sample --ckpt <file> --prompt "..." --length N [--temperature 0.8] [--top-k K]`
+Training saves the best-validation checkpoint to `--ckpt`; **Ctrl-C** saves current
+progress before exiting. `--resume` and `--init-from` are mutually exclusive.
+
+`sample --ckpt <file> --prompt "..." --length N [--temperature 0.8] [--top-k K] [--seed S] [--device D]`
+— generation is stochastic; pass `--seed` to reproduce an exact sample.
+
+`eval --ckpt <file> [--data <file>] [--split all|train|val] [--val-split F] [--eval-batches N] [--seed S]`
+— score a checkpoint's bits-per-character on a corpus (mapped through the
+checkpoint's vocab). Reproduce the headline number with:
+
+```bash
+python snn_char_lm.py eval --ckpt shakespeare.pt --data input.txt \
+    --val-split 0.1 --split val        # -> bpc ~2.44
+```
 
 `smoke` — fast self-test; exits non-zero if the model fails to learn.
 

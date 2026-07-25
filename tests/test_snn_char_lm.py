@@ -195,3 +195,151 @@ def test_corpus_bpc_floors_match_readme():
     # These are the values quoted in README.md; keep them in lock-step.
     assert round(uni, 2) == 4.78
     assert round(big, 2) == 3.54
+
+
+# --------------------------------------------------------------------------- #
+# Tier 5: device, eval, with_vocab, resume state, CSV logging
+# --------------------------------------------------------------------------- #
+def test_pick_device_cpu_and_auto():
+    assert m.pick_device("cpu").type == "cpu"
+    assert m.pick_device("auto").type in ("cpu", "cuda")
+
+
+def test_pick_device_cuda_unavailable_falls_back(monkeypatch, capsys):
+    monkeypatch.setattr(m.torch.cuda, "is_available", lambda: False)
+    assert m.pick_device("cuda").type == "cpu"
+    assert "CUDA is unavailable" in capsys.readouterr().err
+
+
+def test_pick_device_invalid_raises():
+    # A typo of the new --device flag must raise a clean ValueError (main()
+    # formats it) rather than an opaque RuntimeError from torch.device.
+    for bad in ("gpu", "0", "foo", "cuda:x"):
+        with pytest.raises(ValueError):
+            m.pick_device(bad)
+
+
+def test_with_vocab_uses_given_vocab_and_drops_oov():
+    base = m.CharDataset("abcdef " * 50, seq_len=8, val_split=0.0)
+    ds = m.CharDataset.with_vocab("abcZabc def " * 20, seq_len=8,
+                                  stoi=base.stoi, itos=base.itos)
+    assert ds.stoi == base.stoi          # vocab preserved, not re-derived
+    assert "Z" not in ds.stoi            # the OOV 'Z' has no id
+    assert int(ds.data.max()) < ds.vocab_size
+    assert "all" in ds.splits and len(ds.splits["all"]) == len(ds.data)
+
+
+def test_all_split_spans_everything():
+    ds = m.CharDataset("abc " * 100, seq_len=8, val_split=0.1)
+    assert len(ds.splits["all"]) == len(ds.data)
+
+
+def test_require_matching_vocab():
+    ds = m.CharDataset("abcdef " * 50, seq_len=8)
+    m._require_matching_vocab(
+        {"cfg": {"vocab_size": ds.vocab_size}, "stoi": ds.stoi}, ds, "--init-from")
+    with pytest.raises(ValueError):
+        m._require_matching_vocab(
+            {"cfg": {"vocab_size": ds.vocab_size + 1}, "stoi": ds.stoi}, ds, "x")
+    scrambled = dict(ds.stoi)
+    k = list(scrambled)
+    scrambled[k[0]], scrambled[k[1]] = scrambled[k[1]], scrambled[k[0]]
+    with pytest.raises(ValueError):
+        m._require_matching_vocab(
+            {"cfg": {"vocab_size": ds.vocab_size}, "stoi": scrambled}, ds, "x")
+
+
+def test_save_state_roundtrip(tmp_path):
+    ds, cfg, model = _deterministic_model()
+    opt = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    x, y = ds.get_batch(2, CPU)
+    logits, _ = model.forward_seq(x, None)
+    loss = torch.nn.functional.cross_entropy(
+        logits.reshape(-1, cfg.vocab_size), y.reshape(-1))
+    loss.backward()
+    opt.step()                                       # give the optimizer state
+    path = str(tmp_path / "s.state")
+    m._save_state(path, model, cfg, ds, opt, update=7, best_val=1.23,
+                  steps=3000, warmup=100)
+
+    ck = torch.load(path, map_location="cpu", weights_only=True)   # safe load
+    assert ck["format_version"] == 1
+    assert ck["update"] == 7 and abs(ck["best_val"] - 1.23) < 1e-9
+    assert ck["steps"] == 3000 and ck["warmup"] == 100
+    assert "opt_state" in ck
+    m._restore_rng(ck)                               # must not raise
+    opt2 = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    opt2.load_state_dict(ck["opt_state"])            # reloadable into a fresh opt
+
+
+def test_eval_cmd_scores_checkpoint(tmp_path, capsys):
+    ds, cfg, model = _deterministic_model(seq_len=16)
+    ckpt = str(tmp_path / "e.pt")
+    m._save_checkpoint(ckpt, model, cfg, ds)
+    corpus = "hello world. the quick brown fox jumps. " * 20
+    data = str(tmp_path / "c.txt")
+    with open(data, "w", encoding="utf-8") as f:
+        f.write(corpus)
+    args = argparse.Namespace(ckpt=ckpt, data=data, split="all", val_split=0.0,
+                              seq_len=16, batch_size=8, eval_batches=2,
+                              seed=0, device="cpu")
+    m.eval_cmd(args)
+    out = capsys.readouterr().out
+    assert "[eval]" in out and "bpc" in out
+
+
+def test_eval_split_all_ignores_val_split(tmp_path, capsys):
+    # A large --val-split must NOT abort `--split all` (val_split is irrelevant
+    # there); scoring 'all' uses the whole corpus regardless.
+    ds, cfg, model = _deterministic_model(seq_len=16)
+    ckpt = str(tmp_path / "e.pt")
+    m._save_checkpoint(ckpt, model, cfg, ds)
+    corpus = "hello world. the quick brown fox jumps. " * 20
+    data = str(tmp_path / "c.txt")
+    with open(data, "w", encoding="utf-8") as f:
+        f.write(corpus)
+    args = argparse.Namespace(ckpt=ckpt, data=data, split="all", val_split=0.99,
+                              seq_len=16, batch_size=8, eval_batches=2,
+                              seed=0, device="cpu")
+    m.eval_cmd(args)                                  # must not raise
+    assert "[eval]" in capsys.readouterr().out
+
+
+def test_warn_dropped_prompt_chars(capsys):
+    ds = m.CharDataset("abcdef " * 50, seq_len=8)
+    m._warn_dropped_prompt_chars(ds, "abc")          # all in vocab -> silent
+    assert capsys.readouterr().err == ""
+    m._warn_dropped_prompt_chars(ds, "abZ")          # partial
+    assert "not in vocab" in capsys.readouterr().err
+    m._warn_dropped_prompt_chars(ds, "ZZZ")          # none in vocab
+    assert "none of the" in capsys.readouterr().err
+
+
+def test_metrics_csv_single_header_on_reopen(tmp_path):
+    p = str(tmp_path / "m.csv")
+    w, f = m._open_metrics_csv(p)
+    m._csv_row(w, f, 1, "train", 2.0, 3.0, 0.1)
+    f.close()
+    w2, f2 = m._open_metrics_csv(p)                  # resume: append, no re-header
+    m._csv_row(w2, f2, 2, "val", 1.5, None, None)
+    f2.close()
+    lines = open(p, encoding="utf-8").read().strip().splitlines()
+    assert sum(1 for ln in lines if ln.startswith("update,split")) == 1
+    assert len(lines) == 3                           # header + 2 rows
+
+
+def test_cli_eval_parses():
+    args = m.build_parser().parse_args(["eval", "--ckpt", "x.pt", "--split", "val"])
+    assert args.func is m.eval_cmd and args.split == "val"
+
+
+def test_cli_resume_and_init_from_mutually_exclusive():
+    with pytest.raises(SystemExit):
+        m.build_parser().parse_args(
+            ["train", "--init-from", "a.pt", "--resume", "b.pt"])
+
+
+def test_cli_learn_threshold_flag():
+    args = m.build_parser().parse_args(["train", "--learn-threshold",
+                                        "--threshold", "0.8"])
+    assert args.learn_threshold is True and args.threshold == 0.8
