@@ -267,6 +267,10 @@ class SNNConfig:
     learn_threshold: bool = False
     dropout: float = 0.1         # dropout on inter-layer spike currents (regularization)
     seq_len: int = 128           # characters per training window (context length)
+    # -- Tier 6 ablation knobs (all off by default; the shipped model uses none) --
+    beta_per_neuron: bool = False  # learn a per-neuron [hidden] beta vector, not one scalar
+    layernorm: bool = False        # LayerNorm the inter-layer input currents
+    input_coding: str = "rate"     # "rate" (stochastic spikes) | "graded" (deterministic current)
 
 
 def _make_surrogate(name: str):
@@ -334,15 +338,23 @@ class SNNCharLM(nn.Module):
         # Leaky integrate-and-fire cells. Their membrane state, threaded across
         # the sequence, is the recurrent memory.
         self.lifs = nn.ModuleList()
+        # ABLATION: per-neuron learnable beta. snnTorch accepts a [hidden] beta
+        # vector; with learn_beta each neuron gets its own membrane decay, and the
+        # forward pass clamps it to [0, 1] so it stays in the contractive regime.
+        learn_beta_arg = cfg.learn_beta or cfg.beta_per_neuron
         for l in range(cfg.num_layers):
             in_dim = cfg.vocab_size if l == 0 else cfg.hidden
             self.fc_in.append(nn.Linear(in_dim, cfg.hidden))
+            # Fresh beta tensor per layer so learnable per-neuron betas don't share
+            # a Parameter across layers.
+            beta_arg = (torch.full((cfg.hidden,), float(cfg.beta))
+                        if cfg.beta_per_neuron else cfg.beta)
             self.lifs.append(
                 snn.Leaky(
-                    beta=cfg.beta,                 # DESIGN: membrane leak (see below)
+                    beta=beta_arg,                 # DESIGN: membrane leak (see below)
                     threshold=cfg.threshold,
                     spike_grad=spike_grad,         # surrogate gradient for dS/dU
-                    learn_beta=cfg.learn_beta,     # optionally learn the time constant
+                    learn_beta=learn_beta_arg,     # optionally learn the time constant
                     learn_threshold=cfg.learn_threshold,
                     reset_mechanism="subtract",    # DESIGN: soft reset (see below)
                     init_hidden=False,             # we manage the membrane ourselves
@@ -366,6 +378,13 @@ class SNNCharLM(nn.Module):
         # drop spikes directly (that would corrupt the binary code); dropping the
         # analog current is the SNN-friendly way to regularize.
         self.drop = nn.Dropout(cfg.dropout)
+
+        # ABLATION: LayerNorm on the per-layer input currents. Normalizing the
+        # drive into each LIF can stabilize training of deeper stacks (the README
+        # sweep found extra depth hurt). One LayerNorm per layer; off by default.
+        self.norms = (nn.ModuleList(nn.LayerNorm(cfg.hidden)
+                                    for _ in range(cfg.num_layers))
+                      if cfg.layernorm else None)
 
         # DESIGN: rate-decoding readout.
         # The final prediction is a plain Linear on the top layer's *mean firing
@@ -408,6 +427,8 @@ class SNNCharLM(nn.Module):
                 # Layer 0's afferent drive is pre-computed; deeper layers project
                 # the spikes of the layer below at every step.
                 current = cur if l == 0 else self.drop(self.fc_in[l](cur))
+                if self.norms is not None:
+                    current = self.norms[l](current)                 # ABLATION: normalize drive
                 # Leaky integrates the current into its carried membrane and
                 # emits a spike; the returned membrane is the recurrent state.
                 spk, mems[l] = lif(current, mems[l])
@@ -430,9 +451,15 @@ class SNNCharLM(nn.Module):
         # stochastic rate code rather than a constant. Averaging the network's
         # response over these T noisy steps is a lightweight form of ensembling.
         """
-        spike_input = spikegen.rate(char_onehot, num_steps=self.cfg.num_steps,
-                                    gain=self.cfg.rate_gain)             # (T, B, V)
-        cur0 = self.fc_in[0](spike_input)                                # (T, B, hidden)
+        if self.cfg.input_coding == "graded":
+            # ABLATION: deterministic graded coding -- inject the one-hot's
+            # projection as a constant current for all T micro-steps (no spikes).
+            base = self.fc_in[0](char_onehot)                            # (B, hidden)
+            cur0 = base.unsqueeze(0).expand(self.cfg.num_steps, -1, -1)  # (T, B, hidden)
+        else:
+            spike_input = spikegen.rate(char_onehot, num_steps=self.cfg.num_steps,
+                                        gain=self.cfg.rate_gain)         # (T, B, V)
+            cur0 = self.fc_in[0](spike_input)                            # (T, B, hidden)
         rate, mems = self._char_rate(cur0, mems)
         return self.readout(rate), mems
 
@@ -453,13 +480,19 @@ class SNNCharLM(nn.Module):
         if mems is None:
             mems = self.init_state(B, x.device)
         onehot = F.one_hot(x, self.cfg.vocab_size).float()             # (B, L, V)
-        # Encode and project the WHOLE chunk at once: one rate-coding call and
-        # one big matmul replace L per-position encodes and L*T micro-GEMMs. This
-        # is numerically identical (given the same spikes) to encoding per
-        # position -- only the sequential recurrent loop below is unavoidable.
-        spikes = spikegen.rate(onehot, num_steps=self.cfg.num_steps,
-                               gain=self.cfg.rate_gain)                 # (T, B, L, V)
-        cur0_all = self.fc_in[0](spikes)                               # (T, B, L, hidden)
+        if self.cfg.input_coding == "graded":
+            # ABLATION: deterministic graded coding -- inject the one-hot's
+            # projection as a constant current for all T micro-steps (no spikes).
+            base = self.fc_in[0](onehot)                               # (B, L, hidden)
+            cur0_all = base.unsqueeze(0).expand(self.cfg.num_steps, -1, -1, -1)
+        else:
+            # Encode and project the WHOLE chunk at once: one rate-coding call and
+            # one big matmul replace L per-position encodes and L*T micro-GEMMs.
+            # Numerically identical (given the same spikes) to encoding per
+            # position -- only the sequential recurrent loop below is unavoidable.
+            spikes = spikegen.rate(onehot, num_steps=self.cfg.num_steps,
+                                   gain=self.cfg.rate_gain)            # (T, B, L, V)
+            cur0_all = self.fc_in[0](spikes)                           # (T, B, L, hidden)
         rates = []
         for pos in range(L):
             rate, mems = self._char_rate(cur0_all[:, :, pos, :], mems)
@@ -522,24 +555,53 @@ class SNNCharLM(nn.Module):
 # ---------------------------------------------------------------------------
 @torch.no_grad()
 def evaluate(model: SNNCharLM, dataset: CharDataset, split: str,
-             batch_size: int, n_batches: int, device: torch.device) -> float:
+             batch_size: int, n_batches: int, device: torch.device,
+             deterministic: bool = False, encoder_seed: int = 1234) -> float:
     """Mean bits-per-character on held-out windows (lower is better).
 
     We run full windows with a fresh membrane and no gradient -- the same
     conditions the model trains under -- and average the per-character cross
-    entropy over several random batches. On the `val` split this measures
-    generalization, not memorization.
+    entropy. On the `val` split this measures generalization, not memorization.
+
+    The default estimate has two noise sources: which windows are drawn (random)
+    and the stochastic rate encoder. With ``deterministic=True`` (Tier 6) we
+    instead sweep a FIXED set of contiguous, non-overlapping windows tiling the
+    split, under a FIXED encoder RNG -- so the reported bpc is exactly reproducible
+    run-to-run and the best-checkpoint comparison is not made against estimator
+    noise. ``n_batches`` is ignored in that mode (the whole split is swept once).
     """
     was_training = model.training
     model.eval()
     total_nats, total_chars = 0.0, 0
-    for _ in range(n_batches):
-        x, y = dataset.get_batch(batch_size, device, split=split)
-        logits = model(x)                                              # (B, L, V)
-        loss = F.cross_entropy(logits.reshape(-1, model.cfg.vocab_size),
-                               y.reshape(-1), reduction="sum")
-        total_nats += loss.item()
-        total_chars += y.numel()
+    vocab = model.cfg.vocab_size
+    if deterministic:
+        d = dataset.splits[split]
+        L = dataset.seq_len
+        # Non-overlapping windows tiling the split; the split guard guarantees
+        # len(d) >= L + 1, so at least the window at start 0 exists.
+        starts = list(range(0, len(d) - L, L)) or [0]
+        fork_devices = [device] if device.type == "cuda" else []
+        with torch.random.fork_rng(devices=fork_devices):
+            torch.manual_seed(encoder_seed)
+            if device.type == "cuda":
+                torch.cuda.manual_seed(encoder_seed)
+            for i in range(0, len(starts), batch_size):
+                chunk = starts[i:i + batch_size]
+                x = torch.stack([d[s:s + L] for s in chunk]).to(device)
+                y = torch.stack([d[s + 1:s + 1 + L] for s in chunk]).to(device)
+                logits = model(x)
+                loss = F.cross_entropy(logits.reshape(-1, vocab),
+                                       y.reshape(-1), reduction="sum")
+                total_nats += loss.item()
+                total_chars += y.numel()
+    else:
+        for _ in range(n_batches):
+            x, y = dataset.get_batch(batch_size, device, split=split)
+            logits = model(x)                                          # (B, L, V)
+            loss = F.cross_entropy(logits.reshape(-1, vocab),
+                                   y.reshape(-1), reduction="sum")
+            total_nats += loss.item()
+            total_chars += y.numel()
     if was_training:
         model.train()
     return total_nats / total_chars / math.log(2)
@@ -608,6 +670,9 @@ def train(args) -> None:
             learn_threshold=args.learn_threshold,
             dropout=args.dropout,
             seq_len=args.seq_len,
+            beta_per_neuron=args.beta_per_neuron,
+            layernorm=args.layernorm,
+            input_coding=args.input_coding,
         )
         model = SNNCharLM(cfg).to(device)
     n_params = sum(p.numel() for p in model.parameters())
@@ -727,7 +792,8 @@ def train(args) -> None:
                 # is not necessarily best once the model starts to overfit.
                 if do_val and args.eval_every and update % args.eval_every == 0:
                     val_bpc = evaluate(model, dataset, "val", args.batch_size,
-                                       args.eval_batches, device)
+                                       args.eval_batches, device,
+                                       deterministic=args.deterministic_eval)
                     tag = ""
                     if val_bpc < best_val:
                         best_val = val_bpc
@@ -760,7 +826,8 @@ def train(args) -> None:
     # best; this also covers a run whose schedule never triggered a mid-run eval).
     if do_val:
         final_val = evaluate(model, dataset, "val", args.batch_size,
-                             args.eval_batches, device)
+                             args.eval_batches, device,
+                             deterministic=args.deterministic_eval)
         if final_val < best_val:
             best_val = final_val
             _save_checkpoint(args.ckpt, model, cfg, dataset)
@@ -973,11 +1040,14 @@ def eval_cmd(args) -> None:
         raise ValueError("--split val but the corpus and --val-split yield no "
                          "validation window; use --split all or increase "
                          "--val-split / the corpus size.")
-    bpc = evaluate(model, ds, args.split, args.batch_size, args.eval_batches, device)
+    deterministic = getattr(args, "deterministic", False)
+    bpc = evaluate(model, ds, args.split, args.batch_size, args.eval_batches,
+                   device, deterministic=deterministic)
     where = args.data if args.data else "built-in demo corpus"
+    mode = ("deterministic full-split sweep" if deterministic
+            else f"{args.eval_batches} x {args.batch_size} random windows")
     print(f"[eval] {args.ckpt} on {where} | split={args.split} seq_len={seq_len} "
-          f"| {args.eval_batches} x {args.batch_size} windows "
-          f"| bpc {bpc:.4f} | ppl {2 ** bpc:.2f}")
+          f"| {mode} | bpc {bpc:.4f} | ppl {2 ** bpc:.2f}")
 
 
 # ---------------------------------------------------------------------------
@@ -1151,6 +1221,22 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--learn-threshold", dest="learn_threshold",
                    action="store_true",
                    help="make the firing threshold trainable")
+    # -- Tier 6 ablation knobs (all off by default) --
+    t.add_argument("--beta-per-neuron", dest="beta_per_neuron",
+                   action="store_true",
+                   help="learn a per-neuron membrane decay (a [hidden] beta "
+                        "vector) instead of one shared scalar")
+    t.add_argument("--layernorm", action="store_true",
+                   help="LayerNorm the inter-layer input currents (ablation to "
+                        "help train deeper stacks)")
+    t.add_argument("--input-coding", dest="input_coding", type=str,
+                   default="rate", choices=["rate", "graded"],
+                   help="rate = stochastic spike encoder (default); graded = "
+                        "deterministic constant-current injection")
+    t.add_argument("--deterministic-eval", dest="deterministic_eval",
+                   action="store_true",
+                   help="use a fixed-window, seeded-encoder eval for "
+                        "best-checkpoint selection (stable, reproducible)")
     t.add_argument("--dropout", type=float, default=0.1)
     t.add_argument("--lr", type=float, default=3e-3)
     t.add_argument("--weight-decay", dest="weight_decay", type=float, default=1e-4)
@@ -1207,6 +1293,9 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--seed", type=int, default=1337,
                    help="seed so the (random-window, stochastic-encoder) number "
                         "repeats; pass a different value to resample")
+    e.add_argument("--deterministic", action="store_true",
+                   help="fixed-window + seeded-encoder full-split sweep: an "
+                        "exactly reproducible bpc (ignores --eval-batches)")
     e.add_argument("--device", type=str, default="auto",
                    help="auto | cpu | cuda | cuda:N")
     e.set_defaults(func=eval_cmd)
@@ -1230,6 +1319,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    # NB: we deliberately do NOT enable TF32 (set_float32_matmul_precision) or AMP.
+    # This workload is launch-bound (a long chain of tiny sequential spiking
+    # kernels), so faster matmuls buy ~nothing while perturbing float32 numerics;
+    # the real throughput lever is a CUDA-graph capture of the inner loop (see
+    # TIER6.md). Keeping default precision also keeps runs numerically stable.
     args = build_parser().parse_args()
     # Turn the common, expected misuse into a clean one-line message instead of a
     # raw traceback. train() handles its own Ctrl-C (to save); the KeyboardInterrupt

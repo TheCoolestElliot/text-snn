@@ -274,14 +274,20 @@ work. Sitting above the best ANNs is the expected trade-off for an SNN.
 | `--resume <f>` | — | resume a run from a `--save-state` file (restores optimizer/step/RNG; continues toward `--steps`) |
 | `--init-from <f>` | — | warm-start **weights** only (fresh optimizer + schedule) |
 | `--log-csv <f>` | — | append `update,split,bpc,ppl,upd/s,peakGPU` rows for plotting |
+| `--deterministic-eval` | off | fixed-window + seeded-encoder eval for stable best-checkpoint selection |
+| `--beta-per-neuron` | off | *(ablation)* learn a per-neuron `[hidden]` β vector, not one scalar |
+| `--layernorm` | off | *(ablation)* LayerNorm the inter-layer currents |
+| `--input-coding` | rate | *(ablation)* `rate` (stochastic spikes) \| `graded` (deterministic current) |
 
 Training saves the best-validation checkpoint to `--ckpt`; **Ctrl-C** saves current
-progress before exiting. `--resume` and `--init-from` are mutually exclusive.
+progress before exiting. `--resume` and `--init-from` are mutually exclusive. The
+ablation knobs and the ready-to-run experiment plan are documented in
+[`TIER6.md`](TIER6.md).
 
 `sample --ckpt <file> --prompt "..." --length N [--temperature 0.8] [--top-k K] [--seed S] [--device D]`
 — generation is stochastic; pass `--seed` to reproduce an exact sample.
 
-`eval --ckpt <file> [--data <file>] [--split all|train|val] [--val-split F] [--eval-batches N] [--seed S]`
+`eval --ckpt <file> [--data <file>] [--split all|train|val] [--val-split F] [--eval-batches N] [--seed S] [--deterministic]`
 — score a checkpoint's bits-per-character on a corpus (mapped through the
 checkpoint's vocab). Reproduce the headline number with:
 
@@ -289,6 +295,9 @@ checkpoint's vocab). Reproduce the headline number with:
 python snn_char_lm.py eval --ckpt shakespeare.pt --data input.txt \
     --val-split 0.1 --split val        # -> bpc ~2.44
 ```
+
+Add `--deterministic` for an exactly reproducible, seed-invariant number (a fixed
+full-split sweep under a fixed encoder RNG, instead of a noisy random-window estimate).
 
 `smoke` — fast self-test; exits non-zero if the model fails to learn.
 

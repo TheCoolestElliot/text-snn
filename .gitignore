@@ -30,3 +30,6 @@ env/
 !shakespeare.pt
 snn_char_lm.pt
 my_shakespeare.pt
+
+# Tier 6 experiment outputs (checkpoints + metrics CSVs)
+runs/
