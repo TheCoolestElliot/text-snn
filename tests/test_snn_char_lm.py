@@ -405,6 +405,63 @@ def test_ablation_checkpoint_roundtrip(tmp_path):
     assert model2.cfg.input_coding == "graded"
 
 
+def test_build_model_dispatch():
+    assert isinstance(m.build_model(m.SNNConfig(vocab_size=10, arch="snn")),
+                      m.SNNCharLM)
+    assert isinstance(m.build_model(m.SNNConfig(vocab_size=10, arch="gru")),
+                      m.GRUCharLM)
+    with pytest.raises(ValueError):
+        m.build_model(m.SNNConfig(vocab_size=10, arch="bogus"))
+
+
+def _tiny_gru(seq_len=16, hidden=24):
+    ds = m.CharDataset("hello world. the quick brown fox jumps. " * 20,
+                       seq_len=seq_len, val_split=0.2)
+    cfg = m.SNNConfig(vocab_size=ds.vocab_size, arch="gru", hidden=hidden,
+                      num_layers=2, dropout=0.0, seq_len=seq_len)
+    return ds, cfg, m.build_model(cfg).eval()
+
+
+def test_gru_forward_shapes_and_tensor_state():
+    ds, cfg, model = _tiny_gru()
+    x, _ = ds.get_batch(4, CPU)
+    logits, state = model.forward_seq(x, None)
+    assert logits.shape == (4, 16, ds.vocab_size)
+    assert state.shape == (2, 4, 24)           # (num_layers, B, hidden) tensor state
+
+
+def test_detach_state_polymorphic():
+    _, _, gru = _tiny_gru()
+    assert torch.is_tensor(gru.detach_state(gru.init_state(3, CPU)))     # GRU: tensor
+    snn = m.SNNCharLM(_tiny_cfg())
+    assert isinstance(snn.detach_state(snn.init_state(3, CPU)), list)    # SNN: list
+
+
+def test_gru_checkpoint_roundtrip_dispatches_to_gru(tmp_path):
+    ds, cfg, model = _tiny_gru()
+    x, _ = ds.get_batch(2, CPU)
+    with torch.no_grad():
+        before = model(x)
+    p = str(tmp_path / "gru.pt")
+    m._save_checkpoint(p, model, cfg, ds)
+    model2, _ = m._load_checkpoint(p, CPU)
+    assert isinstance(model2, m.GRUCharLM)     # build_model dispatched on cfg.arch
+    model2.eval()
+    with torch.no_grad():
+        after = model2(x)
+    assert torch.equal(before, after)          # GRU forward is deterministic
+
+
+def test_gru_generate_preserves_prompt():
+    ds, cfg, model = _tiny_gru()
+    out = model.generate(ds, "hello", 15, CPU, temperature=0.5)
+    assert out.startswith("hello") and len(out) == len("hello") + 15
+
+
+def test_cli_arch_flag():
+    assert m.build_parser().parse_args(["train", "--arch", "gru"]).arch == "gru"
+
+
 def test_deterministic_eval_is_seed_invariant():
     ds = m.CharDataset("abcdefghij " * 200, seq_len=12, val_split=0.3)
     cfg = m.SNNConfig(vocab_size=ds.vocab_size, hidden=16, num_layers=2,
