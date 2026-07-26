@@ -70,16 +70,16 @@ MB = 1_000_000
 # Budgets (bytes of finished text). Sized for a 5-9M-parameter char model at
 # 20-40 chars/param with <=4 repeat epochs -- see CAMPAIGN.md.
 # ---------------------------------------------------------------------------
-PRETRAIN_BUDGETS = {           # ~42% unframed stories / ~58% framed dialogue
-    # Sized by the measured training throughput (CAMPAIGN.md): the CUDA-graph
-    # step makes ~4 epochs of ~360 MB fit the multi-day budget with room to
-    # spare, and <=4 epochs of fresh text beat many epochs of less.
-    "stories":   (150 * MB, int(3.0 * MB)),  # (train, val)
-    "soda":      (150 * MB, int(2.6 * MB)),
+PRETRAIN_BUDGETS = {           # ~47% unframed stories / ~53% framed dialogue
+    # Sized by the MEASURED main-run throughput (CAMPAIGN.md): h1536/T3 with the
+    # CUDA-graph step sustains ~37K chars/s, so ~6 epochs of ~650 MB fills the
+    # multi-day budget; fresh text up to ~4 epochs beats many epochs of less.
+    "stories":   (300 * MB, int(4.0 * MB)),  # (train, val)
+    "soda":      (300 * MB, int(4.0 * MB)),
     "smoltalk":  (35 * MB, int(0.8 * MB)),
-    "ultrachat": (20 * MB, int(0.5 * MB)),
+    "ultrachat": (25 * MB, int(0.5 * MB)),
     "everyday":  (int(1.3 * MB), int(0.1 * MB)),
-    "identity":  (int(0.9 * MB), 0),         # sprinkle; never in val
+    "identity":  (int(1.5 * MB), 0),         # sprinkle; never in val
 }
 FINETUNE_BUDGETS = {           # assistant-register sharpening + story replay
     "smoltalk":  (10 * MB, int(0.6 * MB)),
@@ -255,12 +255,15 @@ def ultrachat(cache: str, max_user: int, max_assist: int) -> Iterator[str]:
     uniformly clean grammar. Its answers run long, so the assistant-turn cap is
     widened ~1.3x relative to the stage limit; everything else filters as
     usual (plain prose only)."""
-    path = os.path.join(cache, "ultrachat-train-00000.parquet")
     wide = int(max_assist * 1.3)
-    for row in _parquet_rows(path, ["messages"]):
-        ex = _messages_to_exchanges(row["messages"], max_user, wide)
-        if ex:
-            yield _frame(ex)
+    for shard in ("00000", "00001", "00002"):
+        path = os.path.join(cache, f"ultrachat-train-{shard}.parquet")
+        if not os.path.exists(path):
+            continue
+        for row in _parquet_rows(path, ["messages"]):
+            ex = _messages_to_exchanges(row["messages"], max_user, wide)
+            if ex:
+                yield _frame(ex)
 
 
 def soda(cache: str, max_user: int, max_assist: int) -> Iterator[str]:
