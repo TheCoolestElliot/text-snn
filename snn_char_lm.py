@@ -69,8 +69,10 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import math
 import os
+import re
 import sys
 import time
 from dataclasses import dataclass, asdict
@@ -127,6 +129,23 @@ def pick_device(pref: str = "auto") -> torch.device:
 # ---------------------------------------------------------------------------
 # 1. Data: a character-level vocabulary + window sampler
 # ---------------------------------------------------------------------------
+# DESIGN: fixed vocabulary + chat role markers (the Tier 7 chat campaign).
+# A corpus-derived vocabulary (sorted(set(text))) ties a checkpoint to the exact
+# text it was trained on: warm-starting on a second corpus hard-fails the vocab
+# match if even one rare character differs. The chat pipeline instead uses one
+# FIXED, corpus-independent character set so a model can pretrain on one corpus
+# and fine-tune on another. Three control characters frame conversations:
+#   \x01 starts a user turn, \x02 starts an assistant turn, \x03 ends an
+#   assistant turn (the generation stop symbol). Single-character role markers
+#   cost one input neuron and one timestep each, cannot be emitted malformed,
+#   and make stopping unambiguous -- the char-level analogue of ChatML's
+#   single-token <|im_end|>.
+ROLE_USER = "\x01"       # start of a user turn
+ROLE_ASSISTANT = "\x02"  # start of an assistant turn
+ROLE_END = "\x03"        # end of an assistant turn (generation stop)
+# newline + the 3 role markers + printable ASCII 32..126 = 99 symbols.
+FIXED_VOCAB = "\n" + ROLE_USER + ROLE_ASSISTANT + ROLE_END + "".join(
+    chr(c) for c in range(32, 127))
 # A character LM has the tiniest possible vocabulary (the set of distinct
 # characters in the corpus). That is a good match for an SNN whose *input layer
 # has one neuron per symbol*: rate-coding a one-hot vector of size `vocab_size`
@@ -151,6 +170,34 @@ _DEMO_CORPUS = (
 ) * 24
 
 
+def _encode_fast(text: str, stoi: dict) -> Tuple[torch.Tensor, int]:
+    """Encode ``text`` to a long tensor of ids via a 256-entry byte lookup.
+
+    The per-character Python loop costs ~15-20 bytes/char of transient memory
+    and minutes of CPU on a 100 MB-class corpus; going bytes -> lookup-table is
+    ~100x faster and allocation-light, which is what makes the Tier 7 corpus
+    (~150 MB) loadable on a 16 GB machine. Assumes a byte-wide (latin-1-able)
+    vocabulary -- true for both the classic corpus-derived vocabs (printable
+    ASCII) and FIXED_VOCAB; falls back to the loop for anything wider.
+    Characters absent from ``stoi`` are dropped; returns (ids, n_dropped).
+    """
+    try:
+        raw = torch.frombuffer(bytearray(text.encode("latin-1")),
+                               dtype=torch.uint8).to(torch.long)
+    except UnicodeEncodeError:                       # non-latin-1 corpus: slow path
+        ids = [stoi[c] for c in text if c in stoi]
+        return torch.tensor(ids, dtype=torch.long), len(text) - len(ids)
+    lut = torch.full((256,), -1, dtype=torch.long)
+    for c, i in stoi.items():
+        b = c.encode("latin-1")
+        if len(b) == 1:
+            lut[b[0]] = i
+    mapped = lut[raw]
+    keep = mapped >= 0
+    n_dropped = int((~keep).sum())
+    return (mapped[keep].contiguous() if n_dropped else mapped), n_dropped
+
+
 class CharDataset:
     """Turns a text string into integer ids and serves random training windows.
 
@@ -159,17 +206,37 @@ class CharDataset:
     the target (classic next-character prediction).
     """
 
-    def __init__(self, text: str, seq_len: int, val_split: float = 0.0):
+    def __init__(self, text: str, seq_len: int, val_split: float = 0.0,
+                 fixed_vocab: Optional[str] = None,
+                 val_text: Optional[str] = None):
         self.seq_len = seq_len
         # Sorted for determinism so a saved vocab maps ids consistently. The
         # vocabulary is built from the WHOLE text (before splitting) so the model
-        # never meets an unseen character at validation time.
-        chars = sorted(set(text))
+        # never meets an unseen character at validation time. With
+        # ``fixed_vocab`` (e.g. FIXED_VOCAB) the mapping is corpus-INdependent,
+        # which is what lets one checkpoint pretrain on one corpus and
+        # fine-tune on another without tripping the vocab-match guard.
+        chars = sorted(set(fixed_vocab)) if fixed_vocab else sorted(set(text))
         self.stoi = {c: i for i, c in enumerate(chars)}
         self.itos = {i: c for i, c in enumerate(chars)}
         self.vocab_size = len(chars)
-        self.data = torch.tensor([self.stoi[c] for c in text], dtype=torch.long)
-        self._set_splits(val_split)
+        self.data, n_dropped = _encode_fast(text, self.stoi)
+        if n_dropped:
+            print(f"[data] warning: {n_dropped:,} corpus char(s) outside the "
+                  f"fixed vocabulary were dropped", file=sys.stderr)
+        if val_text is not None:
+            # DESIGN: explicit validation corpus. A multi-source corpus's tail
+            # is 100% whichever source was concatenated last, so tail-split
+            # validation would score (and select checkpoints on) a single
+            # register. A separately built, stratified val file avoids that;
+            # it also guarantees train/val doc-disjointness at build time.
+            val_data, v_dropped = _encode_fast(val_text, self.stoi)
+            if v_dropped:
+                print(f"[data] warning: {v_dropped:,} val char(s) outside the "
+                      f"fixed vocabulary were dropped", file=sys.stderr)
+            self._set_explicit_splits(self.data, val_data)
+        else:
+            self._set_splits(val_split)
 
     @classmethod
     def with_vocab(cls, text: str, seq_len: int, stoi: dict, itos: dict,
@@ -186,10 +253,26 @@ class CharDataset:
         ds.stoi = dict(stoi)
         ds.itos = {int(k): v for k, v in itos.items()}
         ds.vocab_size = len(ds.stoi)
-        ds.data = torch.tensor([ds.stoi[c] for c in text if c in ds.stoi],
-                               dtype=torch.long)
+        ds.data, _ = _encode_fast(text, ds.stoi)
         ds._set_splits(val_split)
         return ds
+
+    def _set_explicit_splits(self, train_data: torch.Tensor,
+                             val_data: torch.Tensor) -> None:
+        """Install a separately supplied validation corpus (see __init__)."""
+        if len(train_data) < self.seq_len + 1:
+            raise ValueError(
+                f"train corpus has {len(train_data):,} usable chars but "
+                f"--seq-len {self.seq_len} needs at least {self.seq_len + 1}.")
+        if len(val_data) < self.seq_len + 1:
+            raise ValueError(
+                f"val corpus has {len(val_data):,} usable chars but "
+                f"--seq-len {self.seq_len} needs at least {self.seq_len + 1}.")
+        self.splits = {
+            "all": torch.cat([train_data, val_data]),
+            "train": train_data,
+            "val": val_data,
+        }
 
     def _set_splits(self, val_split: float) -> None:
         """Guard corpus length and carve the contiguous validation tail.
@@ -295,6 +378,20 @@ def _make_surrogate(name: str):
     raise ValueError(f"unknown surrogate '{name}'")
 
 
+def prompt_in_vocab(dataset: "CharDataset", prompt: str) -> str:
+    """The prompt as the model actually saw it (out-of-vocab chars dropped)."""
+    return "".join(c for c in prompt if c in dataset.stoi)
+
+
+def _has_verbatim_loop(s: str, min_len: int = 16) -> bool:
+    """True if ``s`` ends in a verbatim repetition: its tail appears again
+    earlier in ``s`` (the signature of a sampling loop, cf. _generate_core)."""
+    if len(s) < 2 * min_len:
+        return False
+    tail = s[-min_len:]
+    return tail in s[:-1] and s.count(tail) >= 2
+
+
 class CharLMBase(nn.Module):
     """Shared machinery for the character-LM architectures.
 
@@ -307,46 +404,101 @@ class CharLMBase(nn.Module):
     @torch.no_grad()
     def generate(self, dataset: "CharDataset", prompt: str, length: int,
                  device: torch.device, temperature: float = 1.0,
-                 top_k: Optional[int] = None) -> str:
+                 top_k: Optional[int] = None, top_p: Optional[float] = None,
+                 stop_char: Optional[str] = None,
+                 ban_chars: Optional[str] = None) -> str:
         """Warm the recurrent state on ``prompt``, then sample ``length`` chars.
 
         The recurrent state persists across the whole generation, exactly as
         during training, so the memory conditions every new character on
-        everything generated so far.
+        everything generated so far. See ``_generate_core`` for the sampling
+        controls (top-p, stop character, banned characters, loop guard).
         """
         self.eval()
         state = self.init_state(1, device)
-        out_ids: List[int] = []
+        text, _ = self._generate_core(
+            dataset, state, prompt, length, device, temperature=temperature,
+            top_k=top_k, top_p=top_p, stop_char=stop_char, ban_chars=ban_chars)
+        return prompt_in_vocab(dataset, prompt) + text
 
-        # Warm-up: feed the prompt so the recurrent state reflects it.
-        ids = dataset.encode(prompt).to(device)
+    @torch.no_grad()
+    def _generate_core(self, dataset: "CharDataset", state, prompt: str,
+                       length: int, device: torch.device,
+                       temperature: float = 1.0, top_k: Optional[int] = None,
+                       top_p: Optional[float] = None,
+                       stop_char: Optional[str] = None,
+                       ban_chars: Optional[str] = None,
+                       stream=None) -> Tuple[str, object]:
+        """Feed ``prompt`` into ``state``, sample up to ``length`` chars, and
+        return (generated_text, state) -- the caller owns the state, which is
+        what lets a chat REPL keep one recurrent memory across many turns.
+
+        Sampling controls:
+          top_k / top_p     -- truncate the distribution (top_p = nucleus).
+          stop_char         -- stop after sampling it (it IS consumed by the
+                               state and included in the returned text, so a
+                               conversation's memory stays aligned with the
+                               training format; the chat UI strips it).
+          ban_chars         -- never sample these (e.g. role markers that only
+                               the harness may inject).
+          stream            -- callable(str) invoked per generated char.
+
+        # DESIGN: loop guard instead of repetition penalty. Char-level
+        # repetition penalties punish 'e' and space, wrecking text. Verbatim
+        # LOOPS are the actual small-model failure, so when the recent output
+        # contains a repeated >=16-char substring we temporarily raise the
+        # temperature -- enough randomness to break the cycle, no bias on
+        # ordinary characters.
+        """
+        self.eval()
+        vocab = self.cfg.vocab_size
+        ban_ids = [dataset.stoi[c] for c in (ban_chars or "") if c in dataset.stoi]
+        stop_id = (dataset.stoi.get(stop_char, None)
+                   if stop_char is not None else None)
+
         last_logits = None
+        ids = dataset.encode(prompt).to(device)
         for cid in ids:
-            oh = F.one_hot(cid.view(1), self.cfg.vocab_size).float()
+            oh = F.one_hot(cid.view(1), vocab).float()
             last_logits, state = self.step(oh, state)
-            out_ids.append(int(cid))
-
-        # If the prompt was empty, seed from a zero one-hot so we have logits.
         if last_logits is None:
-            oh = torch.zeros(1, self.cfg.vocab_size, device=device)
+            oh = torch.zeros(1, vocab, device=device)
             last_logits, state = self.step(oh, state)
 
-        for _ in range(length):
+        out_ids: List[int] = []
+        hot_until = 0                      # loop-guard temperature bump window
+        for n in range(length):
             # Guard: NaN/inf logits would make torch.multinomial trigger a CUDA
             # device assert; sanitising keeps sampling robust on any checkpoint.
-            last_logits = torch.nan_to_num(last_logits)
-            logits = last_logits.squeeze(0) / max(temperature, 1e-6)
+            logits = torch.nan_to_num(last_logits).squeeze(0).float()
+            temp = temperature + (0.25 if n < hot_until else 0.0)
+            logits = logits / max(temp, 1e-6)
+            for b in ban_ids:
+                logits[b] = float("-inf")
             if top_k is not None and top_k > 0:
                 v, _ = torch.topk(logits, min(top_k, logits.numel()))
                 logits[logits < v[-1]] = float("-inf")
+            if top_p is not None and 0.0 < top_p < 1.0:
+                probs_sorted, order = torch.sort(F.softmax(logits, dim=-1),
+                                                 descending=True)
+                keep = torch.cumsum(probs_sorted, dim=-1) - probs_sorted < top_p
+                keep[0] = True             # always keep the argmax
+                logits[order[~keep]] = float("-inf")
             probs = F.softmax(logits, dim=-1)
             next_id = int(torch.multinomial(probs, 1).item())
             out_ids.append(next_id)
+            ch = dataset.itos[next_id]
+            if stream is not None:
+                stream(ch)
             oh = F.one_hot(torch.tensor([next_id], device=device),
-                           self.cfg.vocab_size).float()
+                           vocab).float()
             last_logits, state = self.step(oh, state)
-
-        return dataset.decode(out_ids)
+            if stop_id is not None and next_id == stop_id:
+                break
+            if n >= hot_until and (n + 1) % 16 == 0 and len(out_ids) >= 48:
+                if _has_verbatim_loop(dataset.decode(out_ids[-64:])):
+                    hot_until = n + 32
+        return dataset.decode(out_ids), state
 
     def detach_state(self, state):
         """Detach the recurrent state between TBPTT chunks (arch-agnostic): the
@@ -580,6 +732,49 @@ class SNNCharLM(CharLMBase):
         """x: (B, L) ids -> logits (B, L, vocab_size), fresh state (for eval)."""
         return self.forward_seq(x, None)[0]
 
+    @torch.no_grad()
+    def spike_stats(self, x: torch.Tensor) -> List[float]:
+        """Per-layer mean firing rate over a probe batch ``x`` (B, L) in [0, 1].
+
+        This is the health metric of the spiking story: with graded input
+        coding the hidden layers' spikes ARE the spiking computation, and
+        LayerNorm can silently compensate for a dead (~0%) or saturated
+        (~100%) layer while bpc still looks fine. The training loop logs these
+        every eval and the campaign alarms outside roughly [2%, 90%].
+        (A read-only mirror of forward_seq's loop -- the hot path stays
+        untouched so it remains CUDA-graph-capturable.)
+        """
+        was_training = self.training
+        self.eval()
+        B, L = x.shape
+        mems = self.init_state(B, x.device)
+        onehot = F.one_hot(x, self.cfg.vocab_size).float()
+        if self.cfg.input_coding == "graded":
+            base = self.fc_in[0](onehot)
+            cur0_all = base.unsqueeze(0).expand(self.cfg.num_steps, -1, -1, -1)
+        else:
+            spikes = spikegen.rate(onehot, num_steps=self.cfg.num_steps,
+                                   gain=self.cfg.rate_gain)
+            cur0_all = self.fc_in[0](spikes)
+        sums = [torch.zeros((), device=x.device)
+                for _ in range(self.cfg.num_layers)]
+        n_micro = 0
+        for pos in range(L):
+            cur0 = cur0_all[:, :, pos, :]
+            for t in range(self.cfg.num_steps):
+                cur = cur0[t]
+                for l, lif in enumerate(self.lifs):
+                    current = cur if l == 0 else self.fc_in[l](cur)
+                    if self.norms is not None:
+                        current = self.norms[l](current)
+                    spk, mems[l] = lif(current, mems[l])
+                    sums[l] = sums[l] + spk.mean()
+                    cur = spk
+                n_micro += 1
+        if was_training:
+            self.train()
+        return [float(s.item()) / n_micro for s in sums]
+
 
 class GRUCharLM(CharLMBase):
     """Non-spiking GRU character LM -- a matched in-harness baseline for the SNN.
@@ -637,12 +832,164 @@ def build_model(cfg: SNNConfig) -> CharLMBase:
 
 
 # ---------------------------------------------------------------------------
+# 2b. CUDA-graph training capture + chat metrics (Tier 7)
+# ---------------------------------------------------------------------------
+def _require_graphable(cfg: SNNConfig, device: torch.device, args) -> None:
+    """Fail fast (with every reason at once) if the config cannot be captured.
+
+    The captured region must be fixed-shape and RNG-free: graded input coding
+    removes the stochastic encoder, dropout 0 removes the last RNG op, and a
+    seq_len that divides evenly into chunks keeps every replay's shapes
+    identical to the capture's.
+    """
+    problems = []
+    if device.type != "cuda":
+        problems.append("a CUDA device")
+    if cfg.arch != "snn":
+        problems.append("--arch snn")
+    if cfg.input_coding != "graded":
+        problems.append("--input-coding graded (RNG-free capture)")
+    if cfg.dropout != 0.0:
+        problems.append("--dropout 0 (RNG-free capture)")
+    if args.seq_len % args.tbptt_chunk != 0:
+        problems.append("--seq-len divisible by --tbptt-chunk (fixed shapes)")
+    if problems:
+        raise ValueError("--cuda-graph requires " + ", ".join(problems))
+
+
+def _capture_chunk_step(model: "SNNCharLM", cfg: SNNConfig, batch_size: int,
+                        chunk: int, device: torch.device,
+                        warm_lr: float) -> dict:
+    """Warm up and capture one TBPTT chunk's forward+loss+backward as a CUDA
+    graph; returns the graph plus the static buffers a caller replays through.
+
+    Follows the official whole-iteration capture recipe (see the DESIGN note at
+    the call site in train()): 3 full warmup iterations on a side stream, model
+    weights snapshotted/restored so warmup does not perturb training, grads set
+    to None once so backward allocates them inside the graph's private pool.
+    """
+    static_x = torch.zeros(batch_size, chunk, dtype=torch.long, device=device)
+    static_y = torch.zeros(batch_size, chunk, dtype=torch.long, device=device)
+    static_mems = model.init_state(batch_size, device)
+    snapshot = {k: v.detach().clone() for k, v in model.state_dict().items()}
+    side = torch.cuda.Stream()
+    side.wait_stream(torch.cuda.current_stream())
+    with torch.cuda.stream(side):
+        warm_opt = torch.optim.AdamW(model.parameters(), lr=warm_lr)
+        for _ in range(3):
+            warm_opt.zero_grad(set_to_none=True)
+            w_logits, _ = model.forward_seq(
+                static_x, [mm.clone() for mm in static_mems])
+            w_loss = F.cross_entropy(
+                w_logits.reshape(-1, cfg.vocab_size), static_y.reshape(-1))
+            w_loss.backward()
+            warm_opt.step()
+    torch.cuda.current_stream().wait_stream(side)
+    model.load_state_dict(snapshot)       # in-place copy: addresses preserved
+    del warm_opt, snapshot, w_logits, w_loss
+    for p in model.parameters():
+        p.grad = None                     # allocate .grad inside the graph pool
+    graph = torch.cuda.CUDAGraph()
+    with torch.cuda.graph(graph):
+        static_logits, static_new_mems = model.forward_seq(
+            static_x, list(static_mems))
+        static_loss = F.cross_entropy(
+            static_logits.reshape(-1, cfg.vocab_size), static_y.reshape(-1))
+        static_loss.backward()
+    return {"graph": graph, "x": static_x, "y": static_y, "mems": static_mems,
+            "new_mems": static_new_mems, "loss": static_loss}
+
+
+def _load_chat_pairs(path: str) -> List[dict]:
+    """Load (user, assistant) conditioning pairs from a JSONL file (one object
+    with 'user' and 'assistant' keys per line; built by build_chat_corpus.py).
+    """
+    pairs = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                pairs.append(json.loads(line))
+    return pairs
+
+
+@torch.no_grad()
+def conditioning_metrics(model: CharLMBase, dataset: CharDataset,
+                         pairs: List[dict], device: torch.device,
+                         max_pairs: int = 96, shuffle_seed: int = 7) -> dict:
+    """The metric that catches fluent-but-unconditioned chat models.
+
+    Scores the bpc of each ASSISTANT span (its characters plus the end-of-turn
+    marker, teacher-forced) twice: once conditioned on the TRUE user turn and
+    once on a SHUFFLED one (a fixed derangement of the users across pairs).
+    ``gain = bpc_shuffled - bpc_true``: a model whose replies actually depend
+    on the prompt scores the true pairing distinctly better (positive gain);
+    a model that emits generic assistant register regardless of the prompt --
+    the most likely tiny-model failure, invisible to val bpc, word-validity
+    and cherry-picked transcripts alike -- scores ~0.
+    """
+    was_training = model.training
+    model.eval()
+    pairs = pairs[:max_pairs]
+    users = [p["user"] for p in pairs]
+    assists = [p["assistant"] for p in pairs]
+    perm = torch.randperm(
+        len(users),
+        generator=torch.Generator().manual_seed(shuffle_seed)).tolist()
+    for i in range(len(perm)):            # force a derangement: no fixed points
+        if perm[i] == i:
+            j = (i + 1) % len(perm)
+            perm[i], perm[j] = perm[j], perm[i]
+    vocab = model.cfg.vocab_size
+    pad_id = dataset.stoi.get(" ", 0)
+
+    def spans_bpc(user_list: List[str]) -> float:
+        total_nats, total_chars = 0.0, 0
+        B = 32
+        for i0 in range(0, len(pairs), B):
+            us = user_list[i0:i0 + B]
+            as_ = assists[i0:i0 + B]
+            encs = [dataset.encode(ROLE_USER + u + ROLE_ASSISTANT + a + ROLE_END)
+                    for u, a in zip(us, as_)]
+            n = len(encs)
+            lmax = max(len(e) for e in encs)
+            xs = torch.full((n, lmax - 1), pad_id, dtype=torch.long)
+            ys = torch.full((n, lmax - 1), pad_id, dtype=torch.long)
+            mask = torch.zeros(n, lmax - 1, dtype=torch.bool)
+            for k, e in enumerate(encs):
+                le = len(e)
+                xs[k, :le - 1] = e[:-1]
+                ys[k, :le - 1] = e[1:]
+                # Loss only over the assistant span + the end marker. In
+                # target space (y = seq shifted left by 1) that span starts at
+                # index len(\x01 + user) = len(user)+1 and covers
+                # len(assistant)+1 characters.
+                a_start = len(us[k]) + 1
+                mask[k, a_start:a_start + len(as_[k]) + 1] = True
+            logits = model(xs.to(device))
+            nll = F.cross_entropy(logits.reshape(-1, vocab),
+                                  ys.to(device).reshape(-1), reduction="none")
+            nll = nll.view(n, -1)[mask.to(device)]
+            total_nats += float(nll.sum())
+            total_chars += int(mask.sum())
+        return total_nats / max(1, total_chars) / math.log(2)
+
+    bpc_true = spans_bpc(users)
+    bpc_shuf = spans_bpc([users[p] for p in perm])
+    if was_training:
+        model.train()
+    return {"bpc_true": bpc_true, "bpc_shuffled": bpc_shuf,
+            "gain": bpc_shuf - bpc_true, "n_pairs": len(pairs)}
+
+
+# ---------------------------------------------------------------------------
 # 3. Training loop
 # ---------------------------------------------------------------------------
 @torch.no_grad()
 def evaluate(model: CharLMBase, dataset: CharDataset, split: str,
              batch_size: int, n_batches: int, device: torch.device,
-             deterministic: bool = False, encoder_seed: int = 1234) -> float:
+             deterministic: bool = False, encoder_seed: int = 1234,
+             max_windows: int = 0) -> float:
     """Mean bits-per-character on held-out windows (lower is better).
 
     We run full windows with a fresh membrane and no gradient -- the same
@@ -666,6 +1013,14 @@ def evaluate(model: CharLMBase, dataset: CharDataset, split: str,
         # Non-overlapping windows tiling the split; the split guard guarantees
         # len(d) >= L + 1, so at least the window at start 0 exists.
         starts = list(range(0, len(d) - L, L)) or [0]
+        if max_windows and len(starts) > max_windows:
+            # Deterministic SUBSAMPLE: evenly spaced windows across the split.
+            # On a 100 MB-class corpus the full sweep costs tens of minutes per
+            # eval, which would throttle both the eval and the save-state
+            # cadence; the subsample keeps in-run selection reproducible and
+            # cheap, and the full sweep is still used for end-of-stage scoring.
+            idx = torch.linspace(0, len(starts) - 1, max_windows).round().long()
+            starts = [starts[i] for i in torch.unique(idx).tolist()]
         fork_devices = [device] if device.type == "cuda" else []
         with torch.random.fork_rng(devices=fork_devices):
             torch.manual_seed(encoder_seed)
@@ -702,10 +1057,18 @@ def train(args) -> None:
     device = pick_device(getattr(args, "device", "auto"))
 
     text = _load_text(args.data)
-    dataset = CharDataset(text, seq_len=args.seq_len, val_split=args.val_split)
+    fixed = FIXED_VOCAB if getattr(args, "vocab", "corpus") == "fixed" else None
+    val_text = None
+    if getattr(args, "val_data", None):
+        with open(args.val_data, "r", encoding="utf-8") as f:
+            val_text = f.read()
+    dataset = CharDataset(text, seq_len=args.seq_len, val_split=args.val_split,
+                          fixed_vocab=fixed, val_text=val_text)
     n_val = len(dataset.splits["val"])
-    print(f"[data] {len(text):,} chars | vocab={dataset.vocab_size} "
-          f"| train={len(dataset.splits['train']):,} val={n_val:,} "
+    print(f"[data] {len(text):,} chars | vocab={dataset.vocab_size}"
+          f"{' (fixed)' if fixed else ''} "
+          f"| train={len(dataset.splits['train']):,} val={n_val:,}"
+          f"{' (separate file)' if val_text is not None else ''} "
           f"| device={device}")
 
     resume_ckpt = None
@@ -819,11 +1182,74 @@ def train(args) -> None:
     print(f"[train] truncated BPTT: window={args.seq_len} chunk={chunk} "
           f"-> backprop depth = chunk*T = {chunk * cfg.num_steps} spiking steps")
 
+    if getattr(args, "tf32", False):
+        # TF32 matmuls: measured as a non-lever while the net was launch-bound,
+        # but once a CUDA graph removes the launch overhead the matmul share
+        # rises, so it is exposed as an opt-in knob (ablated, not assumed).
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        print("[train] TF32 matmuls enabled")
+
+    model.train()
+    use_graph = bool(getattr(args, "cuda_graph", False))
+    graph = static_x = static_y = static_loss = None
+    static_mems = static_new_mems = None
+    if use_graph:
+        _require_graphable(cfg, device, args)
+        # DESIGN: CUDA-graph training step (Tier 7). The SNN's training step is
+        # a chain of layers*T*chunk tiny sequential kernels, so it is bound by
+        # kernel-LAUNCH overhead, not math (TIER6 measured the forward core at
+        # 8-13x under graph replay). Capturing one TBPTT chunk's
+        # forward+loss+backward and replaying it as a single launch removes
+        # that overhead from training itself. The capture recipe follows the
+        # official CUDA-graphs notes exactly:
+        #   * 3 warmup iterations of the full fwd+loss+bwd on a side stream
+        #     (cuBLAS autotuning, workspace allocation), then the model weights
+        #     are restored so warmup does not perturb training;
+        #   * grads set to None ONCE before capture, so backward allocates the
+        #     .grad tensors inside the graph's private pool -- each replay then
+        #     REWRITES those same buffers in place (never call zero_grad after
+        #     capture: set_to_none=True would free the very addresses the
+        #     captured kernels write to);
+        #   * clip_grad_norm_ and AdamW.step() stay EAGER between replays --
+        #     in-place reads/writes of .grad and params at stable addresses are
+        #     safe by construction (the docs' own partial-capture pattern);
+        #   * the captured region is RNG-free (graded coding, dropout 0 --
+        #     enforced by _require_graphable), sidestepping the whole class of
+        #     Philox-replay concerns, and it stays well under WDDM's 2 s TDR.
+        # Eval and sampling keep the ordinary eager module: different shapes.
+        gs = _capture_chunk_step(model, cfg, args.batch_size, chunk, device,
+                                 warm_lr=args.lr)
+        graph, static_x, static_y = gs["graph"], gs["x"], gs["y"]
+        static_mems, static_new_mems = gs["mems"], gs["new_mems"]
+        static_loss = gs["loss"]
+        print(f"[graph] captured fwd+loss+bwd of one {args.batch_size}x{chunk} "
+              f"chunk ({cfg.num_layers} layers x T={cfg.num_steps} x {chunk} "
+              f"chars); clip + optimizer step remain eager")
+
     csv_writer, csv_file = _open_metrics_csv(getattr(args, "log_csv", None))
     do_val = dataset.has_val()
-    model.train()
-    running = 0.0
-    n_since_log = 0
+    # Fixed probe batch for the firing-rate health metric (SNN only): the first
+    # up-to-16 non-overlapping val (or train) windows, so the statistic is
+    # comparable across the whole run.
+    probe_x = None
+    if cfg.arch == "snn":
+        d_probe = dataset.splits["val" if do_val else "train"]
+        n_probe = max(1, min(16, (len(d_probe) - 1) // args.seq_len))
+        probe_x = torch.stack(
+            [d_probe[i * args.seq_len:(i + 1) * args.seq_len]
+             for i in range(n_probe)]).to(device)
+    chat_pairs = None
+    if getattr(args, "chat_pairs", None):
+        chat_pairs = _load_chat_pairs(args.chat_pairs)
+        print(f"[chat] {len(chat_pairs)} conditioning pairs loaded for in-run "
+              f"chat metrics")
+
+    running = torch.zeros((), device=device)   # GPU-side accumulator: one
+    n_since_log = 0                            # .item() sync per LOG, not step
+    last_gnorm = None
+    state_every_s = getattr(args, "state_every_min", 15) * 60.0
+    last_state_t = time.time()
     t0 = time.time()
     update = start_update
     interrupted = False
@@ -839,42 +1265,66 @@ def train(args) -> None:
             # each boundary, so backprop only unrolls chunk*num_steps spiking steps
             # instead of seq_len*num_steps. That bounds both memory and the length
             # of the gradient path, letting --seq-len be long without blowing up.
-            mems = model.init_state(args.batch_size, device)
+            # (In graph mode the detach is structural: the static membrane
+            # buffers are non-grad inputs of the captured graph.)
+            if use_graph:
+                for mm in static_mems:
+                    mm.zero_()                     # fresh membrane per window
+            else:
+                mems = model.init_state(args.batch_size, device)
             for c0 in range(0, x.size(1), chunk):
                 if update >= args.steps:
                     break
-                mems = model.detach_state(mems)                        # cut the graph
                 for g in opt.param_groups:
                     g["lr"] = lr_at(update)
-                xc, yc = x[:, c0:c0 + chunk], y[:, c0:c0 + chunk]
-                logits, mems = model.forward_seq(xc, mems)             # (B, chunk, V)
-                loss = F.cross_entropy(
-                    logits.reshape(-1, cfg.vocab_size), yc.reshape(-1))
-                opt.zero_grad(set_to_none=True)
-                loss.backward()
-                # DESIGN: gradient clipping -- standard insurance for a recurrent
-                # net. The leaky membrane is contractive so gradients stay
-                # well-behaved (norms of order 1-10), but clipping the global norm
-                # cheaply caps the occasional larger step and keeps training smooth.
-                torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
-                opt.step()
+                if use_graph:
+                    static_x.copy_(x[:, c0:c0 + chunk])
+                    static_y.copy_(y[:, c0:c0 + chunk])
+                    graph.replay()                 # fwd+loss+bwd, one launch
+                    # DESIGN: gradient clipping -- standard insurance for a
+                    # recurrent net; eager between replays (see capture notes).
+                    last_gnorm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), args.grad_clip)
+                    opt.step()
+                    with torch.no_grad():          # carry membrane to next chunk
+                        for sm, nm in zip(static_mems, static_new_mems):
+                            sm.copy_(nm)
+                    loss_t = static_loss.detach()
+                else:
+                    mems = model.detach_state(mems)                    # cut the graph
+                    xc, yc = x[:, c0:c0 + chunk], y[:, c0:c0 + chunk]
+                    logits, mems = model.forward_seq(xc, mems)         # (B, chunk, V)
+                    loss = F.cross_entropy(
+                        logits.reshape(-1, cfg.vocab_size), yc.reshape(-1))
+                    opt.zero_grad(set_to_none=True)
+                    loss.backward()
+                    # DESIGN: gradient clipping -- standard insurance for a recurrent
+                    # net. The leaky membrane is contractive so gradients stay
+                    # well-behaved (norms of order 1-10), but clipping the global norm
+                    # cheaply caps the occasional larger step and keeps training smooth.
+                    last_gnorm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), args.grad_clip)
+                    opt.step()
+                    loss_t = loss.detach()
                 update += 1
 
-                running += loss.item()
+                running += loss_t                  # GPU-side; no per-step sync
                 n_since_log += 1
                 if update % args.log_every == 0:
-                    avg = running / n_since_log
-                    running = 0.0
+                    avg = (running / n_since_log).item()
+                    running.zero_()
                     n_since_log = 0
                     bpc = avg / math.log(2)          # bits-per-character
                     speed = args.log_every / (time.time() - t0)
                     t0 = time.time()
                     mem = (torch.cuda.max_memory_allocated() / 1e9
                            if device.type == "cuda" else 0.0)
+                    gn = float(last_gnorm) if last_gnorm is not None else None
                     print(f"upd {update:>6} | loss {avg:6.3f} | bpc {bpc:5.3f} "
                           f"| ppl {math.exp(avg):8.2f} | {speed:4.1f} upd/s "
                           f"| peakGPU {mem:4.2f}GB")
-                    _csv_row(csv_writer, csv_file, update, "train", bpc, speed, mem)
+                    _csv_row(csv_writer, csv_file, update, "train", bpc, speed,
+                             mem, lr=lr_at(update), grad_norm=gn)
 
                 # Held-out evaluation. We report validation bpc (generalization)
                 # and keep the checkpoint with the best val score -- the last step
@@ -882,17 +1332,49 @@ def train(args) -> None:
                 if do_val and args.eval_every and update % args.eval_every == 0:
                     val_bpc = evaluate(model, dataset, "val", args.batch_size,
                                        args.eval_batches, device,
-                                       deterministic=args.deterministic_eval)
+                                       deterministic=args.deterministic_eval,
+                                       max_windows=getattr(args, "eval_max_windows", 0))
+                    fire = (model.spike_stats(probe_x)
+                            if probe_x is not None else None)
                     tag = ""
                     if val_bpc < best_val:
                         best_val = val_bpc
                         _save_checkpoint(args.ckpt, model, cfg, dataset)
                         tag = "  <- best (saved)"
-                    print(f"       val bpc {val_bpc:.3f} | ppl {2**val_bpc:6.2f}{tag}")
-                    _csv_row(csv_writer, csv_file, update, "val", val_bpc, None, None)
+                    fr = ("" if not fire else " | fire " +
+                          "/".join(f"{r:.2f}" for r in fire))
+                    print(f"       val bpc {val_bpc:.3f} | ppl {2**val_bpc:6.2f}"
+                          f"{fr}{tag}")
+                    _csv_row(csv_writer, csv_file, update, "val", val_bpc, None,
+                             None, fire_rates=fire)
+                    if fire and (min(fire) < 0.02 or max(fire) > 0.90):
+                        print("       WARNING: a layer's firing rate left "
+                              "[2%, 90%] -- spiking dynamics may be "
+                              "degenerating (dead or saturated layer)",
+                              file=sys.stderr)
+                    if chat_pairs:
+                        cm = conditioning_metrics(model, dataset, chat_pairs,
+                                                  device, max_pairs=96)
+                        print(f"       cond bpc true {cm['bpc_true']:.3f} | "
+                              f"shuffled {cm['bpc_shuffled']:.3f} | "
+                              f"gain {cm['gain']:+.3f}")
+                        _csv_row(csv_writer, csv_file, update, "cond_gain",
+                                 cm["gain"], None, None)
                     if args.save_state:
                         _save_state(args.save_state, model, cfg, dataset, opt,
                                     update, best_val, args.steps, args.warmup)
+                        last_state_t = time.time()
+                    model.train()
+
+                # Wall-clock save-state cadence, decoupled from the eval
+                # schedule: a multi-day run must never be more than
+                # ~--state-every-min minutes of progress away from a resumable
+                # file, no matter how expensive evals are.
+                if (args.save_state
+                        and time.time() - last_state_t > state_every_s):
+                    _save_state(args.save_state, model, cfg, dataset, opt,
+                                update, best_val, args.steps, args.warmup)
+                    last_state_t = time.time()
 
                 if args.sample_every and update % args.sample_every == 0:
                     preview = model.generate(dataset, prompt=args.prompt or "the ",
@@ -952,7 +1434,17 @@ def _save_checkpoint(path: str, model: SNNCharLM, cfg: SNNConfig,
     }
     if extra:                          # optional resumable training state
         payload.update(extra)
-    torch.save(payload, path)
+    # DESIGN: atomic save with rotation. torch.save straight onto the target
+    # would leave a truncated, unloadable file if the process dies mid-write --
+    # fatal when that file is the only resume state of a multi-day run. Write
+    # to a temp file, keep the previous good file as .bak, then rename into
+    # place (os.replace is atomic on the same volume). A crash at any point
+    # leaves at least one loadable file: path, path.bak, or path.tmp.
+    tmp = path + ".tmp"
+    torch.save(payload, tmp)
+    if os.path.exists(path):
+        os.replace(path, path + ".bak")
+    os.replace(tmp, path)
 
 
 def _require_matching_vocab(ckpt: dict, dataset: CharDataset, flag: str) -> None:
@@ -1025,18 +1517,31 @@ def _open_metrics_csv(path: Optional[str]):
     f = open(path, "a", newline="", encoding="utf-8")
     writer = csv.writer(f)
     if f.tell() == 0:
-        writer.writerow(["update", "split", "bpc", "ppl", "upd_per_s", "peak_gpu_gb"])
+        writer.writerow(["update", "split", "bpc", "ppl", "upd_per_s",
+                         "peak_gpu_gb", "ts", "lr", "grad_norm", "fire_rates"])
     return writer, f
 
 
 def _csv_row(writer, file, update: int, split: str, bpc: float,
-             speed: Optional[float], mem: Optional[float]) -> None:
-    """Append one long-format metrics row (no-op if CSV logging is off)."""
+             speed: Optional[float], mem: Optional[float],
+             lr: Optional[float] = None, grad_norm: Optional[float] = None,
+             fire_rates: Optional[List[float]] = None) -> None:
+    """Append one long-format metrics row (no-op if CSV logging is off).
+
+    The Tier 7 columns: ``ts`` (unix seconds, so a supervisor can detect a
+    stalled run), ``lr``, ``grad_norm``, and ``fire_rates`` (slash-joined
+    per-layer mean firing rates -- the spiking-health signal).
+    """
     if writer is None:
         return
     writer.writerow([update, split, f"{bpc:.5f}", f"{2 ** bpc:.4f}",
                      "" if speed is None else f"{speed:.3f}",
-                     "" if mem is None else f"{mem:.4f}"])
+                     "" if mem is None else f"{mem:.4f}",
+                     f"{time.time():.0f}",
+                     "" if lr is None else f"{lr:.2e}",
+                     "" if grad_norm is None else f"{grad_norm:.3f}",
+                     "" if not fire_rates else
+                     "/".join(f"{r:.3f}" for r in fire_rates)])
     file.flush()
 
 
@@ -1094,7 +1599,8 @@ def sample(args) -> None:
     _warn_dropped_prompt_chars(ds, args.prompt)
     text = model.generate(ds, prompt=args.prompt, length=args.length,
                           device=device, temperature=args.temperature,
-                          top_k=args.top_k)
+                          top_k=args.top_k,
+                          top_p=getattr(args, "top_p", None))
     print(text)
 
 
@@ -1137,6 +1643,237 @@ def eval_cmd(args) -> None:
             else f"{args.eval_batches} x {args.batch_size} random windows")
     print(f"[eval] {args.ckpt} on {where} | split={args.split} seq_len={seq_len} "
           f"| {mode} | bpc {bpc:.4f} | ppl {2 ** bpc:.2f}")
+
+
+# ---------------------------------------------------------------------------
+# 5b. Chat: interactive REPL + scripted one-shot + chat-quality evaluation
+# ---------------------------------------------------------------------------
+def _checkpoint_can_chat(ds: CharDataset) -> bool:
+    return all(c in ds.stoi for c in (ROLE_USER, ROLE_ASSISTANT, ROLE_END))
+
+
+def chat(args) -> None:
+    """Interactive chat with a checkpoint trained on the role-marker format.
+
+    The recurrent membrane state persists ACROSS turns -- the conversation
+    lives in the network's spiking dynamics, exactly as during training on
+    multi-turn dialogues -- so follow-up turns are conditioned on the whole
+    exchange so far. `/reset` zeroes it; `/quit` exits. ``--once`` answers a
+    single prompt non-interactively (scriptable) and prints only the reply.
+    """
+    if args.seed is not None:
+        set_seed(args.seed)
+    device = pick_device(getattr(args, "device", "auto"))
+    model, ds = _load_checkpoint(args.ckpt, device)
+    if not _checkpoint_can_chat(ds):
+        sys.exit("error: this checkpoint's vocabulary has no chat role "
+                 "markers; train one with --vocab fixed on a chat-formatted "
+                 "corpus (see build_chat_corpus.py).")
+    state = model.init_state(1, device)
+    pending_end = False                    # \x03 owed if a reply hit the cap
+    gen_kwargs = dict(temperature=args.temperature, top_k=args.top_k,
+                      top_p=args.top_p, stop_char=ROLE_END,
+                      ban_chars=ROLE_USER + ROLE_ASSISTANT)
+
+    def respond(user_text: str, stream) -> str:
+        nonlocal state, pending_end
+        prompt = ((ROLE_END if pending_end else "")
+                  + ROLE_USER + user_text.strip() + ROLE_ASSISTANT)
+        text, state = model._generate_core(
+            ds, state, prompt, args.max_chars, device, stream=stream,
+            **gen_kwargs)
+        pending_end = not text.endswith(ROLE_END)
+        return text[:-1] if text.endswith(ROLE_END) else text
+
+    if getattr(args, "once", None) is not None:
+        print(respond(args.once, None).strip())
+        return
+
+    print(f"[chat] {args.ckpt} | temperature {args.temperature} "
+          f"top-p {args.top_p} | /reset clears memory, /quit exits")
+    while True:
+        try:
+            user = input("you> ")
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+        user = user.strip()
+        if not user:
+            continue
+        if user in ("/quit", "/exit"):
+            break
+        if user == "/reset":
+            state = model.init_state(1, device)
+            pending_end = False
+            print("[chat] memory cleared")
+            continue
+        sys.stdout.write("snn> ")
+        sys.stdout.flush()
+
+        def _stream(ch: str) -> None:
+            if ch not in (ROLE_USER, ROLE_ASSISTANT, ROLE_END):
+                sys.stdout.write(ch)
+                sys.stdout.flush()
+
+        respond(user, _stream)
+        sys.stdout.write("\n")
+
+
+def _word_set(corpus_path: Optional[str]) -> Optional[set]:
+    """Vocabulary of words (>=2 occurrences) from a corpus file, for the
+    word-validity metric. None if no corpus was given."""
+    if not corpus_path:
+        return None
+    with open(corpus_path, "r", encoding="utf-8") as f:
+        text = f.read(20_000_000).lower()
+    counts = collections.Counter(re.findall(r"[a-z']+", text))
+    return {w for w, c in counts.items() if c >= 2}
+
+
+def chateval(args) -> None:
+    """Chat-quality report card for a checkpoint.
+
+    Metrics (all defined in CAMPAIGN.md):
+      conditioning gain  -- assistant-span bpc with the true vs a shuffled user
+                            turn (positive = replies actually depend on the
+                            prompt; ~0 = generic-register failure).
+      termination rate   -- fraction of sampled replies that emit the
+                            end-of-turn marker within --max-chars.
+      distinct-3gram     -- unique/total character 3-grams over the replies
+                            (low = the model loops).
+      word validity      -- fraction of generated words that occur in --data's
+                            corpus (needs --data; a proxy for spelling).
+    Sampled transcripts are printed (and written to --transcripts if given).
+    """
+    if args.seed is not None:
+        set_seed(args.seed)
+    device = pick_device(getattr(args, "device", "auto"))
+    model, ds = _load_checkpoint(args.ckpt, device)
+    if not _checkpoint_can_chat(ds):
+        sys.exit("error: checkpoint has no chat role markers in its vocab.")
+    pairs = _load_chat_pairs(args.pairs)
+    cm = conditioning_metrics(model, ds, pairs, device, max_pairs=args.n)
+    print(f"[chateval] conditioning over {cm['n_pairs']} pairs: "
+          f"bpc true {cm['bpc_true']:.3f} | shuffled {cm['bpc_shuffled']:.3f} "
+          f"| gain {cm['gain']:+.3f}")
+
+    words = _word_set(getattr(args, "data", None))
+    n_gen = min(args.gen_n, len(pairs))
+    ended = 0
+    lengths = []
+    all_text = []
+    transcripts = []
+    for p in pairs[:n_gen]:
+        state = model.init_state(1, device)
+        prompt = ROLE_USER + p["user"] + ROLE_ASSISTANT
+        text, _ = model._generate_core(
+            ds, state, prompt, args.max_chars, device,
+            temperature=args.temperature, top_p=args.top_p,
+            stop_char=ROLE_END, ban_chars=ROLE_USER + ROLE_ASSISTANT)
+        if text.endswith(ROLE_END):
+            ended += 1
+            text = text[:-1]
+        lengths.append(len(text))
+        all_text.append(text)
+        transcripts.append(f"you> {p['user']}\nsnn> {text}\n")
+    joined = " ".join(all_text)
+    grams = [joined[i:i + 3] for i in range(len(joined) - 2)]
+    distinct3 = len(set(grams)) / max(1, len(grams))
+    toks = re.findall(r"[a-z']+", joined.lower())
+    validity = (sum(1 for t in toks if t in words) / max(1, len(toks))
+                if words is not None else float("nan"))
+    print(f"[chateval] {n_gen} sampled replies: terminated {ended}/{n_gen} "
+          f"| mean len {sum(lengths)/max(1,len(lengths)):.0f} chars "
+          f"| distinct-3gram {distinct3:.3f} "
+          f"| word-validity {validity:.3f}")
+    print("-" * 60)
+    for t in transcripts[:args.show]:
+        print(t)
+    if getattr(args, "transcripts", None):
+        with open(args.transcripts, "w", encoding="utf-8") as f:
+            f.write("\n".join(transcripts))
+        print(f"[chateval] transcripts -> {args.transcripts}")
+
+
+# ---------------------------------------------------------------------------
+# 5c. CUDA-graph training parity check (the go/no-go gate for --cuda-graph)
+# ---------------------------------------------------------------------------
+def graphcheck(args) -> None:
+    """Train the SAME model twice from identical init -- once eager, once with
+    the captured-graph training step -- and compare final weights and losses.
+
+    A subtly wrong capture (stale static buffers, freed grad addresses, baked
+    shapes) still produces a decreasing loss curve, so "loss goes down" proves
+    nothing; weight-level agreement with eager after N updates is the actual
+    correctness gate. Exits non-zero on mismatch.
+    """
+    device = pick_device(getattr(args, "device", "auto"))
+    if device.type != "cuda":
+        sys.exit("error: graphcheck needs a CUDA device.")
+    B, chunk = args.batch_size, args.chunk
+    ds = CharDataset(_DEMO_CORPUS, seq_len=args.seq_len,
+                     fixed_vocab=FIXED_VOCAB)
+    cfg = SNNConfig(vocab_size=ds.vocab_size, hidden=args.hidden,
+                    num_layers=args.layers, num_steps=args.num_steps,
+                    seq_len=args.seq_len, dropout=0.0, layernorm=True,
+                    input_coding="graded")
+    set_seed(999)
+    windows = [ds.get_batch(B, device) for _ in range(args.windows)]
+
+    def run(graphed: bool):
+        set_seed(123)                      # identical init both runs
+        model = SNNCharLM(cfg).to(device).train()
+        opt = torch.optim.AdamW(model.parameters(), lr=3e-3)
+        gs = (_capture_chunk_step(model, cfg, B, chunk, device, warm_lr=3e-3)
+              if graphed else None)
+        losses = []
+        for x, y in windows:
+            if graphed:
+                for mm in gs["mems"]:
+                    mm.zero_()
+            else:
+                mems = model.init_state(B, device)
+            for c0 in range(0, x.size(1), chunk):
+                if graphed:
+                    gs["x"].copy_(x[:, c0:c0 + chunk])
+                    gs["y"].copy_(y[:, c0:c0 + chunk])
+                    gs["graph"].replay()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    opt.step()
+                    with torch.no_grad():
+                        for sm, nm in zip(gs["mems"], gs["new_mems"]):
+                            sm.copy_(nm)
+                    losses.append(float(gs["loss"]))
+                else:
+                    mems = model.detach_state(mems)
+                    logits, mems = model.forward_seq(x[:, c0:c0 + chunk], mems)
+                    loss = F.cross_entropy(
+                        logits.reshape(-1, cfg.vocab_size),
+                        y[:, c0:c0 + chunk].reshape(-1))
+                    opt.zero_grad(set_to_none=True)
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    opt.step()
+                    losses.append(float(loss))
+        return model, losses
+
+    eager_model, eager_losses = run(False)
+    graph_model, graph_losses = run(True)
+    w_diff = max(float((a - b).abs().max())
+                 for (_, a), (_, b) in zip(eager_model.state_dict().items(),
+                                           graph_model.state_dict().items()))
+    l_diff = max(abs(a - b) for a, b in zip(eager_losses, graph_losses))
+    n_upd = len(eager_losses)
+    print(f"[graphcheck] h{args.hidden} L{args.layers} T={args.num_steps} "
+          f"B{B} chunk {chunk} | {n_upd} updates")
+    print(f"[graphcheck] loss  eager {eager_losses[0]:.4f}->"
+          f"{eager_losses[-1]:.4f} | graph {graph_losses[0]:.4f}->"
+          f"{graph_losses[-1]:.4f} | max |diff| {l_diff:.3e}")
+    print(f"[graphcheck] max |weight diff| after {n_upd} updates: {w_diff:.3e}")
+    ok = w_diff < args.tol and l_diff < args.tol
+    print(f"[graphcheck] {'PASS' if ok else 'FAIL'} (tolerance {args.tol:g})")
+    if not ok:
+        sys.exit(1)
 
 
 # ---------------------------------------------------------------------------
@@ -1421,11 +2158,42 @@ def build_parser() -> argparse.ArgumentParser:
                    help="auto | cpu | cuda | cuda:N")
     t.add_argument("--save-state", dest="save_state", type=str, default=None,
                    help="also write a full resumable training state "
-                        "(model+optimizer+RNG) here, refreshed each eval and at "
-                        "exit; load it with --resume")
+                        "(model+optimizer+RNG) here, refreshed each eval, every "
+                        "--state-every-min minutes, and at exit; load with "
+                        "--resume (the previous state is kept as <file>.bak)")
+    t.add_argument("--state-every-min", dest="state_every_min", type=float,
+                   default=15.0,
+                   help="wall-clock minutes between resumable-state saves "
+                        "(decoupled from the eval cadence)")
     t.add_argument("--log-csv", dest="log_csv", type=str, default=None,
-                   help="append metrics (update,split,bpc,ppl,upd/s,peakGPU) to "
-                        "this CSV for plotting the training curves")
+                   help="append metrics (update,split,bpc,ppl,upd/s,peakGPU,"
+                        "ts,lr,gradnorm,fire) to this CSV")
+    # -- Tier 7: chat campaign flags --
+    t.add_argument("--vocab", type=str, default="corpus",
+                   choices=["corpus", "fixed"],
+                   help="corpus = vocabulary derived from --data (classic); "
+                        "fixed = the corpus-independent FIXED_VOCAB incl. chat "
+                        "role markers (lets one model pretrain and fine-tune "
+                        "on different corpora)")
+    t.add_argument("--val-data", dest="val_data", type=str, default=None,
+                   help="separate validation corpus file (overrides "
+                        "--val-split tail splitting; used by the multi-source "
+                        "chat corpus whose tail would be single-register)")
+    t.add_argument("--eval-max-windows", dest="eval_max_windows", type=int,
+                   default=0,
+                   help="cap deterministic eval at N evenly spaced windows "
+                        "(0 = sweep the whole split); keeps in-run evals cheap "
+                        "on a large corpus")
+    t.add_argument("--cuda-graph", dest="cuda_graph", action="store_true",
+                   help="capture the TBPTT chunk's fwd+loss+bwd as a CUDA "
+                        "graph and replay it per update (needs --input-coding "
+                        "graded, --dropout 0; verify with `graphcheck`)")
+    t.add_argument("--tf32", action="store_true",
+                   help="allow TF32 matmuls (worth testing once --cuda-graph "
+                        "removes the launch-overhead bottleneck)")
+    t.add_argument("--chat-pairs", dest="chat_pairs", type=str, default=None,
+                   help="conditioning_val.jsonl from build_chat_corpus.py; if "
+                        "given, conditioning gain is reported at every eval")
     t.set_defaults(func=train)
 
     # -- sample --
@@ -1435,6 +2203,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--length", type=_positive_int, default=400)
     s.add_argument("--temperature", type=float, default=0.8)
     s.add_argument("--top-k", dest="top_k", type=int, default=None)
+    s.add_argument("--top-p", dest="top_p", type=float, default=None,
+                   help="nucleus sampling mass (e.g. 0.9)")
     s.add_argument("--seed", type=int, default=None,
                    help="seed RNGs for reproducible generation (default: fresh "
                         "output each run)")
@@ -1469,6 +2239,67 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--device", type=str, default="auto",
                    help="auto | cpu | cuda | cuda:N")
     e.set_defaults(func=eval_cmd)
+
+    # -- chat --
+    c = sub.add_parser("chat",
+                       help="chat with a checkpoint (REPL, or --once for a "
+                            "single scripted prompt)")
+    c.add_argument("--ckpt", type=str, default="spark.pt")
+    c.add_argument("--once", type=str, default=None,
+                   help="answer this one prompt and exit (prints only the reply)")
+    c.add_argument("--temperature", type=float, default=0.9)
+    c.add_argument("--top-p", dest="top_p", type=float, default=0.9,
+                   help="nucleus sampling mass (tune this OR --top-k, not both)")
+    c.add_argument("--top-k", dest="top_k", type=int, default=None)
+    c.add_argument("--max-chars", dest="max_chars", type=_positive_int,
+                   default=400, help="reply length cap")
+    c.add_argument("--seed", type=int, default=None)
+    c.add_argument("--device", type=str, default="auto")
+    c.set_defaults(func=chat)
+
+    # -- chateval --
+    ce = sub.add_parser("chateval",
+                        help="chat-quality report: conditioning gain, "
+                             "termination, repetition, word validity")
+    ce.add_argument("--ckpt", type=str, default="spark.pt")
+    ce.add_argument("--pairs", type=str, default="corpus/conditioning_val.jsonl")
+    ce.add_argument("--n", type=_positive_int, default=200,
+                    help="pairs scored for conditioning gain")
+    ce.add_argument("--gen-n", dest="gen_n", type=_positive_int, default=12,
+                    help="prompts sampled for generation metrics")
+    ce.add_argument("--show", type=int, default=6,
+                    help="transcripts printed to stdout")
+    ce.add_argument("--data", type=str, default=None,
+                    help="corpus file whose words define the word-validity set")
+    ce.add_argument("--transcripts", type=str, default=None,
+                    help="write all sampled transcripts to this file")
+    ce.add_argument("--temperature", type=float, default=0.9)
+    ce.add_argument("--top-p", dest="top_p", type=float, default=0.9)
+    ce.add_argument("--max-chars", dest="max_chars", type=_positive_int,
+                    default=400)
+    ce.add_argument("--seed", type=int, default=7)
+    ce.add_argument("--device", type=str, default="auto")
+    ce.set_defaults(func=chateval)
+
+    # -- graphcheck --
+    gc = sub.add_parser("graphcheck",
+                        help="parity gate: eager vs CUDA-graph training must "
+                             "produce the same weights")
+    gc.add_argument("--hidden", type=_positive_int, default=256)
+    gc.add_argument("--layers", type=_positive_int, default=3)
+    gc.add_argument("--num-steps", dest="num_steps", type=_positive_int,
+                    default=3)
+    gc.add_argument("--seq-len", dest="seq_len", type=_positive_int, default=128)
+    gc.add_argument("--chunk", type=_positive_int, default=32)
+    gc.add_argument("--batch-size", dest="batch_size", type=_positive_int,
+                    default=32)
+    gc.add_argument("--windows", type=_positive_int, default=6,
+                    help="training windows compared (updates = windows * "
+                         "seq_len/chunk)")
+    gc.add_argument("--tol", type=float, default=1e-3,
+                    help="max allowed |weight diff| and |loss diff|")
+    gc.add_argument("--device", type=str, default="auto")
+    gc.set_defaults(func=graphcheck)
 
     # -- smoke --
     sm = sub.add_parser("smoke", help="fast self-test")
