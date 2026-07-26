@@ -91,6 +91,11 @@ hard-stop on \x03.
   7/8 terminated, word-validity 0.806); chat --once identity works ("I'm Spark, a small
   spiking neural network") with expected story-register bleed at toy scale.
 - Cron heartbeat now hourly at :23 (job 6932c946).
+- Trajectory so far: val 1.810@3K -> 1.545@6K -> 1.472@9K (ahead of gates); cond_gain
+  +0.015 -> +0.022; grad_norm settled ~1.1. WATCH: firing rates L1/L2 drifted below the 2%
+  alarm floor (2.9/3.0/14.5% @3K -> 1.5/1.2/13.0% @9K) but STABILIZED 6K->9K — an extremely
+  sparse code, bpc still improving briskly. Decision: continue; escalate only if <0.5% or
+  bpc stalls. (For TIER7: sparse-coding observation is itself an interesting finding.)
 - After MAIN_PRE_DONE: finetune phase per plan + chunk64-vs-128 A/B from the same
   pretrained checkpoint (cond_gain comparison), then chateval + full deterministic eval
   (official numbers) + docs + final commits.
