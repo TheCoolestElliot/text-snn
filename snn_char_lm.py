@@ -1396,9 +1396,15 @@ def train(args) -> None:
     # checkpoint on disk (with validation, keep it only if it beats the running
     # best; this also covers a run whose schedule never triggered a mid-run eval).
     if do_val:
+        # Same estimator as the in-run evals (incl. --eval-max-windows): the
+        # final number must be comparable with the best-val it is checked
+        # against, and a FULL deterministic sweep of a large val split runs at
+        # eager speed (~tens of minutes at h2048) -- get the official
+        # full-sweep figure post-hoc via `eval --deterministic` instead.
         final_val = evaluate(model, dataset, "val", args.batch_size,
                              args.eval_batches, device,
-                             deterministic=args.deterministic_eval)
+                             deterministic=args.deterministic_eval,
+                             max_windows=getattr(args, "eval_max_windows", 0))
         if final_val < best_val:
             best_val = final_val
             _save_checkpoint(args.ckpt, model, cfg, dataset)

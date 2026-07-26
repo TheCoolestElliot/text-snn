@@ -77,6 +77,24 @@ hard-stop on \x03.
   1-5% of pretrain tokens). Early-stop on prose-val regression >0.05 bpc.
 - Day 5: final eval, README/TIER7 docs, tests, commits, demo polish. Buffer.
 
+## MAIN PRETRAIN (launched 2026-07-26 07:14)
+- Config: h1536/L3/T3/B256/chunk64/seq256 + cuda-graph, corpus v3 (639MB), 234K steps
+  (6 epochs), lr 3e-3 warmup 2000 cosine, eval every 3000 (subsampled 1024 windows) +
+  cond_gain, save-state runs/main.state every 15min, under supervise.py, detached.
+  Logs: runs/main_pre.log, runs/main_pre.csv. Sentinel: runs/MAIN_PRE_DONE. ETA ~12:00 07-27.
+- **Trajectory gates** (from rehearsal + ablation reference curves): val ~1.83 by upd 2-3K;
+  < ~1.65 by 30K; monotone-ish improvement early (3 consecutive worsening evals early = investigate).
+  Alarm: upd/s sustained <1.8 (eviction), firing rate outside [2%,90%], cond_gain falling
+  while val improves (register memorization).
+- **Dress rehearsal PASSED 07:10** (all 4 stages): h1024 4K-step pretrain val 1.696 under
+  supervisor; cross-corpus --init-from finetune OK (val 1.734); chateval OK (gain +0.016,
+  7/8 terminated, word-validity 0.806); chat --once identity works ("I'm Spark, a small
+  spiking neural network") with expected story-register bleed at toy scale.
+- Cron heartbeat now hourly at :23 (job 6932c946).
+- After MAIN_PRE_DONE: finetune phase per plan + chunk64-vs-128 A/B from the same
+  pretrained checkpoint (cond_gain comparison), then chateval + full deterministic eval
+  (official numbers) + docs + final commits.
+
 **Quality expectation to set in docs**: TinyStories-grade — grammatical simple sentences,
 in-register replies, short-range coherence; NOT factuality or multi-turn memory. bpc on the new
 corpus is NOT comparable to 2.31 on the old one (different entropy; expect well under 2).
@@ -118,3 +136,43 @@ corpus is NOT comparable to 2.31 on the old one (different entropy; expect well 
   to be picked by ablation (h1536/2048/3072, T3 vs T5, L3 vs L4).
 - 2026-07-26 ~02:15 supervise.py written (gates on [done] marker, crash-loop brake, .STOP
   sentinel). Windows Update PAUSED until 2026-08-01 (admin shell).
+- 2026-07-26 ~03:35 **INCIDENT**: harness background tasks (ablation battery + poller) were
+  killed externally minutes after launch. **RESILIENCE RULE for the rest of the campaign:
+  all long GPU work runs as DETACHED OS processes (Start-Process pwsh -File <script>), never
+  as harness background tasks; progress tracked via log files; wake-ups via short
+  self-expiring poller tasks (exit on done/error/timeout <=30min, any exit re-invokes).**
+  Battery relaunched detached (scratchpad battery.ps1 -> runs/ablation_battery.log, per-config
+  .DONE sentinels, skip-if-done on rerun). Corpus v2: 327.6MB pretrain (46% stories/54%
+  dialogue), 6.18MB val; finetune regenerated with 197 unique identity dialogues.
+- 2026-07-26 ~03:55 Pollers also get killed (near-instantly). **Wake mechanism switched to a
+  session cron job (id 6cb52246, fires :07/:37 hourly)** — independent of task kills. Battery
+  stdout is buffered until process exit; the flush-per-row CSVs in runs/ are the live telemetry.
+  h3072 config pre-skipped via its .DONE sentinel (throughput ~5.7K chars/s disqualifies it:
+  <=2 epochs/48h). First battery signal (h2048/T3 @500upd): val 2.712 bpc, firing rates
+  0.06/0.11/0.21 (healthy sparse spiking), cond_gain ~0 (expected this early), grad_norm 37-75
+  (hard-clipped every step at 1.0 — watch; queue lr 1.5e-3 variant if wide configs disappoint).
+  Measured upd/s: h2048/T3/B256 = 0.70 (11.5K chars/s).
+- 2026-07-26 ~05:30 **BATTERY 1 RESULTS** (2000 updates, subsampled deterministic val bpc):
+  w2048_T3 **1.778** (graph 0.60-0.66 upd/s) | w1536_T3 **1.829** (graph 2.25 upd/s) |
+  w2048_T5 KILLED (VRAM thrash 0.13 upd/s @6.46GB) | w2048_L4 KILLED (val 4.12@500 - depth-4
+  fails at this LR/budget even with LayerNorm) | w2048_c128 OOM at capture | w3072 pre-skipped.
+  **EAGER REF h2048_T3_B256 = 1.3 upd/s — FASTER than its graph (0.65)!** Emerging rule:
+  CUDA-graph replay wins in a small-footprint sweet spot (h1536/T3 3.1GB: 2.25 upd/s
+  sustained = 36.9K chars/s) but big captures (larger private pools) hit a WDDM cliff.
+  Graph = sweet-spot lever, not universal — document honestly in TIER7.
+- 2026-07-26 ~06:50 **BATTERY 2 RESULTS + FINAL CONFIG**: w1536_T5 val 1.838@1000upd (better
+  per-update than T3, but 0.31-0.38 upd/s = 6-7x slower per second -> dominated; killed after
+  the 1000 data point). w1536_L4 val 3.337@2000 (depth-4 fails at BOTH widths). w1536_c128
+  0.245 upd/s @3.09GB -> the graph cliff tracks CAPTURED KERNEL COUNT as well as pool memory
+  (chunk128 doubles nodes at same VRAM); killed. Chunk-64-vs-128 conditioning question moved
+  to the finetune stage as a same-checkpoint A/B (better experiment anyway).
+  **LOCKED main config: h1536/L3/T3/B256/chunk64/seq256 + CUDA graph** (2.25 upd/s = 36.9K
+  chars/s, 3.1GB, val 1.829@2000 vs h2048's 1.778 at 3.2x the wall-clock cost).
+  Corpus v3 BUILT: 639.3MB pretrain (47% stories/53% dialogue), 8.78MB val, 197-variant
+  identity. Main run: 234K updates = 6 epochs ~= 29h. Dress rehearsal (h1024 full pipeline
+  incl. supervisor, cross-corpus --init-from, chateval, chat probes) launched ~06:50.
+- 2026-07-26 ~05:30 **MAIN RUN PLAN v2**: config = h1536/L3/T3/B256/chunk64/seq256 + graph
+  (near-wash quality vs h2048 per update, 1.75x data per wall-clock vs h2048-eager, low VRAM,
+  parity-proven) pending w1536_T5/L4/c128 results from battery 2 (~07:00). Corpus v3 ~750MB
+  (stories 300 / soda ~300 / ultrachat ~60 / smoltalk+everyday+identity), ~6 epochs ≈ 4.5B
+  chars ≈ 34h, leaving ~20h for finetune+eval+docs+buffer. Downloading ultrachat shards 1-2.
