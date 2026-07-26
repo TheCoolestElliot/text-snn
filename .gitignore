@@ -27,9 +27,13 @@ env/
 # any other *.pt a training run produces).
 *.pt
 !demo.pt
-!shakespeare.pt
+!prose.pt
 snn_char_lm.pt
-my_shakespeare.pt
+my_prose.pt
+
+# Cached Project Gutenberg downloads for build_corpus.py (input.txt is the
+# committed artifact; the cache is just to make a rebuild offline and instant)
+.corpus_cache/
 
 # Tier 6 experiment outputs (checkpoints + metrics CSVs)
 runs/
