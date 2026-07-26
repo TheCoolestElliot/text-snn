@@ -462,6 +462,143 @@ def test_cli_arch_flag():
     assert m.build_parser().parse_args(["train", "--arch", "gru"]).arch == "gru"
 
 
+# --------------------------------------------------------------------------- #
+# Tier 7: fixed vocab, chat format, sampling controls, atomic saves
+# --------------------------------------------------------------------------- #
+def test_fixed_vocab_size_and_roundtrip():
+    assert len(m.FIXED_VOCAB) == 99            # \n + 3 role markers + 95 printable
+    ds = m.CharDataset("hello world " * 10, seq_len=8,
+                       fixed_vocab=m.FIXED_VOCAB)
+    assert ds.vocab_size == 99
+    assert ds.decode(ds.encode("Hi there!")) == "Hi there!"
+    s = m.ROLE_USER + "hi" + m.ROLE_ASSISTANT + "yo" + m.ROLE_END
+    assert ds.decode(ds.encode(s)) == s        # role markers are in-vocab
+
+
+def test_fixed_vocab_is_corpus_independent():
+    a = m.CharDataset("aaa bbb " * 10, seq_len=4, fixed_vocab=m.FIXED_VOCAB)
+    b = m.CharDataset("zzz qqq " * 10, seq_len=4, fixed_vocab=m.FIXED_VOCAB)
+    assert a.stoi == b.stoi                    # the whole point: no vocab drift
+
+
+def test_encode_fast_matches_slow_path_and_counts_drops():
+    stoi = {c: i for i, c in enumerate(sorted(set("abc \n")))}
+    text = "abc XYZ\nca"
+    ids, dropped = m._encode_fast(text, stoi)
+    slow = [stoi[c] for c in text if c in stoi]
+    assert ids.tolist() == slow
+    assert dropped == 3                        # X, Y, Z
+
+
+def test_explicit_val_file_splits():
+    tr, va = "abcd " * 50, "dcba " * 20
+    ds = m.CharDataset(tr, seq_len=8, fixed_vocab=m.FIXED_VOCAB, val_text=va)
+    assert ds.has_val()
+    assert len(ds.splits["train"]) == len(tr)
+    assert len(ds.splits["val"]) == len(va)
+    assert len(ds.splits["all"]) == len(tr) + len(va)
+
+
+def _tiny_chat_model(hidden=32):
+    ds = m.CharDataset("hello world. how are you? " * 30, seq_len=16,
+                       fixed_vocab=m.FIXED_VOCAB)
+    cfg = m.SNNConfig(vocab_size=ds.vocab_size, hidden=hidden, num_layers=2,
+                      num_steps=3, seq_len=16, dropout=0.0,
+                      input_coding="graded", layernorm=True)
+    return ds, cfg, m.SNNCharLM(cfg).eval()
+
+
+def test_generate_ban_chars_never_sampled():
+    ds, cfg, model = _tiny_chat_model()
+    out = model.generate(ds, prompt="h", length=60, device=CPU,
+                         temperature=1.5, ban_chars="e" + m.ROLE_USER)
+    assert "e" not in out[1:]                  # banned char cannot be sampled
+
+
+def test_generate_top_p_runs_and_length():
+    ds, cfg, model = _tiny_chat_model()
+    out = model.generate(ds, prompt="he", length=20, device=CPU, top_p=0.9)
+    assert len(out) == 2 + 20
+
+
+def test_generate_core_returns_reusable_state():
+    ds, cfg, model = _tiny_chat_model()
+    state = model.init_state(1, CPU)
+    text1, state = model._generate_core(ds, state, "hi ", 5, CPU)
+    text2, state = model._generate_core(ds, state, " and ", 5, CPU)
+    assert len(text1) == 5 and len(text2) == 5  # state threads across calls
+
+
+def test_has_verbatim_loop():
+    assert m._has_verbatim_loop("abcdefghijklmnop" * 3)
+    assert not m._has_verbatim_loop(
+        "the quick brown fox jumps over the lazy dog near the river bank")
+
+
+def test_atomic_checkpoint_keeps_bak(tmp_path):
+    ds, cfg, model = _deterministic_model()
+    path = str(tmp_path / "c.pt")
+    m._save_checkpoint(path, model, cfg, ds)
+    m._save_checkpoint(path, model, cfg, ds)   # second save rotates the first
+    assert os.path.exists(path)
+    assert os.path.exists(path + ".bak")
+    torch.load(path, map_location="cpu", weights_only=True)        # loadable
+    torch.load(path + ".bak", map_location="cpu", weights_only=True)
+
+
+def test_conditioning_metrics_toy():
+    ds, cfg, model = _tiny_chat_model()
+    pairs = [{"user": "hello there", "assistant": "hi, how are you today"},
+             {"user": "what is two", "assistant": "two is a number"},
+             {"user": "goodbye now", "assistant": "see you later"}]
+    out = m.conditioning_metrics(model, ds, pairs, CPU, max_pairs=3)
+    assert out["n_pairs"] == 3
+    for k in ("bpc_true", "bpc_shuffled", "gain"):
+        assert isinstance(out[k], float) and math.isfinite(out[k])
+
+
+def test_load_chat_pairs_roundtrip(tmp_path):
+    p = str(tmp_path / "pairs.jsonl")
+    with open(p, "w", encoding="utf-8") as f:
+        f.write('{"user": "a", "assistant": "b"}\n\n'
+                '{"user": "c", "assistant": "d"}\n')
+    pairs = m._load_chat_pairs(p)
+    assert pairs == [{"user": "a", "assistant": "b"},
+                     {"user": "c", "assistant": "d"}]
+
+
+def test_cli_tier7_flags_parse():
+    a = m.build_parser().parse_args(
+        ["train", "--vocab", "fixed", "--val-data", "v.txt", "--cuda-graph",
+         "--eval-max-windows", "100", "--chat-pairs", "p.jsonl",
+         "--state-every-min", "5", "--tf32"])
+    assert a.vocab == "fixed" and a.val_data == "v.txt" and a.cuda_graph
+    assert a.eval_max_windows == 100 and a.state_every_min == 5.0 and a.tf32
+    c = m.build_parser().parse_args(["chat", "--once", "hi", "--top-p", "0.8"])
+    assert c.func is m.chat and c.once == "hi" and c.top_p == 0.8
+    ce = m.build_parser().parse_args(["chateval", "--n", "10"])
+    assert ce.func is m.chateval and ce.n == 10
+    gc = m.build_parser().parse_args(["graphcheck", "--windows", "2"])
+    assert gc.func is m.graphcheck and gc.windows == 2
+
+
+def test_require_graphable_lists_all_problems():
+    cfg = m.SNNConfig(vocab_size=10, dropout=0.1, input_coding="rate")
+    args = argparse.Namespace(seq_len=100, tbptt_chunk=32)
+    with pytest.raises(ValueError) as e:
+        m._require_graphable(cfg, torch.device("cpu"), args)
+    msg = str(e.value)
+    for frag in ("CUDA", "graded", "dropout", "divisible"):
+        assert frag in msg
+
+
+def test_supervise_strip_flag():
+    import supervise
+    assert supervise.strip_flag(["a", "--resume", "f", "b"], "--resume") == \
+        ["a", "b"]
+    assert supervise.strip_flag(["a", "b"], "--resume") == ["a", "b"]
+
+
 def test_deterministic_eval_is_seed_invariant():
     ds = m.CharDataset("abcdefghij " * 200, seq_len=12, val_split=0.3)
     cfg = m.SNNConfig(vocab_size=ds.vocab_size, hidden=16, num_layers=2,
