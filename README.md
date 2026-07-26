@@ -25,17 +25,17 @@ python snn_char_lm.py smoke
 # 2. Train on the built-in demo corpus (no data file needed):
 python snn_char_lm.py train --steps 2000
 
-# 3. Train on real text (Karpathy's tiny-shakespeare, ~1 MB) with a held-out
-#    validation split; the best-validation checkpoint is kept. This quick run
-#    uses defaults (hidden 512, 8000 updates) so it is only a warm-up -- it will
-#    NOT reach the shipped model's 2.44 bpc (see "Results" for the full recipe).
-#    It writes a scratch checkpoint so it can't overwrite the pre-trained
-#    shakespeare.pt shipped in this repo:
+# 3. Train on the shipped prose corpus (~1.1 MB of public-domain English) with a
+#    held-out validation split; the best-validation checkpoint is kept. This
+#    quick run uses defaults (hidden 512, 8000 updates) so it is only a warm-up
+#    -- it will NOT reach the shipped model's score (see "Results" for the full
+#    recipe). It writes a scratch checkpoint so it can't overwrite the
+#    pre-trained prose.pt shipped in this repo:
 python snn_char_lm.py train --data input.txt --steps 8000 --seq-len 160 \
-    --val-split 0.1 --seed 1337 --ckpt my_shakespeare.pt
+    --val-split 0.1 --seed 1337 --ckpt my_prose.pt
 
-# 4. Generate from a checkpoint (the shipped 2.44-bpc model is ready to use):
-python snn_char_lm.py sample --ckpt shakespeare.pt --prompt "ROMEO:" --length 400
+# 4. Generate from a checkpoint (the shipped model is ready to use):
+python snn_char_lm.py sample --ckpt prose.pt --prompt "It was " --length 400
 ```
 
 ---
@@ -88,7 +88,7 @@ memory.
 > all-to-all spike-feedback matrix `W_rec · spikes_prev`. I built and measured
 > it: on this next-character task a learned lateral matrix turns the network into
 > a chaotic dynamical system — it **fails to learn** (collapses to predicting
-> character frequencies, ~4.0 bpc, no better than unigram) and its
+> character frequencies, no better than a unigram model) and its
 > backprop-through-time gradient **explodes past float32 to NaN**. The same
 > failure appears whether the feedback fires every micro-step or once per
 > character. The leak's self-recurrence (spectral radius `beta < 1`) is
@@ -136,7 +136,8 @@ recurrent net; measured gradient norms stay of order 1–10.
 
 The last `--val-split` fraction of the corpus (default 10%) is held out as a
 contiguous validation tail, disjoint from training. Every `--eval-every` updates
-the model is scored on random validation windows (fresh membrane, no gradient)
+the model is scored on validation windows (fresh membrane, no gradient — random
+windows by default, or a fixed full-split sweep under `--deterministic-eval`)
 and the **best-validation checkpoint is kept** — so a checkpoint reflects
 generalization, not the last step's memorization. Bits-per-character (bpc) is the
 reported metric; lower is better, and it is directly comparable across corpora.
@@ -146,81 +147,130 @@ train and val bpc go near zero (there is nothing to generalize to) — it exists
 prove the pipeline learns, not as a benchmark. The real test is a natural-language
 corpus:
 
-## Results on tiny-shakespeare
+---
 
-Trained on Karpathy's tiny-shakespeare (1.1 MB, 65-char vocab; 1.0 M train /
-112 K held-out val chars) on the 8 GB RTX 5060 with a 1.18 M-parameter model
-(hidden 1024, 2 layers), 16 000 updates, ~65 min:
+## The corpus
+
+`input.txt` is **1,092,423 characters of ordinary English prose** over a
+**77-character** vocabulary: four complete public-domain novels from Project
+Gutenberg, chosen for plain, modern-reading narrative with a lot of dialogue —
+the goal is a model that writes normal English, so the training data has to be
+normal English.
+
+| book | author | chars |
+|------|--------|------:|
+| *The Adventures of Sherlock Holmes* | Arthur Conan Doyle | 561,910 |
+| *The Wonderful Wizard of Oz* | L. Frank Baum | 207,710 |
+| *The Time Machine* | H. G. Wells | 179,656 |
+| *Alice's Adventures in Wonderland* | Lewis Carroll | 143,140 |
+
+It is **reproducible, not a mystery blob** — [`build_corpus.py`](build_corpus.py)
+downloads each book, strips the Project Gutenberg licence header/footer, removes
+editorial insertions (footnotes, `[Illustration]` markers, `_italics_` underscores,
+asterisk scene-breaks), and folds the typography down to printable ASCII (curly
+quotes → straight, em dash → `--`, `café` → `cafe`):
+
+```bash
+python build_corpus.py            # rebuild input.txt from scratch (downloads cached)
+python build_corpus.py --check    # hash + stats for the file already on disk
+```
+
+That last fold matters more than it looks: a character LM has **one input neuron
+per distinct symbol**, so every stray typographic variant is a neuron that sees
+almost no training signal. The script pins the finished corpus's sha256
+(`7b0f147a…`) and warns if it ever changes, so an upstream re-release cannot
+silently invalidate the numbers below.
+
+---
+
+## Results
+
+Trained on that corpus (983 K train / 109 K held-out val chars) on the 8 GB
+RTX 5060 with a 1.21 M-parameter model (hidden 1024, 2 layers), 16 000 updates,
+~65 min:
 
 ```bash
 python snn_char_lm.py train --data input.txt --steps 16000 --hidden 1024 \
     --seq-len 160 --dropout 0.2 --weight-decay 2e-4 --val-split 0.1 \
-    --seed 1337 --ckpt shakespeare.pt
+    --seed 1337 --deterministic-eval --ckpt prose.pt
 ```
 
-> Re-running this **overwrites** the `shakespeare.pt` shipped in the repo:
-> training keeps only the best-validation checkpoint *of the current run*, so
-> point `--ckpt` at a scratch name if you want to preserve the shipped one.
+> Re-running this **overwrites** the `prose.pt` shipped in the repo: training
+> keeps only the best-validation checkpoint *of the current run*, so point
+> `--ckpt` at a scratch name if you want to preserve the shipped one.
 
 | metric | value |
 |--------|-------|
-| held-out **validation bpc** | **2.44** (perplexity 5.4) |
-| training loss (running avg, dropout on) | 2.20 bpc |
+| held-out **validation bpc** | **2.310** (perplexity 4.96) |
+| parameters | 1.21 M |
+| training loss (running avg, dropout on) | 2.11 bpc |
 | peak VRAM | 0.72 GB |
-| throughput | ~4 updates/s |
+| throughput | ~4.3 updates/s |
 
-With dropout at 0.2 the model **did not overfit** — validation bpc fell
-monotonically all the way to the last update (2.85 → 2.44) and was still
-inching down at the end, so more compute or capacity would push it further. The
-best-validation checkpoint is the one kept on disk.
+With dropout at 0.2, validation bpc fell from 2.83 at the first eval to 2.31 and
+**never turned back up** — over the last ~2 000 updates it simply flattened (best
+eval at update 15 500; the final one is 0.001 bpc behind it). So the budget was
+spent, not wasted, but the curve is flat at the end: more updates alone would buy
+little without more capacity. The best-validation checkpoint is the one kept on
+disk.
 
 The two bpc rows above are measured differently: validation bpc uses the
-`evaluate()` path (dropout off, fresh membrane, full windows), while the 2.20
+`evaluate()` path (dropout off, fresh membrane, full windows), while the 2.11
 "training" figure is the running average of the dropout-**on** training loss, so
-the two are not directly comparable — the matched-condition train bpc, measured
-through the same `evaluate()` path with dropout off, is ~2.07. Both bpc figures
-are also *stochastic point estimates* (the rate encoder and the eval-window
-sampling are random) and vary by roughly ±0.01 bpc across redraws — well within
-the reported precision. A fixed `--seed` makes a whole run reproducible.
+the two are not directly comparable. Measured through the same `evaluate()` path
+with dropout off, **train bpc is 1.98** — a 0.33 bpc generalization gap. The
+model does fit the training text better than held-out text, as any model does;
+what matters is that the gap stopped widening instead of blowing open. Because
+the run used `--deterministic-eval` (a fixed full-split sweep under a fixed
+encoder RNG), the validation figure is *exactly* reproducible rather than a noisy
+point estimate — re-check it any time with `eval --deterministic`.
 
-A sample from that checkpoint (`--prompt "ROMEO:" --temperature 0.5`):
+A sample from that checkpoint (`--prompt "It was " --temperature 0.5 --seed 7`,
+verbatim, line-wrapped here to fit the page):
 
 ```
-ROMEO:
-I think it upon the world,
-When I was this present that which he dession his honour state of the singer.
-
-KING RICHARD II:
-O heaven, who stands we be put upon the hands the devise thee,
-Shall I would not he shall be son and mine enter grace them the death
+It was a little me, and the Time Traveller was a good came to my head of the
+painted to carry and the corner, but I think that o the party in the
+scenertainly as we had been passed which has already dear my hand we can of the
+paper from the side of the finished me a four life an in the the golder and the
+next morning to the little problem to see the windows of the would be as I had
+the strange in the nex
 ```
 
-It is not fluent — a ~1 M-parameter spiking net at 2.4 bpc won't be — but it has
-unmistakably learned the corpus *structure*: the `NAME:` play format, real
-character names (KING RICHARD II), line breaks, and Shakespearean grammar and
-vocabulary.
+It is not fluent — a 1.2 M-parameter spiking net at 2.3 bpc won't be — but it is
+recognisably *ordinary English*: almost every token is a real word, the function
+words are placed like English function words, the clause rhythm and punctuation
+are right, and it has picked up the corpus's own vocabulary ("the Time
+Traveller"). What it lacks is meaning held across a whole sentence, which is
+exactly what a model this size at this bpc should lack.
 
 ### How it was tuned
 
 A short sweep (each config trained to a fixed 2000-update budget, ranked by
 held-out bpc) settled the architecture knobs:
 
-| change vs. baseline (h512, 2 layers) | val bpc @ 2k |
-|--------------------------------------|:---:|
-| baseline | 2.82 |
-| **width → hidden 1024** | **2.68** ✓ |
-| width → hidden 768 | 2.75 |
-| depth → 3 layers | 3.04 ✗ |
-| longer gradient → chunk 64 | 2.82 (no change) |
-| learnable `beta` | 3.05 ✗ |
+| change vs. baseline (h512, 2 layers) | params | val bpc @ 2k |
+|--------------------------------------|:---:|:---:|
+| baseline (hidden 512) | 0.34 M | 2.715 |
+| width → hidden 768 | 0.71 M | 2.591 ✓ |
+| **width → hidden 1024** | **1.21 M** | **2.523** ✓ |
+| width → hidden 2048 | 4.51 M | 2.412 ✓ |
+| depth → 3 layers | 0.60 M | 2.886 ✗ |
+| longer gradient → chunk 64 | 0.34 M | 2.697 (no real change) |
+| learnable `beta` | 0.34 M | 2.926 ✗ |
 
-The lesson: **width helps up to hidden 1024 on this corpus and budget, but extra
-depth and a learnable time constant both hurt** — more stacked spiking
-nonlinearities are harder to train through. Pushing width further stops paying
-off: a hidden-2048 model fits the training set better but generalizes *worse*
-(val ~2.50 vs 1024's 2.44) — it starts to overfit — so the sweet spot is
-wide-but-not-too-wide. The final model is wide and shallow, trained long with
-dropout.
+The lesson: **width helps and extra depth hurts** — more stacked spiking
+nonlinearities are harder to train through (a finding Tier 6 later qualifies,
+below). A learnable membrane time constant hurts too, and lengthening the TBPTT
+chunk from 32 to 64 buys essentially nothing, so the cheaper chunk is kept.
+
+Width had not stopped paying off at hidden 2048 (2.412) when this sweep ended.
+The shipped model is **hidden 1024** anyway: 2048 costs 3.7× the parameters for
+0.11 bpc at this budget, which is the wrong trade for a project whose point is
+that a spiking net is parameter-efficient. Whether 2048 still wins at the full
+16 000-update budget — where it has far more opportunity to overfit — is **not
+tested here**; it is listed as a follow-up in [`TIER6.md`](TIER6.md). The final
+model is wide and shallow, trained long with dropout.
 
 **Tier 6 revisited these knobs** with a deterministic-eval sweep (exactly
 reproducible bpc; see [`TIER6.md`](TIER6.md)) and found two changes the original
@@ -228,31 +278,31 @@ sweep lacked that turn the depth story around:
 
 | Tier 6 ablation @ 2k (hidden 512) | val bpc |
 |-----------------------------------|:---:|
-| baseline (2 layers, rate coding) | 2.82 |
-| per-neuron learnable `beta` | 2.91 ✗ |
-| 3 layers | 3.05 ✗ |
-| **3 layers + LayerNorm on currents** | **2.78** ✓ |
-| **graded (deterministic) input coding** | **2.73** ✓ |
-| **all three together** | **2.65** ✓✓ |
+| baseline (2 layers, rate coding) | 2.715 |
+| per-neuron learnable `beta` | 2.805 ✗ |
+| 3 layers | 2.886 ✗ |
+| **3 layers + LayerNorm on currents** | **2.635** ✓ |
+| **graded (deterministic) input coding** | **2.615** ✓ |
+| **all three together** | **2.484** ✓✓ |
 
-So **LayerNorm rescues depth** (3 layers goes 3.05 → 2.78, now *beating* the
-2-layer baseline) and **graded input coding helps** (2.73) — and they **stack**
-(2.65, a 0.17-bpc gain over baseline). A per-neuron learnable time constant still
+So **LayerNorm rescues depth** (3 layers goes 2.886 → 2.635, now *beating* the
+2-layer baseline) and **graded input coding helps** (2.615) — and they **stack**
+(2.484, a 0.23-bpc gain over baseline). A per-neuron learnable time constant still
 doesn't help at this budget. These are opt-in flags (`--layernorm`,
 `--input-coding graded`, `--beta-per-neuron`); the shipped checkpoints use none.
 
 For reference, this corpus's own entropy floors — computed on the shipped
-`input.txt` by `corpus_bpc_floors` in `snn_char_lm.py` — are **4.78 bpc**
-(unigram) and **3.54 bpc** (bigram, conditioning on the previous character).
-This spiking model at 2.44 bpc lands **well below the bigram floor** — it is
+`input.txt` by `corpus_bpc_floors` in `snn_char_lm.py` — are **4.48 bpc**
+(unigram) and **3.50 bpc** (bigram, conditioning on the previous character).
+This spiking model at 2.31 bpc lands **well below the bigram floor** — it is
 genuinely modelling English from context, not just character frequencies.
 
 For a non-spiking control, a **matched GRU baseline** — same corpus, same width
 (1024) and budget (16k updates), trainable with `--arch gru` — reaches
-**2.39 bpc**, only 0.06 below this SNN. But the GRU carries **~11× the
-parameters** (12.7M vs 1.18M): its dense recurrent matrices cost what the SNN
-gets for free from the parameter-less leak. So at matched width and budget the
-ANN's edge is small and the SNN is strikingly parameter-efficient. (The classical
+**2.19 bpc**, 0.12 below this SNN. But the GRU carries **~10.5× the parameters**
+(12.75M vs 1.21M): its dense recurrent matrices cost what the SNN gets for free
+from the parameter-less leak. So at matched width and budget the ANN wins, but
+narrowly, and the SNN is strikingly parameter-efficient. (The classical
 "~1.4 bpc" LSTM/GRU figure comes from much larger models trained far longer on
 other corpora such as PTB/enwik8.)
 
@@ -270,7 +320,7 @@ other corpora such as PTB/enwik8.)
   prefer a big batch and fewer optimizer updates over a small batch and many.
 - **The launch wall is beatable.** Because the cost is launch overhead, a
   **CUDA-graph capture** of the fixed-shape inner loop replays it as a single
-  launch — the `bench` subcommand measures **~8× (hidden 1024) to ~12× (hidden
+  launch — the `bench` subcommand measures **~8× (hidden 1024) to ~13× (hidden
   512)** on the forward inner-loop core. (`torch.compile` is not an option here —
   Triton has no Windows / Python 3.14 build.) TF32 and AMP, by contrast, are *not*
   levers: faster matmuls don't help a launch-bound net. Details in
@@ -323,8 +373,8 @@ ablation knobs and the ready-to-run experiment plan are documented in
 checkpoint's vocab). Reproduce the headline number with:
 
 ```bash
-python snn_char_lm.py eval --ckpt shakespeare.pt --data input.txt \
-    --val-split 0.1 --split val        # -> bpc ~2.44
+python snn_char_lm.py eval --ckpt prose.pt --data input.txt \
+    --val-split 0.1 --split val --deterministic
 ```
 
 Add `--deterministic` for an exactly reproducible, seed-invariant number (a fixed
@@ -352,6 +402,7 @@ Continuous integration (`.github/workflows/ci.yml`) runs the tests and a shrunk
 | file | purpose |
 |------|---------|
 | `snn_char_lm.py` | the whole model, training loop, evaluation, sampler, and CLI |
+| `build_corpus.py` | rebuilds `input.txt` reproducibly from Project Gutenberg (`python build_corpus.py`) |
 | `requirements.txt` | runtime dependencies (+ note on the CUDA build of torch) |
 | `requirements-dev.txt` | extra dependency for the test suite (`pytest`) |
 | `pyproject.toml` | packaging metadata, console entry point (`pip install .`), and tool config |
@@ -359,5 +410,5 @@ Continuous integration (`.github/workflows/ci.yml`) runs the tests and a shrunk
 | `README.md` | this file |
 | `LICENSE` | MIT |
 | `demo.pt` | a small checkpoint pre-trained on the demo corpus — try `python snn_char_lm.py sample --ckpt demo.pt` right away |
-| `shakespeare.pt` | the tiny-shakespeare checkpoint (2.44 val bpc) behind the results above — `python snn_char_lm.py sample --ckpt shakespeare.pt --prompt "ROMEO:"` |
-| `input.txt` | the tiny-shakespeare corpus — Karpathy's char-rnn / nanoGPT dataset (public-domain Shakespeare); 1,115,394 bytes, sha256 `86c4e6aa9db7c042ec79f339dcb96d42b0075e16b8fc2e86bf0ca57e2dc565ed`. Reproduce the results with it. |
+| `prose.pt` | the checkpoint behind the results above — `python snn_char_lm.py sample --ckpt prose.pt --prompt "It was "` |
+| `input.txt` | the prose corpus: four public-domain novels, 1,092,423 chars, 77-char vocab, sha256 `7b0f147ae27cb1e276495d2a0fb697fc7f6e8a0932a20e56bcf641de5b1e5ac0`. Rebuild it with `build_corpus.py`. |

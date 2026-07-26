@@ -193,8 +193,8 @@ def test_corpus_bpc_floors_match_readme():
     with open(path, encoding="utf-8") as f:
         uni, big = m.corpus_bpc_floors(f.read())
     # These are the values quoted in README.md; keep them in lock-step.
-    assert round(uni, 2) == 4.78
-    assert round(big, 2) == 3.54
+    assert round(uni, 2) == 4.48
+    assert round(big, 2) == 3.50
 
 
 # --------------------------------------------------------------------------- #

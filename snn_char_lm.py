@@ -41,22 +41,22 @@ Train on the built-in demo corpus (runs with zero setup)::
 
     python snn_char_lm.py train --steps 2000
 
-Train on real text (recommended: Karpathy's tiny-shakespeare, ~1 MB) with a
-held-out validation split (the best-validation checkpoint is kept). This writes
-a scratch checkpoint so it will not overwrite the pre-trained ``shakespeare.pt``
-shipped in the repo; see the README "Results" section for the full recipe that
-reproduces the 2.44-bpc model::
+Train on real text -- the shipped ``input.txt`` is ~1.1 MB of public-domain
+English prose (build it with ``python build_corpus.py``) -- with a held-out
+validation split (the best-validation checkpoint is kept). This writes a scratch
+checkpoint so it will not overwrite the pre-trained ``prose.pt`` shipped in the
+repo; see the README "Results" section for the full recipe::
 
     python snn_char_lm.py train --data input.txt --steps 8000 --seq-len 160 \
-        --val-split 0.1 --seed 1337 --ckpt my_shakespeare.pt
+        --val-split 0.1 --seed 1337 --ckpt my_prose.pt
 
 Sample from a trained checkpoint::
 
-    python snn_char_lm.py sample --ckpt shakespeare.pt --prompt "ROMEO:" --length 400
+    python snn_char_lm.py sample --ckpt prose.pt --prompt "It was " --length 400
 
 Score a checkpoint's bits-per-character on a corpus (reproduce the metric)::
 
-    python snn_char_lm.py eval --ckpt shakespeare.pt --data input.txt \
+    python snn_char_lm.py eval --ckpt prose.pt --data input.txt \
         --val-split 0.1 --split val
 
 Run a fast self-test (a short training run + a generation call)::
@@ -1494,7 +1494,9 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--seq-len", dest="seq_len", type=_positive_int, default=64,
                    help="chunk length L benchmarked (the inner-loop length)")
     b.add_argument("--batch-size", dest="batch_size", type=_positive_int, default=128)
-    b.add_argument("--vocab", type=_positive_int, default=65)
+    b.add_argument("--vocab", type=_positive_int, default=77,
+                   help="vocabulary size to benchmark (default: the shipped "
+                        "corpus's 77 characters)")
     b.add_argument("--iters", type=_positive_int, default=50)
     b.add_argument("--warmup", type=_positive_int, default=10)
     b.add_argument("--device", type=str, default="auto",
