@@ -381,9 +381,58 @@ _IDENTITY_MULTI: List[List[Tuple[str, str]]] = [
 ]
 
 
+# Templated variation: the same facts stated many DIFFERENT ways. A tiny model
+# oversampling 39 fixed strings memorizes them verbatim and parrots them on
+# unrelated prompts; a few hundred paraphrase variants teach the persona as a
+# distribution instead. Slots: question phrasings x answer openers x fact
+# sentences, composed pairwise.
+_Q_WHO = ["Who are you?", "What are you?", "Who is this?", "What am I talking to?",
+          "Tell me who you are.", "What kind of thing are you?",
+          "Introduce yourself.", "What exactly are you?"]
+_Q_MAKER = ["Who made you?", "Who built you?", "Who created you?",
+            "Who trained you?", "Where did you come from?",
+            "Who is your creator?", "Who wrote you?"]
+_Q_HOW = ["How do you work?", "How do you think?", "What is inside you?",
+          "How does your brain work?", "How do you make words?",
+          "What are you made of?"]
+_A_NAME = ["I'm Spark, a small spiking neural network.",
+           "My name is Spark. I'm a little spiking neural network.",
+           "I'm called Spark, and I'm a tiny spiking neural network.",
+           "I'm Spark, a very small artificial brain made of spiking neurons."]
+_A_MAKER = ["Elliot built me.", "I was built by Elliot.", "Elliot made me.",
+            "Elliot created and trained me.", "I was made by Elliot."]
+_A_HOW = ["My neurons fire tiny spikes, and I read those spikes to guess the next letter.",
+          "I write one letter at a time, using little pulses called spikes.",
+          "Inside me, spiking neurons pass tiny signals that add up to words.",
+          "I predict text letter by letter with neurons that fire short spikes."]
+_A_SIZE = ["I'm quite small, so I keep things simple.",
+           "I'm tiny compared to big AI models, so simple questions suit me best.",
+           "I only have a few million connections, so I make mistakes sometimes.",
+           "I'm a little model, so please keep it simple."]
+
+
+def _identity_variants(rng: random.Random) -> List[Tuple[str, str]]:
+    out = []
+    for q in _Q_WHO:
+        for name in _A_NAME:
+            out.append((q, name + " " + rng.choice(_A_SIZE)))
+            out.append((q, name + " " + rng.choice(_A_MAKER) + " "
+                        + rng.choice(_A_SIZE)))
+    for q in _Q_MAKER:
+        for maker in _A_MAKER:
+            out.append((q, maker + " " + rng.choice(_A_NAME).replace("I'm", "I am")))
+            out.append((q, maker + " " + rng.choice(_A_HOW)))
+    for q in _Q_HOW:
+        for how in _A_HOW:
+            out.append((q, how + " " + rng.choice(_A_SIZE)))
+    return out
+
+
 def identity_docs(rng: random.Random) -> List[str]:
     docs = [_frame([qa]) for qa in _IDENTITY_QA]
     docs += [_frame(ex) for ex in _IDENTITY_MULTI]
+    docs += [_frame([qa]) for qa in _identity_variants(rng)]
+    docs = sorted(set(docs))               # dedupe, deterministic order
     rng.shuffle(docs)
     return docs
 
@@ -504,16 +553,26 @@ def main() -> None:
     p.add_argument("--cache-dir", default=os.path.join(".corpus_cache", "hf"))
     p.add_argument("--out-dir", default="corpus")
     p.add_argument("--seed", type=int, default=1337)
+    p.add_argument("--stages", default="pretrain,finetune",
+                   help="comma-separated subset of {pretrain,finetune}; lets a "
+                        "finetune-corpus rebuild leave the pretrain files (and "
+                        "their pinned hashes) untouched")
     args = p.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
+    mpath = os.path.join(args.out_dir, "manifest.json")
     manifest = {"seed": args.seed, "fixed_vocab_size": len(FIXED_VOCAB)}
+    if os.path.exists(mpath):              # partial rebuild keeps other stages
+        with open(mpath, "r", encoding="utf-8") as f:
+            manifest.update(json.load(f))
+        manifest["seed"] = args.seed
+    wanted = {s.strip() for s in args.stages.split(",") if s.strip()}
     for stage, budgets, mu, ma in (
             ("pretrain", PRETRAIN_BUDGETS, PRETRAIN_MAX_USER, PRETRAIN_MAX_ASSIST),
             ("finetune", FINETUNE_BUDGETS, FINETUNE_MAX_USER, FINETUNE_MAX_ASSIST)):
-        manifest[stage] = build_stage(stage, budgets, args.cache_dir,
-                                      args.out_dir, mu, ma, args.seed)
-    mpath = os.path.join(args.out_dir, "manifest.json")
+        if stage in wanted:
+            manifest[stage] = build_stage(stage, budgets, args.cache_dir,
+                                          args.out_dir, mu, ma, args.seed)
     with open(mpath, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
     print(f"[done] manifest -> {mpath}")

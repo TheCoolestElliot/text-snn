@@ -1854,7 +1854,7 @@ def graphcheck(args) -> None:
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     opt.step()
-                    losses.append(float(loss))
+                    losses.append(float(loss.detach()))
         return model, losses
 
     eager_model, eager_losses = run(False)
