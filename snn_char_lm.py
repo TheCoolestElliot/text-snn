@@ -1643,7 +1643,8 @@ def eval_cmd(args) -> None:
                          "--val-split / the corpus size.")
     deterministic = getattr(args, "deterministic", False)
     bpc = evaluate(model, ds, args.split, args.batch_size, args.eval_batches,
-                   device, deterministic=deterministic)
+                   device, deterministic=deterministic,
+                   max_windows=getattr(args, "max_windows", 0))
     where = args.data if args.data else "built-in demo corpus"
     mode = ("deterministic full-split sweep" if deterministic
             else f"{args.eval_batches} x {args.batch_size} random windows")
@@ -2242,6 +2243,10 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--deterministic", action="store_true",
                    help="fixed-window + seeded-encoder full-split sweep: an "
                         "exactly reproducible bpc (ignores --eval-batches)")
+    e.add_argument("--max-windows", dest="max_windows", type=int, default=0,
+                   help="with --deterministic: cap at N evenly spaced windows "
+                        "(0 = full sweep); a full sweep of a large corpus runs "
+                        "at eager speed and can take tens of minutes")
     e.add_argument("--device", type=str, default="auto",
                    help="auto | cpu | cuda | cuda:N")
     e.set_defaults(func=eval_cmd)
