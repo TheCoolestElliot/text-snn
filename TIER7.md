@@ -131,6 +131,18 @@ rate. Round 3 keeps round 2's corpus surgery with round 1's gentle LR: best
 transcripts, precise identity (the "who are you?" answer no longer fires at
 hotel-booking prompts), crisp short replies.
 
+**A final negative result:** with ~1.5 days of buffer left, a v2 was attempted —
+300 MB of *strictly fresh* TinyStories/SODA text (the corpus builder can skip a
+previous build's documents exactly, since its reader order is deterministic),
+50 K continued-pretraining steps at a 6e-4 warm restart, then the same
+fine-tune. It lost the ship/no-ship gate: official bpc 1.2372 vs 1.2362,
+identical conditioning gain, and *worse* termination (63% vs 79%) and
+repetition. Fifty thousand warm-restart steps on fresh data could not beat the
+converged 234 K-step cosine — the restart's disruption cost roughly what the
+fresh text was worth. The shipped `spark.pt` is round 3 on the original
+schedule; the gate suite exists precisely so that a plausible-sounding
+improvement has to prove itself.
+
 ### 5. Measuring what actually matters: conditioning
 
 Validation bpc cannot tell a chat model from a fluent monologue generator. The
