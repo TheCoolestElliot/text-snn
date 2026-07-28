@@ -1,5 +1,14 @@
 # 5-Day Autonomous Campaign Log
 
+> **OUTCOME (closed 2026-07-28, ~2 days ahead of deadline):** mission
+> accomplished. `spark.pt` — 5.04M-param spiking chat model, official
+> **1.2362 bpc** / conditioning gain **+0.038** / word validity 0.95-0.99 /
+> 79% reply self-termination; identity, greetings, and small talk work;
+> honest limits documented. 3.8B training characters in 29.3 unattended
+> hours via the CUDA-graph training step (bitwise-parity-proven), zero
+> crashes. GRU control: 41.9M params, 1.0512, overfits in 1.7h. Full story
+> in TIER7.md; the log below is the raw play-by-play.
+
 **Mission (from Elliot, 2026-07-26):** make the SNN write modern conversational
 English ("kind of like Claude", NOT archaic prose), with good grammar, as smart as
 possible, with prompt->response input/output. Use the hardware maximally. 5 days,
@@ -181,3 +190,11 @@ corpus is NOT comparable to 2.31 on the old one (different entropy; expect well 
   parity-proven) pending w1536_T5/L4/c128 results from battery 2 (~07:00). Corpus v3 ~750MB
   (stories 300 / soda ~300 / ultrachat ~60 / smoltalk+everyday+identity), ~6 epochs ≈ 4.5B
   chars ≈ 34h, leaving ~20h for finetune+eval+docs+buffer. Downloading ultrachat shards 1-2.
+
+- 2026-07-27 12:35 **MAIN PRETRAIN COMPLETE**: best val 1.199 bpc, 234K updates, ~29.3h, ZERO crashes/restarts. Firing rates ended 1.8/1.3/13.0% (stable sparse code). cond_gain ended ~+0.038. Finetune phase launched (official eval -> baseline chateval -> A/B c64-graph vs c128-eager finetunes -> chateval+regression).
+
+- 2026-07-27 16:50 **FT ROUND 1 RESULTS**: A(c64) vs B(c128) IDENTICAL cond_gain +0.040 => chunk-128 gradient span buys nothing (carried membrane already delivers credit; honest TIER7 finding). A: word-validity 0.991, term 8/12, regression +0.001. Transcript diagnosis: story-register bleed in long replies, identity parroting on unrelated prompts (3.8% oversample too hot), long replies wander. **ROUND 2 launched**: finetune corpus rebuilt into corpus/v3ft2 (stories 33%->14%, identity 3.8%->1.6%, max assist 450->350, +ultrachat), lr 5e-4, 12K steps from main_pre.pt. Official pretrain: 1.2146 bpc; pretrained chateval gain +0.039, validity 0.970.
+
+- 2026-07-27 20:45 **FT ROUND 3 = WINNER -> spark.pt**. 3-way: ft_A gain+.040/term 67%/validity .991/reg 1.216 | ft2 +.039/81%/.960/1.232 | **ft3 +.039/75%/.974/1.222, mean len 141, best transcripts** (apt short replies, role-aware, clean identity, assistant greeting). Known limits (honest docs): long replies wander toward story register, niche prompts fail — capacity, not bugs. Launching bonus matched-GRU baseline (h1536/L3, same corpus/budget updates) overnight for the honest ANN comparison.
+
+- 2026-07-28 01:40 **GRU baseline concluded (early-stopped)**: lr 1e-3 diverged (archived gru_v3_lr1e3_diverged.csv); lr 4e-4 best val **1.042 @24K updates (~1.7h)**, then monotonic overfit to 1.082@51K -> stopped (best banked in runs/gru_v3.pt). Honest comparison: GRU h1536/L3 = 41.9M params, best 1.042, overfits in 2h; SNN h1536/L3/T5->T3 = 5.04M params, 1.199 (official 1.2146 full-sweep), never overfit across 29h/6 epochs. GPU now free for final eval battery.
