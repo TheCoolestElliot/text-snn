@@ -40,3 +40,4 @@ runs/
 
 # Tier 7 chat-campaign data (rebuildable via build_chat_corpus.py; ~400 MB)
 corpus/
+!spark.pt

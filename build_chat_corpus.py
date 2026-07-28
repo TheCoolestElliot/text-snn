@@ -82,17 +82,23 @@ PRETRAIN_BUDGETS = {           # ~47% unframed stories / ~53% framed dialogue
     "identity":  (int(1.5 * MB), 0),         # sprinkle; never in val
 }
 FINETUNE_BUDGETS = {           # assistant-register sharpening + story replay
-    "smoltalk":  (10 * MB, int(0.6 * MB)),
-    "soda":      (8 * MB, int(0.4 * MB)),
+    # Round-2 shares (the round-1 transcripts diagnosed the failure modes):
+    # story replay cut 33%->14% (story-register bleed into replies), identity
+    # cut 3.8%->1.6% (verbatim parroting on unrelated prompts), dialogue up.
+    "smoltalk":  (int(4.5 * MB), int(0.3 * MB)),
+    "soda":      (9 * MB, int(0.5 * MB)),
+    "ultrachat": (2 * MB, int(0.1 * MB)),
     "everyday":  (int(1.3 * MB), int(0.1 * MB)),
-    "stories":   (7 * MB, int(0.3 * MB)),    # ~25% replay against style override
-    "identity":  (int(0.8 * MB), 0),         # ~3% of finetune tokens, capped
+    "stories":   (3 * MB, int(0.2 * MB)),
+    "identity":  (int(0.35 * MB), 0),
 }
 
 # Stricter turn-length limits for the fine-tune stage: short exchanges are the
 # ones a truncated gradient window can actually learn conditioning from.
 PRETRAIN_MAX_USER, PRETRAIN_MAX_ASSIST = 300, 800
-FINETUNE_MAX_USER, FINETUNE_MAX_ASSIST = 200, 450
+# Finetune caps tightened in round 2 (long replies wander off-register; short
+# crisp replies terminate cleanly and stay conversational).
+FINETUNE_MAX_USER, FINETUNE_MAX_ASSIST = 200, 350
 MAX_EXCHANGES_PER_DIALOGUE = 4
 
 # Reject any conversation whose text contains these: code, markup, tables and

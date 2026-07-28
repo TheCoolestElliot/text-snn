@@ -12,7 +12,14 @@ python snn_char_lm.py chat --ckpt spark.pt            # interactive REPL
 python snn_char_lm.py chat --ckpt spark.pt --once "Who are you?"
 ```
 
-<!-- FINAL NUMBERS + sample transcript go here -->
+**Headline numbers** (deterministic full-sweep bpc; details and context below):
+`spark.pt` = 5.04 M params, **1.2362 bpc** on the held-out modern-corpus val,
+conditioning gain **+0.038** over 500 held-out exchanges, word validity
+0.95–0.99, 79% of sampled replies self-terminate. The matched GRU control needs
+**41.9 M params** for 1.0512 / +0.082 — and overfits within 1.7 h, which the
+SNN never did across 29 h. The campaign's raw arithmetic: 234 000 graph-replayed
+updates × 16 384 chars each = **3.8 billion characters** of training in 29.3
+unattended hours on one 8 GB consumer GPU, zero crashes.
 
 ## What changed and why
 
@@ -93,7 +100,36 @@ Two Tier 6 lessons survived contact with the 600× larger corpus: LayerNorm'd
 3-layer depth and graded input coding stay in; T=5's per-update advantage is
 real but loses 6× on wall-clock to T=3 at fixed hardware.
 
-<!-- ### 4. Main run + fine-tune results — fill after completion -->
+### 4. The main run, and three rounds of fine-tuning
+
+**Pretrain** (h1536 / 3 layers / T=3 / batch 256 / seq 256 / chunk 64, CUDA
+graph, 639 MB corpus, 6 epochs = 234 K updates, lr 3e-3 cosine): 29.3 h, no
+crashes, no supervisor restarts. Val bpc fell 1.81 → **1.199** (in-run
+subsampled; **1.2146** official full sweep) and was still creeping down when
+the cosine schedule ended. Firing rates settled at 1.6/1.3/13% per layer by
+update 6 K and never moved again — the network chose a very sparse code and
+kept it.
+
+**Fine-tune** was run three times from the same pretrained checkpoint, because
+the first round's *transcripts* (not its metrics!) exposed two failure modes
+the metric suite scored as fine: story-register bleed into long replies, and
+the identity block firing verbatim at unrelated prompts (3.8% oversampling was
+too hot). The A/B/C table, all scored on the same 200 held-out pairs:
+
+| round | recipe | cond gain | terminated | word validity | mean reply | pretrain-val regression |
+|-------|--------|:---:|:---:|:---:|:---:|:---:|
+| 1 (A) | lr 3e-4, story replay 33%, identity 3.8% | +0.040 | 67% | 0.991 | 242 ch | +0.001 |
+| 1 (B) | as A but TBPTT chunk 128 | +0.040 | 75% | 0.980 | 220 ch | +0.002 |
+| 2 | lr 5e-4, replay 14%, identity 1.6%, turns ≤350 ch | +0.039 | 81% | 0.960 | 167 ch | +0.017 |
+| **3 = `spark.pt`** | round-2 corpus, lr 3e-4 | +0.039 | 75% | 0.974 | 141 ch | +0.007 |
+
+Two negative results worth their table rows: **doubling the TBPTT gradient
+span (chunk 128) bought exactly nothing** for conditioning — the membrane
+state carried across chunks already delivers the long-range credit — and the
+higher fine-tune LR traded prose ability for register sharpness at a poor
+rate. Round 3 keeps round 2's corpus surgery with round 1's gentle LR: best
+transcripts, precise identity (the "who are you?" answer no longer fires at
+hotel-booking prompts), crisp short replies.
 
 ### 5. Measuring what actually matters: conditioning
 
@@ -146,7 +182,17 @@ python supervise.py --state runs/main.state -- \
     --seed 1337 --ckpt runs/main_pre.pt --save-state runs/main.state \
     --log-csv runs/main_pre.csv
 
-# chat fine-tune  <!-- exact recipe filled in after the A/B -->
+# chat fine-tune (round-3 recipe = the shipped spark.pt)
+python build_chat_corpus.py --out-dir corpus/v3ft2 --stages finetune
+python snn_char_lm.py train \
+    --data corpus/v3ft2/finetune_train.txt --val-data corpus/v3ft2/finetune_val.txt \
+    --vocab fixed --init-from runs/main_pre.pt \
+    --input-coding graded --layernorm --dropout 0 \
+    --seq-len 256 --tbptt-chunk 64 --batch-size 256 --cuda-graph \
+    --steps 10000 --warmup 300 --lr 3e-4 \
+    --eval-every 1000 --eval-max-windows 512 --deterministic-eval \
+    --chat-pairs corpus/v3/conditioning_val.jsonl --sample-every 0 \
+    --seed 44 --ckpt spark.pt --log-csv runs/ft3.csv
 
 # evaluate
 python snn_char_lm.py chateval --ckpt spark.pt --pairs corpus/v3/conditioning_val.jsonl \

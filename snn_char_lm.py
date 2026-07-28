@@ -2263,7 +2263,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="nucleus sampling mass (tune this OR --top-k, not both)")
     c.add_argument("--top-k", dest="top_k", type=int, default=None)
     c.add_argument("--max-chars", dest="max_chars", type=_positive_int,
-                   default=400, help="reply length cap")
+                   default=300,
+                   help="reply length cap (short replies stay on-register; "
+                        "the model's long replies wander)")
     c.add_argument("--seed", type=int, default=None)
     c.add_argument("--device", type=str, default="auto")
     c.set_defaults(func=chat)
