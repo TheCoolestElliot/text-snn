@@ -450,10 +450,19 @@ def identity_docs(rng: random.Random) -> List[str]:
 # Assembly
 # ---------------------------------------------------------------------------
 def fill(source_iter: Iterable[str], train: Bucket, val: Bucket,
-         counters: dict) -> None:
-    """Route docs to val (~2%, stable hash) or train until both budgets fill."""
+         counters: dict, skip_docs: int = 0) -> None:
+    """Route docs to val (~2%, stable hash) or train until both budgets fill.
+
+    ``skip_docs`` skips the first N *accepted* docs before collecting: the
+    reader sequence is deterministic, so passing a previous build's
+    ``accepted_docs`` (from its manifest) yields documents strictly disjoint
+    from that build -- how the continued-pretraining corpus guarantees
+    fresh-only text.
+    """
     for doc in source_iter:
         counters["accepted"] += 1
+        if counters["accepted"] <= skip_docs:
+            continue
         if _is_val_doc(doc):
             val.add(doc)
         else:
@@ -492,8 +501,16 @@ def conditioning_pairs(val_buckets: dict, n_pairs: int,
     return pairs[:n_pairs]
 
 
+CONTINUE_BUDGETS = {           # fresh-only continuation corpus (see fill(skip_docs))
+    "stories":   (200 * MB, 0),
+    "soda":      (100 * MB, 0),
+    "ultrachat": (12 * MB, 0),
+}
+
+
 def build_stage(stage: str, budgets: dict, cache: str, out_dir: str,
-                max_user: int, max_assist: int, seed: int) -> dict:
+                max_user: int, max_assist: int, seed: int,
+                skip: Optional[dict] = None) -> dict:
     rng = random.Random(seed)
     stats = {}
     buckets = {}
@@ -512,7 +529,8 @@ def build_stage(stage: str, budgets: dict, cache: str, out_dir: str,
             continue
         train_b, val_b = buckets[name]
         counters = {"accepted": 0}
-        fill(make_iter(), train_b, val_b, counters)
+        fill(make_iter(), train_b, val_b, counters,
+             skip_docs=(skip or {}).get(name, 0))
         stats[name] = {"accepted_docs": counters["accepted"],
                        "train_mb": round(train_b.size / MB, 2),
                        "val_mb": round(val_b.size / MB, 2)}
@@ -563,10 +581,18 @@ def main() -> None:
     p.add_argument("--out-dir", default="corpus")
     p.add_argument("--seed", type=int, default=1337)
     p.add_argument("--stages", default="pretrain,finetune",
-                   help="comma-separated subset of {pretrain,finetune}; lets a "
-                        "finetune-corpus rebuild leave the pretrain files (and "
+                   help="comma-separated subset of {pretrain,finetune,continue}; "
+                        "lets a partial rebuild leave other stages' files (and "
                         "their pinned hashes) untouched")
+    p.add_argument("--skip", default=None,
+                   help="for --stages continue: 'source=N,source=N' accepted-doc "
+                        "counts to skip (use the previous build's manifest "
+                        "accepted_docs), yielding strictly fresh documents")
     args = p.parse_args()
+    skip = None
+    if args.skip:
+        skip = {kv.split("=")[0]: int(kv.split("=")[1])
+                for kv in args.skip.split(",") if kv.strip()}
 
     os.makedirs(args.out_dir, exist_ok=True)
     mpath = os.path.join(args.out_dir, "manifest.json")
@@ -578,10 +604,12 @@ def main() -> None:
     wanted = {s.strip() for s in args.stages.split(",") if s.strip()}
     for stage, budgets, mu, ma in (
             ("pretrain", PRETRAIN_BUDGETS, PRETRAIN_MAX_USER, PRETRAIN_MAX_ASSIST),
-            ("finetune", FINETUNE_BUDGETS, FINETUNE_MAX_USER, FINETUNE_MAX_ASSIST)):
+            ("finetune", FINETUNE_BUDGETS, FINETUNE_MAX_USER, FINETUNE_MAX_ASSIST),
+            ("continue", CONTINUE_BUDGETS, PRETRAIN_MAX_USER, PRETRAIN_MAX_ASSIST)):
         if stage in wanted:
             manifest[stage] = build_stage(stage, budgets, args.cache_dir,
-                                          args.out_dir, mu, ma, args.seed)
+                                          args.out_dir, mu, ma, args.seed,
+                                          skip=skip if stage == "continue" else None)
     with open(mpath, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
     print(f"[done] manifest -> {mpath}")

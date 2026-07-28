@@ -195,7 +195,12 @@ def _encode_fast(text: str, stoi: dict) -> Tuple[torch.Tensor, int]:
     mapped = lut[raw]
     keep = mapped >= 0
     n_dropped = int((~keep).sum())
-    return (mapped[keep].contiguous() if n_dropped else mapped), n_dropped
+    ids = mapped[keep].contiguous() if n_dropped else mapped
+    # Store ids as uint8 when they fit (any vocab <= 256, i.e. always for the
+    # byte-wide vocabs this path handles): 1 byte/char instead of 8 keeps a
+    # ~GB-class corpus loadable on a 16 GB machine. get_batch/evaluate cast
+    # their (tiny) window slices back to long.
+    return ids.to(torch.uint8), n_dropped
 
 
 class CharDataset:
@@ -323,7 +328,10 @@ class CharDataset:
         ix = torch.randint(0, max_start, (batch_size,))
         x = torch.stack([d[i:i + self.seq_len] for i in ix])                    # (B, L)
         y = torch.stack([d[i + 1:i + 1 + self.seq_len] for i in ix])            # (B, L)
-        return x.to(device), y.to(device)
+        # .long(): the corpus is stored uint8 (see _encode_fast); the model's
+        # one_hot/embedding wants int64, so the cast happens on the small
+        # window batch, not the whole corpus.
+        return x.long().to(device), y.long().to(device)
 
     def encode(self, s: str) -> torch.Tensor:
         return torch.tensor([self.stoi[c] for c in s if c in self.stoi],
@@ -1028,8 +1036,9 @@ def evaluate(model: CharLMBase, dataset: CharDataset, split: str,
                 torch.cuda.manual_seed(encoder_seed)
             for i in range(0, len(starts), batch_size):
                 chunk = starts[i:i + batch_size]
-                x = torch.stack([d[s:s + L] for s in chunk]).to(device)
-                y = torch.stack([d[s + 1:s + 1 + L] for s in chunk]).to(device)
+                x = torch.stack([d[s:s + L] for s in chunk]).long().to(device)
+                y = torch.stack([d[s + 1:s + 1 + L]
+                                 for s in chunk]).long().to(device)
                 logits = model(x)
                 loss = F.cross_entropy(logits.reshape(-1, vocab),
                                        y.reshape(-1), reduction="sum")
@@ -1238,7 +1247,7 @@ def train(args) -> None:
         n_probe = max(1, min(16, (len(d_probe) - 1) // args.seq_len))
         probe_x = torch.stack(
             [d_probe[i * args.seq_len:(i + 1) * args.seq_len]
-             for i in range(n_probe)]).to(device)
+             for i in range(n_probe)]).long().to(device)
     chat_pairs = None
     if getattr(args, "chat_pairs", None):
         chat_pairs = _load_chat_pairs(args.chat_pairs)
