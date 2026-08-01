@@ -42,3 +42,7 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Transient campaign driver output; the durable record is
+# experiments/runs/<name>/log.jsonl and docs/reports/data/phase2_campaign.json.
+experiments/*.log
