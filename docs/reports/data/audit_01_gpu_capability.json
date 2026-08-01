@@ -1,0 +1,50 @@
+{
+  "env": {
+    "python": "3.14.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.12.1+cu130",
+    "cuda_runtime": "13.0",
+    "cudnn": 92000,
+    "gpu": "NVIDIA GeForce RTX 5060",
+    "sm": "12.0",
+    "vram_gib": 7.96,
+    "sms": 30
+  },
+  "matmul_tflops": {
+    "fp32": 11.91,
+    "tf32": 20.05,
+    "bf16": 40.62,
+    "fp16": 39.87
+  },
+  "bandwidth_gbps": 383.5,
+  "launch_overhead": {
+    "single_elementwise_us": 14.23,
+    "unfused_lif_step_us": 75.42
+  },
+  "cuda_graph": {
+    "capture": "OK",
+    "per_20_step_graph_us": 214.47,
+    "per_step_us": 10.724
+  },
+  "torch_compile": {
+    "triton_importable": "ModuleNotFoundError: No module named 'triton'",
+    "inductor": {
+      "status": "FAILED",
+      "error": "TritonMissing: Cannot find a working triton installation. Either the package is not installed or it is too old. More information on installing Triton can be found at: https://github.com/triton-lang/triton\n\nSet TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=\"+dynamo\"\n"
+    },
+    "aot_eager": {
+      "status": "OK",
+      "us": 170.48
+    },
+    "cudagraphs": {
+      "status": "OK",
+      "us": 114.8
+    },
+    "eager_us": 91.27
+  },
+  "amp": {
+    "bf16": "torch.bfloat16",
+    "fp16": "torch.float16"
+  },
+  "peak_vram_alloc_gib": 0.781
+}

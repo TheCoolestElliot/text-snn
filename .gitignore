@@ -1,43 +1,40 @@
-# Python
+# --- Data -------------------------------------------------------------------
+# Corpora are downloaded by scripts/data/, never committed. See
+# docs/reports/01_reconnaissance.md for provenance and checksums.
+# NOTE: the leading slash is load-bearing -- a bare `data/` would also ignore
+# docs/reports/data/, which holds committed benchmark evidence.
+/data/
+*.zip
+*.bin
+*.npy
+
+# --- Training artifacts -----------------------------------------------------
+checkpoints/
+runs/
+wandb/
+*.pt
+*.pth
+*.ckpt
+
+# --- Python -----------------------------------------------------------------
 __pycache__/
 *.py[cod]
 *.egg-info/
+.eggs/
 build/
 dist/
+.venv/
+venv/
+
+# --- Tooling ----------------------------------------------------------------
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.coverage
+htmlcov/
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Editor / OS
+# --- Editors / OS -----------------------------------------------------------
 .vscode/
 .idea/
 .DS_Store
-
-# Claude Code local session state
-.claude/
-
-# Training artifacts.
-# Keep the two checkpoints the README ships and references; ignore ad-hoc
-# training outputs (the default --ckpt name, the quick-start scratch file, and
-# any other *.pt a training run produces).
-*.pt
-!demo.pt
-!prose.pt
-snn_char_lm.pt
-my_prose.pt
-
-# Cached Project Gutenberg downloads for build_corpus.py (input.txt is the
-# committed artifact; the cache is just to make a rebuild offline and instant)
-.corpus_cache/
-
-# Tier 6 experiment outputs (checkpoints + metrics CSVs)
-runs/
-
-# Tier 7 chat-campaign data (rebuildable via build_chat_corpus.py; ~400 MB)
-corpus/
-!spark.pt
+Thumbs.db
