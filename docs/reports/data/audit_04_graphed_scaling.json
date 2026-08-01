@@ -1,0 +1,113 @@
+{
+  "batch": {
+    "batch=16,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 19.61,
+      "tok_per_s": 104446,
+      "Mtok_per_hour": 376,
+      "peak_vram_gib": 0.162
+    },
+    "batch=32,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 16.27,
+      "tok_per_s": 251707,
+      "Mtok_per_hour": 906,
+      "peak_vram_gib": 0.245
+    },
+    "batch=64,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 19.17,
+      "tok_per_s": 427393,
+      "Mtok_per_hour": 1539,
+      "peak_vram_gib": 0.35
+    },
+    "batch=128,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 25.4,
+      "tok_per_s": 645011,
+      "Mtok_per_hour": 2322,
+      "peak_vram_gib": 0.497
+    },
+    "batch=256,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 39.72,
+      "tok_per_s": 825024,
+      "Mtok_per_hour": 2970,
+      "peak_vram_gib": 0.727
+    },
+    "batch=512,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 57.34,
+      "tok_per_s": 1143000,
+      "Mtok_per_hour": 4115,
+      "peak_vram_gib": 1.128
+    }
+  },
+  "width": {
+    "batch=64,d=256,L=128": {
+      "params_M": 0.24,
+      "ms": 15.52,
+      "tok_per_s": 527977,
+      "Mtok_per_hour": 1901,
+      "peak_vram_gib": 0.55
+    },
+    "batch=64,d=512,L=128": {
+      "params_M": 0.73,
+      "ms": 19.29,
+      "tok_per_s": 424683,
+      "Mtok_per_hour": 1529,
+      "peak_vram_gib": 0.662
+    },
+    "batch=64,d=768,L=128": {
+      "params_M": 1.49,
+      "ms": 28.24,
+      "tok_per_s": 290133,
+      "Mtok_per_hour": 1044,
+      "peak_vram_gib": 0.78
+    },
+    "batch=64,d=1024,L=128": {
+      "params_M": 2.52,
+      "ms": 35.74,
+      "tok_per_s": 229238,
+      "Mtok_per_hour": 825,
+      "peak_vram_gib": 0.904
+    },
+    "batch=64,d=1536,L=128": {
+      "params_M": 5.35,
+      "ms": 69.02,
+      "tok_per_s": 118683,
+      "Mtok_per_hour": 427,
+      "peak_vram_gib": 1.11
+    }
+  },
+  "candidates": {
+    "batch=128,d=512,L=256": {
+      "params_M": 0.73,
+      "ms": 50.67,
+      "tok_per_s": 646681,
+      "Mtok_per_hour": 2328,
+      "peak_vram_gib": 1.166
+    },
+    "batch=256,d=512,L=256": {
+      "params_M": 0.73,
+      "ms": 117.59,
+      "tok_per_s": 557321,
+      "Mtok_per_hour": 2006,
+      "peak_vram_gib": 1.566
+    },
+    "batch=128,d=1024,L=256": {
+      "params_M": 2.52,
+      "ms": 100.1,
+      "tok_per_s": 327353,
+      "Mtok_per_hour": 1178,
+      "peak_vram_gib": 1.642
+    },
+    "batch=256,d=768,L=512": {
+      "params_M": 1.49,
+      "ms": 224.3,
+      "tok_per_s": 584364,
+      "Mtok_per_hour": 2104,
+      "peak_vram_gib": 3.008
+    }
+  }
+}

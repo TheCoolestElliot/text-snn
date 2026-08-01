@@ -1,20 +1,17 @@
-# Character-level spiking neural network language model
+# Environment as measured during Phase-1 reconnaissance (2026-08-01).
+# See docs/reports/01_reconnaissance.md §2.2 for the full audited stack.
 #
-# Verified on: Python 3.14, torch 2.12.1+cu130, snnTorch 1.0.0,
-#              NVIDIA RTX 5060 (8 GB), CUDA 13.
+# PyTorch is built against CUDA 13.0 for Blackwell (sm_120). Install it from
+# NVIDIA's index first, then the rest:
 #
-# Install PyTorch with the CUDA build that matches your driver from
-# https://pytorch.org/get-started/locally/  (the plain PyPI wheel below is
-# CPU-only). The RTX 5060 and other Blackwell (sm_120) GPUs need a CUDA 12.8+
-# build -- an older cu124-or-earlier wheel installs but has no kernels for them
-# and will fail at runtime. Example matching the verified stack above:
-#     pip install torch --index-url https://download.pytorch.org/whl/cu130
+#   pip install torch==2.12.1 --index-url https://download.pytorch.org/whl/cu130
+#   pip install -r requirements.txt
 #
-# To reproduce the verified stack exactly, pin the tested versions:
-#     torch==2.12.1+cu130   snntorch==1.0.0
-# (a CPU-only reproduction can use the plain `pip install torch` wheel.)
-#
-# Test dependencies live in requirements-dev.txt (pytest).
+# NOTE: triton is deliberately absent. It has no Windows wheel for this stack,
+# so torch.compile(backend="inductor") is unavailable and CUDA-graph capture is
+# the project's only fusion mechanism. See §2.3 and §3.7 of the report.
 
-torch>=2.2
-snntorch>=0.9
+torch==2.12.1
+numpy==2.5.0
+matplotlib==3.11.0
+snntorch==1.0.0

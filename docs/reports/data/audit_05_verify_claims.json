@@ -1,0 +1,86 @@
+{
+  "C1_jiterator": {
+    "bundled_nvrtc": [
+      "caffe2_nvrtc.dll",
+      "caffe2_nvrtc.lib",
+      "nvrtc-builtins64_130.dll",
+      "nvrtc64_130_0.alt.dll",
+      "nvrtc64_130_0.dll"
+    ],
+    "import": "OK",
+    "compile_and_run_s": 0.174,
+    "status": "OK",
+    "max_err_v": 4.76837158203125e-07,
+    "max_err_s": 0.0,
+    "requires_grad": false,
+    "fused_us": 18.57,
+    "eager_us": 90.27,
+    "speedup": 4.86,
+    "dtypes": {
+      "fp32": "OK torch.float32",
+      "bf16": "OK torch.bfloat16",
+      "fp16": "OK torch.float16"
+    },
+    "graph_capture": {
+      "status": "OK",
+      "per_step_us": 1.76
+    },
+    "unroll_L128_fused_ms": 2.66,
+    "unroll_L128_eager_ms": 10.65,
+    "unroll_speedup": 4.0
+  },
+  "C2_precision": {
+    "bf16": {
+      "spacing_at_1.0": 0.0078125,
+      "pct_of_threshold": 0.7812
+    },
+    "fp16": {
+      "spacing_at_1.0": 0.0009765625,
+      "pct_of_threshold": 0.0977
+    },
+    "fp32": {
+      "spacing_at_1.0": 1.1920928955078125e-07,
+      "pct_of_threshold": 0.0
+    },
+    "fp16_finer_than_bf16_x": 8.0,
+    "spike_count_fp32": 35472.0,
+    "spike_count_drift_pct": {
+      "bf16": 0.0395,
+      "fp16": 0.0395
+    }
+  },
+  "C3_toeplitz": {
+    "L=128,B=16,H=512": {
+      "sequential_ms": 4.111,
+      "toeplitz_ms": 0.038,
+      "speedup": 108.0,
+      "max_abs_err": 1.9073486328125e-06
+    },
+    "L=256,B=16,H=512": {
+      "sequential_ms": 8.176,
+      "toeplitz_ms": 0.106,
+      "speedup": 77.4,
+      "max_abs_err": 2.384185791015625e-06
+    },
+    "L=1024,B=4,H=256": {
+      "sequential_ms": 29.429,
+      "toeplitz_ms": 0.184,
+      "speedup": 160.0,
+      "max_abs_err": 2.86102294921875e-06
+    },
+    "fp32_underflow": {
+      "decay=0.9": {
+        "underflows_to_zero_at_n": 987,
+        "value_at_n1023": 0.0
+      },
+      "decay=0.95": {
+        "underflows_to_zero_at_n": 2028,
+        "value_at_n1023": 1.6264571638500346e-23
+      },
+      "decay=0.99": {
+        "underflows_to_zero_at_n": 10346,
+        "value_at_n1023": 3.4261654946021736e-05
+      }
+    }
+  }
+}

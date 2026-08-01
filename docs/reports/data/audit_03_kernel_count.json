@@ -1,0 +1,75 @@
+{
+  "kernel_count": {
+    "ops_per_step=1": {
+      "ms": 0.95,
+      "us_per_kernel": 14.87
+    },
+    "ops_per_step=2": {
+      "ms": 1.86,
+      "us_per_kernel": 14.52
+    },
+    "ops_per_step=4": {
+      "ms": 3.45,
+      "us_per_kernel": 13.46
+    },
+    "ops_per_step=8": {
+      "ms": 7.16,
+      "us_per_kernel": 13.98
+    },
+    "ops_per_step=16": {
+      "ms": 14.83,
+      "us_per_kernel": 14.48
+    },
+    "ops_per_step=32": {
+      "ms": 29.65,
+      "us_per_kernel": 14.48
+    }
+  },
+  "hoisting": {
+    "naive_ms": 37.73,
+    "lean_hoisted_ms": 31.97,
+    "speedup": 1.18
+  },
+  "graph_unroll": {
+    "L=32": {
+      "eager_ms": 31.8,
+      "graphed_ms": 2.43,
+      "speedup": 13.1,
+      "capture_s": 0.04,
+      "tok_per_s_graphed": 844331,
+      "peak_vram_gib": 0.208
+    },
+    "L=64": {
+      "eager_ms": 56.8,
+      "graphed_ms": 5.04,
+      "speedup": 11.3,
+      "capture_s": 0.05,
+      "tok_per_s_graphed": 812371,
+      "peak_vram_gib": 0.283
+    },
+    "L=128": {
+      "eager_ms": 118.3,
+      "graphed_ms": 9.71,
+      "speedup": 12.2,
+      "capture_s": 0.1,
+      "tok_per_s_graphed": 843366,
+      "peak_vram_gib": 0.37
+    },
+    "L=256": {
+      "eager_ms": 212.1,
+      "graphed_ms": 19.39,
+      "speedup": 10.9,
+      "capture_s": 0.22,
+      "tok_per_s_graphed": 845059,
+      "peak_vram_gib": 0.482
+    },
+    "L=512": {
+      "eager_ms": 434.2,
+      "graphed_ms": 38.96,
+      "speedup": 11.1,
+      "capture_s": 0.41,
+      "tok_per_s_graphed": 841143,
+      "peak_vram_gib": 0.645
+    }
+  }
+}
