@@ -1,0 +1,83 @@
+{
+  "device": "cuda",
+  "torch": "2.12.1+cu130",
+  "snntorch": "1.0.0",
+  "X1_surrogate": {
+    "max_abs_diff_vs_snntorch": 0.0,
+    "our_grad_at_0": 1.0,
+    "snntorch_grad_at_0": 1.0,
+    "max_abs_diff_value_vs_derivative": 5.960464477539063e-08,
+    "snntorch_docstring_vs_code_ratio_at_0": 3.141592653589793,
+    "expected_ratio_alpha_pi_over_2": 3.141592653589793
+  },
+  "X23_semantics": {
+    "hard": {
+      "snntorch_reset_mechanism": "zero",
+      "snntorch_reset_delay": false,
+      "snntorch_default_config": false,
+      "spike_mismatches": 0,
+      "spike_total": 16384,
+      "spike_rate_ours": 0.040283,
+      "spike_rate_snntorch": 0.040283,
+      "grad_max_abs_diff": 4.76837158203125e-07,
+      "grad_max_rel_diff": 1.3962977618575678e-07,
+      "grad_norm_ours": 57.25824737548828,
+      "grad_norm_snntorch": 57.25825119018555,
+      "exact_threshold_hits": 0
+    },
+    "detached": {
+      "snntorch_reset_mechanism": "zero",
+      "snntorch_reset_delay": true,
+      "snntorch_default_config": true,
+      "spike_mismatches": 0,
+      "spike_total": 16384,
+      "spike_rate_ours": 0.040283,
+      "spike_rate_snntorch": 0.040283,
+      "grad_max_abs_diff": 4.76837158203125e-07,
+      "grad_max_rel_diff": 1.2775683444488095e-07,
+      "grad_norm_ours": 68.03334045410156,
+      "grad_norm_snntorch": 68.03334045410156,
+      "exact_threshold_hits": 0
+    },
+    "soft": {
+      "snntorch_reset_mechanism": "subtract",
+      "snntorch_reset_delay": false,
+      "snntorch_default_config": false,
+      "spike_mismatches": 10,
+      "spike_total": 16384,
+      "spike_rate_ours": 0.046082,
+      "spike_rate_snntorch": 0.046082,
+      "grad_max_abs_diff": 2.0554871559143066,
+      "grad_max_rel_diff": 0.6544638276100159,
+      "grad_norm_ours": 47.929988861083984,
+      "grad_norm_snntorch": 47.95432662963867,
+      "exact_threshold_hits": 0
+    },
+    "none": {
+      "snntorch_reset_mechanism": "none",
+      "snntorch_reset_delay": false,
+      "snntorch_default_config": false,
+      "spike_mismatches": 0,
+      "spike_total": 16384,
+      "spike_rate_ours": 0.173767,
+      "spike_rate_snntorch": 0.173767,
+      "grad_max_abs_diff": 4.76837158203125e-07,
+      "grad_max_rel_diff": 9.170319259510507e-08,
+      "grad_norm_ours": 98.3631591796875,
+      "grad_norm_snntorch": 98.36316680908203,
+      "exact_threshold_hits": 0
+    }
+  },
+  "X4_soft_boundary": {
+    "input_sigma=0.5": {
+      "post_reset_membrane_at_or_above_threshold": 6,
+      "spike_mismatches": 10,
+      "grad_max_abs_diff": 2.0554871559143066
+    },
+    "input_sigma=0.15": {
+      "post_reset_membrane_at_or_above_threshold": 0,
+      "spike_mismatches": 0,
+      "grad_max_abs_diff": 2.384185791015625e-07
+    }
+  }
+}
