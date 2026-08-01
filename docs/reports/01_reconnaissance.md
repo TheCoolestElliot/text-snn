@@ -122,6 +122,15 @@ timescales — rather than from a learned recurrent mixing matrix. That is a
 sharper and more defensible research question than "can we make a spiking net
 score well".
 
+**I5 boundary, ratified 2026-08-01 (§4.6).** I5 admits per-neuron temporal
+dynamics with **O(1) parameters per neuron** — learned per-channel decay,
+multiple timescales, an adaptive threshold, a complex/rotational membrane state —
+because those are properties of a neuron's own dynamical system and keep the
+memory in *state*. It forbids **free-form per-channel FIR kernels over time**
+(O(K) params/neuron, memory stored in lag-indexed weights) as well as any lateral
+mixing. This was decided before a line of Phase-2 code was written, precisely so
+it could not be decided by which answer scored better.
+
 ### 1.4 Corpus decision
 
 **Primary corpus: enwik8, with text8 as a secondary check.** Ratified 2026-08-01.
@@ -720,20 +729,52 @@ Phase 4:
    for this training regime — and every ablation conclusion depends on it, so we
    measure it first (§8.3).
 
-### 4.6 A definitional question to settle before implementation
+### 4.6 A definitional question — **RESOLVED 2026-08-01, before implementation**
 
 Invariant I5 forbids an "explicit lateral recurrent weight matrix". The survey
-raises a genuine boundary case that should be decided **in advance and in
+raised a genuine boundary case that had to be decided **in advance and in
 writing**, not opportunistically once results are in: does I5 admit a learned
 per-channel kernel over *time* (diagonal in the neuron axis, mixing only a
 neuron's own history), or a complex-valued / 2×2 rotational membrane state?
 
 Neither introduces neuron-to-neuron mixing, so both arguably satisfy the letter of
 I5 — and temporal kernels are what make a neuron parallel-scannable, sidestepping
-the launch-latency wall entirely. **This is flagged as an open decision for Elliot,
-not resolved here**, because deciding it after seeing which answer scores better
-would be exactly the kind of post-hoc rationalisation this protocol exists to
-prevent.
+the launch-latency wall entirely. That is precisely why it was dangerous to leave
+open: whoever decides it after seeing which answer scores better is rationalising,
+not deciding.
+
+**Ruling (Elliot, 2026-08-01).** I5 admits *parametric* per-neuron temporal
+dynamics and forbids *non-parametric* ones. The dividing line is the number of
+free parameters per neuron, not the reach of the memory:
+
+| Form | Admitted? | Rationale |
+|---|---|---|
+| `v_t = decay_c · v_{t−1} + i_t`, `decay_c` learned per channel | **Yes** | O(1) params/neuron; a leak constant is a neuron property |
+| Multiple learned timescales per neuron (e.g. fast/slow membrane pair) | **Yes** | Still O(1) per neuron; multi-timescale dynamics are the stated scientific spine (§8.1.6) |
+| Adaptive threshold `thr_t = thr₀ + a_c·u_t` with its own learned decay | **Yes** | O(1) per neuron; SE-adLIF evidence (§4.3 item 4) |
+| Complex-valued / 2×2 rotational membrane state | **Yes** | O(1) per neuron (a decay and an angle); no cross-neuron mixing |
+| Free-form learned FIR kernel `v_t = Σ_k h_c[k]·i_{t−k}` | **No** | O(K) params/neuron — a depthwise temporal convolution wearing a neuron's name |
+| `v_t = W_rec · s_{t−1} + …` | **No** | Lateral mixing; the original I5 prohibition |
+
+**Why this line.** The project's claim is that *memory lives in neuron state*. A
+learned decay, a second timescale, or a rotation angle are all **properties of a
+neuron's own dynamical system**, and each is still a first-order linear recurrence
+in the state — so each remains exactly parallel-scannable (§3.11 C3) and keeps the
+Toeplitz/scan lever available. A free-form FIR kernel is different in kind: it
+stores the memory in *weights indexed by lag* rather than in state, which is the
+thing I5 exists to forbid. Admitting it would make the model a depthwise temporal
+CNN that emits spikes, and a reviewer would be right to say so.
+
+**Consequences.**
+
+* Phase 3 may propose multi-timescale, adaptive-threshold, and rotational-state
+  neurons. It may **not** propose per-channel FIR kernels or any lateral matrix.
+* Every admitted form is linear in the state *between* spikes, so the reset rule
+  remains the single switch that decides whether the parallel form is legal
+  (§3.11 C3) — reinforcing design principle §8.1.4.
+* The Phase-2 baseline is unaffected: it is the canonical single-timescale LIF.
+  The admitted extensions are Phase-3 candidates, ranked on the same ROI matrix as
+  everything else, and none of them is in the baseline.
 
 ---
 
@@ -935,11 +976,13 @@ extrapolated, or recalled — each is measured, and the raw JSON is committed.
       patched (§3.11)
 - [x] Bottlenecks ranked, assumptions stated, risks matrixed (§5–§7)
 - [x] Research strategy and budget model set out (§8–§9)
-- [ ] **One open decision for Elliot: the §4.6 boundary question on invariant I5**
-      (does "no lateral recurrent weight matrix" admit a per-channel *temporal*
-      kernel or a complex/rotational membrane state?). It should be answered before
-      implementation, not after seeing which answer scores better.
-- [ ] **Committed and reviewed by Elliot — Phase 2 does not begin until this is signed off**
+- [x] **§4.6 boundary question on invariant I5 resolved** (2026-08-01, before any
+      Phase-2 code): I5 admits O(1)-parameter-per-neuron temporal dynamics
+      (multi-timescale decay, adaptive threshold, complex/rotational state) and
+      forbids free-form per-channel FIR kernels and all lateral mixing.
+- [x] **Committed and reviewed by Elliot — Phase 2 authorised 2026-08-01.**
+      `v1-final` tags the archived v1 tree; `main` fast-forwarded to this report;
+      Phase 2 proceeds on branch `phase-2-baseline`.
 
 ---
 
@@ -949,3 +992,4 @@ extrapolated, or recalled — each is measured, and the raw JSON is committed.
 |---|---|
 | 1 | Initial audit: four benchmarks, cost model, strategy. Concluded custom kernels were impossible and fusion unavailable. |
 | **2** | **Literature review contradicted that conclusion; re-measurement confirmed the contradiction.** `torch.cuda.jiterator` + torch-bundled NVRTC provides elementwise CUDA fusion with no `nvcc`/MSVC/Triton (§3.11 C1). Added the exact Toeplitz parallel form and its underflow bound (C3), corrected the bf16 recommendation (C2), added risks R10–R12, bottlenecks B3/B5/B7/B8, assumptions A8–A10, and §4. Rev-1 claims are retained struck-through rather than deleted. |
+| **3** | **§4.6 resolved and Phase 2 authorised** (2026-08-01). I5's boundary is now written down as an O(1)-parameters-per-neuron test: multi-timescale decay, adaptive threshold, and complex/rotational membrane state are admitted; free-form per-channel FIR kernels and all lateral mixing are not (§1.3, §4.6). No measurement changed; this rev records a decision that had to precede implementation. |

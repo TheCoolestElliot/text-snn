@@ -9,6 +9,10 @@
 *.npy
 
 # --- Training artifacts -----------------------------------------------------
+# Per-run logs and checkpoints are bulky and are NOT committed. Curated evidence
+# extracted from them is committed to docs/reports/data/, exactly as the Phase-1
+# audit JSON was -- so every number in a report is backed by a tracked file.
+# experiments/logs/ (pre-registered hypotheses) IS tracked and must stay so.
 checkpoints/
 runs/
 wandb/

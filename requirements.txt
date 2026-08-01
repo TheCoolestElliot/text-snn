@@ -7,11 +7,22 @@
 #   pip install torch==2.12.1 --index-url https://download.pytorch.org/whl/cu130
 #   pip install -r requirements.txt
 #
-# NOTE: triton is deliberately absent. It has no Windows wheel for this stack,
-# so torch.compile(backend="inductor") is unavailable and CUDA-graph capture is
-# the project's only fusion mechanism. See §2.3 and §3.7 of the report.
+# NOTE: triton is deliberately absent. It has no Windows wheel for this stack, so
+# torch.compile(backend="inductor") is unavailable. Fusion is NOT unavailable,
+# however: NVRTC ships inside the torch wheel and torch.cuda.jiterator compiles
+# elementwise CUDA against it at runtime (§3.11 C1). The torch pin is therefore
+# load-bearing twice over -- for the sm_120 build AND because jiterator is a
+# private API (risk R11).
 
 torch==2.12.1
 numpy==2.5.0
 matplotlib==3.11.0
+
+# snnTorch is not a dependency of the model -- the LIF neuron is written from
+# scratch in src/snn/neuron.py. It is kept as an INDEPENDENT third implementation
+# to cross-check our eager reference against, which is worth more than the import
+# it replaces.
 snntorch==1.0.0
+
+# Test + tooling
+pytest==9.1.1
