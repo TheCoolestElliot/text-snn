@@ -78,6 +78,13 @@ ARMS: dict[str, str] = {
     "analogue_beta0.5_s0": "analogue_beta0.5",
     "snn_beta0.9_s0": "snn_beta0.9",
     "snn_beta0.95_s0": "snn_beta0.95",
+    # EXP_003's parameter-matched depth ladder. Same probe, same statistic --
+    # reusing this file rather than writing a second one is deliberate: the
+    # horizon numbers it produces have to be comparable with the table above,
+    # and two implementations of one statistic is how they stop being.
+    "depth_K1_s0": "depth_K1",
+    "depth_K4_s0": "depth_K4",
+    "depth_K8_s0": "depth_K8",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
@@ -251,21 +258,42 @@ def horizon_from_excess(excess: dict[str, float], tol: float) -> int | None:
     return horizon
 
 
-def committed_fresh_bpc(run: str, split: str) -> float | None:
-    """The Phase-2 number this probe's k = L point has to reproduce (F1)."""
-    path = _REPO / "docs" / "reports" / "data" / "phase2_final_scores.json"
-    if not path.exists():
-        return None
-    blob = json.loads(path.read_text(encoding="utf-8"))
-    entry = blob.get(run)
-    if not isinstance(entry, dict):
-        return None
-    block = entry.get(split)
+def _fresh_bpc_from_block(block) -> float | None:
     if not isinstance(block, dict):
         return None
     results = block.get("results", block)
     fresh = results.get("fresh") if isinstance(results, dict) else None
     return fresh.get("bpc") if isinstance(fresh, dict) else None
+
+
+def committed_fresh_bpc(run: str, split: str) -> float | None:
+    """The independently-produced number this probe's k = L point must reproduce.
+
+    F1 is the check that makes every other number in this file trustworthy, so it
+    must not quietly go missing for the runs that are newest and least
+    established. Two sources, in order:
+
+      1. docs/reports/data/phase2_final_scores.json, for the Phase-2 campaign;
+      2. experiments/runs/<run>/final_<split>.json, written by scripts/evaluate.py
+         for anything added later (EXP_003's depth ladder).
+
+    Both are produced by `snn.evaluate.evaluate` through the ordinary `fresh`
+    protocol -- a different code path from this file's reshape -- which is what
+    makes the agreement evidence rather than a tautology.
+    """
+    path = _REPO / "docs" / "reports" / "data" / "phase2_final_scores.json"
+    if path.exists():
+        blob = json.loads(path.read_text(encoding="utf-8"))
+        entry = blob.get(run)
+        if isinstance(entry, dict):
+            bpc = _fresh_bpc_from_block(entry.get(split))
+            if bpc is not None:
+                return bpc
+
+    local = _REPO / "experiments" / "runs" / run / f"final_{split}.json"
+    if local.exists():
+        return _fresh_bpc_from_block(json.loads(local.read_text(encoding="utf-8")))
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -456,6 +484,147 @@ def main(argv: list[str] | None = None) -> int:
     results["by_arm"] = agg
     results["f1_failures"] = f1_failures
 
+    # ---- absolute bpc at each context length, and the dominance test -------
+    #
+    # The paired excess is measured against each arm's OWN asymptote, which makes
+    # it the right statistic for locating a horizon and the WRONG one for
+    # comparing arms: the GRU's excess is larger than the baseline's at every c
+    # simply because it has more to lose. Adding the asymptote back gives the
+    # absolute bpc an arm achieves with exactly c characters of context, which is
+    # comparable across arms.
+    #
+    # That distinction is what separates the two ways of buying horizon. Raising
+    # beta lengthens the horizon while pushing the absolute curve UP from c = 2
+    # onward -- it degrades every context length in exchange for reaching
+    # further. The GRU's curve lies at or below the baseline's everywhere. So the
+    # test a Phase-4 candidate has to pass is not "is the horizon longer" but
+    # "is the absolute curve nowhere worse", and that is computed here rather
+    # than asserted in prose.
+    baseline_arm = "snn_beta0.5"
+    if baseline_arm not in agg:
+        # A partial run (--runs) that excludes the baseline cannot compute the
+        # cross-arm comparison, and silently comparing against whatever arm
+        # happened to be first would be worse than not comparing at all.
+        out = _REPO / args.out
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(results, indent=2), encoding="utf-8")
+        print(f"\n  (baseline arm {baseline_arm!r} not in this selection; "
+              f"absolute-curve comparison skipped)")
+        print(f"WROTE {args.out}")
+        return 1 if f1_failures else 0
+
+    seq_len_ref = next(iter(results["arms"].values()))["seq_len"]
+    contexts = sorted(int(x) for x in
+                      agg[baseline_arm]["_paired"]["excess_bpc_at_context_mean"])
+
+    def absolute_curve(arm: str) -> dict[str, float]:
+        r = agg[arm]
+        asym = r[str(seq_len_ref)]["bpc_mean"]
+        ex = r["_paired"]["excess_bpc_at_context_mean"]
+        return {str(c): asym + ex[str(c)] for c in contexts}
+
+    base_curve = absolute_curve(baseline_arm)
+
+    # ---- the PER-CONTEXT noise floor -------------------------------------
+    #
+    # EXP_000's sigma = 0.00461 bpc is the standard deviation of the WHOLE-SPLIT
+    # score. It is the wrong bar for a per-context comparison and wrong in both
+    # directions: measured over the five baseline seeds, the seed spread of the
+    # excess at c = 1 is 6x the whole-split sigma (short contexts have the fewest
+    # position-samples), while at c >= 16 it is 30x SMALLER. Judging a curve
+    # against a flat 0.00922 would reject candidates on noise at exactly the
+    # short contexts the criterion exists to protect, and wave through real
+    # long-context regressions.
+    #
+    # So the bar is measured, per context, from the same five seeds that produced
+    # the noise floor in the first place.
+    base_runs = [r for r in results["arms"].values() if r["arm"] == baseline_arm]
+    per_context_2sigma: dict[str, float] = {}
+    if len(base_runs) > 1:
+        for c in contexts:
+            vals = [r["paired_context"]["excess_bpc_at_context"][str(c)]
+                    for r in base_runs]
+            m = sum(vals) / len(vals)
+            sd = math.sqrt(sum((v - m) ** 2 for v in vals) / (len(vals) - 1))
+            per_context_2sigma[str(c)] = 2 * sd
+    results["per_context_2sigma"] = {
+        "n_seeds": len(base_runs),
+        "arm": baseline_arm,
+        "bars": per_context_2sigma,
+        "whole_split_2sigma_for_reference": 0.00922,
+    }
+
+    dominance: dict = {}
+    for arm in agg:
+        curve = absolute_curve(arm)
+        deltas = {c: curve[c] - base_curve[c] for c in curve}
+        # The worst point is the largest ABSOLUTE regression, not the largest in
+        # units of the local noise bar. Normalising by the bar sounds more
+        # principled and is not: the bar at c >= 16 is ~0.0003 bpc, so any arm
+        # with a worse asymptote scores thousands of "sigmas" out at c = 125 and
+        # every arm's worst point collapses onto "its asymptote is worse" --
+        # which is just bpc again, and defeats the whole point of looking at the
+        # curve. The bars are used for the significance BOOLEAN, where they
+        # belong, and the reported worst point stays in bits per character.
+        worst_c = max(deltas, key=lambda c: deltas[c])
+        # Short-context regression: the failure mode the criterion exists for --
+        # buying reach by degrading the characters the model already sees.
+        short = [c for c in deltas if int(c) <= 8]
+        worst_short = max(short, key=lambda c: deltas[c])
+        significant = [
+            int(c) for c in deltas
+            if deltas[c] > per_context_2sigma.get(c, 0.00922)
+        ]
+        dominance[arm] = {
+            "bpc_at_context": curve,
+            "delta_vs_baseline": deltas,
+            "worst_delta_bpc": deltas[worst_c],
+            "worst_delta_at_context": int(worst_c),
+            "worst_short_context_delta_bpc": deltas[worst_short],
+            "worst_short_context_at": int(worst_short),
+            "n_contexts_significantly_worse": len(significant),
+            "nowhere_worse_than_noise": not significant,
+        }
+    results["absolute_context_curves"] = dominance
+
+    # ---- where the I5 gap actually lives ----------------------------------
+    #
+    # Splitting the SNN-vs-GRU gap by context length says how much of it any
+    # horizon candidate could possibly recover. The part present at ZERO context
+    # cannot be a memory effect at all, and the part inside the SNN's own 7
+    # characters is context it already reaches and extracts less from. Only the
+    # remainder is addressable by making memory longer -- which is the
+    # denominator every candidate's ROI should be quoted against.
+    if "gru" in agg:
+        s, g = absolute_curve(baseline_arm), absolute_curve("gru")
+        cmax = str(max(contexts))
+        horizon = agg[baseline_arm]["_paired"]["horizon_2sigma_per_seed"][0] or 7
+        h = str(horizon)
+        total = s[cmax] - g[cmax]
+        zero = s["0"] - g["0"]
+        within = (s[h] - g[h]) - zero
+        results["i5_gap_decomposition"] = {
+            "baseline_horizon": horizon,
+            "asymptotic_gap_bpc": total,
+            "zero_context_bpc": zero,
+            "within_reach_bpc": within,
+            "beyond_horizon_bpc": total - (s[h] - g[h]),
+            "share_not_addressable_by_horizon": (zero + within) / total,
+        }
+        dec = results["i5_gap_decomposition"]
+        print("\n" + "=" * 78)
+        print("WHERE THE I5 GAP LIVES (SNN baseline vs GRU anchor)")
+        print("=" * 78)
+        print(f"  asymptotic gap          {dec['asymptotic_gap_bpc']:.4f} bpc")
+        print(f"  at zero context         {dec['zero_context_bpc']:.4f}  "
+              f"({100*dec['zero_context_bpc']/total:.0f}%)  -- memory cannot explain this")
+        print(f"  within the 7-char reach {dec['within_reach_bpc']:.4f}  "
+              f"({100*dec['within_reach_bpc']/total:.0f}%)  -- context it already has")
+        print(f"  beyond the horizon      {dec['beyond_horizon_bpc']:.4f}  "
+              f"({100*dec['beyond_horizon_bpc']/total:.0f}%)  -- the horizon candidates' ceiling")
+        print(f"  NOT addressable by horizon: "
+              f"{100*dec['share_not_addressable_by_horizon']:.0f}%")
+
     out = _REPO / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(results, indent=2), encoding="utf-8")
@@ -491,6 +660,24 @@ def main(argv: list[str] | None = None) -> int:
         worst = max(p["reconciliation_max_abs_residual_bpc"])
         print(f"  {arm:20s} truncation curve reproduced from the paired curve "
               f"to max |residual| = {worst:.4f} bpc")
+
+    print("\n" + "=" * 78)
+    print("ABSOLUTE bpc at exactly c characters of context, vs the baseline")
+    print("=" * 78)
+    show_c = (0, 1, 2, 3, 4, 8, 16, 32, 64)
+    bars = results["per_context_2sigma"]["bars"]
+    if bars:
+        print("2sigma bar".ljust(20) + "".join(
+            f"{bars.get(str(c), float('nan')):>8.4f}" for c in show_c)
+            + "   <- measured per context, not the flat whole-split 0.0092")
+    print("arm".ljust(20) + "".join(f"{c:>8d}" for c in show_c)
+          + "  worst short-c   n worse")
+    for arm, dom in results["absolute_context_curves"].items():
+        line = arm.ljust(20) + "".join(
+            f"{dom['bpc_at_context'][str(c)]:>8.4f}" for c in show_c)
+        print(line + f"   {dom['worst_short_context_delta_bpc']:>+8.4f}"
+                     f" (c={dom['worst_short_context_at']:<3d})"
+                     f" {dom['n_contexts_significantly_worse']:>4d}/128")
     if f1_failures:
         print(f"\n  F1 FAILURES (probe does not reproduce Phase 2): {f1_failures}")
     print(f"\nWROTE {args.out}")

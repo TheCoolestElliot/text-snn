@@ -1,0 +1,188 @@
+{
+  "audit": "08_mutation_campaign",
+  "gate": "tests/test_neuron_equivalence.py",
+  "baseline_pass": true,
+  "baseline_seconds": 12.2,
+  "n_mutations": 25,
+  "mutations": {
+    "M01": {
+      "description": "drop the -v_pre*sg term from the hard-reset derivative",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.62s"
+    },
+    "M02": {
+      "description": "sign-flip the -v_pre*sg term in the hard-reset derivative",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.64s"
+    },
+    "M03": {
+      "description": "drop thr from the soft-reset derivative",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.4,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:333: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_backward[shape0-soft] - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 31 passed in 5.12s"
+    },
+    "M04": {
+      "description": "give detached the derivative of hard",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[detached]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 23 passed in 4.72s"
+    },
+    "M05": {
+      "description": "give hard the derivative of detached",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.69s"
+    },
+    "M06": {
+      "description": "none reset derivative 1 -> 0",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[none]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 24 passed in 4.80s"
+    },
+    "M07": {
+      "description": "drop beta from grad_v_prev",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.65s"
+    },
+    "M08": {
+      "description": "grad_v_prev divides by beta instead of multiplying",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.66s"
+    },
+    "M09": {
+      "description": "drop the grad_spike*sg term",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.66s"
+    },
+    "M10": {
+      "description": "drop the grad_v_next*dv term",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.65s"
+    },
+    "M11": {
+      "description": "straight-through: sg = 1 instead of the surrogate",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.74s"
+    },
+    "M12": {
+      "description": "omit the threshold shift in x",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.71s"
+    },
+    "M13": {
+      "description": "> instead of >= in the BACKWARD kernel only",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.69s"
+    },
+    "M14": {
+      "description": "backward compares x against thr instead of 0",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 4.77s"
+    },
+    "M15": {
+      "description": "> instead of >= in the FORWARD kernel",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 13.7,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:260: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 12.23s"
+    },
+    "M16": {
+      "description": "hard reset does not reset",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 3.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 2.43s"
+    },
+    "M17": {
+      "description": "soft reset subtracts the spike, not thr*spike",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 4.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-soft] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 2 passed in 2.64s"
+    },
+    "M18": {
+      "description": "let NVRTC contract the membrane update into an FMA",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 8.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:230: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_membrane_is_bit_identical[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 17 passed in 6.48s"
+    },
+    "M19": {
+      "description": "forward decays the current instead of the membrane",
+      "file": "kernels.py",
+      "caught": true,
+      "gate_seconds": 3.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 2.45s"
+    },
+    "M20": {
+      "description": "pi instead of pi/2 in the CUDA surrogate",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 10.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 9.45s"
+    },
+    "M21": {
+      "description": "2x surrogate gain in the CUDA source",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 14.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 12.69s"
+    },
+    "M22": {
+      "description": "CUDA surrogate loses its square in the denominator",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 14.7,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 13.22s"
+    },
+    "M23": {
+      "description": "eager atan_grad loses its factor of 1/2",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 3.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:175: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 1.84s"
+    },
+    "M24": {
+      "description": "eager atan_value drops the 1/pi",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 3.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:175: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 1.90s"
+    },
+    "M25": {
+      "description": "atan_spike reverts to the unparenthesised straight-through form",
+      "file": "surrogate.py",
+      "caught": true,
+      "gate_seconds": 3.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 2.32s"
+    }
+  },
+  "n_caught": 25,
+  "escaped": [],
+  "all_caught": true,
+  "source_restored_clean": true
+}
