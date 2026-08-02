@@ -1,0 +1,1519 @@
+{
+  "analogue_beta0.5_s0": {
+    "run": "analogue_beta0.5_s0",
+    "group": "B_control_analogue",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "2e5b667d7c42",
+      "eval_config_hash": "bcd6f3feae40",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.293130527057369,
+          "nats": 7916765.11328125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.33108285010645266,
+            0.45779955151833984
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.278153002659397,
+          "nats": 7865056.9609375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3304707970666258,
+            0.4575317127532081
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "2e5b667d7c42",
+      "eval_config_hash": "bcd6f3feae40",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.280620304238478,
+          "nats": 7873575.03125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.32986389041731234,
+            0.4565205756378801
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2658332664668435,
+          "nats": 7822524.51171875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3292312098568992,
+            0.4562247738634285
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 7436.1,
+    "peak_vram_gib": 0.8518,
+    "steps": 20000
+  },
+  "analogue_beta0.5_s1": {
+    "run": "analogue_beta0.5_s1",
+    "group": "B_control_analogue",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "4f3a17c4054b",
+      "eval_config_hash": "b5fc789312b2",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2955060985215114,
+          "nats": 7924966.49609375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3362238577714092,
+            0.46786560275052724
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.280572407070213,
+          "nats": 7873409.671875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33561099026548236,
+            0.467578069355927
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "4f3a17c4054b",
+      "eval_config_hash": "b5fc789312b2",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2809891866582124,
+          "nats": 7874848.5546875,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3350849173178798,
+            0.46646556022920105
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2662483839330396,
+          "nats": 7823957.65625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33445314259121295,
+            0.4661478786484191
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 7582.25,
+    "peak_vram_gib": 0.8518,
+    "steps": 20000
+  },
+  "analogue_beta0.5_s2": {
+    "run": "analogue_beta0.5_s2",
+    "group": "B_control_analogue",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "a174ca7e2918",
+      "eval_config_hash": "484351218ac0",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.292317304829835,
+          "nats": 7913957.55859375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.330678898056871,
+            0.46340951284295634
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.277236059052885,
+          "nats": 7861891.3203125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3300792412146142,
+            0.46313807936875445
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\analogue_beta0.5_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "a174ca7e2918",
+      "eval_config_hash": "484351218ac0",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2772225561518624,
+          "nats": 7861844.703125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3294533122526972,
+            0.46201773458405543
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.262301495242219,
+          "nats": 7810331.484375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3288360228271861,
+            0.46171847750481804
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 7568.59,
+    "peak_vram_gib": 0.8518,
+    "steps": 20000
+  },
+  "gru_s0": {
+    "run": "gru_s0",
+    "group": "B_control_gru",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "ab5f4f0f8171",
+      "eval_config_hash": "93158d4e309b",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8123964748190264,
+          "nats": 6257086.98828125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.775450601685598,
+          "nats": 6129535.6796875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "ab5f4f0f8171",
+      "eval_config_hash": "93158d4e309b",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8026171769592991,
+          "nats": 6223325.10546875,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 1.7651176305736433,
+          "nats": 6093862.3046875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 738019,
+    "wall_clock_s": 442.23,
+    "peak_vram_gib": 0.8643,
+    "steps": 20000
+  },
+  "gru_s1": {
+    "run": "gru_s1",
+    "group": "B_control_gru",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "83773df263e4",
+      "eval_config_hash": "ca3ca13a0fd2",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8128443764780433,
+          "nats": 6258633.31640625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.7761206823002333,
+          "nats": 6131849.0546875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "83773df263e4",
+      "eval_config_hash": "ca3ca13a0fd2",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8046689231953035,
+          "nats": 6230408.51953125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 1.7675346815376582,
+          "nats": 6102206.890625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 738019,
+    "wall_clock_s": 441.9,
+    "peak_vram_gib": 0.8643,
+    "steps": 20000
+  },
+  "gru_s2": {
+    "run": "gru_s2",
+    "group": "B_control_gru",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "68ca9a86a652",
+      "eval_config_hash": "c4bea4c8dfb8",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8151894725033062,
+          "nats": 6266729.486328125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.7785063486933952,
+          "nats": 6140085.2890625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\gru_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "68ca9a86a652",
+      "eval_config_hash": "c4bea4c8dfb8",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 738019,
+      "results": {
+        "fresh": {
+          "bpc": 1.8060067304120404,
+          "nats": 6235027.142578125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 1.7695715637204759,
+          "nats": 6109238.98828125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 738019,
+    "wall_clock_s": 441.68,
+    "peak_vram_gib": 0.8643,
+    "steps": 20000
+  },
+  "snn_beta0.5_s0": {
+    "run": "snn_beta0.5_s0",
+    "group": "A_seed_variance",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d60053ecf7e7",
+      "eval_config_hash": "f8761bc6c6da",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.285918282977153,
+          "nats": 7891865.68359375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.33942914871793045,
+            0.3235542111490902
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.269259601011841,
+          "nats": 7834353.53125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33884078342663615,
+            0.3234410164387603
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d60053ecf7e7",
+      "eval_config_hash": "f8761bc6c6da",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2718995629892054,
+          "nats": 7843467.69140625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.33779098446431916,
+            0.32298626907561956
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2554769668134713,
+          "nats": 7786770.59765625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33717206826335505,
+            0.3228413721448497
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 398.88,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.5_s1": {
+    "run": "snn_beta0.5_s1",
+    "group": "A_seed_variance",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "ab6774bb8309",
+      "eval_config_hash": "576df54c7317",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.28637624901564,
+          "nats": 7893446.7578125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.35505387265431254,
+            0.33503897801825877
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.269740716820306,
+          "nats": 7836014.52734375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3544914091103955,
+            0.3349292591998452
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "ab6774bb8309",
+      "eval_config_hash": "576df54c7317",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2706395479381665,
+          "nats": 7839117.63671875,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.35310582542105723,
+            0.33403939243994263
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2541719952712036,
+          "nats": 7782265.3359375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.35251137457395854,
+            0.33389013927233846
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 396.14,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.5_s2": {
+    "run": "snn_beta0.5_s2",
+    "group": "A_seed_variance",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "e85188cfa98d",
+      "eval_config_hash": "913ccbbf09c2",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.2849856685830456,
+          "nats": 7888645.94140625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3452094922724523,
+            0.33597471172872345
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.2680829556822726,
+          "nats": 7830291.30078125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3446362724429683,
+            0.3358750660952769
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "e85188cfa98d",
+      "eval_config_hash": "913ccbbf09c2",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.270503900016693,
+          "nats": 7838649.328125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3434519536401096,
+            0.3348846361041069
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2537585127716557,
+          "nats": 7780837.8359375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.34284883894418416,
+            0.33474117242976237
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 393.19,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.5_s3": {
+    "run": "snn_beta0.5_s3",
+    "group": "A_seed_variance",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s3\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "84223895c8a7",
+      "eval_config_hash": "6baac19e2009",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.28173265294885,
+          "nats": 7877415.28515625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.34111235369192927,
+            0.32732191799502625
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.264943660181565,
+          "nats": 7819453.25,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.34053417608926173,
+            0.32723341019530044
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s3\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "84223895c8a7",
+      "eval_config_hash": "6baac19e2009",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.261929842996634,
+          "nats": 7809048.3984375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3396106338814685,
+            0.3266158401966095
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.2451818205700587,
+          "nats": 7751227.80859375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33899409794493723,
+            0.32648195718464096
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 383.52,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.5_s4": {
+    "run": "snn_beta0.5_s4",
+    "group": "A_seed_variance",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s4\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "af867c9f5d45",
+      "eval_config_hash": "3cc81b2dde10",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.287411182903827,
+          "nats": 7897019.74609375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3504871224102221,
+            0.32213383638545084
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.270769193438832,
+          "nats": 7839565.22265625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.349908457774865,
+            0.32209198686637375
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.5_s4\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "af867c9f5d45",
+      "eval_config_hash": "3cc81b2dde10",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.273487375841324,
+          "nats": 7848949.4296875,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3486431119473357,
+            0.3211651511098209
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.25698491861649,
+          "nats": 7791976.625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.348034482645361,
+            0.32107746875599813
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 373.6,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.95_s0": {
+    "run": "snn_beta0.95_s0",
+    "group": "C_beta_check_0.95",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d119ebc4a890",
+      "eval_config_hash": "2fc706451cfb",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.3946882669811314,
+          "nats": 8267381.33984375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.2946445208631064,
+            0.22082958135165667
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.3713410711031435,
+          "nats": 8186777.875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29340397331275436,
+            0.2210157262651544
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d119ebc4a890",
+      "eval_config_hash": "2fc706451cfb",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.370157377879284,
+          "nats": 8182691.3125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.2925212928339055,
+            0.2204951259650682
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.346473019065998,
+          "nats": 8100923.83203125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29123769190750626,
+            0.2206459131680037
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.84,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.95_s1": {
+    "run": "snn_beta0.95_s1",
+    "group": "C_beta_check_0.95",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "b0dfd5b87030",
+      "eval_config_hash": "ba55b68494e4",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.386923536555272,
+          "nats": 8240574.515625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.30007078106466095,
+            0.22477866042601435
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.3630491685937973,
+          "nats": 8158151.05078125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29888106176727697,
+            0.2250072144364056
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "b0dfd5b87030",
+      "eval_config_hash": "ba55b68494e4",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.364666726524262,
+          "nats": 8163735.48046875,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.2975830412224719,
+            0.2242409979042254
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.34078859191644,
+          "nats": 8081299.01171875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29634276346156474,
+            0.22442070747676648
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.64,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.95_s2": {
+    "run": "snn_beta0.95_s2",
+    "group": "C_beta_check_0.95",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "8483dcc5465f",
+      "eval_config_hash": "20c9ff6ef207",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.3975092712480786,
+          "nats": 8277120.52734375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3007325208500812,
+            0.22315444914918198
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.374212599799641,
+          "nats": 8196691.4921875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29955221398880605,
+            0.22328608443862513
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.95_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "8483dcc5465f",
+      "eval_config_hash": "20c9ff6ef207",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.373944724374809,
+          "nats": 8195766.68359375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.2980708303420167,
+            0.2228136243004548
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.3507200287972223,
+          "nats": 8115586.13671875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29684136611850637,
+            0.22291520943767146
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.63,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.9_s0": {
+    "run": "snn_beta0.9_s0",
+    "group": "C_beta_check_0.9",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "9fb5c5fd79a3",
+      "eval_config_hash": "bdd8ab6a166c",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.348287185978878,
+          "nats": 8107187.03125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3067856129062803,
+            0.2315859418166311
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.326286601811033,
+          "nats": 8031232.5859375,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.30573143300257233,
+            0.2317193903421101
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s0\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "9fb5c5fd79a3",
+      "eval_config_hash": "bdd8ab6a166c",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.3276123742023365,
+          "nats": 8035809.66015625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.30453185305783625,
+            0.23134882904981313
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.3056127529110433,
+          "nats": 7959858.5390625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3034364992850705,
+            0.2314517321555238
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.83,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.9_s1": {
+    "run": "snn_beta0.9_s1",
+    "group": "C_beta_check_0.9",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d233a68ff131",
+      "eval_config_hash": "39bdfc017e3d",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.344288748882856,
+          "nats": 8093382.89453125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3103467763254517,
+            0.22652239940668406
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.3220290683256266,
+          "nats": 8016533.94921875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3093038962075585,
+            0.22661569557691874
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s1\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "d233a68ff131",
+      "eval_config_hash": "39bdfc017e3d",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.3231226822417024,
+          "nats": 8020309.5234375,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3081100924234641,
+            0.2262159946717714
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.3009110991220094,
+          "nats": 7943626.62890625,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.30702581687977437,
+            0.22627792232914976
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.88,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "snn_beta0.9_s2": {
+    "run": "snn_beta0.9_s2",
+    "group": "C_beta_check_0.9",
+    "ckpt": "ckpt_final.pt",
+    "val": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "2e56b1db1151",
+      "eval_config_hash": "a7699138bc35",
+      "overrides": {},
+      "split": "val",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.349998623807417,
+          "nats": 8113095.5703125,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.31234871243175705,
+            0.22650046528954254
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.328247735819329,
+          "nats": 8038003.171875,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.311344104377847,
+            0.22662939444968574
+          ],
+          "n_windows": 19456,
+          "split": "val"
+        }
+      }
+    },
+    "test": {
+      "checkpoint": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\experiments\\runs\\snn_beta0.9_s2\\ckpt_final.pt",
+      "checkpoint_step": 20000,
+      "checkpoint_config_hash": "2e56b1db1151",
+      "eval_config_hash": "a7699138bc35",
+      "overrides": {},
+      "split": "test",
+      "max_windows": 0,
+      "batch_size": 128,
+      "params": 735437,
+      "results": {
+        "fresh": {
+          "bpc": 2.3283488774585432,
+          "nats": 8038352.3515625,
+          "n_chars": 4980736,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3099725646407981,
+            0.2260549637047868
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        },
+        "carried": {
+          "bpc": 2.3061929409095883,
+          "nats": 7961861.5703125,
+          "n_chars": 4980736,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3089288767231138,
+            0.22616276929253026
+          ],
+          "n_windows": 19456,
+          "split": "test"
+        }
+      }
+    },
+    "params": 735437,
+    "wall_clock_s": 372.45,
+    "peak_vram_gib": 0.6089,
+    "steps": 20000
+  },
+  "_statistics": {
+    "A_seed_variance": {
+      "fresh": {
+        "n": 5,
+        "values": [
+          2.2719,
+          2.27064,
+          2.270504,
+          2.26193,
+          2.273487
+        ],
+        "mean": 2.269692,
+        "sd": 0.004502,
+        "min": 2.26193,
+        "max": 2.273487
+      },
+      "carried": {
+        "n": 5,
+        "values": [
+          2.255477,
+          2.254172,
+          2.253759,
+          2.245182,
+          2.256985
+        ],
+        "mean": 2.253115,
+        "sd": 0.00461,
+        "min": 2.245182,
+        "max": 2.256985
+      }
+    },
+    "B_control_analogue": {
+      "fresh": {
+        "n": 3,
+        "values": [
+          2.28062,
+          2.280989,
+          2.277223
+        ],
+        "mean": 2.279611,
+        "sd": 0.002076,
+        "min": 2.277223,
+        "max": 2.280989
+      },
+      "carried": {
+        "n": 3,
+        "values": [
+          2.265833,
+          2.266248,
+          2.262301
+        ],
+        "mean": 2.264794,
+        "sd": 0.002169,
+        "min": 2.262301,
+        "max": 2.266248
+      }
+    },
+    "B_control_gru": {
+      "fresh": {
+        "n": 3,
+        "values": [
+          1.802617,
+          1.804669,
+          1.806007
+        ],
+        "mean": 1.804431,
+        "sd": 0.001707,
+        "min": 1.802617,
+        "max": 1.806007
+      },
+      "carried": {
+        "n": 3,
+        "values": [
+          1.765118,
+          1.767535,
+          1.769572
+        ],
+        "mean": 1.767408,
+        "sd": 0.00223,
+        "min": 1.765118,
+        "max": 1.769572
+      }
+    },
+    "C_beta_check_0.9": {
+      "fresh": {
+        "n": 3,
+        "values": [
+          2.327612,
+          2.323123,
+          2.328349
+        ],
+        "mean": 2.326361,
+        "sd": 0.002829,
+        "min": 2.323123,
+        "max": 2.328349
+      },
+      "carried": {
+        "n": 3,
+        "values": [
+          2.305613,
+          2.300911,
+          2.306193
+        ],
+        "mean": 2.304239,
+        "sd": 0.002897,
+        "min": 2.300911,
+        "max": 2.306193
+      }
+    },
+    "C_beta_check_0.95": {
+      "fresh": {
+        "n": 3,
+        "values": [
+          2.370157,
+          2.364667,
+          2.373945
+        ],
+        "mean": 2.36959,
+        "sd": 0.004665,
+        "min": 2.364667,
+        "max": 2.373945
+      },
+      "carried": {
+        "n": 3,
+        "values": [
+          2.346473,
+          2.340789,
+          2.35072
+        ],
+        "mean": 2.345994,
+        "sd": 0.004983,
+        "min": 2.340789,
+        "max": 2.35072
+      }
+    },
+    "noise_floor": {
+      "sigma_bpc_carried": 0.00461,
+      "n_seeds": 5,
+      "adoption_threshold_2sigma": 0.00922,
+      "exceeds_0.05_replan_trigger": false
+    }
+  }
+}

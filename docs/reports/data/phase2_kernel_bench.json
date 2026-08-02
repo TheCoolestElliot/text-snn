@@ -1,0 +1,287 @@
+{
+  "config": {
+    "batch_size": 128,
+    "seq_len": 256,
+    "d_model": 512,
+    "n_layers": 2,
+    "vocab_size": 205,
+    "reset": "hard",
+    "us_per_kernel_assumed": 1.45e-05
+  },
+  "jiterator_available": true,
+  "torch": "2.12.1+cu130",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "scan": [
+    {
+      "variant": "lif_scan eager (fwd, 1 layer)",
+      "kernels": 3330,
+      "kernels_per_timestep": 13.008,
+      "measured_ms": 58.524,
+      "predicted_ms": 48.285,
+      "measured_over_predicted": 1.212,
+      "memcpy": 0,
+      "memset": 0,
+      "launch_calls": 3330,
+      "top_kernels": [
+        [
+          "vectorized_elementwise_kernel",
+          2816
+        ],
+        [
+          "elementwise_kernel",
+          256
+        ],
+        [
+          "unrolled_elementwise_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ]
+      ]
+    },
+    {
+      "variant": "lif_scan fused (fwd, 1 layer)",
+      "kernels": 260,
+      "kernels_per_timestep": 1.016,
+      "measured_ms": 8.522,
+      "predicted_ms": 3.77,
+      "measured_over_predicted": 2.261,
+      "memcpy": 0,
+      "memset": 0,
+      "launch_calls": 260,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          4
+        ]
+      ]
+    },
+    {
+      "variant": "lif_scan eager (fwd+bwd, 1 layer)",
+      "kernels": 6909,
+      "kernels_per_timestep": 26.988,
+      "measured_ms": 251.176,
+      "predicted_ms": 100.181,
+      "measured_over_predicted": 2.507,
+      "memcpy": 0,
+      "memset": 1,
+      "launch_calls": 6909,
+      "top_kernels": [
+        [
+          "vectorized_elementwise_kernel",
+          5882
+        ],
+        [
+          "elementwise_kernel",
+          768
+        ],
+        [
+          "unrolled_elementwise_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ],
+        [
+          "reduce_kernel",
+          1
+        ]
+      ]
+    },
+    {
+      "variant": "lif_scan fused (fwd+bwd, 1 layer)",
+      "kernels": 521,
+      "kernels_per_timestep": 2.035,
+      "measured_ms": 17.02,
+      "predicted_ms": 7.555,
+      "measured_over_predicted": 2.253,
+      "memcpy": 0,
+      "memset": 1,
+      "launch_calls": 521,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          256
+        ],
+        [
+          "lif_backward_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          6
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          2
+        ],
+        [
+          "reduce_kernel",
+          1
+        ]
+      ]
+    }
+  ],
+  "params": 735437,
+  "model": [
+    {
+      "variant": "model forward",
+      "kernels": 528,
+      "kernels_per_timestep": 1.031,
+      "measured_ms": 17.955,
+      "predicted_ms": 7.656,
+      "measured_over_predicted": 2.345,
+      "memcpy": 0,
+      "memset": 2,
+      "launch_calls": 528,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          512
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          8
+        ],
+        [
+          "magma_sgemmEx_kernel",
+          3
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          2
+        ],
+        [
+          "reduce_kernel",
+          2
+        ],
+        [
+          "vectorized_gather_kernel",
+          1
+        ]
+      ]
+    },
+    {
+      "variant": "model forward+backward",
+      "kernels": 1082,
+      "kernels_per_timestep": 2.113,
+      "measured_ms": 37.314,
+      "predicted_ms": 15.689,
+      "measured_over_predicted": 2.378,
+      "memcpy": 0,
+      "memset": 18,
+      "launch_calls": 1082,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          512
+        ],
+        [
+          "lif_backward_kernel",
+          512
+        ],
+        [
+          "at_cuda_detail",
+          14
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          12
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          7
+        ],
+        [
+          "cutlass",
+          6
+        ]
+      ]
+    }
+  ],
+  "trainer": [
+    {
+      "variant": "training step (eager)",
+      "kernels": 1132,
+      "kernels_per_timestep": 2.211,
+      "measured_ms": 37.648,
+      "predicted_ms": 16.414,
+      "measured_over_predicted": 2.294,
+      "memcpy": 4,
+      "memset": 18,
+      "launch_calls": 1132,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          512
+        ],
+        [
+          "lif_backward_kernel",
+          512
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          21
+        ],
+        [
+          "multi_tensor_apply_kernel",
+          19
+        ],
+        [
+          "at_cuda_detail",
+          14
+        ],
+        [
+          "elementwise_kernel",
+          14
+        ]
+      ]
+    },
+    {
+      "variant": "training step (graph replay)",
+      "kernels": 1132,
+      "kernels_per_timestep": 2.211,
+      "measured_ms": 17.667,
+      "predicted_ms": 16.414,
+      "measured_over_predicted": 1.076,
+      "memcpy": 4,
+      "memset": 18,
+      "launch_calls": 1,
+      "top_kernels": [
+        [
+          "lif_forward_kernel",
+          512
+        ],
+        [
+          "lif_backward_kernel",
+          512
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          21
+        ],
+        [
+          "multi_tensor_apply_kernel",
+          19
+        ],
+        [
+          "at_cuda_detail",
+          14
+        ],
+        [
+          "elementwise_kernel",
+          14
+        ]
+      ],
+      "capture_seconds": 0.08,
+      "speedup_vs_eager": 2.13
+    }
+  ]
+}

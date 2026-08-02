@@ -1,0 +1,589 @@
+{
+  "A_seed_variance": {
+    "snn_beta0.5_s0": {
+      "run_name": "snn_beta0.5_s0",
+      "config_hash": "d60053ecf7e7",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 403.8,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.280957579867671,
+          "nats": 1036149.92578125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3402680516242981,
+            0.3240082263946533
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.26412006558984,
+          "nats": 1028501.30078125,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3391712188720703,
+            0.3237338483333588
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.5_s1": {
+      "run_name": "snn_beta0.5_s1",
+      "config_hash": "ab6774bb8309",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 401.1,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.2841237116769952,
+          "nats": 1037588.17578125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.35668137967586516,
+            0.33603014051914215
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.262898541613822,
+          "nats": 1027946.41015625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.35476143956184386,
+            0.3353662848472595
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.5_s2": {
+      "run_name": "snn_beta0.5_s2",
+      "config_hash": "e85188cfa98d",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 398.2,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.2807572974716086,
+          "nats": 1036058.9453125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.34645642936229704,
+            0.33690926134586335
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.261566192017588,
+          "nats": 1027341.17578125,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.34493112862110137,
+            0.3363172709941864
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.5_s3": {
+      "run_name": "snn_beta0.5_s3",
+      "config_hash": "84223895c8a7",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 388.4,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.2776972789578673,
+          "nats": 1034668.8984375,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.34247271418571473,
+            0.328351765871048
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.2591420965536764,
+          "nats": 1026240.00390625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3410167992115021,
+            0.32779463529586794
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.5_s4": {
+      "run_name": "snn_beta0.5_s4",
+      "config_hash": "af867c9f5d45",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 378.2,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.281718869670848,
+          "nats": 1036495.75,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3516192823648453,
+            0.32305369675159457
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.2635604942378604,
+          "nats": 1028247.109375,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.35017483234405516,
+            0.32265684902668
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    }
+  },
+  "B_control_analogue": {
+    "analogue_beta0.5_s0": {
+      "run_name": "analogue_beta0.5_s0",
+      "config_hash": "2e5b667d7c42",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 7442.4,
+      "peak_vram_gib": 0.8518,
+      "val": {
+        "fresh": {
+          "bpc": 2.2903867780760683,
+          "nats": 1040433.2421875,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.33148043751716616,
+            0.4590026021003723
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.2703401363261975,
+          "nats": 1031326.8359375,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.33074275553226473,
+            0.45772102326154707
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "analogue_beta0.5_s1": {
+      "run_name": "analogue_beta0.5_s1",
+      "config_hash": "4f3a17c4054b",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 7589.2,
+      "peak_vram_gib": 0.8518,
+      "val": {
+        "fresh": {
+          "bpc": 2.2953074252946997,
+          "nats": 1042668.5,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.33678236305713655,
+            0.4692574843764305
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.273332548459885,
+          "nats": 1032686.171875,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3358587086200714,
+            0.4678443863987923
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "analogue_beta0.5_s2": {
+      "run_name": "analogue_beta0.5_s2",
+      "config_hash": "a174ca7e2918",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 7576.2,
+      "peak_vram_gib": 0.8518,
+      "val": {
+        "fresh": {
+          "bpc": 2.2909747781602356,
+          "nats": 1040700.34765625,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3313970446586609,
+            0.46453613638877866
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.269960562016611,
+          "nats": 1031154.41015625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3303067311644554,
+            0.46332745254039764
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    }
+  },
+  "B_control_gru": {
+    "gru_s0": {
+      "run_name": "gru_s0",
+      "config_hash": "ab5f4f0f8171",
+      "steps": 20000,
+      "params": 738019,
+      "wall_clock_s": 447.2,
+      "peak_vram_gib": 0.8643,
+      "val": {
+        "fresh": {
+          "bpc": 1.8123407662440176,
+          "nats": 823275.61328125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.7722574577380263,
+          "nats": 805067.33203125,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "gru_s1": {
+      "run_name": "gru_s1",
+      "config_hash": "83773df263e4",
+      "steps": 20000,
+      "params": 738019,
+      "wall_clock_s": 446.6,
+      "peak_vram_gib": 0.8643,
+      "val": {
+        "fresh": {
+          "bpc": 1.813991550317457,
+          "nats": 824025.5,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.7729650029628086,
+          "nats": 805388.7421875,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "gru_s2": {
+      "run_name": "gru_s2",
+      "config_hash": "68ca9a86a652",
+      "steps": 20000,
+      "params": 738019,
+      "wall_clock_s": 446.4,
+      "peak_vram_gib": 0.8643,
+      "val": {
+        "fresh": {
+          "bpc": 1.815771888921791,
+          "nats": 824834.23828125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 1.7768469867589511,
+          "nats": 807152.17578125,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    }
+  },
+  "C_beta_check_0.9": {
+    "snn_beta0.9_s0": {
+      "run_name": "snn_beta0.9_s0",
+      "config_hash": "9fb5c5fd79a3",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.5,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.3536605625905698,
+          "nats": 1069176.05078125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3076010078191757,
+            0.23158933818340302
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.322948270562189,
+          "nats": 1055224.65625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.30597937703132627,
+            0.2320169448852539
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.9_s1": {
+      "run_name": "snn_beta0.9_s1",
+      "config_hash": "d233a68ff131",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.5,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.347034604199044,
+          "nats": 1066166.13671875,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3115646719932556,
+            0.2265080213546753
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.3194805241789145,
+          "nats": 1053649.39453125,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.30941577851772306,
+            0.22682042121887208
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.9_s2": {
+      "run_name": "snn_beta0.9_s2",
+      "config_hash": "2e56b1db1151",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.0,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.3560983736708874,
+          "nats": 1070283.453125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3128697484731674,
+            0.22650566399097444
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.325545629947712,
+          "nats": 1056404.53515625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.3116467744112015,
+            0.2268974483013153
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    }
+  },
+  "C_beta_check_0.95": {
+    "snn_beta0.95_s0": {
+      "run_name": "snn_beta0.95_s0",
+      "config_hash": "d119ebc4a890",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.2,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.4003168158359593,
+          "nats": 1090370.1640625,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.2951027899980545,
+            0.22073954343795776
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.367199784991022,
+          "nats": 1075326.390625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.293643856048584,
+            0.22128199338912963
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.95_s1": {
+      "run_name": "snn_beta0.95_s1",
+      "config_hash": "b0dfd5b87030",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.0,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.3930060741234924,
+          "nats": 1087049.1796875,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.30074062645435334,
+            0.22481700778007507
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.3594135370463167,
+          "nats": 1071789.40234375,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.2991494208574295,
+            0.22536889612674713
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    },
+    "snn_beta0.95_s2": {
+      "run_name": "snn_beta0.95_s2",
+      "config_hash": "8483dcc5465f",
+      "steps": 20000,
+      "params": 735437,
+      "wall_clock_s": 377.0,
+      "peak_vram_gib": 0.6089,
+      "val": {
+        "fresh": {
+          "bpc": 2.4060792235401056,
+          "nats": 1092987.80078125,
+          "n_chars": 655360,
+          "protocol": "fresh",
+          "firing_rate": [
+            0.3012251228094101,
+            0.22328893542289735
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        },
+        "carried": {
+          "bpc": 2.371135960520451,
+          "nats": 1077114.44140625,
+          "n_chars": 655360,
+          "protocol": "carried",
+          "firing_rate": [
+            0.29984150528907777,
+            0.2234828531742096
+          ],
+          "n_windows": 2560,
+          "split": "val"
+        }
+      },
+      "status": "OK"
+    }
+  }
+}
