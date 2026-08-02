@@ -140,4 +140,140 @@ informative one.
 
 ## 8. Results
 
-*(appended after the run; nothing above this line is edited)*
+**Run 2026-08-02.** 11 checkpoints, full enwik8 test split (4 980 736 characters
+each), 9 truncation lengths, ~25 s of GPU per checkpoint. Raw JSON in
+`docs/reports/data/exp_001_memory_horizon.json`.
+
+**F1 passed on all 11 checkpoints.** The `k = 256` point reproduces the committed
+Phase-2 `fresh` bpc to between 4.4e-10 and 1.3e-08 bpc — the probe is the same
+measurement as the baseline, reached by a different route. F2 passed: 4 980 736
+characters scored at every `k`, for every arm.
+
+### 8.1 An amendment, made before the verdicts and labelled as one
+
+The pre-registered statistic is **confounded**, and this was found during the
+first smoke run, before the full sweep. `bpc(k)` averages over every position
+inside a chunk, so a fraction `1/k` of all scored characters sit at position 0
+with no context at all. A model with a *short* horizon but expensive first
+characters therefore still traces a smooth curve improving all the way out to
+`k = L`, which looks exactly like long memory.
+
+That is not a hypothesis about the confound; it is measurable, and it was
+measured. If the whole truncation penalty is boundary amortisation then
+
+```
+bpc(k) − bpc(L)  =  (L/k − 1)/L  ·  Σ_{c<k} excess(c)
+```
+
+**exactly, with no free parameter.** Reconstructing the pre-registered curve from
+the paired one this way reproduces it to a maximum absolute residual of **0.0072
+to 0.0282 bpc**, against truncation penalties of 0.47–0.83 bpc — i.e. **97–99 %
+of the pre-registered signal is boundary amortisation.** The statistic carries
+almost no independent information about memory.
+
+So a second statistic was added: the **paired context curve** (§3 of
+`scripts/exp/001_memory_horizon.py`). For a fixed position `p`, the model, the
+window and the target character are identical between the truncated and
+untruncated runs and only the available context differs, so text difficulty —
+which dominates the ~0.02 bpc per-position standard error of the naive
+alternative — cancels in the difference.
+
+**This addition was made after seeing the smoke-test curve.** It is recorded as
+post-hoc, the pre-registered predictions are resolved below against the statistic
+they were written for, and both curves are reported in full.
+
+### 8.2 The pre-registered predictions, resolved as written
+
+| # | Prediction | Measured | Verdict |
+|---|---|---|---|
+| **P1** | `bpc_snn(8) − bpc_snn(256) < 0.0092` | **+0.5232** | **FAILED as written** |
+| **P2** | `bpc_snn(1) > 3.0` | 4.1462 | held |
+| **P3** | `bpc_gru(8) − bpc_gru(256) > 0.10` | **+0.8347** | held |
+| **P4** | horizon: SNN ≤ 8, GRU ≥ 64 | SNN **7**, GRU **57–60** | SNN half held; **GRU half failed** (57–60 < 64) |
+
+P1 failed on the confounded statistic and its *substance* — that the SNN's
+membrane carries nothing usable past ~8 characters — holds on the corrected one,
+at +0.0030 bpc of excess at 8 characters of context, a third of the 2σ bar. Both
+facts are recorded. P4's GRU half missed its threshold by 4–7 characters; it is
+recorded as failed rather than rounded into a pass.
+
+### 8.3 The number this experiment exists to produce
+
+Memory horizon = the shortest context beyond which more context is worth less
+than 2σ = 0.00922 bpc, measured on the paired curve.
+
+| Arm | n | **Horizon (chars)** | Excess at 8 chars | Excess at 16 chars | Test bpc |
+|---|---:|---:|---:|---:|---:|
+| Analogue control (β=0.5) | 1 | **6** | +0.0007 | +0.0000 | 2.2806 |
+| **SNN baseline (β=0.5)** | 5 | **7** *(7,7,7,7,7)* | +0.0030 | −0.0000 | 2.2697 |
+| SNN β=0.9 | 1 | **24** | +0.1040 | +0.0262 | 2.3276 |
+| SNN β=0.95 | 1 | **35** | +0.1246 | +0.0451 | 2.3702 |
+| **GRU anchor** *(violates I5)* | 3 | **57–60** | +0.1970 | +0.0800 | 1.8044 |
+
+All five SNN seeds return **exactly 7**. All three GRU seeds return 57–60.
+
+### 8.4 What it means — and the part that was not predicted
+
+**The GRU reaches roughly 8× further back than the spiking baseline can.** That is
+the mechanism behind the 0.486 bpc that `02_baseline_report.md` §7.2 attributes to
+invariant I5, and it is now measured rather than inferred.
+
+**But the β arms falsify the naive reading of that, inside this same experiment.**
+Raising β from 0.5 to 0.95 *does* buy horizon — 7 → 24 → 35 characters, a 5×
+increase — and bpc gets monotonically **worse** over exactly that range (2.2697 →
+2.3276 → 2.3702). Horizon is **necessary but not sufficient**, and the pre-
+registered M1/M2 dichotomy in §1 was too coarse: this is neither "the gap is
+length of memory" nor "length of memory is irrelevant".
+
+The resolution the data supports: a scalar leak buys horizon by **low-pass
+filtering**, which lengthens memory by *blurring* it — the same state variable
+that holds the distant past also has to hold the present character, and at β=0.95
+the present is 1/20th of the signal. The GRU is not merely *longer* than the
+spiking baseline; it is longer **while keeping recent context sharp**, because a
+gate lets each unit choose per step whether to retain or overwrite.
+
+**The Phase-3 consequence is sharper than "buy horizon".** A candidate must
+lengthen memory *without* degrading the fidelity of recent context — which means
+**separating** the fast and slow paths rather than slowing the single existing
+one. That is precisely the distinction between the §4.6-admitted multi-timescale
+and rotational forms (separate state variables) and the β knob (one state
+variable, slower), and it converts `02_baseline_report.md` §7.3's "structure, not
+magnitude" from a slogan into a quantitative, testable prediction:
+
+> **A two-compartment neuron should reach a horizon materially longer than 7
+> characters while its excess at 1–4 characters of context stays at the
+> baseline's level. Raising β lengthens the horizon and raises the near-context
+> excess together (β=0.9: +0.4660 at 3 chars vs the baseline's +0.2913). Any
+> candidate that shows the β signature is buying horizon the losing way.**
+
+That is a pre-registerable acceptance criterion for Phase 4, and it is carried
+into `03_phase3_candidates.md` as one.
+
+Two further observations, recorded because they were not asked for:
+
+* **The analogue control's horizon is 6 — statistically the same as the spiking
+  arm's 7.** Binarity and the hard threshold do not shorten memory. That is an
+  independent confirmation, on a different axis, of §7.2's finding that binarity
+  is nearly free: the two arms differ in emission, not in reach.
+* **The GRU's cost of *zero* context is higher than the SNN's** (+2.2379 vs
+  +1.8920 bpc at c = 0). It is not that the GRU is uniformly better at every
+  context length — it is that the GRU has more to lose, because it has more
+  invested in context. At 0–2 characters the two arms are much closer than their
+  headline gap suggests.
+
+### 8.5 Failure modes, checked
+
+| # | Failure | Outcome |
+|---|---|---|
+| F1 | `k = L` does not reproduce the committed number | Passed, 11/11, residual 4.4e-10 to 1.3e-08 bpc |
+| F2 | Reshaping changes which characters are scored | Passed: 4 980 736 characters at every k, every arm |
+| F3 | Wrong config loaded for a checkpoint | Config hash recorded per row; β=0.9 and β=0.95 arms reproduce their own committed bpc under F1, so they are the models they claim to be |
+| F4 | GRU state convention differs | Both arms exercise their own `state=None` branch through one shared code path; the GRU's F1 residual is 1.6e-09 to 1.0e-08 |
+| F5 | Batch-shape change alters numerics | Bounded by F1 at ~1e-08 bpc, six orders below the 0.00922 threshold |
+
+### 8.6 Status
+
+**CLOSED.** Deliverable produced. P1 failed as written and its substance holds
+under the corrected statistic; P4's GRU half failed; the confound in the
+pre-registered design was found, quantified, and reported rather than absorbed.
+The unpredicted β result in §8.4 is the finding that most changes Phase 3.

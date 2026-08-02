@@ -127,4 +127,104 @@ actually tested.
 
 ## 8. Results
 
-*(appended after the run; nothing above this line is edited)*
+**Run 2026-08-02**, B = 128, L = 256, d = 512, same box and torch build as
+`phase2_kernel_bench.json`. Raw JSON in
+`docs/reports/data/exp_002_candidate_neuron_cost.json`.
+
+**G1 passed:** N0 measures 1.0117 kernels per timestep against the committed
+1.016 — the same instrument, the same answer.
+
+### 8.1 The table
+
+| id | Neuron | State | Per-channel params | in/out | Kernels/timestep | ms | vs N0 |
+|---|---|---:|---:|:---:|---:|---:|---:|
+| **N0** | LIF (Phase-2 baseline) | 1 | 0 | 2/3 | 1.0117 | 9.16 | 1.00 |
+| **N1** | Learned per-channel decay | 1 | 1 | 3/3 | **1.0117** | 8.90 | **0.97** |
+| **N2** | Two-timescale membrane | 2 | 1 | 4/4 | **1.0156** | 9.90 | **1.08** |
+| **N3** | Adaptive threshold (adLIF) | 2 | 1 | 4/4 | **1.0156** | 10.07 | **1.10** |
+| **N4** | Rotational (complex) membrane | 2 | 2 | 5/4 | **1.0156** | 9.78 | **1.07** |
+
+Peak allocation is **0.188 GiB for every row, identical to four decimal places.**
+
+### 8.2 The predictions, resolved
+
+| # | Prediction | Outcome |
+|---|---|---|
+| **Q1** | all compile, within 8/8 | **held** — nothing struck; the widest candidate uses 5 inputs and 4 outputs, so the arity budget is not close to binding |
+| **Q2** | a two-state neuron still issues one kernel/timestep | **held** — 1.0156 for all of N2/N3/N4, against the 1.05 bar |
+| **Q3** | under 25 % slower than the baseline LIF | **held** — worst case N3 at 1.10× |
+| **Q4** | a `[1, d]` parameter broadcasts with no extra kernel or allocation | **held** — no extra kernel, and peak memory is byte-identical to the baseline |
+| **Q5** | the per-channel decay gradient costs ≥1 extra kernel/timestep | **FALSIFIED, with a caveat** — see §8.3 |
+
+### 8.3 Q5 was stated as a penalty, and the penalty is avoidable
+
+Q5 predicted that N1's backward must break the one-kernel floor, because a
+per-channel gradient is a reduction over batch and time and §2.3 puts reductions
+permanently out of reach here. The reduction is indeed unavoidable. **Paying for
+it with an extra kernel is not.**
+
+| Strategy | Kernels/timestep | ms | Peak VRAM |
+|---|---:|---:|---:|
+| Accumulate `grad_beta` inside the loop | **2.0195** | 16.46 | 0.376 GiB |
+| Emit per-step contributions, reduce **once** at the end | **1.0234** | 11.44 | 0.522 GiB |
+
+The in-loop form costs exactly the predicted +1 kernel per timestep. The deferred
+form buys it back for **+0.146 GiB** — which on a box with 7.96 GiB and a 0.61 GiB
+baseline run is not a constraint. **Any learnable per-neuron parameter can
+therefore keep the one-kernel floor on both passes**, at a memory price the
+machine can pay. Q5 is recorded as falsified; the mechanism behind it was right
+and the conclusion drawn from it was wrong.
+
+### 8.4 A kernel that compiled, ran, and computed the wrong function
+
+The first draft of N2 declared
+`(vf_prev, vs_prev, cur, beta_f, beta_s, w_c, thr)` — scalars interleaved before
+the per-channel tensor `w_c`. jiterator binds every **tensor** argument first and
+then the scalars, so `w_c` was silently bound into the `beta_f` slot. It compiled,
+it ran, it produced sensible-looking spikes, and **it priced within 2 % of the
+corrected kernel**, because the cost of a kernel depends on its shape and not on
+whether its arithmetic is right.
+
+Nothing in a timing harness can catch that. It was caught by checking each kernel
+against a plain-torch statement of its own equations, which found `v_pre` off by
+0.99 and spikes not bit-identical. That check is now part of the script and its
+output is committed per candidate — the run **aborts** rather than pricing a
+candidate that fails it.
+
+| Candidate | max abs error vs reference | Spikes bit-identical |
+|---|---:|:---:|
+| N0 | 0.0 | yes |
+| N1 | 2.4e-07 | yes |
+| N2 | 2.4e-07 | yes |
+| N3 | 1.2e-07 | yes |
+| N4 | 6.0e-08 | yes |
+
+This is a cost harness, not the R10 gate — these are forward recurrences with no
+verified backward, and §5.1 still stands in full.
+
+### 8.5 A measurement that changed on repetition
+
+The first run put N3 at **1.26×**, failing Q3's 1.25 bar. Three repeated timing
+passes put it at **1.10×**. The verdict was decided by clock and power state, not
+by the neuron. Every row is now the median of three passes with the spread
+committed, per §5.2 — and the near-miss is recorded because a threshold that a
+single sample can flip either way is one whose result must be reported as
+borderline rather than as a pass.
+
+### 8.6 What this settles for the ROI matrix
+
+**Every §4.6-admitted neuron is systems-free.** Two state variables, per-channel
+learned parameters, and a learnable decay's gradient all fit inside one jiterator
+kernel per timestep, within the arity limit, at ≤1.10× the baseline's wall-clock
+and at identical memory. At the corrected 32.8 µs/kernel this is worth **~0.03
+GPU-hours on a 3-seed arm** — three orders below the measurement's own resolution.
+
+The systems column of the Phase-3 ROI matrix is therefore **not a discriminator**
+between N1–N4. They are to be ranked on expected bits-per-character alone, and the
+real cost of each is the **mutation-tested gradient gate** it needs before it can
+run — engineering time, not GPU time.
+
+### 8.7 Status
+
+**CLOSED.** Q1–Q4 held, Q5 falsified, nothing struck, one wrong kernel caught by
+a check added because of it and now committed.

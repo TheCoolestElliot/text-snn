@@ -1,0 +1,313 @@
+{
+  "experiment": "EXP_002_candidate_neuron_cost",
+  "config": {
+    "batch_size": 128,
+    "seq_len": 256,
+    "d_model": 512
+  },
+  "torch": "2.12.1+cu130",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "jiterator_limits": {
+    "max_inputs": 8,
+    "max_outputs": 8
+  },
+  "baseline_reference_kernels_per_timestep": 1.016,
+  "candidates": {
+    "N0": {
+      "id": "N0",
+      "name": "LIF (Phase-2 baseline)",
+      "tensor_inputs": 2,
+      "outputs": 3,
+      "state_vars": 1,
+      "per_channel_params": 0,
+      "arity_total_inputs": 2,
+      "within_8x8_limit": true,
+      "compile_and_first_run_s": 0.044,
+      "q1_compiles": true,
+      "kernels": 259,
+      "kernels_per_timestep": 1.0117,
+      "memcpy": 0,
+      "memset": 0,
+      "ms_samples": [
+        9.096,
+        9.158,
+        9.279
+      ],
+      "ms": 9.158,
+      "ms_spread_rel": 0.02,
+      "peak_gib": 0.188,
+      "top_kernels": [
+        [
+          "n0_lif_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          1
+        ]
+      ],
+      "g1_pass": true,
+      "ms_vs_baseline": 1.0,
+      "q2_one_kernel_per_timestep": true,
+      "q3_under_25pct_slower": true
+    },
+    "N1": {
+      "id": "N1",
+      "name": "learned per-channel decay",
+      "tensor_inputs": 3,
+      "outputs": 3,
+      "state_vars": 1,
+      "per_channel_params": 1,
+      "arity_total_inputs": 3,
+      "within_8x8_limit": true,
+      "compile_and_first_run_s": 0.009,
+      "q1_compiles": true,
+      "kernels": 259,
+      "kernels_per_timestep": 1.0117,
+      "memcpy": 0,
+      "memset": 0,
+      "ms_samples": [
+        8.725,
+        8.898,
+        9.378
+      ],
+      "ms": 8.898,
+      "ms_spread_rel": 0.0734,
+      "peak_gib": 0.188,
+      "top_kernels": [
+        [
+          "n1_decay_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          1
+        ]
+      ],
+      "ms_vs_baseline": 0.972,
+      "q2_one_kernel_per_timestep": true,
+      "q3_under_25pct_slower": true
+    },
+    "N2": {
+      "id": "N2",
+      "name": "two-timescale membrane",
+      "tensor_inputs": 4,
+      "outputs": 4,
+      "state_vars": 2,
+      "per_channel_params": 1,
+      "arity_total_inputs": 4,
+      "within_8x8_limit": true,
+      "compile_and_first_run_s": 0.01,
+      "q1_compiles": true,
+      "kernels": 260,
+      "kernels_per_timestep": 1.0156,
+      "memcpy": 0,
+      "memset": 0,
+      "ms_samples": [
+        9.803,
+        9.898,
+        10.132
+      ],
+      "ms": 9.898,
+      "ms_spread_rel": 0.0332,
+      "peak_gib": 0.1882,
+      "top_kernels": [
+        [
+          "n2_two_ts_kernel",
+          256
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          2
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ]
+      ],
+      "ms_vs_baseline": 1.081,
+      "q2_one_kernel_per_timestep": true,
+      "q3_under_25pct_slower": true
+    },
+    "N3": {
+      "id": "N3",
+      "name": "adaptive threshold (adLIF)",
+      "tensor_inputs": 4,
+      "outputs": 4,
+      "state_vars": 2,
+      "per_channel_params": 1,
+      "arity_total_inputs": 4,
+      "within_8x8_limit": true,
+      "compile_and_first_run_s": 0.011,
+      "q1_compiles": true,
+      "kernels": 260,
+      "kernels_per_timestep": 1.0156,
+      "memcpy": 0,
+      "memset": 0,
+      "ms_samples": [
+        9.938,
+        10.066,
+        10.324
+      ],
+      "ms": 10.066,
+      "ms_spread_rel": 0.0383,
+      "peak_gib": 0.1882,
+      "top_kernels": [
+        [
+          "n3_adthr_kernel",
+          256
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          2
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ]
+      ],
+      "ms_vs_baseline": 1.099,
+      "q2_one_kernel_per_timestep": true,
+      "q3_under_25pct_slower": true
+    },
+    "N4": {
+      "id": "N4",
+      "name": "rotational (complex) membrane",
+      "tensor_inputs": 5,
+      "outputs": 4,
+      "state_vars": 2,
+      "per_channel_params": 2,
+      "arity_total_inputs": 5,
+      "within_8x8_limit": true,
+      "compile_and_first_run_s": 0.01,
+      "q1_compiles": true,
+      "kernels": 260,
+      "kernels_per_timestep": 1.0156,
+      "memcpy": 0,
+      "memset": 0,
+      "ms_samples": [
+        9.635,
+        9.784,
+        9.818
+      ],
+      "ms": 9.784,
+      "ms_spread_rel": 0.0187,
+      "peak_gib": 0.1882,
+      "top_kernels": [
+        [
+          "n4_rot_kernel",
+          256
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          2
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ]
+      ],
+      "ms_vs_baseline": 1.068,
+      "q2_one_kernel_per_timestep": true,
+      "q3_under_25pct_slower": true
+    }
+  },
+  "semantics": {
+    "N0": {
+      "v_pre_max_err": 0.0,
+      "spike_bit_identical": true,
+      "v_next_max_err": 0.0,
+      "pass": true
+    },
+    "N1": {
+      "v_pre_max_err": 2.384185791015625e-07,
+      "spike_bit_identical": true,
+      "recovered_beta_c_max_err": 1.7881393432617188e-07,
+      "per_channel_values_distinct": true,
+      "pass": true
+    },
+    "N2": {
+      "v_pre_max_err": 2.384185791015625e-07,
+      "spike_bit_identical": true,
+      "vf_max_err": 2.384185791015625e-07,
+      "vs_max_err": 1.1920928955078125e-07,
+      "pass": true
+    },
+    "N3": {
+      "x_max_err": 1.1920928955078125e-07,
+      "spike_bit_identical": true,
+      "u_max_err": 0.0,
+      "v_next_max_err": 0.0,
+      "pass": true
+    },
+    "N4": {
+      "re_max_err": 5.960464477539063e-08,
+      "im_max_err": 5.960464477539063e-08,
+      "spike_bit_identical": true,
+      "re_next_max_err": 5.960464477539063e-08,
+      "pass": true
+    }
+  },
+  "n1_backward": {
+    "accumulate_in_loop": {
+      "kernels": 517,
+      "kernels_per_timestep": 2.0195,
+      "memcpy": 0,
+      "memset": 0,
+      "ms": 16.465,
+      "peak_gib": 0.3757,
+      "top_kernels": [
+        [
+          "vectorized_elementwise_kernel",
+          258
+        ],
+        [
+          "n1_bwd_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          2
+        ],
+        [
+          "reduce_kernel",
+          1
+        ]
+      ]
+    },
+    "stack_and_reduce_once": {
+      "kernels": 262,
+      "kernels_per_timestep": 1.0234,
+      "memcpy": 0,
+      "memset": 1,
+      "ms": 11.44,
+      "peak_gib": 0.5222,
+      "top_kernels": [
+        [
+          "n1_bwd_kernel",
+          256
+        ],
+        [
+          "CatArrayBatchedCopy_vectorized",
+          4
+        ],
+        [
+          "vectorized_elementwise_kernel",
+          1
+        ],
+        [
+          "reduce_kernel",
+          1
+        ]
+      ]
+    }
+  }
+}
