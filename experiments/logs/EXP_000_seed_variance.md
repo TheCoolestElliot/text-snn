@@ -108,4 +108,71 @@ configuration.
 
 ## 9. Results
 
-*Not yet run. This section is appended to, never rewritten.*
+**Run 2026-08-01.** 5 runs, 0 failures, 374–399 s each, 0.61 GiB peak VRAM.
+Scored on the full enwik8 test split from the final checkpoint. Raw JSON in
+`docs/reports/data/phase2_final_scores.json`.
+
+### 9.1 The number
+
+| Seed | Test bpc (carried) | Test bpc (fresh) |
+|---:|---:|---:|
+| 0 | 2.255477 | 2.27186 |
+| 1 | 2.254172 | 2.27058 |
+| 2 | 2.253759 | 2.27049 |
+| 3 | 2.245182 | 2.26188 |
+| 4 | 2.256985 | 2.27353 |
+| **mean** | **2.25311** | 2.26967 |
+| **σ** | **0.00461** | 0.00447 |
+
+> **σ = 0.00461 bits/character** over 5 identical-except-seed runs.
+
+### 9.2 The decision rule, now resolved to numbers
+
+| Effect size | Verdict |
+|---|---|
+| > **0.00922 bpc** (2σ) | real effect, may be adopted |
+| 0.00461 – 0.00922 | within noise; published, not adopted |
+| < 0.00461 | no effect |
+
+§5's replan trigger (σ > 0.05) is **not triggered** — σ is roughly 11× below it.
+The Phase-4 budget stands at **3 seeds per arm** and needs no re-costing.
+
+Worth stating positively rather than as a mere pass: at 0.0046 bpc the instrument
+resolves **0.01 bpc effects at three seeds**. That is finer than the campaign was
+designed assuming, so Phase 4 can afford to ask sharper questions.
+
+### 9.3 Failure modes, checked
+
+| # | Failure | Outcome |
+|---|---|---|
+| F1 | Runs not identical apart from seed | Config hashes differ only where seed does; all five share every other field |
+| F2 | Non-determinism inflating σ | `test_determinism.py` passed before the campaign: same seed ⇒ identical trajectory, resume bit-exact |
+| F3 | A seed collapsing to silence | None did. Final firing rates 0.337–0.353 (layer 0) and 0.321–0.335 (layer 1) across all five |
+| F4 | σ from 5 samples is itself noisy | Acknowledged and unresolved by design; the 2σ rule absorbs it. Seed 3 is the outlier at 2.2452, 1.7σ below the mean |
+| F5 | Fused/eager disagreement making "the baseline" ambiguous | R10 gate passed, and was mutation-tested 21/21, before this ran |
+
+### 9.4 On §6's declared expectation — it was wrong
+
+§6 predicted, in advance, that β = 0.5's sub-one-character memory horizon would
+make the baseline weak, and asked that a weak result be recorded as the predicted
+consequence of the reference hyperparameters rather than re-described afterwards.
+
+The prediction failed, and it is recorded here as failed. β = 0.5 is the **best**
+of the three values checked: β = 0.9 costs +0.0511 bpc (11.1σ) and β = 0.95 costs
++0.0929 bpc (20.1σ). The baseline is not crippled by its decay constant, and a
+longer membrane time constant makes things monotonically worse.
+
+The mechanism visible in the logs: as β rises the second layer goes quieter
+(0.33 → 0.23 → 0.22 mean firing rate), i.e. each neuron's output depends more on
+accumulated past current and less on the present character. For next-character
+prediction that is a losing trade. Membrane leak is a low-pass filter, and a
+low-pass filter is a poor place to store linguistic context.
+
+This is a more useful result than the one predicted: it says Phase 3 should pursue
+the *structure* of neuron memory (the multi-timescale, adaptive-threshold and
+rotational forms admitted by the §4.6 ruling), not its *length*.
+
+### 9.5 Status
+
+**CLOSED.** Deliverable produced; decision rule resolved; §6's expectation
+falsified and recorded. Full analysis in `docs/reports/02_baseline_report.md` §7.
