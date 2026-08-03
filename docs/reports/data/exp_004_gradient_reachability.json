@@ -1,0 +1,351 @@
+{
+  "experiment": "EXP_004_gradient_reachability",
+  "screen": "03_phase3_candidates.md \u00a77.2",
+  "rule": "flag a new parameter whose |dL/dp| is exactly zero, or whose per-element RMS is below 1/100 of the layer weights'",
+  "ratio_floor": 0.01,
+  "torch": "2.12.1+cu130",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "expected_params": 737485,
+  "inits": {
+    "w_init=0.0": {
+      "label": "proposed (exact nesting)",
+      "w_init": 0.0,
+      "beta_slow": 0.95,
+      "eager": {
+        "fused": false,
+        "loss": 5.3219451904296875,
+        "train_bpc": 7.67794393411578,
+        "params": 737485,
+        "linear_weight_grad_rms": 7.054283196339384e-05,
+        "per_layer": [
+          {
+            "layer": 0,
+            "firing_rate": 0.051750779151916504,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.0008589903591200709,
+              "rms": 5.7633351389085874e-05,
+              "l2": 0.029508275911211967,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0026720527093857527,
+              "rms": 0.00035438447957858443,
+              "l2": 0.008018805645406246,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 5.02367809336719,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0,
+              "rms": 0.0,
+              "l2": 0.0,
+              "exactly_zero": true,
+              "rms_vs_linear_weight": 0.0,
+              "flagged": true
+            },
+            "slow_share_of_membrane": null
+          },
+          {
+            "layer": 1,
+            "firing_rate": 2.980232238769531e-07,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.0008600993314757943,
+              "rms": 8.14308223198168e-05,
+              "l2": 0.0416925810277462,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.002172641223296523,
+              "rms": 0.0005033640773035586,
+              "l2": 0.011389829218387604,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 7.135580799545513,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0,
+              "rms": 0.0,
+              "l2": 0.0,
+              "exactly_zero": true,
+              "rms_vs_linear_weight": 0.0,
+              "flagged": true
+            },
+            "slow_share_of_membrane": null
+          }
+        ],
+        "flagged": [
+          "layer0.beta_s_raw",
+          "layer1.beta_s_raw"
+        ],
+        "exactly_zero": [
+          "layer0.beta_s_raw",
+          "layer1.beta_s_raw"
+        ],
+        "passes_screen": false
+      },
+      "fused": {
+        "fused": true,
+        "loss": 5.3219451904296875,
+        "train_bpc": 7.67794393411578,
+        "params": 737485,
+        "linear_weight_grad_rms": 7.054283196339384e-05,
+        "per_layer": [
+          {
+            "layer": 0,
+            "firing_rate": 0.051750779151916504,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.0008589903591200709,
+              "rms": 5.763335502706468e-05,
+              "l2": 0.029508277773857117,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0026720522437244654,
+              "rms": 0.0003543845086824149,
+              "l2": 0.008018805645406246,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 5.023678505936825,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0,
+              "rms": 0.0,
+              "l2": 0.0,
+              "exactly_zero": true,
+              "rms_vs_linear_weight": 0.0,
+              "flagged": true
+            },
+            "slow_share_of_membrane": null
+          },
+          {
+            "layer": 1,
+            "firing_rate": 2.980232238769531e-07,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.0008600993314757943,
+              "rms": 8.14308223198168e-05,
+              "l2": 0.0416925810277462,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.002172641921788454,
+              "rms": 0.0005033640773035586,
+              "l2": 0.011389829218387604,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 7.135580799545513,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0,
+              "rms": 0.0,
+              "l2": 0.0,
+              "exactly_zero": true,
+              "rms_vs_linear_weight": 0.0,
+              "flagged": true
+            },
+            "slow_share_of_membrane": null
+          }
+        ],
+        "flagged": [
+          "layer0.beta_s_raw",
+          "layer1.beta_s_raw"
+        ],
+        "exactly_zero": [
+          "layer0.beta_s_raw",
+          "layer1.beta_s_raw"
+        ],
+        "passes_screen": false
+      },
+      "passes_screen": false,
+      "agrees_fused_vs_eager": true
+    },
+    "w_init=0.1": {
+      "label": "pre-registered fallback",
+      "w_init": 0.1,
+      "beta_slow": 0.95,
+      "eager": {
+        "fused": false,
+        "loss": 5.324160575866699,
+        "train_bpc": 7.681140059699415,
+        "params": 737485,
+        "linear_weight_grad_rms": 0.00038324008346535265,
+        "per_layer": [
+          {
+            "layer": 0,
+            "firing_rate": 0.09094774723052979,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.005046345759183168,
+              "rms": 0.00031543496879749,
+              "l2": 0.16150270402431488,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.009185783565044403,
+              "rms": 0.001231614500284195,
+              "l2": 0.027868254110217094,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 3.213689155757479,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.000782024406362325,
+              "rms": 9.912325185723603e-05,
+              "l2": 0.0022429032251238823,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 0.25864531434431076,
+              "flagged": false
+            },
+            "slow_share_of_membrane": null
+          },
+          {
+            "layer": 1,
+            "firing_rate": 0.004620611667633057,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.008556509390473366,
+              "rms": 0.0004407342930790037,
+              "l2": 0.2256559580564499,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.012287209741771221,
+              "rms": 0.0018381989793851972,
+              "l2": 0.04159369692206383,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 4.7964684767933,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0010572295868769288,
+              "rms": 0.00015378765237983316,
+              "l2": 0.0034798174165189266,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 0.401282796385093,
+              "flagged": false
+            },
+            "slow_share_of_membrane": null
+          }
+        ],
+        "flagged": [],
+        "exactly_zero": [],
+        "passes_screen": true
+      },
+      "fused": {
+        "fused": true,
+        "loss": 5.324160575866699,
+        "train_bpc": 7.681140059699415,
+        "params": 737485,
+        "linear_weight_grad_rms": 0.0003832401125691831,
+        "per_layer": [
+          {
+            "layer": 0,
+            "firing_rate": 0.09094774723052979,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.005046346224844456,
+              "rms": 0.00031543496879749,
+              "l2": 0.16150270402431488,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.009185781702399254,
+              "rms": 0.001231614500284195,
+              "l2": 0.027868254110217094,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 3.2136889117050917,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.0007820242317393422,
+              "rms": 9.912325913319364e-05,
+              "l2": 0.0022429032251238823,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 0.2586453136877726,
+              "flagged": false
+            },
+            "slow_share_of_membrane": null
+          },
+          {
+            "layer": 1,
+            "firing_rate": 0.004620611667633057,
+            "linear_weight": {
+              "present": true,
+              "numel": 262144,
+              "abs_max": 0.008556509390473366,
+              "rms": 0.0004407342930790037,
+              "l2": 0.2256559580564499,
+              "exactly_zero": false
+            },
+            "w": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.012287210673093796,
+              "rms": 0.0018381989793851972,
+              "l2": 0.04159369692206383,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 4.796468112542271,
+              "flagged": false
+            },
+            "beta_s_raw": {
+              "present": true,
+              "numel": 512,
+              "abs_max": 0.001057229470461607,
+              "rms": 0.00015378765237983316,
+              "l2": 0.0034798174165189266,
+              "exactly_zero": false,
+              "rms_vs_linear_weight": 0.40128276591107404,
+              "flagged": false
+            },
+            "slow_share_of_membrane": null
+          }
+        ],
+        "flagged": [],
+        "exactly_zero": [],
+        "passes_screen": true
+      },
+      "passes_screen": true,
+      "agrees_fused_vs_eager": true
+    }
+  },
+  "selected_init": "w_init=0.1",
+  "selection_rule": "EXP_004 \u00a72.2: the proposed init w=0 is used if it clears \u00a77.2's screen; otherwise the fallback w=0.1 named in the pre-registration is used."
+}
