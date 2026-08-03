@@ -1,7 +1,8 @@
 # EXP_006 — Do ~3 % of channels carry the horizon?
 
 **Pre-registered:** 2026-08-03, before any ablated number was computed.
-**Status:** OPEN. Results go in §9.
+**Status:** **CLOSED** 2026-08-03. **All six predictions held**; the reading they
+support is narrower than `EXP_004` §10.11 item 4's, and §9.6 says why.
 **Phase:** 4 (controlled experiments). The causal question `EXP_004` §10.5 left
 open and §10.11 item 4 called "the highest-information single run available".
 
@@ -240,7 +241,210 @@ produce, and the run aborts if any fails.
 ## 8. Entry conditions
 
 - [x] Existing test suite green — **242 passed**, matching `EXP_005` §8.1
-- [ ] No mutation campaign running, and none started while this runs
-- [ ] Nothing in `src/snn/` modified by this experiment — it is inference-only and
+- [x] No mutation campaign running, and none started while this runs
+- [x] Nothing in `src/snn/` modified by this experiment — it is inference-only and
       edits a state dict in memory
-- [ ] This file committed **before** the harness is written
+- [x] This file committed **before** the harness is written — `bd3939f`, against
+      the harness's `8bcad97`
+
+### 8.1 Two refinements made before the run, recorded rather than absorbed
+
+Both are in the harness's commit message and neither was made after seeing a
+result.
+
+* **H5 checks containment strictly and the count to within one**, not exact
+  equality. The channel that *is* the layer median is already at the clamp
+  target, so clamping it is a legitimate no-op; demanding an exact count would
+  have failed the check on arithmetic that is correct. The strict leg — nothing
+  outside the plan may move — is the one with the content, and it passed 91/91.
+* **An unresolved horizon is encoded as 128, not dropped.** `horizon_from_excess`
+  returns `None` when the excess curve never flattens inside the probe's range,
+  which means *horizon > 127* — the longest outcome, not a missing one. Dropping
+  those seeds would bias every median downward, and would do it hardest on the
+  heavily ablated arms this experiment is looking at. **In the event it never
+  fired:** every horizon resolved, on all 91 configurations.
+
+---
+
+## 9. Results
+
+**Run 2026-08-03.** Seven seeds × 13 configurations = **91 probe runs**, full test
+split (4 980 736 characters) at all nine `k`. **~27 minutes ≈ 0.45 GPU-hours**,
+against §2's 0.45 estimate. No training. Raw JSON:
+`docs/reports/data/exp_006_slow_tail_ablation.json`.
+
+### 9.1 The headline: ~3 % of channels carry the horizon, and they carry the bits too
+
+Median over 7 seeds, at the inherited 2σ = 0.00922 tolerance. "% horizon gone" is
+against the intact arm's 47 and the baseline's committed 7; "% gain gone" is
+against the arm's 0.1240 bpc fresh gain over the Phase-2 baseline's 2.2697.
+
+| Config | Horizon | % horizon gone | Fresh bpc | % gain gone | vs baseline |
+|---|---:|---:|---:|---:|---:|
+| **A(0)** *(intact)* | **47** | 0.0 % | **2.14566** | 0.0 % | −0.12404 |
+| A(4) | 31 | 40.0 % | 2.17763 | 25.8 % | −0.09207 |
+| A(8) | 22 | 62.5 % | 2.21652 | 57.1 % | −0.05318 |
+| **A(16)** | **12** | **87.5 %** | **2.26340** | **94.9 %** | −0.00630 |
+| A(32) | 8 | 97.5 % | 2.32203 | 142.2 % | **+0.05233** |
+| A(64) | 8 | 97.5 % | 2.36057 | 173.3 % | +0.09087 |
+| A(128) | 7 | 100.0 % | 2.40012 | 205.1 % | +0.13042 |
+| A(512) | 6 | 102.5 % | 2.44868 | 244.3 % | +0.17898 |
+
+**Clamping the 16 highest-`beta_s` channels per layer — 3.1 % of the width —
+takes the horizon from 47 to 12 and removes 94.9 % of the arm's bits-per-character
+gain.** Clamping 32 leaves the arm **worse than the single-compartment Phase-2
+baseline it was built to beat.**
+
+`N½`, the smallest swept `N` at which half the horizon gain is gone, is **8** —
+1.6 % of the width.
+
+### 9.2 The dissociation, which is what makes it causal rather than correlational
+
+| Config | What it does | Horizon | % horizon gone | % gain gone |
+|---|---|---:|---:|---:|
+| **A(16)** | clamp the top 16 by `beta_s` | **12** | **87.5 %** | 94.9 % |
+| **B(16)** | clamp all **except** the top 16 by `beta_s` | **45** | **5.0 %** | 148.7 % |
+| **C(16)** | clamp the top 16 by `\|w\|` | **47** | **0.0 %** | 28.7 % |
+| **E(16)** | 16 random non-tail channels, **same mean displacement** | **48** | **−2.5 %** | 16.6 % |
+
+Four interventions of identical size — 16 channels per layer — and only one of
+them touches the horizon. Removing the tail destroys it; keeping *only* the tail
+and flattening the other 496 preserves it at 45 of 47; selecting the same number
+of channels by mix magnitude, or by a matched-displacement random draw, leaves it
+where it was.
+
+**The two selection rules pick disjoint sets.** The overlap between the top 16 by
+`beta_s` and the top 16 by `|w|` is **0, 0, 1, 0, 2, 1, 1** channels of 16 across
+the seven seeds — which quantifies `EXP_004` §10.5's observation that `|w|` on the
+tail is not larger than elsewhere, and is why `C` is a control rather than a
+second look at the same channels.
+
+**E(16) also prices the null intervention.** Clamping 16 arbitrary channels by the
+same amount costs 16.6 % of the gain. So of A(16)'s 94.9 %, about **78 points are
+specific to the tail's timescale** and the rest is the generic cost of clamping
+sixteen channels. The horizon result carries no such correction: E(16) removes
+none of it.
+
+### 9.3 The predictions, resolved as written
+
+| # | Prediction | Threshold | Measured | Verdict |
+|---|---|---|---|---|
+| **U1** | median horizon `A(16)` ≤ 27 | 27 | **12** | **held** |
+| **U2** | median horizon `B(16)` ≥ 27 | 27 | **45** | **held** |
+| **U3** | \|`A(32)` − `A(512)`\| ≤ 3 | 3 | **2** | **held** |
+| **U4** | `A(16)` costs ≥ 0.05 bpc fresh | 0.05 | **0.1177** | **held** |
+| **U5** | median horizon `C(16)` ≥ 38 | 38 | **47** | **held** |
+| **U6** | median horizon `E(16)` ≥ 38 | 38 | **48** | **held** |
+
+**Decision cell (§4): U1 ∧ U2 ∧ U5 ∧ U6 all hold ⇒ the horizon is carried by ~3 %
+of channels, causally.** `EXP_004` §10.5's association is upgraded from
+correlational to causal at the level of `beta_s`.
+
+**U4 held, so §4's demotion rider does not fire.** The bits do follow the
+horizon-carrying channels, and horizon-widening is **not** demoted on this
+evidence. §9.6 is where the caution actually belongs, and it is a different
+caution from the one §4 anticipated.
+
+**Every prediction holding is itself worth a remark.** Six for six is not what
+this project's pre-registrations have usually produced — `EXP_004` falsified T2,
+`EXP_005` failed S1, S3 and S4 — and a clean sweep is the pattern that should
+attract suspicion rather than satisfaction. What makes it credible here is §9.4:
+the interventions are four independent selection rules of identical size whose
+results dissociate, and the harness proved its own null on 91 configurations
+before any of them were read.
+
+### 9.4 Self-checks — 280 of 280, and one of them is exact
+
+| # | Check | Result |
+|---|---|---|
+| **H1** | `beta_s_raw` and nothing else modified | **91 / 91** |
+| **H2** | the k = 1 point is bit-identical to `A(0)`'s | **84 / 84**, worst residual **0.000e+00 bpc**, nats bit-identical on every configuration |
+| **H3** | `A(0)` reproduces the committed `final_test.json` fresh bpc (`EXP_001`'s F1) | **7 / 7** |
+| **H4** | `A(0)` reproduces `EXP_005`'s committed per-seed horizons | **7 / 7** — 38 / 47 / 45 / 57 / 48 / 47 / 53, exactly |
+| **H5** | the edit landed on exactly the planned channels | **91 / 91** |
+
+**H2 is the one worth dwelling on.** Across all 91 configurations there are
+exactly **seven distinct zero-context bpc values — one per seed**, unchanged by
+every intervention. That is forced by algebra (§1.1) and it is the check that
+distinguishes this ablation from the `w`-zeroing one it replaced: the confound
+`EXP_004` §10.6 identified is not merely argued away here, it is measured at zero
+to the bit, 84 times.
+
+### 9.5 An internal consistency check nobody asked for, which the design happened to permit
+
+`A(N)` and `B(N)` clamp complementary channel sets, so their costs should sum to
+`A(512)`'s — clamping everything. They do, to a precision the experiment did not
+target:
+
+| | A | B | sum | A(512) | residual |
+|---|---:|---:|---:|---:|---:|
+| N = 16 | 0.11774 | 0.18439 | **0.30213** | **0.30302** | 0.00089 |
+| N = 64 | 0.21491 | 0.08825 | **0.30316** | **0.30302** | 0.00014 |
+
+The slow pole's total contribution decomposes **additively** between any channel
+set and its complement, to within 0.0009 bpc on a 0.303 bpc quantity. Nothing in
+the design required this and no prediction rests on it; it is reported because an
+un-forced identity that closes is evidence the interventions are doing what they
+are described as doing.
+
+It also reframes the numerator. **The slow pole is worth 0.303 bpc, not 0.124** —
+`A(512)`, with every slow pole flattened to the population median, is 0.179 bpc
+*worse than the Phase-2 baseline*. A second compartment running at ~0.55 is not a
+neutral addition that the tail then improves on; it is actively harmful, and the
+tail is what pays for it and then some. Of that 0.303, the top 16 channels carry
+**39 %** and the other 496 carry 61 %.
+
+### 9.6 What this does NOT establish, and why it cuts against §10.11 item 4
+
+`EXP_004` §10.11 item 4 reads: *"~3 % of channels appear to carry the horizon,
+which if true means the long-memory capacity is far from saturated."* **The first
+half is now established. The second does not follow, and this experiment supplies
+an argument against it.**
+
+`beta_s` was initialised at **0.95 on all 512 channels** (`EXP_004` §10.5). The
+network began with the maximum possible slow capacity and **pulled 97 % of it
+down**, keeping 11–19 channels per layer above 0.9. So the tail's size is a
+**learned outcome of a network that had 512 slow channels available and declined
+them**, not a ceiling it ran into. "Nowhere near saturated" describes a constraint
+that the training run does not appear to have been under.
+
+This is an argument, not a measurement, and two things could defeat it: the
+descent might be an optimisation artifact rather than a preference (a slow pole
+may hurt early training in a way that has nothing to do with its final value), and
+nothing here rules out a *different* count being better under a different
+initialisation. **The experiment that would settle it is cheap and is named
+here rather than left implicit: freeze or regularise `beta_s` toward 0.95 on N
+channels per layer, train at N ∈ {16, 64, 256}, and read the bpc.** Three seeds at
+`EXP_004`'s measured 525 s is ~1.3 GPU-hours for the ladder.
+
+Until that runs, the correct statement is the narrow one: **~3 % of channels carry
+the horizon and ~95 % of the arm's gain; whether more of them would help is
+unmeasured, and the initialisation history is evidence that it would not.**
+
+Two further limits, restating §5 rather than discovering them:
+
+* **`B(16)`'s bpc is not a cost and is not quoted as one** (§4's rider). It clamps
+  97 % of channels and lands 0.060 bpc *worse than the Phase-2 baseline*. Only its
+  horizon is used, and only as U2's leg.
+* **`C(64)`'s partial horizon loss (25 %) is consistent with the `|w|` ranking
+  reaching into the tail as N grows, but the overlap was only measured at N = 16.**
+  Stated as consistency, not as a measurement.
+
+### 9.7 Status
+
+**CLOSED. All six pre-registered predictions held; 280 of 280 self-checks passed.**
+
+Three things change, and one that pointedly does not:
+
+1. **`EXP_004` §10.5's association is causal.** ~3 % of channels per layer carry
+   the horizon: removing 16 takes it from 47 to 12, keeping only those 16 holds it
+   at 45, and two matched controls of identical size move it not at all.
+2. **They carry the bits as well as the statistic** — 94.9 % of the arm's fresh
+   gain, or ~78 points of that after subtracting the matched control's generic
+   cost. The horizon is not a decorative statistic on this arm.
+3. **The slow pole is worth 0.303 bpc and is harmful without its tail** (§9.5).
+   `A(512)` is 0.179 bpc worse than the Phase-2 baseline.
+4. **`EXP_004` §10.11 item 4's "far from saturated" is NOT established, and this
+   experiment argues against it** (§9.6). The ranking input it was being used to
+   justify — widen the slow tail — should not be taken from this result. The
+   frozen-`beta_s` ladder in §9.6 is what would justify it.
