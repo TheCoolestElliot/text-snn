@@ -226,24 +226,82 @@ def test_forward(shape):
 
 @pytest.mark.cuda
 @requires_fused
-def test_membrane_is_bit_identical_which_needs_three_suppressed_contractions():
-    """Zero difference, not a small one -- and the mix is the new place to lose it.
+def test_returned_membrane_is_bit_identical():
+    """Zero difference, not a small one, on the state the scan returns.
 
-    The fused kernel writes both membrane recursions AND `vf + w*vs` with
-    `__fmul_rn`/`__fadd_rn`. The eager path performs each as a separate CUDA
-    kernel and therefore rounds twice; an FMA rounds once. A one-ulp drift is
-    invisible in any tolerance-based check and flips any spike whose membrane
-    lands within an ulp of the threshold, which is exactly the R10 failure mode.
+    The fused kernel writes both membrane recursions with `__fmul_rn`/`__fadd_rn`.
+    The eager path performs each as a separate CUDA kernel and therefore rounds
+    twice; an FMA rounds once. A one-ulp drift is invisible in any tolerance-based
+    check and flips any spike whose membrane lands within an ulp of the threshold,
+    which is exactly the R10 failure mode.
 
     Asserted separately from `test_forward` so that if it ever fails while
     `test_forward` still passes, the message is "the rounding contract broke"
     rather than "the gate failed".
+
+    NOTE WHAT THIS DOES NOT COVER, because it took a mutation escape to notice:
+    the returned state is `(vf_after_reset, vs)`, and **neither depends on the
+    mix**. `vf + w*vs` reaches only `v_pre`, which the scan does not return, and
+    the spike, which changes only where the membrane lands within an ulp of the
+    threshold. The mix's own contraction is covered by
+    `test_the_mix_is_bit_identical_at_the_kernel_boundary` below.
     """
     for beta_f, beta_s, w, thr in REGIMES:
         cur, v0, ww, bb = _inputs(4, 128, 32, seed=71, thr=thr, beta_s=beta_s, w=w)
         _, v_f = twocomp_scan(cur, v0, ww, bb, beta_f, thr, ALPHA, fused=True)
         _, v_e = twocomp_scan_eager(cur, v0, ww, bb, beta_f, thr, ALPHA)
         assert float((v_f - v_e).abs().max()) == 0.0, (beta_f, beta_s, w, thr)
+
+
+@pytest.mark.cuda
+@requires_fused
+def test_the_mix_is_bit_identical_at_the_kernel_boundary():
+    """The third suppressed contraction, asserted on the quantity that carries it.
+
+    ADDED BECAUSE A MUTATION ESCAPED. The 2026-08-03 campaign ran T05 -- "let
+    NVRTC contract the MIX into an FMA" -- and the gate passed, 46/47. The
+    analogous mutation on the LIF's own membrane (M18) has always been caught, so
+    the harness was working and this file had a specific hole.
+
+    Measured on this stack at B=64, d=512: the contracted mix moves `v_pre` on
+    **5866 of 32768 elements**, by up to 4.8e-07 -- and flips **zero** spikes.
+    That is the whole mechanism. `v_pre` is the only place the mix appears, the
+    scan does not return it, and a spike flips only where `|v_pre - thr|` is
+    within an ulp. Whether any element lands there is luck, so a spike-pattern
+    check is a coin flip rather than a gate, and it came up tails.
+
+    So the contract is asserted where it lives: one step of the real forward
+    kernel against a plain-torch statement of the same three roundings. The
+    suppressed kernel matches it on 32768 of 32768 elements.
+
+    The general lesson, which outlives this kernel: **a numerical contract is only
+    guarded where the quantity it constrains is actually observed.** An
+    intermediate that no assertion reads is unguarded no matter how many tests
+    surround it.
+    """
+    from snn.twocomp import twocomp_forward_kernel
+
+    fn = twocomp_forward_kernel()
+    B, d = 64, 512
+    for beta_f, beta_s, w, thr in REGIMES:
+        g = torch.Generator(device="cpu").manual_seed(hash((beta_f, thr)) % 2**31)
+        vf = torch.randn(B, d, generator=g).cuda()
+        vs = torch.randn(B, d, generator=g).cuda()
+        cur = torch.randn(B, d, generator=g).cuda()
+        ww = (w + 0.25 * torch.randn(1, d, generator=g)).cuda()
+        bb = (beta_s + 0.04 * torch.randn(1, d, generator=g)).clamp(0.05, 0.995).cuda()
+
+        _vf, _vs, _s, v_pre = fn(vf, vs, cur, ww, bb, beta_f=beta_f, thr=thr)
+        # Each line is one multiply and one add, as two separate CUDA kernels,
+        # rounding twice -- exactly what the kernel's intrinsics must reproduce.
+        vfp = vf * beta_f + cur
+        vsp = vs * bb + cur
+        vmix = vfp + ww * vsp
+        assert torch.equal(v_pre, vmix), (
+            f"beta_f={beta_f} thr={thr}: v_pre differs from the twice-rounded "
+            f"reference on {int((v_pre != vmix).sum())}/{v_pre.numel()} elements, "
+            f"max|d|={float((v_pre - vmix).abs().max()):.3e} -- the mix contracted"
+        )
 
 
 @pytest.mark.cuda
