@@ -85,6 +85,14 @@ ARMS: dict[str, str] = {
     "depth_K1_s0": "depth_K1",
     "depth_K4_s0": "depth_K4",
     "depth_K8_s0": "depth_K8",
+    # EXP_004's two-compartment arm. Same probe, same paired statistic, same
+    # script -- for the same reason the depth ladder reuses it: the horizon
+    # numbers have to be comparable with the rows above, and two implementations
+    # of one statistic is how they stop being. Phase 4 runs this with an explicit
+    # --out so the committed Phase-3 artifact is never overwritten.
+    "twocomp_s0": "twocomp",
+    "twocomp_s1": "twocomp",
+    "twocomp_s2": "twocomp",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
