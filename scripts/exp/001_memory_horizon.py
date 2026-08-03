@@ -93,6 +93,16 @@ ARMS: dict[str, str] = {
     "twocomp_s0": "twocomp",
     "twocomp_s1": "twocomp",
     "twocomp_s2": "twocomp",
+    # EXP_005's four extra seeds of the SAME arm (candidate #14, promoted to
+    # blocking by EXP_004 4). This is a registry entry and nothing else: the
+    # statistic, the k-sweep and the F1 tolerance are untouched, which is
+    # EXP_005's failure mode K5. The probe stays the instrument that produced
+    # every horizon number in the project, and EXP_005 runs it with an explicit
+    # --out so no committed artifact is overwritten.
+    "twocomp_s3": "twocomp",
+    "twocomp_s4": "twocomp",
+    "twocomp_s5": "twocomp",
+    "twocomp_s6": "twocomp",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
