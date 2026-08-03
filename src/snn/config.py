@@ -49,7 +49,7 @@ import torch  # noqa: E402
 # --------------------------------------------------------------------------
 
 CORPUS_CHOICES = ("enwik8", "text8")
-ARCH_CHOICES = ("snn", "analogue", "twocomp", "gru")
+ARCH_CHOICES = ("snn", "analogue", "twocomp", "tokenshift", "threshold", "gru")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -96,6 +96,16 @@ class Config:
     # unlogged choice there would be an unfalsifiable one.
     beta_slow: float = 0.95         # slow-pole decay at init; sigmoid-parameterised
     w_init: float = 0.1             # initial fast/slow mix; 0.0 nests the baseline
+
+    # --- pre-scan arms (EXP_007, EXP_008) --------------------------------
+    # Ignored by every other arm, and Config fields rather than constants for the
+    # same reason `beta_slow` and `w_init` are: the initialisation is what the
+    # §7.2 screen selects, and an unlogged choice there is an unfalsifiable one.
+    # Both defaults are the value at which the arm IS the Phase-2 baseline, so a
+    # run that forgets to set them trains the baseline rather than something
+    # undocumented.
+    mu_init: float = 1.0            # tokenshift only: 2-tap mix; 1.0 nests the baseline
+    thr_log_init: float = 0.0       # threshold only: log threshold; 0.0 nests it
 
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
@@ -278,6 +288,8 @@ _HELP: dict[str, str] = {
     "t_steps": "micro-steps per character T",
     "beta_slow": "twocomp only: slow-pole decay at init, in (0, 1)",
     "w_init": "twocomp only: initial fast/slow mix; 0.0 nests the Phase-2 baseline",
+    "mu_init": "tokenshift only: 2-tap input mix; 1.0 nests the Phase-2 baseline",
+    "thr_log_init": "threshold only: log per-channel threshold; 0.0 nests the baseline",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",
