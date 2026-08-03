@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -70,6 +71,30 @@ ARMS = {
 MAY_DIFFER = {"seed", "run_name", "arch"}
 
 _DEFAULTS = {f.name: f.default for f in dataclasses.fields(Config)}
+
+
+def is_complete(run: str) -> bool:
+    """True iff `run` finished its full budget and was scored on test.
+
+    Run-level idempotence, added 2026-08-03 **after the first launch was killed
+    by a harness timeout mid-`tokenshift_s1`** and before any result was read.
+    Recorded here rather than absorbed silently, because a driver that skips work
+    is a driver that can skip work it should have done.
+
+    The bar is deliberately both halves: `summary.json` is written only after the
+    trainer's own loop completes `max_steps`, and `final_test.json` only after
+    `scripts/evaluate.py` scores it. A directory holding a `ckpt_last.pt` from an
+    interrupted run satisfies neither, and `main` deletes such a directory rather
+    than resuming into it -- a resumed run is a different object from an
+    uninterrupted one until `tests/test_determinism.py`'s guarantee is checked for
+    this arm, and it has not been.
+    """
+    d = RUNS / run
+    if not (d / "final_test.json").exists() or not (d / "summary.json").exists():
+        return False
+    summary = json.loads((d / "summary.json").read_text(encoding="utf-8"))
+    cfg = json.loads((d / "config.json").read_text(encoding="utf-8"))
+    return int(summary.get("steps", 0)) == int(cfg.get("max_steps", -1))
 
 
 def _check_no_campaign() -> None:
@@ -174,16 +199,27 @@ def main(argv: list[str] | None = None) -> int:
         prefix = ARMS[arch][0]
         for seed in seeds:
             run = f"{prefix}_s{seed}"
-            _check_no_campaign()          # before EVERY run, not once
-            t_train = _run(["scripts/train.py", *_train_argv(arch, seed)],
-                           f"train {run}")
-            _check_no_campaign()
-            t_eval = _run([
-                "scripts/evaluate.py",
-                "--ckpt", str(RUNS / run / "ckpt_final.pt"),
-                "--split", "test",
-                "--out", str(RUNS / run / "final_test.json"),
-            ], f"evaluate {run}")
+            if is_complete(run):
+                print(f"\n=== {run} already complete, skipping", flush=True)
+                t_train = t_eval = 0.0
+            else:
+                if (RUNS / run).exists():
+                    # A partial directory would append to log.jsonl and leave a
+                    # ckpt_last.pt from a run that never finished, so the artifacts
+                    # would describe two runs at once. Removed, not resumed.
+                    print(f"\n=== {run} is partial; removing and retraining",
+                          flush=True)
+                    shutil.rmtree(RUNS / run)
+                _check_no_campaign()      # before EVERY run, not once
+                t_train = _run(["scripts/train.py", *_train_argv(arch, seed)],
+                               f"train {run}")
+                _check_no_campaign()
+                t_eval = _run([
+                    "scripts/evaluate.py",
+                    "--ckpt", str(RUNS / run / "ckpt_final.pt"),
+                    "--split", "test",
+                    "--out", str(RUNS / run / "final_test.json"),
+                ], f"evaluate {run}")
 
             row = check_same_arm(run, arch, reference)
             summary = json.loads(
@@ -192,6 +228,7 @@ def main(argv: list[str] | None = None) -> int:
                 (RUNS / run / "final_test.json").read_text(encoding="utf-8"))
             row.update({
                 "seed": seed,
+                "trained_in_this_invocation": t_train > 0,
                 "train_seconds": round(t_train, 1),
                 "eval_seconds": round(t_eval, 1),
                 "reported_wall_clock_s": summary.get("wall_clock_s"),

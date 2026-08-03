@@ -242,4 +242,18 @@ and §9 of the Phase-3 report is still unticked.
 - [x] Existing test suite green — **242 passed** (2026-08-03)
 - [x] Working tree clean at `1e5b239`, branch `phase-4-experiments`
 - [x] No mutation campaign running
-- [x] This file committed **before** the arm's implementation is written
+- [x] This file committed **before** the arm's implementation is written — `1f05bab`,
+      against the harness's `5d6f88a` and the resolver's `f9c509c`
+- [x] Suite green **after** the implementation — **262 passed**: the same 242,
+      none of them changed, plus 20 new in `tests/test_prescan.py`, of which four
+      test Identity 2 directly (the fold reproduces the arm's logits; the folded
+      state dict is exactly a baseline's, with no `thr_log` and the baseline's
+      parameter count)
+- [x] **H5's first half discharged before the run.**
+      `scripts/audit/09_gradient_reachability.py` re-run 2026-08-03: `thr` **PASS**,
+      `ctl_live` **PASS**, all three self-test controls held, and the screen
+      reproduced its committed `exp_004_gradient_reachability.json` at a worst
+      relative residual of **0.00e+00**
+- [x] Both arms capture a CUDA graph and start at the Phase-2 baseline's own
+      step-0 loss of **5.3219** at **736 461** parameters — the nesting, observed
+      on the real training path rather than only in a test
