@@ -375,7 +375,19 @@
         "outcome": "a measurement, not an arm"
       },
       "exp_004": {"run": false},
-      "status_after_exp_004": "PROMOTED TO BLOCKING by EXP_004's decision cell (§4, §10.10): every further 2σ verdict in this family rests on a sigma measured on a one-state neuron. EXP_004 §10.7 gives a weak n=3 reading (0.00487 carried against 0.00461) that does not close it."
+      "status_after_exp_004": "PROMOTED TO BLOCKING by EXP_004's decision cell (§4, §10.10): every further 2σ verdict in this family rests on a sigma measured on a one-state neuron. EXP_004 §10.7 gives a weak n=3 reading (0.00487 carried against 0.00461) that does not close it.",
+      "exp_005": {
+        "run": true,
+        "log": "experiments/logs/EXP_005_sigma_transfer.md",
+        "verdict": "CLOSED -- no longer blocking",
+        "result": "sigma does NOT transfer: carried sd 0.00313 at n=7 against the baseline's 0.00461 (0.680x), fresh 0.658x. The two-compartment family's bar is 2 sigma = 0.00627. The failure is in the safe direction -- the inherited 0.00922 was conservative -- so no adopted verdict moves; EXP_004's adoption strengthens from 29.2 to 42.9 sigma.",
+        "qualification": "n=7 cannot demonstrate the difference: the variance ratio is 0.462 and an F(6,4) test only resolves ratios outside [0.1605, 9.20]. The band was failed; the difference was not established.",
+        "consequences": [
+          "sigma is not a project constant -- #14 is closed for THIS neuron, not in general. Any future structurally-different arm needs its own sigma.",
+          "The §6.2 per-context bars are arm-specific in SHAPE, not only scale (EXP_005 §9.5): the baseline's excess-sd collapses beyond its 7-character horizon while this arm's persists to c=127, 21x larger at c=16. The criterion must be calibrated per arm, which is more expensive than Phase 3 priced it.",
+          "The per-context bar is built on the wrong scale (45x too small at c=127), but the count does not move: 5 of 128 at c=3..7 under all three bars. The fix is REFERRED to Elliot, not applied."
+        ]
+      }
     },
     {
       "id": "C15",
