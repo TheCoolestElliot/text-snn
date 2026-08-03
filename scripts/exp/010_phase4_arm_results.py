@@ -110,6 +110,32 @@ ARMS = {
         "runs": [f"twocomp_distill_s{i}" for i in range(3)],
         "reference_arm": "twocomp",
         "labelled": "DIAGNOSTIC -- never the headline; EXP_009 §4's rider",
+        # ---------------------------------------------------------------
+        # POST-HOC, and flagged as such everywhere it has an effect.
+        #
+        # `twocomp_distill_s1` diverged at step 12 497 of 20 000 and scores NaN.
+        # EXP_009 fixed n = 3 and did not anticipate a divergence, so there is no
+        # pre-registered rule for this and one is being made after seeing the
+        # outcome. The rule chosen is the one that keeps the failure visible:
+        #
+        #   * the seed is excluded from every mean, because a NaN is not a score;
+        #   * it is NOT replaced by a fourth seed. EXP_009 §2 pairs student seed i
+        #     with teacher `gru_s{i}` and there is no `gru_s3`, so a replacement
+        #     would have to reuse a teacher and break the design that keeps the
+        #     seeds independent -- and swapping a diverged seed for a fresh one is
+        #     how a failure disappears from a record;
+        #   * every X-prediction it touches is reported at **n = 2** with the
+        #     pre-registered n = 3 unmet, so the verdicts are PROVISIONAL and the
+        #     JSON says so in `provisional_reason`.
+        #
+        # `scripts/exp/009_chase_divergence.py` reproduces the divergence
+        # deterministically and localises it; it is a finding of this experiment,
+        # not an accident to be routed around.
+        "excluded_runs": {
+            "twocomp_distill_s1": "diverged at step 12497/20000; scores NaN. "
+                                  "Reproduced and localised in "
+                                  "docs/reports/data/exp_009_divergence.json",
+        },
     },
 }
 
@@ -480,8 +506,12 @@ def main(argv: list[str] | None = None) -> int:
 
     for arm in wanted:
         spec = ARMS[arm]
-        runs = spec["runs"]
+        excluded = spec.get("excluded_runs", {})
+        runs = [r for r in spec["runs"] if r not in excluded]
         ref_arm = spec["reference_arm"]
+        if excluded:
+            print(f"  NOTE: {arm} excludes {sorted(excluded)} -- see the ARMS "
+                  f"registry for the post-hoc rule and why it was chosen")
 
         # ---- F1, on every run of the arm -----------------------------------
         f1 = {r: hz["arms"][r].get("f1_pass") for r in runs if r in hz["arms"]}
@@ -517,6 +547,13 @@ def main(argv: list[str] | None = None) -> int:
             "runs": runs,
             "labelled": spec["labelled"],
             "log": spec["log"],
+            "excluded_runs": excluded,
+            "n_preregistered": len(spec["runs"]),
+            "n_used": len(runs),
+            "provisional_reason": (
+                f"pre-registered n={len(spec['runs'])} not met: "
+                f"{sorted(excluded)} excluded ({'; '.join(excluded.values())}). "
+                "Every verdict below is PROVISIONAL." if excluded else None),
             "f1_pass": f1,
             "bpc": bpc,
             "horizon": {"per_seed": per_seed_h, "median": med_h,
@@ -570,6 +607,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\n" + "-" * w)
         print(f"{arm}   [{c['labelled']}]")
         print("-" * w)
+        if c.get("provisional_reason"):
+            print(f"  !! {c['provisional_reason']}")
         for p in ("fresh", "carried"):
             b = c["bpc"][p]
             print(f"  test bpc {p:8s} {b['mean']:.5f} +/- {b['sd']:.5f}  "

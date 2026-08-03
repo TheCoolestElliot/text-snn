@@ -1,0 +1,181 @@
+{
+  "experiment": "EXP_009_distillation_ceiling",
+  "run": "twocomp_distill_s1",
+  "from_checkpoint": "experiments\\runs\\twocomp_distill_s1\\ckpt_best.pt",
+  "lambda": 0.5,
+  "reproduced": true,
+  "first_nonfinite_step": 12497,
+  "origin": "backward",
+  "trace": [
+    {
+      "step": 10000,
+      "loss": 1.4852557182312012,
+      "grad_norm": 0.2654748558998108,
+      "objective": 0.8895254135131836,
+      "kl_to_teacher": 0.29379504919052124,
+      "firing_rate": [
+        0.3906989097595215,
+        0.3977920413017273
+      ]
+    },
+    {
+      "step": 10250,
+      "loss": 1.5334045886993408,
+      "grad_norm": 0.2579790949821472,
+      "objective": 0.9176219701766968,
+      "kl_to_teacher": 0.30183935165405273,
+      "firing_rate": [
+        0.3927738070487976,
+        0.40143269300460815
+      ]
+    },
+    {
+      "step": 10500,
+      "loss": 1.5177675485610962,
+      "grad_norm": 0.245335191488266,
+      "objective": 0.9095739126205444,
+      "kl_to_teacher": 0.30138033628463745,
+      "firing_rate": [
+        0.3852856755256653,
+        0.39622926712036133
+      ]
+    },
+    {
+      "step": 10750,
+      "loss": 1.511359691619873,
+      "grad_norm": 0.25807955861091614,
+      "objective": 0.9078628420829773,
+      "kl_to_teacher": 0.30436599254608154,
+      "firing_rate": [
+        0.3872133493423462,
+        0.39687490463256836
+      ]
+    },
+    {
+      "step": 11000,
+      "loss": 1.4859263896942139,
+      "grad_norm": 0.32694050669670105,
+      "objective": 0.8911597728729248,
+      "kl_to_teacher": 0.29639315605163574,
+      "firing_rate": [
+        0.3911897540092468,
+        0.3983641266822815
+      ]
+    },
+    {
+      "step": 11250,
+      "loss": 1.5696521997451782,
+      "grad_norm": 0.35377997159957886,
+      "objective": 0.945146381855011,
+      "kl_to_teacher": 0.32064059376716614,
+      "firing_rate": [
+        0.3876330852508545,
+        0.39492958784103394
+      ]
+    },
+    {
+      "step": 11500,
+      "loss": 1.4513561725616455,
+      "grad_norm": 0.2388768494129181,
+      "objective": 0.869411051273346,
+      "kl_to_teacher": 0.2874659299850464,
+      "firing_rate": [
+        0.3889145255088806,
+        0.39473921060562134
+      ]
+    },
+    {
+      "step": 11750,
+      "loss": 1.5612413883209229,
+      "grad_norm": 0.2438192367553711,
+      "objective": 0.9316518306732178,
+      "kl_to_teacher": 0.30206233263015747,
+      "firing_rate": [
+        0.38724952936172485,
+        0.3961043357849121
+      ]
+    },
+    {
+      "step": 12000,
+      "loss": 1.5754852294921875,
+      "grad_norm": 0.3008287847042084,
+      "objective": 0.9391882419586182,
+      "kl_to_teacher": 0.3028913140296936,
+      "firing_rate": [
+        0.39153915643692017,
+        0.39702916145324707
+      ]
+    },
+    {
+      "step": 12250,
+      "loss": 1.549528956413269,
+      "grad_norm": 0.27252039313316345,
+      "objective": 0.9260662794113159,
+      "kl_to_teacher": 0.30260366201400757,
+      "firing_rate": [
+        0.38938331604003906,
+        0.3959091901779175
+      ]
+    },
+    {
+      "step": 12497,
+      "loss": 1.5046665668487549,
+      "grad_norm": Infinity,
+      "objective": 0.8966119289398193,
+      "kl_to_teacher": 0.2885572612285614,
+      "firing_rate": [
+        0.3872985243797302,
+        0.395754873752594
+      ]
+    }
+  ],
+  "resumed_at_step": 10000,
+  "steps_after_resume": 2497,
+  "fp32_max": 3.4028234663852886e+38,
+  "fp32_sqrt_max": 1.844674352395373e+19,
+  "instrumented_steps": [
+    {
+      "step": 12497,
+      "ce": 1.5046665668487549,
+      "kl": 0.2885572612285614,
+      "loss": 0.8966119289398193,
+      "grad_norm_fp32": Infinity,
+      "grad_norm_fp64": 5.832666278479634e+31,
+      "grad_abs_max": 5.462305972155926e+31,
+      "param_abs_max": 4.251174449920654,
+      "logits_abs_max_finite": 38.904083251953125,
+      "state_abs_max_finite": [
+        37.00684356689453,
+        17.349441528320312
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 12498,
+      "ce": 1.5034351348876953,
+      "kl": 0.3035205602645874,
+      "loss": 0.9034778475761414,
+      "grad_norm_fp32": NaN,
+      "grad_norm_fp64": NaN,
+      "grad_abs_max": NaN,
+      "param_abs_max": 4.251307487487793,
+      "logits_abs_max_finite": 39.74076461791992,
+      "state_abs_max_finite": [
+        43.60089874267578,
+        18.06199073791504
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": [
+        "embed.weight",
+        "layers.0.weight",
+        "layers.0.bias",
+        "w.0",
+        "beta_s_raw.0"
+      ]
+    }
+  ],
+  "n_parameters_with_grad": 11
+}

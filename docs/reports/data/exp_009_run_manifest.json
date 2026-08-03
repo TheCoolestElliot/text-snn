@@ -1,0 +1,81 @@
+{
+  "experiment": "EXP_009_distillation_ceiling",
+  "log": "experiments/logs/EXP_009_distillation_ceiling.md",
+  "lambda": 0.5,
+  "temperature": 1.0,
+  "sequential": true,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "runs": [
+    {
+      "run": "twocomp_distill_s0",
+      "seed": 0,
+      "teacher_run": "gru_s0",
+      "lambda": 0.5,
+      "wall_clock_s": 881.67,
+      "peak_vram_gib": 1.0395,
+      "y2": {
+        "teacher_run": "gru_s0",
+        "committed_fresh_bpc": 1.8026171769592991,
+        "reproduced_fresh_bpc": 1.8026171769592991,
+        "residual_bpc": 0.0,
+        "pass": true
+      },
+      "y3_teacher_unchanged": true,
+      "driver_seconds": 886.6,
+      "trained_in_this_invocation": true,
+      "test_bpc": {
+        "fresh": 2.136871075502476,
+        "carried": 2.11055331155039
+      }
+    },
+    {
+      "run": "twocomp_distill_s1",
+      "seed": 1,
+      "teacher_run": "gru_s1",
+      "lambda": 0.5,
+      "wall_clock_s": 835.85,
+      "peak_vram_gib": 1.102,
+      "y2": {
+        "teacher_run": "gru_s1",
+        "committed_fresh_bpc": 1.8046689231953035,
+        "reproduced_fresh_bpc": 1.8046689231953035,
+        "residual_bpc": 0.0,
+        "pass": true
+      },
+      "y3_teacher_unchanged": true,
+      "driver_seconds": 838.6,
+      "trained_in_this_invocation": true,
+      "test_bpc": {
+        "fresh": NaN,
+        "carried": NaN
+      }
+    },
+    {
+      "run": "twocomp_distill_s2",
+      "seed": 2,
+      "teacher_run": "gru_s2",
+      "lambda": 0.5,
+      "wall_clock_s": 815.61,
+      "peak_vram_gib": 1.1645,
+      "y2": {
+        "teacher_run": "gru_s2",
+        "committed_fresh_bpc": 1.8060067304120404,
+        "reproduced_fresh_bpc": 1.8060067304120404,
+        "residual_bpc": 0.0,
+        "pass": true
+      },
+      "y3_teacher_unchanged": true,
+      "driver_seconds": 818.1,
+      "trained_in_this_invocation": true,
+      "test_bpc": {
+        "fresh": 2.134360169532612,
+        "carried": 2.107861492277931
+      }
+    }
+  ],
+  "total_seconds": 2574.0
+}
