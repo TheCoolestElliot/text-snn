@@ -46,7 +46,146 @@
         "fresh": 2.2203086882559235,
         "carried": 2.213651419743929
       }
+    },
+    {
+      "run": "tokenshift_s1",
+      "arch": "tokenshift",
+      "differs_in": [
+        "arch",
+        "mu_init",
+        "run_name",
+        "seed"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "thr_log_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 1,
+      "trained_in_this_invocation": true,
+      "train_seconds": 587.9,
+      "eval_seconds": 9.9,
+      "reported_wall_clock_s": 583.06,
+      "wall_clock_vs_baseline": 1.462,
+      "peak_vram_gib": 0.8589,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.220628474154696,
+        "carried": 2.2140703185655144
+      }
+    },
+    {
+      "run": "tokenshift_s2",
+      "arch": "tokenshift",
+      "differs_in": [
+        "arch",
+        "mu_init",
+        "run_name",
+        "seed"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "thr_log_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 2,
+      "trained_in_this_invocation": true,
+      "train_seconds": 603.6,
+      "eval_seconds": 11.0,
+      "reported_wall_clock_s": 598.65,
+      "wall_clock_vs_baseline": 1.501,
+      "peak_vram_gib": 0.8589,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.2227452649081356,
+        "carried": 2.215606379348766
+      }
+    },
+    {
+      "run": "threshold_s0",
+      "arch": "threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "mu_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 0,
+      "trained_in_this_invocation": true,
+      "train_seconds": 452.2,
+      "eval_seconds": 9.3,
+      "reported_wall_clock_s": 447.11,
+      "wall_clock_vs_baseline": 1.121,
+      "peak_vram_gib": 0.7339,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.2119487654766967,
+        "carried": 2.1951926621284596
+      }
+    },
+    {
+      "run": "threshold_s1",
+      "arch": "threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "seed",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "mu_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 1,
+      "trained_in_this_invocation": true,
+      "train_seconds": 455.5,
+      "eval_seconds": 10.4,
+      "reported_wall_clock_s": 450.57,
+      "wall_clock_vs_baseline": 1.13,
+      "peak_vram_gib": 0.7339,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.2128257253798123,
+        "carried": 2.1959155323651918
+      }
+    },
+    {
+      "run": "threshold_s2",
+      "arch": "threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "seed",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "mu_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 2,
+      "trained_in_this_invocation": true,
+      "train_seconds": 452.7,
+      "eval_seconds": 10.1,
+      "reported_wall_clock_s": 447.48,
+      "wall_clock_vs_baseline": 1.122,
+      "peak_vram_gib": 0.7339,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.2084467642226433,
+        "carried": 2.1913703556332877
+      }
     }
   ],
-  "total_seconds": 0.0
+  "total_seconds": 2602.5
 }
