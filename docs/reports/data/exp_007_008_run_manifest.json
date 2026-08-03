@@ -1,0 +1,52 @@
+{
+  "experiments": [
+    "EXP_007_token_shift",
+    "EXP_008_learned_threshold"
+  ],
+  "logs": [
+    "experiments/logs/EXP_007_token_shift.md",
+    "experiments/logs/EXP_008_learned_threshold.md"
+  ],
+  "reference_run": "snn_beta0.5_s0",
+  "reference_wall_clock_s": 398.88,
+  "sequential": true,
+  "arms": [
+    "tokenshift",
+    "threshold"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "runs": [
+    {
+      "run": "tokenshift_s0",
+      "arch": "tokenshift",
+      "differs_in": [
+        "arch",
+        "mu_init",
+        "run_name"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "beta_slow",
+        "thr_log_init",
+        "w_init"
+      ],
+      "same_arm": true,
+      "seed": 0,
+      "trained_in_this_invocation": false,
+      "train_seconds": 0.0,
+      "eval_seconds": 0.0,
+      "reported_wall_clock_s": 602.74,
+      "wall_clock_vs_baseline": 1.511,
+      "peak_vram_gib": 0.8589,
+      "params": 736461,
+      "test_bpc": {
+        "fresh": 2.2203086882559235,
+        "carried": 2.213651419743929
+      }
+    }
+  ],
+  "total_seconds": 0.0
+}

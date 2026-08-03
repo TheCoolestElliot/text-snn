@@ -213,5 +213,32 @@ as a diagnostic, beside the un-distilled number.
 - [x] Existing test suite green — **242 passed** (2026-08-03)
 - [x] Working tree clean at `1e5b239`, branch `phase-4-experiments`
 - [x] No mutation campaign running
-- [x] Nothing in `src/snn/` modified by this experiment (§2.1)
-- [x] This file committed **before** the harness is written
+- [x] Nothing in `src/snn/` modified by this experiment (§2.1) — the trainer is
+      subclassed in `scripts/exp/009_distill.py`
+- [x] This file committed **before** the harness is written — `1f05bab`, against
+      the harness's `5d6f88a`
+
+### 8.1 The smoke run, 2026-08-03 — all four checks discharged before the sweep
+
+Three steps at `lambda = 0.5` on seed 0, plus the two checks that cannot be made
+by the sweep itself:
+
+| Check | Result |
+|---|---|
+| **Y1** | at `lambda = 0` the subclass steps **bitwise** like `Trainer` — identical loss and grad-norm on all three steps, **and identical parameters afterwards** |
+| **Y2** | the teacher scores **1.802617** through this harness against `gru_s0`'s committed **1.802617** — residual **0.00e+00** |
+| **Y3** | the teacher's parameters unchanged |
+| **Q5** | the teacher log-probability buffer differs on every consecutive step, so it is not a stale value baked into the captured graph |
+
+Y1 was checked on parameters as well as on losses deliberately: two trainers can
+report the same loss and still have stepped differently, and it is the parameters
+that carry the difference into the next 19 997 steps.
+
+### 8.2 One refinement, made before any result was read
+
+The driver skips runs that are already complete and deletes partial ones, on the
+same rule and for the same reason as `EXP_007` §8.1 — the first launch of the
+chain was killed by a harness timeout. Completeness here additionally requires
+`distill.json`, which is written only after Y2 and Y3 have passed for that run, so
+a run can never be skipped on the strength of artifacts that predate its own
+self-checks.

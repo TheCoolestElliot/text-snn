@@ -49,6 +49,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -254,11 +255,31 @@ def _student_config(seed: int) -> Config:
     return cfg
 
 
+def is_complete(run: str) -> bool:
+    """Run-level idempotence, same rule and same reason as
+    `007_run_prescan_arms.is_complete`: added after a harness timeout killed the
+    first launch mid-run, and before any result was read. Both halves are
+    required -- `summary.json` means the loop finished its budget,
+    `final_test.json` means it was scored, and `distill.json` means Y2 and Y3
+    passed for it."""
+    d = RUNS / run
+    if not all((d / f).exists()
+               for f in ("summary.json", "final_test.json", "distill.json")):
+        return False
+    summary = json.loads((d / "summary.json").read_text(encoding="utf-8"))
+    cfg = json.loads((d / "config.json").read_text(encoding="utf-8"))
+    return int(summary.get("steps", 0)) == int(cfg.get("max_steps", -1))
+
+
 def train_one(seed: int, lam: float) -> dict:
     if LOCKFILE.exists():
         raise SystemExit(f"Y6: {LOCKFILE.relative_to(_REPO)} exists")
 
     cfg = _student_config(seed)
+    if (RUNS / cfg.run_name).exists() and not is_complete(cfg.run_name):
+        # Partial artifacts describe two runs at once; removed, not resumed.
+        print(f"=== {cfg.run_name} is partial; removing and retraining", flush=True)
+        shutil.rmtree(RUNS / cfg.run_name)
     teacher_run = TEACHER_RUN.format(seed=seed)
     print(f"\n=== distil {teacher_run} -> {cfg.run_name} (lambda={lam})",
           flush=True)
@@ -319,14 +340,21 @@ def main(argv: list[str] | None = None) -> int:
                 "lambda": args.lam, "temperature": TEMPERATURE,
                 "sequential": True, "seeds": seeds, "runs": []}
     for seed in seeds:
-        row = train_one(seed, args.lam)
-        run = row["run"]
-        proc = subprocess.run(
-            [sys.executable, "-u", "scripts/evaluate.py",
-             "--ckpt", str(RUNS / run / "ckpt_final.pt"), "--split", "test",
-             "--out", str(RUNS / run / "final_test.json")], cwd=str(_REPO))
-        if proc.returncode != 0:
-            raise SystemExit(f"evaluate {run} failed")
+        run = f"twocomp_distill_s{seed}"
+        if is_complete(run):
+            print(f"=== {run} already complete, skipping", flush=True)
+            row = json.loads((RUNS / run / "distill.json").read_text("utf-8"))
+            row.update({"run": run, "seed": seed,
+                        "trained_in_this_invocation": False})
+        else:
+            row = train_one(seed, args.lam)
+            row["trained_in_this_invocation"] = True
+            proc = subprocess.run(
+                [sys.executable, "-u", "scripts/evaluate.py",
+                 "--ckpt", str(RUNS / run / "ckpt_final.pt"), "--split", "test",
+                 "--out", str(RUNS / run / "final_test.json")], cwd=str(_REPO))
+            if proc.returncode != 0:
+                raise SystemExit(f"evaluate {run} failed")
         test = json.loads((RUNS / run / "final_test.json").read_text("utf-8"))
         row["test_bpc"] = {p: test["results"][p]["bpc"]
                            for p in ("fresh", "carried")}

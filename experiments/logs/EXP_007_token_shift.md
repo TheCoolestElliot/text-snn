@@ -236,4 +236,33 @@ Two riders, also fixed now:
 - [x] Existing test suite green — **242 passed** (2026-08-03, matching `EXP_006` §8)
 - [x] Working tree clean at `1e5b239`, branch `phase-4-experiments`
 - [x] No mutation campaign running
-- [x] This file committed **before** the arm's implementation is written
+- [x] This file committed **before** the arm's implementation is written — `1f05bab`,
+      against the harness's `5d6f88a` and the resolver's `f9c509c`
+- [x] Suite green **after** the implementation — **262 passed**: the same 242,
+      none of them changed, plus 20 new in `tests/test_prescan.py`
+
+### 8.1 One refinement, made before any result was read
+
+**The driver skips runs that are already complete, and deletes partial ones.**
+The first launch was killed by a harness timeout part-way through
+`tokenshift_s1`, leaving `tokenshift_s0` finished and scored and `tokenshift_s1`
+holding a `ckpt_last.pt` from step 10 000 of 20 000. `is_complete` was added to
+`scripts/exp/007_run_prescan_arms.py` at that point — before any bpc from this
+experiment had been looked at — and it is recorded here rather than absorbed
+into the harness silently.
+
+Two properties of it matter:
+
+* **Completeness requires both halves**: `summary.json` (written only after the
+  trainer finishes `max_steps`) *and* `final_test.json` (written only by
+  `scripts/evaluate.py`), with the step count checked against the config's. A
+  directory holding an interrupted run satisfies neither.
+* **A partial run is deleted and retrained, not resumed.** `Trainer` supports
+  resume and `tests/test_determinism.py` asserts it is bit-identical for the
+  Phase-2 arm, but that has not been checked for this one — and a partial
+  directory would in any case append to `log.jsonl` and leave artifacts
+  describing two runs at once. Ten minutes of GPU is cheaper than an ambiguous
+  provenance.
+
+`tokenshift_s0` is therefore the only run in this experiment that predates the
+refinement, and it was complete before it was made.
