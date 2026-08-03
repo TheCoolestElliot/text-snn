@@ -1,7 +1,10 @@
 # EXP_008 — A learned per-channel threshold, and the fact that it adds nothing
 
 **Pre-registered:** 2026-08-03, before any threshold arm was trained.
-**Status:** OPEN. Results go in §9.
+**Status:** **CLOSED** 2026-08-03. **W2, W4, W5 and W6 held; W1 and W3 failed.**
+The arm buys **0.0590 bpc** — 44 % of the two-compartment neuron's entire gain,
+for one parameter per channel that folds away to nothing at inference. W1's
+failure was chased to machine precision and §9.5 reports what it was.
 **Phase:** 4 (controlled experiments). The arm `EXP_004` §10.11 item 2 named as
 "one parameter, no second state variable, no new kernel, and no gradient gate",
 and which nothing has run.
@@ -257,3 +260,206 @@ and §9 of the Phase-3 report is still unticked.
 - [x] Both arms capture a CUDA graph and start at the Phase-2 baseline's own
       step-0 loss of **5.3219** at **736 461** parameters — the nesting, observed
       on the real training path rather than only in a test
+
+---
+
+## 9. Results
+
+**Run 2026-08-03.** Three seeds, 20 000 steps each, strictly sequential.
+**~0.37 GPU-hours** of training. Raw JSON:
+`docs/reports/data/exp_007_008_run_manifest.json`,
+`docs/reports/data/exp_007_009_arm_results.json`, and — for §9.5 —
+`docs/reports/data/exp_008_fold_residual.json`.
+
+### 9.1 The headline: one redundant parameter per channel is worth 0.059 bpc
+
+| | baseline (n=5) | **threshold (n=3)** | Δ |
+|---|---:|---:|---:|
+| test bpc, carried | 2.25311 | **2.19416 ± 0.00244** | **−0.05896** |
+| test bpc, fresh | 2.26969 | **2.21107 ± 0.00232** | −0.05862 |
+| memory horizon | 7 (5/5) | **7 (3/3)** | 0 |
+| wall-clock, 20 000 steps | 398.9 s | **448 s (1.12×)** | |
+| peak VRAM | 0.609 GiB | **0.734 GiB** | |
+
+−0.05896 is **23.6 standard errors** of the difference and 12.8× the inherited σ.
+
+**Put beside the arm this project has already adopted, that number is the point.**
+The two-compartment neuron buys 0.1344 bpc for a second state variable, a new
+jiterator kernel, a hand-written backward, a 22-mutation R10 gate and 1.35×
+wall-clock. **This arm buys 0.0590 — 43.9 % of that — for one parameter per
+channel, no new kernel, no new gate, 1.12× wall-clock, and it can be folded into
+the weights afterwards so that the shipped model has the baseline's exact
+parameter count and the baseline's exact cost.**
+
+### 9.2 Where the gain is, and the surprise is the second row
+
+| Component of the gain | bpc | share | of what was available |
+|---|---:|---:|---:|
+| At zero context | +0.0291 | 49.7 % | 24.4 % of the 0.1193 there |
+| **Within the baseline's 7-character reach** | **+0.0288** | **49.1 %** | **24.8 % of the 0.1161 there** |
+| Beyond the horizon | +0.0007 | 1.2 % | 0.3 % |
+| **Total** | **+0.0586** | 100 % | |
+
+**This is the first arm in the project to move the within-reach component**, and
+it is not the arm that was aimed at it — `EXP_007` was, and moved it by −0.0065.
+A static per-channel threshold is not only a zero-context effect: it changes when
+every channel fires and therefore when it resets, at every context length.
+
+Against the §6.2 criterion the arm is worse than the baseline at **0 of 128
+context lengths**, and its single best context is c = 0 at −0.0291. It is the
+cleanest §6.2 row any Phase-4 arm has produced.
+
+**The learned thresholds are far more extreme than §10.6's.**
+
+| `exp(theta)` = threshold multiplier | layer 0 | layer 1 |
+|---|---:|---:|
+| mean over 3 seeds | **0.342 ± 0.001** | **0.428 ± 0.003** |
+| 10th–90th percentile | 0.24 – 0.45 | 0.35 – 0.51 |
+| `EXP_004` §10.6's equivalent, in the two-compartment arm | 0.69 | 0.79 |
+
+The network drops its firing threshold to about **a third** of nominal, where the
+two-compartment neuron reached only 0.69/0.79 by the same algebra. Whatever the
+mechanism is worth, the two-compartment arm was not exploiting it fully.
+
+### 9.3 The predictions, resolved as written
+
+| # | Prediction | Threshold | Measured | Verdict |
+|---|---|---|---|---|
+| **W1** | folded model reproduces the arm's fresh bpc | < 1e-3 bpc | **1.86e-3 / 5.42e-4 / 9.47e-4** | **FAILED** (1 of 3 seeds) |
+| **W2** | mean carried improves by > 2σ | 2.24389 | **2.19416** | **held** |
+| **W3** | zero-context share of the gain ≥ 50 % | 0.50 | **49.7 %** | **FAILED** |
+| **W4** | mean `exp(theta)` < 0.95 in both layers | 0.95 | **0.342 / 0.428** | **held** |
+| **W5** | zero-context gain ≤ 0.0506 bpc | 0.0506 | **0.0291** | **held** |
+| **W6** | median horizon ≤ 8 | 8 | **7** | **held** |
+
+**W3 failed by 0.3 percentage points and is reported as failed.** 49.7 % against a
+50 % bar is not a pass, and the temptation to call it one is exactly what
+pre-registration exists to remove. What the near-miss means is more interesting
+than the verdict: the gain is split almost exactly in half between zero-context
+and within-reach, which is *not* what §10.6 predicted and is the finding §9.2
+records.
+
+**W5 and W6 were the two stated against the plan, and both held**, so §10.6's
+account survives its own falsification tests: the arm does not exceed the
+two-compartment neuron's zero-context gain (0.0291 against 0.0506) and it buys no
+horizon.
+
+### 9.4 The decision rule, and why the verdict is not the one §4 wrote
+
+§4's first column is W1, and its cell is **"STOP AND CHASE IT: a failed fold-in
+means §1.1's algebra or its implementation is wrong. No bpc verdict is issued and
+the tolerance is not widened."**
+
+The tolerance has not been widened. The chase was run (§9.5), and it establishes
+that **the algebra is right to machine precision** and that the 1e-3 bar was
+borrowed from the wrong precedent. So §4's cell fires on its trigger, but the
+conclusion it names — "the algebra is wrong" — is refuted by the chase it
+demanded.
+
+**What is reported, therefore:** W1 **failed as written**; Identity 2 is
+**confirmed at 7 fp64 eps**; and the question of what tolerance a fold-in check
+should carry is **referred to Elliot, not answered here**. `EXP_005` §9.4 is the
+precedent — the §6.2 bar was found to be on the wrong scale, both numbers were
+reported, and the redefinition was referred rather than applied. Redefining a
+pre-registered threshold after watching it fail is not something an experiment
+gets to do to itself.
+
+The W2 verdict is issued under that caveat and is labelled everywhere as resting
+on a confirmed identity and a failed check of it.
+
+### 9.5 Chasing W1 — three precisions, and the answer is a discontinuity
+
+`scripts/exp/008_chase_fold.py` asks the narrower question the bpc comparison
+cannot: is the residual a broken identity, or fp32 rounding amplified by the hard
+threshold? Three comparisons of the current at layer 0, each removing one source
+of floating-point error:
+
+| | what it measures | max abs diff ÷ max abs current |
+|---|---|---:|
+| **A** — as shipped: fp32 fold, fp32 GEMM | storage **and** GEMM reordering | 6.9e-7 – 9.9e-7 (**~6–8 fp32 eps**) |
+| **B** — fp32 fold, fp64 GEMM | the fold's own fp32 *storage* alone | 5.9e-9 – 1.0e-8 |
+| **C** — exact fp64 fold, fp64 GEMM | **the algebra** | **1.5e-15 – 1.8e-15 (≈ 7 fp64 eps)** |
+
+**Leg C settles it. `g·(W·h + b)` and `(g·W)·h + g·b` agree to seven units in the
+last place of float64.** Identity 2 is not approximately true; it is true, and the
+entire residual is floating point.
+
+What turns 6 fp32 eps into 1.9e-3 bpc is the neuron:
+
+| | layer 0 | layer 1 |
+|---|---:|---:|
+| spikes that flip between arm and folded model | 2 684 – 5 339 of 16 777 216 | 42 653 – 77 953 of 16 777 216 |
+| as a fraction | 1.6e-4 – 3.2e-4 | **2.5e-3 – 4.6e-3** |
+
+A one-ulp perturbation of the current flips any spike whose membrane sits within
+an ulp of the threshold. Those spikes are the *input* to the next layer's GEMM, so
+the disagreement is amplified **an order of magnitude per layer**, and by the head
+the logits differ by up to **27 on a scale of 264**.
+
+**W1's bar was borrowed from `EXP_001`'s F1, and F1 is not the same kind of
+check.** F1 compares two evaluations of the *same weights*, where no spike can
+flip and 1e-3 is generous. A fold-in compares two *different* weight tensors that
+denote the same function — the one case where fp32 reordering reaches the metric.
+Borrowing the number was the error, and it was made in §3 of this file.
+
+### 9.6 A noise floor nobody had measured, and it is not the seed noise
+
+The chase produced a number the project did not have:
+
+> **The reported bpc of this architecture is reproducible to only ~2e-3 across
+> mathematically-equivalent reparameterisations of its own weights** — measured at
+> 6.2e-4, 1.6e-3 and 2.0e-3 on the three seeds, in both directions, since seed 1's
+> folded model is *better* than the arm.
+
+This does **not** contradict `tests/test_determinism.py`: for fixed weights and a
+fixed code path, evaluation is bit-exact and stays so. The floor applies precisely
+when the weights are rewritten into an equivalent form — which is what folding at
+inference does, and what any future weight-space transformation would do.
+
+Two consequences, both stated rather than acted on:
+
+* **The adoption bar 2σ = 0.00922 is only 4.6× this floor.** Any future arm whose
+  claim rests on a reparameterisation — quantisation, folding, weight
+  normalisation — needs this floor beside it, not the seed σ.
+* **Folding this arm away at inference is free in parameters and kernels and costs
+  up to 0.002 bpc of drift, of unpredictable sign.** That is the honest version of
+  §4's "zero parameters, zero kernels" recommendation, and it is small against the
+  0.059 the arm buys.
+
+### 9.7 Status
+
+**CLOSED. W2, W4, W5 and W6 held; W1 and W3 failed. The W2 gain is reported under
+§9.4's caveat.**
+
+1. **A learned per-channel threshold buys 0.0590 bpc over the Phase-2 baseline**
+   at 3 seeds, 23.6 se, with **0 of 128 contexts regressed** — the cleanest §6.2
+   row in Phase 4 — and no horizon change.
+2. **It is 44 % of the two-compartment neuron's entire gain**, for one parameter
+   per channel, no kernel, no gate, 1.12× wall-clock, and it folds away.
+3. **Identity 2 is confirmed to 7 fp64 eps** (§9.5). The arm adds no functions, so
+   the gain is an **optimisation effect**, not a capacity one — and §10.6's "two
+   live explanations" for the zero-context gain collapse: **neither was capacity.**
+4. **Half the gain is within-reach** (§9.2), which §10.6 did not predict and which
+   makes this the first arm in the project to move that component at all.
+5. **W1 failed and the algebra is right** (§9.4, §9.5). The fold-in tolerance was
+   borrowed from a check of a different kind; the redefinition is **referred**.
+6. **A reparameterisation noise floor of ~2e-3 bpc exists and had not been
+   measured** (§9.6). It is 1/4.6 of the adoption bar.
+
+### 9.8 What this experiment does not answer
+
+* **Whether the gain composes with the two-compartment neuron.** The adopted arm
+  already contains a learned per-channel threshold *implicitly* (§10.6's algebra),
+  and §9.2 shows it reached only 0.69/0.79 where this arm reaches 0.342/0.428.
+  Whether adding an explicit `theta` on top of `w` buys anything further is the
+  obvious next experiment and is **not** answered by adding the two numbers.
+  `EXP_004` §10.11 item 2 said so first: "it should be run against the baseline
+  *and* against this arm, because in this arm it is already present and would not
+  add twice."
+* **Why a redundant parameterisation helps.** AdamW normalises per parameter and
+  decouples weight decay, so a gain trains on a different effective schedule from
+  the rows it multiplies. That is a mechanism, not a measurement, and this
+  experiment did not test it.
+* **Whether RMSNorm on `cur`** — §6.3's actual candidate #2, which also passes the
+  §7.2 screen — does better. It attacks the same components by a different route
+  and is now the highest-value unrun arm on the list.

@@ -1,7 +1,10 @@
 # EXP_009 — Is the remaining gap representational or optimisational?
 
 **Pre-registered:** 2026-08-03, before any distilled student was trained.
-**Status:** OPEN. Results go in §9.
+**Status:** **CLOSED PROVISIONALLY** 2026-08-03, at **n = 2 of a pre-registered
+3**: one seed diverged and §9.4 is what happened. X1, X3 and X5 held; **X2 and X4
+failed**. The recipe closes **3.2 %** of the remaining gap — a lower bound, and
+§1.1 forbids reading its smallness as a representational ceiling.
 **Phase:** 4 (controlled experiments).
 
 **This is a labelled diagnostic and never the headline.** Distillation from the
@@ -242,3 +245,192 @@ chain was killed by a harness timeout. Completeness here additionally requires
 `distill.json`, which is written only after Y2 and Y3 have passed for that run, so
 a run can never be skipped on the strength of artifacts that predate its own
 self-checks.
+
+---
+
+## 9. Results
+
+**Run 2026-08-03.** Three seeds launched, **two completed**; `twocomp_distill_s1`
+diverged at step 12 497 of 20 000 and is §9.4. **~0.71 GPU-hours.** Raw JSON:
+`docs/reports/data/exp_009_run_manifest.json`,
+`docs/reports/data/exp_009_divergence.json`,
+`docs/reports/data/exp_007_009_arm_results.json`.
+
+**Every verdict below is PROVISIONAL at n = 2.** §3 fixed n = 3 and it was not
+met. §9.4 records why the shortfall was not made up.
+
+### 9.1 The bound, which is small
+
+| | un-distilled twocomp (n=7) | **distilled (n=2)** | Δ |
+|---|---:|---:|---:|
+| test bpc, carried | 2.11869 | **2.10921 ± 0.00190** | **−0.00948** |
+| test bpc, fresh | 2.14566 | **2.13562 ± 0.00178** | −0.01005 |
+| memory horizon | 47 (median of 7) | 40, 47 | — |
+| wall-clock, 20 000 steps | 536.7 s | **849 s (1.58×)** | |
+
+−0.00948 clears the family's own bar (2σ = 0.00627) at **5.3 standard errors**, so
+distillation does buy bits. What it does not buy is much of the gap:
+
+| | bpc |
+|---|---:|
+| asymptotic gap to the GRU anchor, before | **0.3398** |
+| asymptotic gap to the GRU anchor, after | **0.3291** |
+| **share closed** | **3.2 %** |
+
+**X2 required 25 %.** The teacher's own distribution, handed to the student on
+every one of 20 000 batches, moved the student 3.2 % of the way toward it.
+
+### 9.2 The predictions, resolved as written
+
+| # | Prediction | Threshold | Measured | Verdict |
+|---|---|---|---|---|
+| **X1** | mean carried improves by > 2σ_family | 2.11242 | **2.10921** | **held** |
+| **X2** | closes ≥ 25 % of the asymptotic gap | 0.25 | **0.032** | **FAILED** |
+| **X3** | median horizon ≥ 38 | 38 | **43.5** | **held** |
+| **X4** | within-reach gain > beyond-horizon gain | — | **−0.0131 vs −0.0004** | **FAILED** |
+| **X5** | mean carried ≥ 1.85 | 1.85 | **2.10921** | **held** |
+
+**Decision cell (§4): X1 holds, X2 fails ⇒ "Some of the gap is optimisational;
+less than a quarter of it by this route. The architecture ranking stands."**
+
+**X4 failed, and it was one of the two stated against the plan.** Decomposing the
+distilled arm's gain over the un-distilled one:
+
+| Component | bpc | share |
+|---|---:|---:|
+| At zero context | +0.0243 | 226.3 % |
+| Within the 7-character reach | **−0.0131** | −122.3 % |
+| Beyond the horizon | −0.0004 | −4.0 % |
+| **Total** | **+0.0107** | 100 % |
+
+So the teacher's signal helped the student at the one context where the teacher
+has no memory advantage at all, and **hurt it inside the reach** — the component
+that is 51.8 % of the gap and the reason this project cares. That is the third
+Phase-4 arm in a row whose gain turns out to live at zero context (`EXP_007`
+§9.1, `EXP_008` §9.2), and the pattern is now the most consistent thing in the
+phase.
+
+### 9.3 What §1.1 forbids concluding, restated because it is the whole point
+
+X2 failed. **That does not establish that the remaining gap is
+representational**, and this file's §1.1 fixed that reading before the run:
+
+> If it closes nothing, the honest conclusion is *"this distillation recipe did
+> not help"*, **not** *"the gap is representational"*. λ, the temperature, the
+> schedule and the teacher choice are all unswept here, and any of them could be
+> the reason.
+
+What **is** established, constructively and at 5.3 se, is a **lower bound**: at
+least 3.2 % of the asymptotic gap is reachable by this architecture under a
+different training signal, with no architectural change. A lower bound of 3.2 %
+is a weak bound. It is not zero.
+
+The follow-up that would tighten it is named and **not run**: a λ sweep
+(λ ∈ {0.1, 0.9}), a λ schedule, or a longer budget. §2.3 excluded a sweep
+deliberately, and running one now — after seeing the answer — would convert a
+pre-registered null into a searched-until-it-worked result.
+
+### 9.4 One seed of three diverged, and it is a finding rather than an accident
+
+`twocomp_distill_s1` trained cleanly to step 12 250 — loss 1.5495, grad-norm
+0.2725, firing rates 0.389/0.396 — and by step 12 500 every logged quantity was
+NaN and stayed NaN for the remaining 7 500 steps. Its `final_test.json` is NaN.
+
+`scripts/exp/009_chase_divergence.py` replays the run from its last healthy
+checkpoint (step 10 000, whose parameters sit **inside** the range the seven
+un-distilled seeds occupy: `|w|` max 1.48 against their 1.73, `beta_s` max 0.9863
+against their 0.9855). **The divergence reproduces exactly**, so it is a
+deterministic function of (checkpoint, step) and not a hardware event.
+
+| step | forward | ce | kl | max \|grad\| | ‖g‖ in fp32 | ‖g‖ in fp64 |
+|---:|---|---:|---:|---:|---:|---:|
+| 12 497 | finite, \|logits\| max 38.9 | 1.5047 | 0.2886 | **5.46e31** | **inf** | 5.833e31 |
+| 12 498 | finite, \|logits\| max 39.7 | 1.5034 | 0.3035 | **NaN** | NaN | NaN |
+
+**Three things follow, and none of them is what the log looked like.**
+
+1. **The forward never overflowed.** At both steps the logits and the carried
+   state are finite and the loss is *healthy*. This is not a membrane blow-up.
+2. **The first symptom is not a NaN.** At 12 497 every individual gradient is
+   finite and the largest is 5.46e31. `clip_grad_norm_` accumulates the sum of
+   squares in fp32, and 5.46e31 squared overflows — so the norm is `inf` in fp32
+   and 5.833e31 in fp64. **The gradient clip that exists to prevent exactly this
+   is the component that fails first**, and because the branchless implementation
+   computes `clamp(max_norm/(inf + 1e-6), max=1.0) = 0`, it *zeroes* the update
+   instead of rescaling it.
+3. **The NaN is generated in layer 0's two-compartment backward.** At 12 498 the
+   non-finite gradients are exactly `embed.weight`, `layers.0.weight`,
+   `layers.0.bias`, `w.0` and `beta_s_raw.0`. Layer 1's and the head's are finite.
+   Backpropagation runs head → layer 1 → layer 0 → embed, so a NaN confined to
+   layer 0 and below **was produced inside layer 0's scan**, not inherited.
+
+Once any gradient is non-finite the same clip multiplies every gradient by NaN,
+so one bad step is permanent. That is read off the committed trainer, not measured
+here, and it explains the 7 500 dead steps rather than the first one.
+
+**What this says about the adopted arm, carefully.** The exploding quantity is the
+BPTT gradient through the reset-shielded two-compartment scan — a property of the
+**adopted neuron**, surfaced by a change of training signal rather than caused by
+one. Seven un-distilled seeds did not hit it, so nothing here shows the adopted
+arm is unstable in its committed configuration. What it does show is that **the
+arm has a gradient-explosion mode that the project's gradient clip cannot catch,
+because the clip's own fp32 accumulator overflows before the gradient does.**
+
+**Two changes suggest themselves and neither is applied**, both because they touch
+committed Phase-2 code and both because they would flatter the work:
+
+* accumulate the clip norm in fp64, so the clip does its job at 5e31 rather than
+  reporting `inf`;
+* make a non-finite gradient norm abort or skip the step rather than silently
+  zeroing it, which would have turned 7 500 dead steps into one logged event.
+
+Both are **referred to Elliot**. `EXP_005` §9.4's precedent applies: measure it,
+report it, refer the change.
+
+### 9.5 Why the diverged seed was not replaced
+
+The obvious repair is to train a fourth seed. It was not done, for two reasons
+fixed before looking at what a fourth seed would have said:
+
+* §2 pairs student seed `i` with teacher `gru_s{i}` and **there is no `gru_s3`.**
+  A replacement would reuse a teacher and break the design that keeps the seeds
+  independent — a second variable introduced to repair a first.
+* **Swapping a diverged seed for a fresh one is how a failure leaves the record.**
+  The divergence is the most transferable thing this experiment produced; a
+  three-seed table with it quietly absent would be worth less than a two-seed
+  table with it in §9.4.
+
+So: n = 2, said plainly, with every verdict marked provisional, and the
+`excluded_runs` rule written into `scripts/exp/010_phase4_arm_results.py`'s
+registry with its reasoning rather than applied silently.
+
+### 9.6 Self-checks
+
+| # | Check | Result |
+|---|---|---|
+| **Y1** | at λ = 0 the subclass steps bitwise like `Trainer` | **held** — identical losses, grad-norms and parameters over 3 steps |
+| **Y2** | the teacher reproduces its committed fresh test bpc | **3 / 3**, residual **0.00e+00** on every seed |
+| **Y3** | the teacher is unchanged after training | **3 / 3** |
+| **Y4** | the student's config differs from `twocomp_s{i}`'s only in the allowed fields | **3 / 3** |
+| **Y5** | the horizon probe's k = L point reproduces each run's committed fresh bpc | **2 / 2** (the diverged run was not probed) |
+| **Y6** | no mutation campaign lockfile before every run | **3 / 3** |
+
+**Y2 is the one worth noting.** The teacher scored **1.802617** through this
+harness against `gru_s0`'s independently committed **1.802617** — residual exactly
+zero, on all three seeds. Whatever went wrong in seed 1, it was not the teacher.
+
+### 9.7 Status
+
+**CLOSED, PROVISIONALLY, at n = 2. X1, X3 and X5 held; X2 and X4 failed.**
+
+1. **A lower bound: ≥ 3.2 % of the remaining 0.3398 bpc gap is optimisational**,
+   demonstrated constructively at 5.3 se. Small, and not zero.
+2. **X2's failure does not establish a representational ceiling** (§1.1, §9.3).
+   The recipe was one point in a space this experiment deliberately did not sweep.
+3. **Distillation's help is at zero context and it *hurts* within the reach**
+   (§9.2) — the third Phase-4 arm in a row to land at zero context.
+4. **One seed in three diverged, deterministically, and the clip is what failed
+   first** (§9.4). The exploding gradient is in the adopted neuron's backward, not
+   in this recipe's forward, and the project's gradient clip cannot see it.
+5. **No number in this file may be quoted as the spiking model's score** (§4's
+   rider). The distilled arm does not appear in the Phase-4 report's adopted row.

@@ -1,0 +1,139 @@
+{
+  "experiment": "EXP_008_learned_threshold",
+  "question": "is W1's residual a broken identity or fp32 rounding through a discontinuity?",
+  "w1_tolerance_bpc": 0.001,
+  "runs": {
+    "threshold_s0": {
+      "identity_on_current": [
+        {
+          "layer": 0,
+          "current_abs_max": 110.54057312011719,
+          "A_shipped_fp32_max_abs_diff": 7.62939453125e-05,
+          "A_shipped_fp32_mean_abs_diff": 1.3405092431639787e-06,
+          "A_in_units_of_current_max": 6.901895219015771e-07,
+          "B_fp32fold_fp64gemm_max_abs_diff": 6.494317688066076e-07,
+          "B_in_units_of_current_max": 5.8750533896808434e-09,
+          "C_exact_fold_fp64_max_abs_diff": 1.7053025658242404e-13,
+          "C_in_units_of_current_max": 1.5426937980240071e-15,
+          "eps_fp32": 1.1920928955078125e-07,
+          "eps_fp64": 2.220446049250313e-16
+        }
+      ],
+      "spikes": {
+        "per_layer": [
+          {
+            "layer": 0,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 5339,
+            "disagreement_fraction": 0.00031822919845581055,
+            "arm_firing_rate": 0.34487974643707275,
+            "folded_firing_rate": 0.34481436014175415
+          },
+          {
+            "layer": 1,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 77953,
+            "disagreement_fraction": 0.004646360874176025,
+            "arm_firing_rate": 0.3612642288208008,
+            "folded_firing_rate": 0.3611293435096741
+          }
+        ],
+        "logits_max_abs_diff": 27.126373291015625,
+        "logits_mean_abs_diff": 0.3766627907752991,
+        "logits_abs_max": 263.56689453125
+      },
+      "subset_windows": 512,
+      "subset_bpc_arm": 2.2219975759908333,
+      "subset_bpc_folded": 2.2240295940064403,
+      "subset_bpc_residual": 0.00203201801560704
+    },
+    "threshold_s1": {
+      "identity_on_current": [
+        {
+          "layer": 0,
+          "current_abs_max": 94.31273651123047,
+          "A_shipped_fp32_max_abs_diff": 6.866455078125e-05,
+          "A_shipped_fp32_mean_abs_diff": 1.3788419437332777e-06,
+          "A_in_units_of_current_max": 7.28051727913479e-07,
+          "B_fp32fold_fp64gemm_max_abs_diff": 7.556367336292169e-07,
+          "B_in_units_of_current_max": 8.012032749566523e-09,
+          "C_exact_fold_fp64_max_abs_diff": 1.4210854715202004e-13,
+          "C_in_units_of_current_max": 1.506780021541398e-15,
+          "eps_fp32": 1.1920928955078125e-07,
+          "eps_fp64": 2.220446049250313e-16
+        }
+      ],
+      "spikes": {
+        "per_layer": [
+          {
+            "layer": 0,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 2684,
+            "disagreement_fraction": 0.00015997886657714844,
+            "arm_firing_rate": 0.35997825860977173,
+            "folded_firing_rate": 0.36004751920700073
+          },
+          {
+            "layer": 1,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 42653,
+            "disagreement_fraction": 0.0025423169136047363,
+            "arm_firing_rate": 0.37081217765808105,
+            "folded_firing_rate": 0.3708663582801819
+          }
+        ],
+        "logits_max_abs_diff": 20.5814208984375,
+        "logits_mean_abs_diff": 0.23154297471046448,
+        "logits_abs_max": 272.3638610839844
+      },
+      "subset_windows": 512,
+      "subset_bpc_arm": 2.222944641453472,
+      "subset_bpc_folded": 2.222321849279035,
+      "subset_bpc_residual": 0.000622792174437059
+    },
+    "threshold_s2": {
+      "identity_on_current": [
+        {
+          "layer": 0,
+          "current_abs_max": 85.01033782958984,
+          "A_shipped_fp32_max_abs_diff": 8.392333984375e-05,
+          "A_shipped_fp32_mean_abs_diff": 1.3036900554652675e-06,
+          "A_in_units_of_current_max": 9.872133435345378e-07,
+          "B_fp32fold_fp64gemm_max_abs_diff": 8.771223016790231e-07,
+          "B_in_units_of_current_max": 1.0317831031765646e-08,
+          "C_exact_fold_fp64_max_abs_diff": 1.5631940186722204e-13,
+          "C_in_units_of_current_max": 1.838828145590681e-15,
+          "eps_fp32": 1.1920928955078125e-07,
+          "eps_fp64": 2.220446049250313e-16
+        }
+      ],
+      "spikes": {
+        "per_layer": [
+          {
+            "layer": 0,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 2851,
+            "disagreement_fraction": 0.00016993284225463867,
+            "arm_firing_rate": 0.3529052734375,
+            "folded_firing_rate": 0.35281985998153687
+          },
+          {
+            "layer": 1,
+            "n_spike_sites": 16777216,
+            "n_disagreements": 51081,
+            "disagreement_fraction": 0.0030446648597717285,
+            "arm_firing_rate": 0.37534159421920776,
+            "folded_firing_rate": 0.3752981424331665
+          }
+        ],
+        "logits_max_abs_diff": 23.523727416992188,
+        "logits_mean_abs_diff": 0.2547958791255951,
+        "logits_abs_max": 288.31964111328125
+      },
+      "subset_windows": 512,
+      "subset_bpc_arm": 2.2232175779203915,
+      "subset_bpc_folded": 2.2248371385435664,
+      "subset_bpc_residual": 0.0016195606231748094
+    }
+  }
+}

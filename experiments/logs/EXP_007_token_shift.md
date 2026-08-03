@@ -1,7 +1,8 @@
 # EXP_007 — What does a trivial 2-tap input mix buy inside the reach?
 
 **Pre-registered:** 2026-08-03, before any token-shift arm was trained.
-**Status:** OPEN. Results go in §9.
+**Status:** **CLOSED** 2026-08-03. **V1 held and V2 failed**: the two-tap mix buys
+0.0387 bpc, and **101.8 % of it is at zero context**, where the mix is not a mix.
 **Phase:** 4 (controlled experiments).
 
 **This is a labelled diagnostic, not a candidate for adoption.** Token-shift is
@@ -266,3 +267,143 @@ Two properties of it matter:
 
 `tokenshift_s0` is therefore the only run in this experiment that predates the
 refinement, and it was complete before it was made.
+
+---
+
+## 9. Results
+
+**Run 2026-08-03.** Three seeds, 20 000 steps each, strictly sequential.
+**~0.50 GPU-hours** of training against §2's 0.4 estimate. Raw JSON:
+`docs/reports/data/exp_007_008_run_manifest.json` and
+`docs/reports/data/exp_007_009_arm_results.json`; horizons in
+`docs/reports/data/exp_007_009_memory_horizon.json`.
+
+### 9.1 The headline: it works, and not for the reason it was built
+
+| | baseline (n=5) | **token-shift (n=3)** | Δ |
+|---|---:|---:|---:|
+| test bpc, carried | 2.25311 | **2.21444 ± 0.00103** | **−0.03867** |
+| test bpc, fresh | 2.26969 | **2.22123 ± 0.00132** | −0.04846 |
+| memory horizon | 7 (5/5) | **8 (3/3)** | +1 |
+
+−0.03867 is **18.0 standard errors** of the difference and 8.4× the inherited σ.
+V1 is not close.
+
+**And then the decomposition, which is the result.**
+
+| Component of the gain | bpc | share |
+|---|---:|---:|
+| **At zero context** | **+0.0493** | **+101.8 %** |
+| Within the baseline's 7-character reach | **−0.0065** | −13.4 % |
+| Beyond the horizon | +0.0057 | +11.7 % |
+| **Total** | **+0.0485** | 100 % |
+
+**Everything the two-tap mix buys, it buys at the one context where it has nothing
+to mix.** Within the reach it was built to attack, it is slightly *worse* than the
+baseline.
+
+### 9.2 Why, in one line of algebra that was in §1.2 all along
+
+At the first character of a window `cur_{-1} = 0`, so
+
+```
+cur'_0 = mu_c·cur_0 + (1 - mu_c)·0 = mu_c·cur_0
+```
+
+**At zero context the token-shift is not a filter. It is a per-channel gain on the
+current — which is exactly `EXP_004` §10.6's learned per-channel threshold, and
+exactly what `EXP_008` tests directly.** The `1 − mu` tap contributes nothing at
+c = 0 for the same reason `EXP_006` §1.1's `beta_s` contributes nothing there.
+
+So the arm that was ranked to attack the within-reach component turns out to
+deliver ~102 % of its gain through the *other* candidate's mechanism, arriving at
+it sideways. That is what V2 failing means, and it is worth more than V2 holding
+would have been: **it is independent corroboration of §10.6 from an arm that was
+not built to test it.**
+
+The learned `mu` is consistent with that reading and is not uniform between layers:
+
+| | layer 0 | layer 1 |
+|---|---:|---:|
+| mean `mu` (3 seeds) | **0.712 ± 0.003** | **1.147 ± 0.003** |
+| 10th–90th percentile | 0.63 – 0.82 | 0.24 – 2.02 |
+
+Layer 0 settles tightly just below 1 in every seed; layer 1 spreads across
+`mu > 1` — a *negative* weight on the previous character — with a 10-90 band eight
+times wider. The two layers are not doing the same thing, and this experiment does
+not establish what layer 1 is doing.
+
+### 9.3 The predictions, resolved as written
+
+| # | Prediction | Threshold | Measured | Verdict |
+|---|---|---|---|---|
+| **V1** | mean carried improves by > 2σ | 2.24389 | **2.21444** | **held** |
+| **V2** | within-reach gain > beyond-horizon gain | — | **−0.0065 vs +0.0057** | **FAILED** |
+| **V3** | median horizon ≤ 14 | 14 | **8** | **held** |
+| **V4** | within-reach gain < 0.0581 | 0.0581 | **−0.0065** | held *(vacuously — see below)* |
+| **V5** | no context c ≤ 8 worse than its bar | 0 | **0 of 128 at any c** | **held** |
+| **V6** | mean \|1 − mu\| ≥ 0.05 in both layers | 0.05 | **0.29 / 0.62** | **held** |
+
+**Decision cell (§4): V1 holds, V2 fails ⇒ "It buys bits, but not the ones this
+experiment aimed at."** The within-reach claim is **not made**.
+
+**V4 held vacuously and is reported as such rather than as a pass.** It was stated
+against the plan — "a two-tap FIR recovers less than half of the within-reach
+component" — and a *negative* within-reach gain clears a positive ceiling without
+telling anyone anything. The prediction was mis-specified: it bounded the
+mechanism from above and never considered that the mechanism might go the wrong
+way. Counting it as a hit would be scoring a miss as a hit.
+
+**V5 is the one clean piece of good news.** The arm is worse than the baseline at
+**zero** of 128 context lengths — the first Phase-4 arm to manage that. The
+two-compartment arm is worse at 5, and every β-raising arm in Phase 3 at ~126.
+
+### 9.4 What it cost, which is not what §1 implied
+
+| | baseline | **token-shift** | two-compartment |
+|---|---:|---:|---:|
+| wall-clock, 20 000 steps | 398.9 s | **595 s (1.49×)** | 536.7 s (1.35×) |
+| peak VRAM | 0.609 GiB | **0.859 GiB (1.41×)** | 0.980 GiB |
+
+**The "cheap" arm is more expensive in wall-clock than the two-state neuron it was
+supposed to undercut.** §1 priced it as O(1) kernels per layer against the scan's
+O(L), which is true and is the wrong metric: the transform allocates four
+`[B, L, d]` intermediates per layer — 67 MiB each at B=128, L=256, d=512 — and all
+of them stay alive for the backward. On a memory-bound box that costs 1.49×.
+
+This is `EXP_002` §10.9's mistake in a new place: a forward-only kernel-count
+argument that omits what the backward has to keep. Recorded here rather than in a
+systems appendix because it changes the arm's ROI, and because the same reasoning
+was about to be applied to every other "outside the time loop" candidate.
+
+### 9.5 What this does and does not settle for I5
+
+**Nothing.** The boundary question is Elliot's and this experiment took no
+position on it (§header). What it supplies is the price it promised, and the price
+is now known to be for a different thing than expected:
+
+* If token-shift is ruled **inside** I5, it is an adoptable arm at −0.0387 bpc
+  with 0/128 contexts regressed — but its mechanism is ~102 % zero-context, so it
+  is largely **redundant with `EXP_008`'s one-parameter arm**, which delivers more
+  (−0.0590) for less (1.12× wall-clock against 1.49×). Adopting both without
+  measuring their interaction would be double-counting.
+* If it is ruled **outside**, nothing is lost that `EXP_008` does not already
+  provide, and the within-reach component stays unattacked.
+
+### 9.6 Status
+
+**CLOSED. V1, V3, V5, V6 held; V2 failed; V4 held vacuously and is not counted.**
+
+1. **A two-tap input mix buys 0.0387 bpc over the Phase-2 baseline at 3 seeds**,
+   with no context regressed beyond its own noise bar.
+2. **It does not attack the within-reach component.** It is 0.0065 bpc *worse*
+   there. **The within-reach component — 51.8 % of the remaining gap — remains
+   unattacked by any arm this project has run**, and this experiment was the one
+   that was supposed to attack it.
+3. **101.8 % of its gain is at zero context, where the mix degenerates to a
+   per-channel gain** (§9.2). The arm corroborates `EXP_004` §10.6 sideways and is
+   mechanistically close to `EXP_008` rather than complementary to it.
+4. **It costs 1.49× wall-clock**, more than the two-compartment neuron, for the
+   reason §9.4 gives. "Outside the time loop" is not the same as "free", and the
+   kernel-count argument that said otherwise is the one `EXP_002` already got
+   wrong once.
