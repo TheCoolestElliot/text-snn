@@ -1,0 +1,92 @@
+{
+  "experiment": "EXP_005_sigma_transfer",
+  "log": "experiments/logs/EXP_005_sigma_transfer.md",
+  "reference_run": "twocomp_s0",
+  "reference_wall_clock_s": 525.3,
+  "sequential": true,
+  "seeds": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "runs": [
+    {
+      "run": "twocomp_s3",
+      "differs_in": [
+        "run_name",
+        "seed"
+      ],
+      "same_arm": true,
+      "seed": 3,
+      "train_seconds": 519.6,
+      "eval_seconds": 10.2,
+      "reported_wall_clock_s": 514.6,
+      "wall_clock_vs_exp_004": 0.98,
+      "peak_vram_gib": 0.9801,
+      "params": 737485,
+      "test_bpc": {
+        "fresh": 2.1472929209121934,
+        "carried": 2.1199276547608297
+      }
+    },
+    {
+      "run": "twocomp_s4",
+      "differs_in": [
+        "run_name",
+        "seed"
+      ],
+      "same_arm": true,
+      "seed": 4,
+      "train_seconds": 517.6,
+      "eval_seconds": 10.0,
+      "reported_wall_clock_s": 512.75,
+      "wall_clock_vs_exp_004": 0.976,
+      "peak_vram_gib": 0.9801,
+      "params": 737485,
+      "test_bpc": {
+        "fresh": 2.1477288233869185,
+        "carried": 2.1208154993554014
+      }
+    },
+    {
+      "run": "twocomp_s5",
+      "differs_in": [
+        "run_name",
+        "seed"
+      ],
+      "same_arm": true,
+      "seed": 5,
+      "train_seconds": 517.6,
+      "eval_seconds": 10.0,
+      "reported_wall_clock_s": 512.75,
+      "wall_clock_vs_exp_004": 0.976,
+      "peak_vram_gib": 0.9801,
+      "params": 737485,
+      "test_bpc": {
+        "fresh": 2.1463147480875797,
+        "carried": 2.1191277758977796
+      }
+    },
+    {
+      "run": "twocomp_s6",
+      "differs_in": [
+        "run_name",
+        "seed"
+      ],
+      "same_arm": true,
+      "seed": 6,
+      "train_seconds": 518.1,
+      "eval_seconds": 10.0,
+      "reported_wall_clock_s": 513.26,
+      "wall_clock_vs_exp_004": 0.977,
+      "peak_vram_gib": 0.9801,
+      "params": 737485,
+      "test_bpc": {
+        "fresh": 2.145421741750553,
+        "carried": 2.1188636976688446
+      }
+    }
+  ],
+  "total_seconds": 2113.1
+}
