@@ -2,9 +2,11 @@
 
 **Project:** Character-level spiking neural-network language model
 **Author:** Elliot Asher Caudill
-**Date:** 2026-08-02
-**Status:** Phase-3 deliverable. Awaiting review before Phase 4 begins.
-**Branch:** `phase-3-candidates`
+**Date:** 2026-08-02 (rev 2, 2026-08-03 — §10)
+**Status:** Phase-3 deliverable. **§9's sign-off box is still unticked and is
+Elliot's to tick.** Phase 4 was opened on 2026-08-03 on Elliot's instruction
+without it, which is recorded here rather than resolved by ticking it.
+**Branch:** `phase-3-candidates` (rev 2 committed on `phase-4-experiments`)
 
 ---
 
@@ -212,8 +214,10 @@ horizon, and §6.2 turns it into an adoption rule.
 
 * **The analogue control's horizon is 6 against the spiking arm's 7.** Binarity
   and the hard threshold do not shorten memory. That is an independent
-  confirmation, on a different axis, of §7.2's finding that binarity is nearly
-  free: the arms differ in emission, not in reach.
+  confirmation, on a different axis, of `02_baseline_report.md` §7.2's finding
+  that binarity is nearly free: the arms differ in emission, not in reach.
+  *(Rev 1 wrote a bare "§7.2", which reads as a self-reference — this document
+  has a §7.2 of its own, about screens.)*
 * **The GRU loses *more* than the SNN when starved of context** (+2.238 vs +1.892
   bpc at zero context, relative to each arm's own asymptote). It is not uniformly
   better at every context length in relative terms — it has more invested in
@@ -387,6 +391,19 @@ checked the whole set. One candidate was refuted outright, two pairs turned out 
 be the same lever under different names, and eight candidates were identified as
 missing.
 
+The set is enumerated in **`docs/reports/data/phase3_candidates.json`**, and
+`scripts/audit/10_candidate_spec.py` checks that file against this report cell by
+cell. Two things that rev 1 left implicit are worth stating, because the second
+is a correction:
+
+* **The 18 are the *final* set** — 14 ranked (§6.3) + 1 refuted + 3 referred to
+  Elliot. The two merges reduced **20 proposals to those 18**; read the other way
+  round the counts in this section and in §9 do not close, and rev 1 did not say
+  which reading was meant.
+* **The provenance of the generation step is thinner than the rest of this
+  report**, and §6.5 says exactly how thin rather than leaving the reader to
+  discover it.
+
 ### 6.1 Two pairs that are the same lever
 
 This is the mistake Phase 2 caught with fusion and CUDA-graph capture, repeated:
@@ -462,8 +479,10 @@ than it was (§7.1).
 | **13** | **Training budget** (40k steps) | is the baseline under-trained? | 0 | neutral | 0.7 | Likely shifts all arms equally; run once, not per-arm |
 | **14** | **Re-measure σ on a two-state neuron** | the 2σ rule's own validity | — | — | 0.55 | σ was measured at *one* configuration; every verdict assumes it transfers |
 
-Total: **~7.9 GPU-hours** against Phase 4's ~30, leaving room for the replication
-and follow-up arms the results will demand.
+Total: **7.8 GPU-hours** against Phase 4's ~30, leaving room for the replication
+and follow-up arms the results will demand. *(Rev 1 said "~7.9"; the rows sum to
+7.80. `scripts/audit/10_candidate_spec.py` now asserts the total against the
+table it totals.)*
 
 **Refuted and dropped:** micro-step refinement at T > 1. On a launch-bound machine
 it multiplies kernels per character by T, the readout shape for T > 1 is
@@ -500,11 +519,53 @@ broken — but it may not run until it clears the gradient-reachability screen i
 §7.2. This is the clearest case in the phase of a candidate whose ROI column would
 otherwise have been fiction.
 
+**Confirmed by measurement, 2026-08-03.** `|∂L/∂θ|` is exactly 0.000e+00 in both
+layers at the proposed init, and a θ = π/8 fallback clears the screen. §7.3.
+
+### 6.5 What this section's provenance can and cannot support
+
+Every other claim in this report traces to a script, a machine-readable output and
+an experiment log. **§6 did not, and that is worth stating plainly rather than
+leaving a reader to notice.** The candidate generation, the adversarial
+verification and the completeness audit were carried out in a session whose
+transcript was never exported, so the reasoning trail behind them is gone and is
+not recoverable.
+
+`docs/reports/data/phase3_candidates.json` closes as much of that as can be
+closed: it enumerates all 18 candidates with every column of §6.3, the refutation
+and its reason, the three referrals and theirs, and the two merges with their
+algebra — and `scripts/audit/10_candidate_spec.py` asserts it against this
+document. What that buys is that the *set* is now checkable and cannot silently
+drift from the report. What it does not buy is any evidence that the generation
+was sound.
+
+Three claims in this section rest on the lost session alone, and the spec records
+them as unverifiable rather than absorbing them:
+
+* **"Eight candidates were identified as missing" by the completeness audit.**
+  Only **two are attributable** from the committed record — §5 names #2 (current
+  normalisation) and #4 (readout capacity). The other six are not identified
+  anywhere, and the spec leaves them null rather than guessing.
+* **The two merged pairs.** §6.1's algebra is checkable on its own terms and holds.
+  The *original proposal wordings* are not in the repository, so the claim that
+  the merged candidates were what was actually proposed cannot be re-checked.
+* **"Across the six areas the Phase-1 plan names."** The report says the set spans
+  them; it never says which candidate sits where. The spec's
+  `family_reconstructed` field is this reconstruction's inference from candidate
+  text, not a recovered value, and four candidates are left null.
+
+None of the three changes a ranking or a result. They are recorded because a
+reader deciding how much weight §6 carries should be told where its evidence
+stops, and because rev 1's uniform tone did not distinguish this section from the
+measured ones.
+
 ---
 
 ## 7. What Phase 3 built
 
-Two pieces of engineering, both paying down costs the experiments identified.
+Two pieces of engineering, both paying down costs the experiments identified —
+plus one screen this phase **specified but did not build**, whose implementation
+is recorded as an addendum in §7.3 rather than backdated into the phase.
 
 ### 7.1 A committed mutation-testing harness — 25 / 25 caught
 
@@ -528,19 +589,72 @@ Adding a candidate neuron's mutations is now one list entry rather than a new
 campaign, which is the largest single reduction in the cost of every new-neuron
 row in §6.3.
 
-### 7.2 Screens that were added because they caught something
+### 7.2 Screens — two built here, one specified here and built later
 
-* **Kernel semantics against a plain-torch reference** (`EXP_002` §8.4). Added
-  after a candidate kernel compiled, ran, produced plausible spikes and **priced
-  within 2 % of the correct one** while computing the wrong function. Now aborts
-  the run.
-* **Gradient reachability, proposed as a mandatory prerequisite.** Build the eager
+Rev 1 titled this section "Screens that were added because they caught
+something" and listed all three together. Two of them are code committed in this
+phase; the middle one was a **specification**, and grouping it with the others
+implied an artifact that did not exist. Corrected below, and the distinction is
+kept rather than smoothed over now that the screen does exist.
+
+* **Kernel semantics against a plain-torch reference** — *built in Phase 3*
+  (`scripts/exp/002_candidate_neuron_cost.py`, `EXP_002` §8.4). Added after a
+  candidate kernel compiled, ran, produced plausible spikes and **priced within
+  2 % of the correct one** while computing the wrong function. Now aborts the run.
+* **Gradient reachability — specified here, not built here.** Build the eager
   reference at a candidate's proposed init, take one backward, report `|∂L/∂p|`
   for every new parameter against `|∂L/∂W|`, and flag anything exactly zero or
   ~100× below. Seconds per candidate; it is what identifies §6.4's saddle before
-  0.8 GPU-hours are spent certifying a null.
-* **A concurrency guard on the mutation campaign**, added because it was needed —
-  see §8.
+  0.8 GPU-hours are spent certifying a null. **In Phase 3 this was a rule on
+  paper: §6.4's saddle was found by hand from the backward equations, and no
+  script implemented the check.** See §7.3 for what happened when it was built.
+* **A concurrency guard on the mutation campaign** — *built in Phase 3*, added
+  because it was needed; see §8.
+
+### 7.3 The reachability screen, built in Phase 4 — addendum, 2026-08-03
+
+Appended rather than folded into §7.2, so that what Phase 3 delivered stays
+legible. `scripts/audit/09_gradient_reachability.py` implements the rule above as
+a candidate registry with one shared decision rule, runnable **before** a
+candidate has a kernel — which is the whole economic argument for the screen, and
+which `scripts/exp/004_gradient_reachability.py` (two hard-coded inits of a neuron
+that already had a kernel, an arch and a `Config` field) did not deliver. Raw
+JSON: `docs/reports/data/audit_09_gradient_reachability.json`.
+
+Four things it establishes that this report could only assert:
+
+1. **§6.4's saddle is now measured, not derived.** At the rotational membrane's
+   proposed init (θ = 0, imaginary state zero) `|∂L/∂θ|` is **exactly 0.000e+00 in
+   both layers**. §6.4 called this "a provable dead end" from the backward
+   equations alone; it is now a number. A θ = π/8 fallback clears the screen, so
+   candidate #10 has a screened init it did not have in Phase 3.
+2. **The same defect sits in candidate #6's proposed init.** The adaptive
+   threshold nests the baseline exactly at `b = 0`, and `b = 0` is an exact saddle
+   for the adaptation decay by the same adjoint argument `EXP_004` §2.2 makes for
+   the two-compartment mix. Three of the four exact-nesting initialisations this
+   project has proposed are saddles (#1, #6, #10); **zeroing a mixing coefficient
+   to nest the baseline is a saddle generator**, and it is now a thing to check
+   rather than a thing to discover.
+3. **Not every exact-nesting init is a saddle, and the difference is structural.**
+   Candidate #5's `β = logit(0.5)` and `EXP_004` §10.6's learned per-channel
+   threshold both nest the baseline exactly and both **pass** — because their
+   parameter multiplies a live *state*, where #1/#6/#10's multiplies a state whose
+   *adjoint* is what collapses.
+4. **Candidate #6's fallback fails too, for a reason nothing predicted.** At
+   `b = 0.1` layer 1's firing rate is exactly 0.0, so a spike-driven adaptation
+   variable is identically zero and **both** parameters lose their gradient. That
+   is the initialisation pathology of §5 / `EXP_003` R4, not a property of the
+   candidate — and it means **#6 is not screenable independently of #8**
+   (variance-scaled initialisation), which §6.3 ranked only as a prerequisite for
+   *deep* arms. It is a prerequisite for *spike-driven* arms as well.
+
+The screen carries its own gate, because a screen nothing has ever tripped is
+indistinguishable from one that cannot trip: three synthetic controls run on
+every invocation — a reachable parameter, one multiplied by exactly zero, and one
+scaled to 1e-9 — and the run **aborts** unless each trips the leg it was built to
+trip. It also re-derives `EXP_004`'s committed reachability numbers, produced by a
+different script before it existed, and reproduces them **bit-identically**
+(worst relative residual 0.00e+00).
 
 ---
 
@@ -576,7 +690,11 @@ wrong code into the source tree must own the machine while it runs.**
 
 - [x] 10–15 ranked hypotheses across neuron model, coding/T, reset rule,
       optimisation, sparsity, and kernel-count reduction — **18 generated, 1
-      refuted, 2 pairs merged, 8 added by a completeness audit, 14 ranked**
+      refuted, 2 pairs merged, 8 added by a completeness audit, 14 ranked**.
+      Enumerated in `docs/reports/data/phase3_candidates.json` and checked against
+      this report by `scripts/audit/10_candidate_spec.py`. **Of the eight, two are
+      attributable from the committed record** and the rest rest on a lost
+      transcript — §6.5
 - [x] ROI matrix against the §5 bottlenecks, priced at the corrected 32.8 µs/kernel
       and with fusion and graph capture counted as one lever
 - [x] Every candidate ruled against the §4.6 I5 boundary; three referred to Elliot
@@ -622,3 +740,4 @@ wrong code into the source tree must own the machine while it runs.**
 | Rev | Change |
 |---|---|
 | 1 | Phase-3 deliverable: three pre-registered experiments, the horizon measurement and its confound, the I5 gap decomposition, the calibrated acceptance criterion, 14 ranked candidates, the mutation harness, and one contaminated run reported. |
+| 2 | **Corrections, 2026-08-03, made from Phase 4 after an audit found three claims this report could not back.** No result, ranking or number in §§1–5 changes. (a) §7.2 grouped a screen that was only *specified* with two that were *built*; retitled, and the implementation recorded separately as §7.3 rather than backdated. (b) §6's counts did not close arithmetically — the 18 is the final set (14 + 1 + 3) reached by merging 20 proposals, now stated and enumerated in `docs/reports/data/phase3_candidates.json`. (c) §6.3's total said "~7.9 GPU-hours"; its rows sum to **7.80**. (d) §2.5's bare "§7.2" read as a self-reference and meant `02_baseline_report.md` §7.2. (e) §6.5 added: the generation step's provenance is thinner than the rest of the report, and says how. (f) §6.4's saddle, derived on paper in rev 1, is now measured. |

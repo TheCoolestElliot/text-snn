@@ -1,0 +1,636 @@
+{
+  "audit": "10_candidate_spec",
+  "spec": "docs/reports/data/phase3_candidates.json",
+  "report": "docs/reports/03_phase3_candidates.md",
+  "checks_run": 121,
+  "checks_failed": 0,
+  "passed": true,
+  "failures": [],
+  "checks": [
+    {
+      "check": "ranked row count",
+      "ok": true,
+      "detail": "report 14, spec 14, expected 14"
+    },
+    {
+      "check": "rank 1 name",
+      "ok": true,
+      "detail": "spec 'Two-compartment neuron (fast/slow, slow pole reset-shielded)' != report 'Two-compartment neuron (fast/slow, slow pole reset-shielded)'"
+    },
+    {
+      "check": "rank 1 attacks",
+      "ok": true,
+      "detail": "spec 'beyond-horizon (49 %)' != report 'beyond-horizon (49 %)'"
+    },
+    {
+      "check": "rank 1 params_per_neuron",
+      "ok": true,
+      "detail": "spec '2' != report '2'"
+    },
+    {
+      "check": "rank 1 i5",
+      "ok": true,
+      "detail": "spec 'admitted, \u00a74.6 row 2' != report 'admitted, \u00a74.6 row 2'"
+    },
+    {
+      "check": "rank 1 note",
+      "ok": true,
+      "detail": "spec 'Nests the baseline exactly at w=0, so the downside is structural, not hoped' != report 'Nests the baseline exactly at w=0, so the downside is structural, not hoped'"
+    },
+    {
+      "check": "rank 1 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.8 != report 0.8"
+    },
+    {
+      "check": "rank 2 name",
+      "ok": true,
+      "detail": "spec 'Current normalisation (RMSNorm on cur, outside the time loop)' != report 'Current normalisation (RMSNorm on cur, outside the time loop)'"
+    },
+    {
+      "check": "rank 2 attacks",
+      "ok": true,
+      "detail": "spec 'zero-context + within-reach (51 %)' != report 'zero-context + within-reach (51 %)'"
+    },
+    {
+      "check": "rank 2 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0 (2d/layer)' != report '0 (2d/layer)'"
+    },
+    {
+      "check": "rank 2 i5",
+      "ok": true,
+      "detail": "spec 'neutral' != report 'neutral'"
+    },
+    {
+      "check": "rank 2 note",
+      "ok": true,
+      "detail": "spec \"Closes a deviation from the baseline's own literature; subsumes the init candidate\" != report \"Closes a deviation from the baseline's own literature; subsumes the init candidate\""
+    },
+    {
+      "check": "rank 2 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.4 != report 0.4"
+    },
+    {
+      "check": "rank 3 name",
+      "ok": true,
+      "detail": "spec 'Depth K = 4 at 3 seeds' != report 'Depth K = 4 at 3 seeds'"
+    },
+    {
+      "check": "rank 3 attacks",
+      "ok": true,
+      "detail": "spec 'mixed; already 4\u03c3 at n=1' != report 'mixed; already 4\u03c3 at n=1'"
+    },
+    {
+      "check": "rank 3 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 3 i5",
+      "ok": true,
+      "detail": "spec 'admitted' != report 'admitted'"
+    },
+    {
+      "check": "rank 3 note",
+      "ok": true,
+      "detail": "spec 'Carries a named short-context trade (\u00a76.2)' != report 'Carries a named short-context trade (\u00a76.2)'"
+    },
+    {
+      "check": "rank 3 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.4 != report 0.4"
+    },
+    {
+      "check": "rank 4 name",
+      "ok": true,
+      "detail": "spec 'Readout capacity (deeper non-spiking head, width-compensated)' != report 'Readout capacity (deeper non-spiking head, width-compensated)'"
+    },
+    {
+      "check": "rank 4 attacks",
+      "ok": true,
+      "detail": "spec 'zero-context (26 %)' != report 'zero-context (26 %)'"
+    },
+    {
+      "check": "rank 4 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 4 i5",
+      "ok": true,
+      "detail": "spec 'untouched \u2014 head is outside the spiking path' != report 'untouched \u2014 head is outside the spiking path'"
+    },
+    {
+      "check": "rank 4 note",
+      "ok": true,
+      "detail": "spec 'The only arm attacking the component memory cannot reach' != report 'The only arm attacking the component memory cannot reach'"
+    },
+    {
+      "check": "rank 4 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.4 != report 0.4"
+    },
+    {
+      "check": "rank 5 name",
+      "ok": true,
+      "detail": "spec 'Learned per-channel decay' != report 'Learned per-channel decay'"
+    },
+    {
+      "check": "rank 5 attacks",
+      "ok": true,
+      "detail": "spec 'beyond-horizon' != report 'beyond-horizon'"
+    },
+    {
+      "check": "rank 5 params_per_neuron",
+      "ok": true,
+      "detail": "spec '1' != report '1'"
+    },
+    {
+      "check": "rank 5 i5",
+      "ok": true,
+      "detail": "spec 'admitted, \u00a74.6 row 1' != report 'admitted, \u00a74.6 row 1'"
+    },
+    {
+      "check": "rank 5 note",
+      "ok": true,
+      "detail": "spec 'EXP_002 Q5: keeps the 1-kernel floor for +0.146 GiB' != report 'EXP_002 Q5: keeps the 1-kernel floor for +0.146 GiB'"
+    },
+    {
+      "check": "rank 5 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.7 != report 0.7"
+    },
+    {
+      "check": "rank 6 name",
+      "ok": true,
+      "detail": "spec 'Adaptive threshold (spike-driven, own decay)' != report 'Adaptive threshold (spike-driven, own decay)'"
+    },
+    {
+      "check": "rank 6 attacks",
+      "ok": true,
+      "detail": "spec 'beyond-horizon' != report 'beyond-horizon'"
+    },
+    {
+      "check": "rank 6 params_per_neuron",
+      "ok": true,
+      "detail": "spec '2' != report '2'"
+    },
+    {
+      "check": "rank 6 i5",
+      "ok": true,
+      "detail": "spec 'admitted, \u00a74.6 row 3' != report 'admitted, \u00a74.6 row 3'"
+    },
+    {
+      "check": "rank 6 note",
+      "ok": true,
+      "detail": "spec 'May buy rate homeostasis rather than horizon \u2014 measure, do not assume' != report 'May buy rate homeostasis rather than horizon \u2014 measure, do not assume'"
+    },
+    {
+      "check": "rank 6 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.8 != report 0.8"
+    },
+    {
+      "check": "rank 7 name",
+      "ok": true,
+      "detail": "spec 'Reset ablation (hard / soft / detached / none)' != report 'Reset ablation (hard / soft / detached / none)'"
+    },
+    {
+      "check": "rank 7 attacks",
+      "ok": true,
+      "detail": "spec 'mechanism; unlocks the parallel form' != report 'mechanism; unlocks the parallel form'"
+    },
+    {
+      "check": "rank 7 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 7 i5",
+      "ok": true,
+      "detail": "spec 'free parameter, \u00a71.3' != report 'free parameter, \u00a71.3'"
+    },
+    {
+      "check": "rank 7 note",
+      "ok": true,
+      "detail": "spec 'Already implemented and tested; the cheapest real experiment available' != report 'Already implemented and tested; the cheapest real experiment available'"
+    },
+    {
+      "check": "rank 7 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.5 != report 0.5"
+    },
+    {
+      "check": "rank 8 name",
+      "ok": true,
+      "detail": "spec 'Variance-scaled initialisation' != report 'Variance-scaled initialisation'"
+    },
+    {
+      "check": "rank 8 attacks",
+      "ok": true,
+      "detail": "spec 'depth enabler' != report 'depth enabler'"
+    },
+    {
+      "check": "rank 8 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 8 i5",
+      "ok": true,
+      "detail": "spec 'neutral' != report 'neutral'"
+    },
+    {
+      "check": "rank 8 note",
+      "ok": true,
+      "detail": "spec 'Promoted by EXP_003 R4; prerequisite for any deep arm' != report 'Promoted by EXP_003 R4; prerequisite for any deep arm'"
+    },
+    {
+      "check": "rank 8 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.4 != report 0.4"
+    },
+    {
+      "check": "rank 9 name",
+      "ok": true,
+      "detail": "spec 'Firing-rate set-point (rate regulariser + threshold)' != report 'Firing-rate set-point (rate regulariser + threshold)'"
+    },
+    {
+      "check": "rank 9 attacks",
+      "ok": true,
+      "detail": "spec 'horizon and the energy claim' != report 'horizon and the energy claim'"
+    },
+    {
+      "check": "rank 9 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 9 i5",
+      "ok": true,
+      "detail": "spec 'neutral' != report 'neutral'"
+    },
+    {
+      "check": "rank 9 note",
+      "ok": true,
+      "detail": "spec 'Under hard reset retention is \u03b2(1\u2212p), so p is a horizon lever nothing else touches' != report 'Under hard reset retention is \u03b2(1\u2212p), so p is a horizon lever nothing else touches'"
+    },
+    {
+      "check": "rank 9 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.5 != report 0.5"
+    },
+    {
+      "check": "rank 10 name",
+      "ok": true,
+      "detail": "spec 'Rotational / complex membrane' != report 'Rotational / complex membrane'"
+    },
+    {
+      "check": "rank 10 attacks",
+      "ok": true,
+      "detail": "spec 'beyond-horizon' != report 'beyond-horizon'"
+    },
+    {
+      "check": "rank 10 params_per_neuron",
+      "ok": true,
+      "detail": "spec '2' != report '2'"
+    },
+    {
+      "check": "rank 10 i5",
+      "ok": true,
+      "detail": "spec 'admitted, \u00a74.6 row 4' != report 'admitted, \u00a74.6 row 4'"
+    },
+    {
+      "check": "rank 10 note",
+      "ok": true,
+      "detail": "spec 'See \u00a76.4 \u2014 its proposed init is a provable dead end' != report 'See \u00a76.4 \u2014 its proposed init is a provable dead end'"
+    },
+    {
+      "check": "rank 10 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.8 != report 0.8"
+    },
+    {
+      "check": "rank 11 name",
+      "ok": true,
+      "detail": "spec 'Parameter-scaling pilot (0.735M / 2.5M / 5M, 1 seed)' != report 'Parameter-scaling pilot (0.735M / 2.5M / 5M, 1 seed)'"
+    },
+    {
+      "check": "rank 11 attacks",
+      "ok": true,
+      "detail": "spec '\u00a74.5 item 1, unmeasured' != report '\u00a74.5 item 1, unmeasured'"
+    },
+    {
+      "check": "rank 11 params_per_neuron",
+      "ok": true,
+      "detail": "spec '\u2014' != report '\u2014'"
+    },
+    {
+      "check": "rank 11 i5",
+      "ok": true,
+      "detail": "spec '\u2014' != report '\u2014'"
+    },
+    {
+      "check": "rank 11 note",
+      "ok": true,
+      "detail": "spec 'Tells Phase 5 what size to run; bounds every other ceiling' != report 'Tells Phase 5 what size to run; bounds every other ceiling'"
+    },
+    {
+      "check": "rank 11 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.35 != report 0.35"
+    },
+    {
+      "check": "rank 12 name",
+      "ok": true,
+      "detail": "spec 'Surrogate width sweep (\u03b1)' != report 'Surrogate width sweep (\u03b1)'"
+    },
+    {
+      "check": "rank 12 attacks",
+      "ok": true,
+      "detail": "spec 'training dynamics' != report 'training dynamics'"
+    },
+    {
+      "check": "rank 12 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 12 i5",
+      "ok": true,
+      "detail": "spec 'neutral' != report 'neutral'"
+    },
+    {
+      "check": "rank 12 note",
+      "ok": true,
+      "detail": "spec '\u00a74.3 item 3 says sweep width, not shape; never tested here' != report '\u00a74.3 item 3 says sweep width, not shape; never tested here'"
+    },
+    {
+      "check": "rank 12 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.5 != report 0.5"
+    },
+    {
+      "check": "rank 13 name",
+      "ok": true,
+      "detail": "spec 'Training budget (40k steps)' != report 'Training budget (40k steps)'"
+    },
+    {
+      "check": "rank 13 attacks",
+      "ok": true,
+      "detail": "spec 'is the baseline under-trained?' != report 'is the baseline under-trained?'"
+    },
+    {
+      "check": "rank 13 params_per_neuron",
+      "ok": true,
+      "detail": "spec '0' != report '0'"
+    },
+    {
+      "check": "rank 13 i5",
+      "ok": true,
+      "detail": "spec 'neutral' != report 'neutral'"
+    },
+    {
+      "check": "rank 13 note",
+      "ok": true,
+      "detail": "spec 'Likely shifts all arms equally; run once, not per-arm' != report 'Likely shifts all arms equally; run once, not per-arm'"
+    },
+    {
+      "check": "rank 13 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.7 != report 0.7"
+    },
+    {
+      "check": "rank 14 name",
+      "ok": true,
+      "detail": "spec 'Re-measure \u03c3 on a two-state neuron' != report 'Re-measure \u03c3 on a two-state neuron'"
+    },
+    {
+      "check": "rank 14 attacks",
+      "ok": true,
+      "detail": "spec \"the 2\u03c3 rule's own validity\" != report \"the 2\u03c3 rule's own validity\""
+    },
+    {
+      "check": "rank 14 params_per_neuron",
+      "ok": true,
+      "detail": "spec '\u2014' != report '\u2014'"
+    },
+    {
+      "check": "rank 14 i5",
+      "ok": true,
+      "detail": "spec '\u2014' != report '\u2014'"
+    },
+    {
+      "check": "rank 14 note",
+      "ok": true,
+      "detail": "spec '\u03c3 was measured at one configuration; every verdict assumes it transfers' != report '\u03c3 was measured at one configuration; every verdict assumes it transfers'"
+    },
+    {
+      "check": "rank 14 gpu_hours",
+      "ok": true,
+      "detail": "spec 0.55 != report 0.55"
+    },
+    {
+      "check": "spec budget equals the sum of the ranked rows",
+      "ok": true,
+      "detail": "spec says 7.8, rows sum to 7.8"
+    },
+    {
+      "check": "report total is present",
+      "ok": true,
+      "detail": "no 'Total: ~N GPU-hours' line"
+    },
+    {
+      "check": "report total equals the sum of its own rows",
+      "ok": true,
+      "detail": "report says ~7.8, its rows sum to 7.8"
+    },
+    {
+      "check": "exactly one refuted candidate",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "check": "refuted candidate named in the report",
+      "ok": true,
+      "detail": "'Micro-step refinement at T > 1' not found in the refutation paragraph"
+    },
+    {
+      "check": "three referred candidates",
+      "ok": true,
+      "detail": "report 3, spec 3"
+    },
+    {
+      "check": "referred 'Token-shift' in spec",
+      "ok": true,
+      "detail": "no spec entry whose name starts with 'Token-shift'"
+    },
+    {
+      "check": "referred 'Input-gated decay' in spec",
+      "ok": true,
+      "detail": "no spec entry whose name starts with 'Input-gated decay'"
+    },
+    {
+      "check": "referred 'Distillation from the trained GRU' in spec",
+      "ok": true,
+      "detail": "no spec entry whose name starts with 'Distillation from the trained GRU'"
+    },
+    {
+      "check": "counts.ranked",
+      "ok": true,
+      "detail": "14"
+    },
+    {
+      "check": "counts.refuted",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "check": "counts.referred_to_elliot",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "check": "counts arithmetic closes",
+      "ok": true,
+      "detail": "{'candidates_in_final_set': 18, 'ranked': 14, 'refuted': 1, 'referred_to_elliot': 3, 'arithmetic': '14 ranked + 1 refuted + 3 referred = 18', 'merged_pairs': 2, 'proposals_before_merging': 20, 'note': \"The report's \u00a76 and \u00a79 give these as a list of counts rather than an arithmetic chain, and the chain only closes one way: the 18 is the final set, and the two merges reduced 20 proposals to it. Report rev 2 restates \u00a76 and \u00a79 to match this file.\"}"
+    },
+    {
+      "check": "pre-merge proposal count",
+      "ok": true,
+      "detail": "20 != 18 + 2"
+    },
+    {
+      "check": "merge count matches the report",
+      "ok": true,
+      "detail": "report 2, spec 2"
+    },
+    {
+      "check": "merge target C01 exists",
+      "ok": true,
+      "detail": "C01"
+    },
+    {
+      "check": "merge target C01 is flagged in its candidate entry",
+      "ok": true,
+      "detail": "merged_from_pair is not true"
+    },
+    {
+      "check": "merge target C10 exists",
+      "ok": true,
+      "detail": "C10"
+    },
+    {
+      "check": "merge target C10 is flagged in its candidate entry",
+      "ok": true,
+      "detail": "merged_from_pair is not true"
+    },
+    {
+      "check": "\u00a79 carries a candidate tally",
+      "ok": true,
+      "detail": "no bolded run mentioning 'generated' in \u00a79"
+    },
+    {
+      "check": "\u00a79 tally says '18 generated'",
+      "ok": true,
+      "detail": "found '18', spec says 18"
+    },
+    {
+      "check": "\u00a79 tally says '1 refuted'",
+      "ok": true,
+      "detail": "found '1', spec says 1"
+    },
+    {
+      "check": "\u00a79 tally says '2 pairs merged'",
+      "ok": true,
+      "detail": "found '2', spec says 2"
+    },
+    {
+      "check": "\u00a79 tally says '14 ranked'",
+      "ok": true,
+      "detail": "found '14', spec says 14"
+    },
+    {
+      "check": "reachability screen artifact present",
+      "ok": true,
+      "detail": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\docs\\reports\\data\\audit_09_gradient_reachability.json"
+    },
+    {
+      "check": "C01 screen key 'c01_w0' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C01 screen key 'c01_w01' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C02 screen key 'c02' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C05 screen key 'c05' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C06 screen key 'c06_b0' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C06 screen key 'c06_b01' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C10 screen key 'c10_th0' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C10 screen key 'c10_thpi8' exists",
+      "ok": true,
+      "detail": "not in audit_09"
+    },
+    {
+      "check": "C16 explains why it is unscreened",
+      "ok": true,
+      "detail": "applies=true, no keys, and no stated reason"
+    },
+    {
+      "check": "C17 explains why it is unscreened",
+      "ok": true,
+      "detail": "applies=true, no keys, and no stated reason"
+    },
+    {
+      "check": "no screened arm is missing from the spec",
+      "ok": true,
+      "detail": "screened but unclaimed: []"
+    }
+  ],
+  "unverifiable_claims": [
+    {
+      "claim": "eight of the eighteen candidates were added by a completeness audit",
+      "status": "only 2 are attributable from the committed record (C02, C04), via \u00a75",
+      "recoverable": false,
+      "why": "the generating session's transcript was never exported"
+    },
+    {
+      "claim": "the two merged pairs were the same lever under different names",
+      "status": "the merge algebra is given in \u00a76.1 and is checkable on its own terms; the original proposal wordings are not in the repository, so the merge cannot be checked against what was proposed",
+      "recoverable": false,
+      "why": "same lost transcript"
+    },
+    {
+      "claim": "the candidate set spans the six areas the Phase-1 plan names",
+      "status": "the spec's `family_reconstructed` is this reconstruction's inference from candidate text, not a recovered value; four candidates are left null rather than guessed",
+      "recoverable": false,
+      "why": "same lost transcript"
+    }
+  ]
+}

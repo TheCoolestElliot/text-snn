@@ -1,0 +1,466 @@
+{
+  "artifact": "phase3_candidate_spec",
+  "revision": 1,
+  "created": "2026-08-03",
+  "source_report": "docs/reports/03_phase3_candidates.md",
+  "provenance": {
+    "status": "RECONSTRUCTED FROM THE COMMITTED REPORT -- NOT THE ORIGINAL GENERATION RECORD",
+    "why": "Phase 3's candidate generation, its adversarial verification and its completeness audit were carried out in a Claude Code session whose transcript was never exported (`Claude Conversation 3 (kinda).txt` records the failed export). Every other Phase-3 claim traces to a script, a JSON and a log; this one existed only as report prose. This file closes that gap as far as it can be closed, and says plainly where it cannot.",
+    "what_is_recovered": "The final candidate set, verbatim from the report's own tables: the 14 ranked rows of §6.3 with every column, the refuted candidate and its reason, the three candidates referred to Elliot and their reasons, and the two merged pairs with the algebra given for each.",
+    "what_is_NOT_recovered": [
+      "The pre-merge proposal text for the four candidates that became two. §6.1 states the merge conclusions and their algebra, but the original wordings are gone, so the merge claims cannot be re-checked against what was actually proposed.",
+      "Which eight of the eighteen were added by the completeness audit. §5 names two of them (#2 current normalisation and #4 readout capacity); the other six are not attributable from the committed record and are recorded as null rather than guessed.",
+      "The mapping of each candidate onto the six Phase-1 areas. §9 says the set spans them; it does not say which candidate sits where. `family_reconstructed` below is this file's inference from the candidate text, is labelled as such, and is not evidence.",
+      "What the adversarial verification consisted of, beyond the three criteria §6 names (the §4.6 ruling, jiterator's elementwise-only and 8-input limits, and the corrected cost constants)."
+    ],
+    "rule": "No field in this file may assert something the committed record does not support. Where the record is silent the value is null and the reason is stated."
+  },
+  "counts": {
+    "candidates_in_final_set": 18,
+    "ranked": 14,
+    "refuted": 1,
+    "referred_to_elliot": 3,
+    "arithmetic": "14 ranked + 1 refuted + 3 referred = 18",
+    "merged_pairs": 2,
+    "proposals_before_merging": 20,
+    "note": "The report's §6 and §9 give these as a list of counts rather than an arithmetic chain, and the chain only closes one way: the 18 is the final set, and the two merges reduced 20 proposals to it. Report rev 2 restates §6 and §9 to match this file."
+  },
+  "merges": [
+    {
+      "into": "C01",
+      "duplicate_names": [
+        "fast/slow membrane pair",
+        "reset-partitioned neuron"
+      ],
+      "basis": "Algebraically identical, not merely similar. Expanding the slow compartment, w*vs_t = w*beta_s*vs_{t-1} + w*cur_t, so one is the other with g = w*beta_s plus a scalar rescaling of the current that the layer's own Linear absorbs. Both compile to EXP_002's N2 with the same kernel signature.",
+      "report_section": "§6.1",
+      "recheckable": false,
+      "recheckable_why": "the pre-merge proposal texts are not in the repository"
+    },
+    {
+      "into": "C10",
+      "duplicate_names": [
+        "rotational membrane (multi-timescale family)",
+        "rotational membrane (adaptive-threshold family)"
+      ],
+      "basis": "Same per-channel (radius, angle), same 2x2 rotation, same 'fire on the real part'.",
+      "report_section": "§6.1",
+      "recheckable": false,
+      "recheckable_why": "the pre-merge proposal texts are not in the repository"
+    }
+  ],
+  "budget": {
+    "ranked_gpu_hours_total": 7.8,
+    "phase_4_budget_gpu_hours": 30,
+    "note": "Sum of the 14 ranked rows' `gpu_hours_3_seeds`. Report rev 1 quoted '~7.9'; the rows sum to 7.80. Report rev 2 corrects it."
+  },
+  "screen": {
+    "artifact": "docs/reports/data/audit_09_gradient_reachability.json",
+    "script": "scripts/audit/09_gradient_reachability.py",
+    "rule": "§7.2 -- run the gradient-reachability screen before every new-parameter arm",
+    "note": "`reachability` below links each candidate to the screen key that covers it, or records why the screen does not apply. Candidates with no learnable parameter are out of the screen's scope by construction, not by omission."
+  },
+  "candidates": [
+    {
+      "id": "C01",
+      "rank": 1,
+      "status": "ranked",
+      "name": "Two-compartment neuron (fast/slow, slow pole reset-shielded)",
+      "attacks": "beyond-horizon (49 %)",
+      "params_per_neuron": "2",
+      "i5": "admitted, §4.6 row 2",
+      "gpu_hours_3_seeds": 0.8,
+      "note": "Nests the baseline exactly at w=0, so the downside is structural, not hoped",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "neuron model",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": true,
+      "reachability": {
+        "applies": true,
+        "screen_keys": ["c01_w0", "c01_w01"],
+        "outcome": "proposed init w=0 is an exact saddle for beta_s; fallback w=0.1 passes"
+      },
+      "exp_004": {
+        "run": true,
+        "log": "experiments/logs/EXP_004_two_compartment.md",
+        "verdict": "ADOPT",
+        "result": "2.1174 bpc carried over 3 seeds against the baseline's 2.2531 (29.4 sigma); horizon 7 -> 45",
+        "qualification": "not a uniform gain -- +0.0508 at zero context, -0.0598 inside the baseline's 7-character reach, +0.1343 beyond it"
+      },
+      "status_after_exp_004": "adopted; the Phase-5 backbone"
+    },
+    {
+      "id": "C02",
+      "rank": 2,
+      "status": "ranked",
+      "name": "Current normalisation (RMSNorm on `cur`, outside the time loop)",
+      "attacks": "zero-context + within-reach (51 %)",
+      "params_per_neuron": "0 (2d/layer)",
+      "i5": "neutral",
+      "gpu_hours_3_seeds": 0.4,
+      "note": "Closes a deviation from the baseline's own literature; subsumes the init candidate",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "optimisation",
+      "added_by_completeness_audit": true,
+      "added_by_completeness_audit_source": "§5: 'neither existed in the candidate set until a completeness audit asked what was missing'",
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": true,
+        "screen_keys": ["c02"],
+        "outcome": "PASS -- the gain multiplies the current on every path to the loss"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged; EXP_004's decision cell re-ranked the beyond-horizon family, not this one. EXP_004 §10.11 item 3 raises its priority independently: the within-reach component is now 52 % of the remaining gap."
+    },
+    {
+      "id": "C03",
+      "rank": 3,
+      "status": "ranked",
+      "name": "Depth K = 4 at 3 seeds",
+      "attacks": "mixed; already 4σ at n=1",
+      "params_per_neuron": "0",
+      "i5": "admitted",
+      "gpu_hours_3_seeds": 0.4,
+      "note": "Carries a named short-context trade (§6.2)",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": null,
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "no new parameter; width is re-derived to hold the count, not added"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged"
+    },
+    {
+      "id": "C04",
+      "rank": 4,
+      "status": "ranked",
+      "name": "Readout capacity (deeper non-spiking head, width-compensated)",
+      "attacks": "zero-context (26 %)",
+      "params_per_neuron": "0",
+      "i5": "untouched — head is outside the spiking path",
+      "gpu_hours_3_seeds": 0.4,
+      "note": "The only arm attacking the component memory cannot reach",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": null,
+      "added_by_completeness_audit": true,
+      "added_by_completeness_audit_source": "§5: 'neither existed in the candidate set until a completeness audit asked what was missing'",
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "new parameters, but ordinary Linear layers outside the time loop; there is no adjoint recursion for an init to collapse"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged as a ranking, but EXP_004 §10.6 partially explains its target: 40.6 % of the two-compartment gain was at zero context and had a one-parameter threshold explanation"
+    },
+    {
+      "id": "C05",
+      "rank": 5,
+      "status": "ranked",
+      "name": "Learned per-channel decay",
+      "attacks": "beyond-horizon",
+      "params_per_neuron": "1",
+      "i5": "admitted, §4.6 row 1",
+      "gpu_hours_3_seeds": 0.7,
+      "note": "`EXP_002` Q5: keeps the 1-kernel floor for +0.146 GiB",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "neuron model",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": true,
+        "screen_keys": ["c05"],
+        "outcome": "PASS -- and its exact-nesting init beta_raw = logit(0.5) is NOT a saddle, unlike C01's w = 0"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "re-ranked against the two-compartment arm rather than the baseline, and partly subsumed by it: that arm already learns a per-channel decay on one of its two poles (EXP_004 §4, §10.11 item 1)"
+    },
+    {
+      "id": "C06",
+      "rank": 6,
+      "status": "ranked",
+      "name": "Adaptive threshold (spike-driven, own decay)",
+      "attacks": "beyond-horizon",
+      "params_per_neuron": "2",
+      "i5": "admitted, §4.6 row 3",
+      "gpu_hours_3_seeds": 0.8,
+      "note": "May buy rate homeostasis rather than horizon — measure, do not assume",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "neuron model",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": true,
+        "screen_keys": ["c06_b0", "c06_b01"],
+        "outcome": "SADDLE at both inits. b = 0 is an exact saddle for the adaptation decay, by the same adjoint argument as C01's w = 0. The b = 0.1 fallback ALSO fails, for a different and unpredicted reason: layer 1 is silent at initialisation, so the spike-driven adaptation variable is identically zero and both parameters go with it. C06 is not screenable independently of C08."
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "re-ranked against the two-compartment arm (EXP_004 §4). EXP_004 §10.6 says the static half of this candidate -- a learned per-channel threshold -- is worth having regardless, and the screen confirms that half is reachable where the spike-driven half is not."
+    },
+    {
+      "id": "C07",
+      "rank": 7,
+      "status": "ranked",
+      "name": "Reset ablation (hard / soft / detached / none)",
+      "attacks": "mechanism; unlocks the parallel form",
+      "params_per_neuron": "0",
+      "i5": "free parameter, §1.3",
+      "gpu_hours_3_seeds": 0.5,
+      "note": "Already implemented and tested; the cheapest real experiment available",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "reset rule",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "a free parameter of the existing kernel, not a learnable one"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged"
+    },
+    {
+      "id": "C08",
+      "rank": 8,
+      "status": "ranked",
+      "name": "Variance-scaled initialisation",
+      "attacks": "depth enabler",
+      "params_per_neuron": "0",
+      "i5": "neutral",
+      "gpu_hours_3_seeds": 0.4,
+      "note": "Promoted by `EXP_003` R4; prerequisite for any deep arm",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "optimisation",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "rescales existing parameters; introduces none"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "scope widened by the §7.2 screen's first general run: it is a prerequisite for any SPIKE-DRIVEN candidate, not only for deep ones. See C06."
+    },
+    {
+      "id": "C09",
+      "rank": 9,
+      "status": "ranked",
+      "name": "Firing-rate set-point (rate regulariser + threshold)",
+      "attacks": "horizon *and* the energy claim",
+      "params_per_neuron": "0",
+      "i5": "neutral",
+      "gpu_hours_3_seeds": 0.5,
+      "note": "Under hard reset retention is β(1−p), so p is a horizon lever nothing else touches",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "sparsity",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "a loss term plus a threshold constant; the learnable-threshold half is screened separately as `thr`"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged"
+    },
+    {
+      "id": "C10",
+      "rank": 10,
+      "status": "ranked",
+      "name": "Rotational / complex membrane",
+      "attacks": "beyond-horizon",
+      "params_per_neuron": "2",
+      "i5": "admitted, §4.6 row 4",
+      "gpu_hours_3_seeds": 0.8,
+      "note": "See §6.4 — its proposed init is a provable dead end",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "neuron model",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": true,
+      "reachability": {
+        "applies": true,
+        "screen_keys": ["c10_th0", "c10_thpi8"],
+        "outcome": "§6.4's saddle is CONFIRMED BY MEASUREMENT: |dL/dtheta| is exactly 0.000e+00 in both layers at theta = 0 with im_0 = 0. A theta = pi/8 fallback clears the screen, so the candidate is recoverable and the note in §6.3 -- 'its proposed init is a provable dead end' -- is now a measured one."
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "re-ranked against the two-compartment arm (EXP_004 §4); now has a screened, passing fallback init it did not have in Phase 3"
+    },
+    {
+      "id": "C11",
+      "rank": 11,
+      "status": "ranked",
+      "name": "Parameter-scaling pilot (0.735M / 2.5M / 5M, 1 seed)",
+      "attacks": "§4.5 item 1, unmeasured",
+      "params_per_neuron": "—",
+      "i5": "—",
+      "gpu_hours_3_seeds": 0.35,
+      "note": "Tells Phase 5 what size to run; bounds every other ceiling",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": null,
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "no new parameter kind"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "raised in importance: EXP_004 §6.1 and §10.6 could not separate a +0.28 % parameter increase from a learned per-channel threshold, and this pilot is what would price a 0.28 % change"
+    },
+    {
+      "id": "C12",
+      "rank": 12,
+      "status": "ranked",
+      "name": "Surrogate width sweep (α)",
+      "attacks": "training dynamics",
+      "params_per_neuron": "0",
+      "i5": "neutral",
+      "gpu_hours_3_seeds": 0.5,
+      "note": "§4.3 item 3 says sweep width, not shape; never tested here",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "optimisation",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "alpha is a hyperparameter, not a learned one"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged"
+    },
+    {
+      "id": "C13",
+      "rank": 13,
+      "status": "ranked",
+      "name": "Training budget (40k steps)",
+      "attacks": "is the baseline under-trained?",
+      "params_per_neuron": "0",
+      "i5": "neutral",
+      "gpu_hours_3_seeds": 0.7,
+      "note": "Likely shifts all arms equally; run once, not per-arm",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "optimisation",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "no parameter"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged"
+    },
+    {
+      "id": "C14",
+      "rank": 14,
+      "status": "ranked",
+      "name": "Re-measure σ on a two-state neuron",
+      "attacks": "the 2σ rule's own validity",
+      "params_per_neuron": "—",
+      "i5": "—",
+      "gpu_hours_3_seeds": 0.55,
+      "note": "σ was measured at *one* configuration; every verdict assumes it transfers",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": null,
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "a measurement, not an arm"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "PROMOTED TO BLOCKING by EXP_004's decision cell (§4, §10.10): every further 2σ verdict in this family rests on a sigma measured on a one-state neuron. EXP_004 §10.7 gives a weak n=3 reading (0.00487 carried against 0.00461) that does not close it."
+    },
+    {
+      "id": "C15",
+      "rank": null,
+      "status": "refuted",
+      "name": "Micro-step refinement at T > 1",
+      "attacks": "coding / T",
+      "params_per_neuron": "0",
+      "i5": null,
+      "gpu_hours_3_seeds": null,
+      "note": "Refuted outright and dropped",
+      "refutation": "On a launch-bound machine it multiplies kernels per character by T; the readout shape for T > 1 is unspecified in the current code (`model.py` raises NotImplementedError); and `01_reconnaissance.md` §4.3 item 1 already settles T = 1 as the right default.",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "coding/T",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {"applies": false, "screen_keys": [], "outcome": "refuted; never proposed for a run"},
+      "exp_004": {"run": false},
+      "status_after_exp_004": "unchanged; still refuted"
+    },
+    {
+      "id": "C16",
+      "rank": null,
+      "status": "referred_to_elliot",
+      "name": "Token-shift (x'_t = μ_c·x_t + (1−μ_c)·x_{t−1})",
+      "attacks": null,
+      "params_per_neuron": "1",
+      "i5": "BOUNDARY -- referred",
+      "gpu_hours_3_seeds": null,
+      "note": "One parameter per neuron, so O(1) by the §4.6 ruling's stated test, but lag-indexed by its spirit. It is the one SpikeGPT ingredient this project has neither implemented nor ruled on.",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "coding/T",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": true,
+        "screen_keys": [],
+        "outcome": "NOT SCREENED -- gated on a boundary ruling that has not been given. Screening it would price an arm Elliot has not admitted, and §4.6's own precedent is that a boundary decided after seeing scores is rationalisation."
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "still referred; gates no adopted arm"
+    },
+    {
+      "id": "C17",
+      "rank": null,
+      "status": "referred_to_elliot",
+      "name": "Input-gated decay",
+      "attacks": null,
+      "params_per_neuron": "O(1)",
+      "i5": "BOUNDARY -- referred",
+      "gpu_hours_3_seeds": null,
+      "note": "A decay that depends on the neuron's own input makes the recurrence nonlinear in the state, forfeiting the parallel-scannability that §4.6's rationale leans on, even though the parameter count is O(1).",
+      "introduces_learnable_parameter": true,
+      "family_reconstructed": "neuron model",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": true,
+        "screen_keys": [],
+        "outcome": "NOT SCREENED -- gated on a boundary ruling that has not been given"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "still referred; gates no adopted arm. EXP_004 §2.1 notes the adopted neuron's shielded slow pole is exactly linear and therefore parallel-scannable, which is the property this candidate would forfeit -- so the trade is now concrete rather than hypothetical."
+    },
+    {
+      "id": "C18",
+      "rank": null,
+      "status": "referred_to_elliot",
+      "name": "Distillation from the trained GRU",
+      "attacks": null,
+      "params_per_neuron": "0",
+      "i5": "touches no invariant; changes the headline claim",
+      "gpu_hours_3_seeds": null,
+      "note": "Touches no invariant (I1–I5 constrain the architecture, not the training signal) but changes the headline claim from 'trained from scratch' to 'distilled', which is a scope decision. The teacher already exists on disk.",
+      "introduces_learnable_parameter": false,
+      "family_reconstructed": "optimisation",
+      "added_by_completeness_audit": null,
+      "merged_from_pair": false,
+      "reachability": {
+        "applies": false,
+        "screen_keys": [],
+        "outcome": "changes the training signal, not the parameterisation"
+      },
+      "exp_004": {"run": false},
+      "status_after_exp_004": "still referred; gates no adopted arm"
+    }
+  ]
+}
