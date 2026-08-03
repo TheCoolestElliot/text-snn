@@ -49,7 +49,7 @@ import torch  # noqa: E402
 # --------------------------------------------------------------------------
 
 CORPUS_CHOICES = ("enwik8", "text8")
-ARCH_CHOICES = ("snn", "analogue", "gru")
+ARCH_CHOICES = ("snn", "analogue", "twocomp", "gru")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -88,6 +88,14 @@ class Config:
     surrogate: str = "atan"
     surrogate_alpha: float = 2.0
     t_steps: int = 1                # T
+
+    # --- two-compartment neuron (arch="twocomp" only; EXP_004 §2) ---------
+    # Ignored by every other arm. They are Config fields rather than constants in
+    # model.py so that a run's config.json records the neuron it actually trained
+    # -- the initialisation is the thing EXP_004's §7.2 screen selects, and an
+    # unlogged choice there would be an unfalsifiable one.
+    beta_slow: float = 0.95         # slow-pole decay at init; sigmoid-parameterised
+    w_init: float = 0.1             # initial fast/slow mix; 0.0 nests the baseline
 
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
@@ -268,6 +276,8 @@ _HELP: dict[str, str] = {
     "surrogate": "surrogate gradient family",
     "surrogate_alpha": "surrogate width alpha; derivative(0) = alpha/2",
     "t_steps": "micro-steps per character T",
+    "beta_slow": "twocomp only: slow-pole decay at init, in (0, 1)",
+    "w_init": "twocomp only: initial fast/slow mix; 0.0 nests the Phase-2 baseline",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",
