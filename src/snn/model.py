@@ -42,6 +42,7 @@ hidden GEMMs only. The embedding and the output head are fp32 and never spike
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any
 
 import torch
@@ -50,6 +51,7 @@ from torch import Tensor
 
 from snn.neuron import lif_scan
 from snn.surrogate import atan_value
+from snn.twocomp import twocomp_scan
 
 if TYPE_CHECKING:  # avoid a hard import cycle / hard dependency at runtime
     from snn.config import Config
@@ -57,10 +59,12 @@ if TYPE_CHECKING:  # avoid a hard import cycle / hard dependency at runtime
 __all__ = [
     "SpikingCharLM",
     "AnalogueCharLM",
+    "TwoCompartmentCharLM",
     "GRUCharLM",
     "build_model",
     "count_params",
     "spiking_param_count",
+    "twocomp_param_count",
     "gru_param_count",
     "match_gru_width",
     "resolve_gemm_dtype",
@@ -285,7 +289,17 @@ class _CharLMStack(nn.Module):
 
     # -- the neuron, supplied by the subclass -----------------------------
 
-    def _scan(self, cur: Tensor, v0: Tensor) -> tuple[Tensor, Tensor]:
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        """`layer` is the index of the layer being scanned.
+
+        The Phase-2 arms ignore it: their neuron owns no parameters, which is the
+        structural form of I5 (`snn.neuron.lif_scan` takes tensors and scalars
+        only). `TwoCompartmentCharLM` needs it, because its per-channel decay and
+        mix are per layer. Passing the index rather than letting the subclass
+        override `forward` keeps every arm on one forward loop -- the same reason
+        the analogue control is identical to the spiking arm *by construction*
+        rather than by careful bookkeeping.
+        """
         raise NotImplementedError
 
     # -- forward ----------------------------------------------------------
@@ -323,7 +337,7 @@ class _CharLMStack(nn.Module):
 
         for k, linear in enumerate(self.layers):
             cur = self._project(linear, h)  # ONE GEMM, whole sequence
-            emitted, v_final = self._scan(cur, state[k])
+            emitted, v_final = self._scan(cur, state[k], k)
             h = emitted
             new_state.append(v_final)
             rates.append(emitted.detach().mean())
@@ -362,7 +376,7 @@ class SpikingCharLM(_CharLMStack):
     GEMM directly.
     """
 
-    def _scan(self, cur: Tensor, v0: Tensor) -> tuple[Tensor, Tensor]:
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
         return lif_scan(
             cur,
             v0,
@@ -474,9 +488,108 @@ class AnalogueCharLM(_CharLMStack):
     every table.
     """
 
-    def _scan(self, cur: Tensor, v0: Tensor) -> tuple[Tensor, Tensor]:
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
         return analogue_scan(
             cur, v0, self.beta, self.threshold, self.surrogate_alpha, self.reset
+        )
+
+
+# ---------------------------------------------------------------------------
+# Arm 4: the Phase-4 candidate (EXP_004, candidate #1)
+# ---------------------------------------------------------------------------
+
+
+def twocomp_param_count(vocab_size: int, d_model: int, n_layers: int) -> int:
+    """Closed form for TwoCompartmentCharLM.
+
+    The spiking count plus two `[1, d]` per-channel parameters per layer. At
+    V=205, d=512, K=2 this is 735_437 + 2_048 = 737_485, which is **+0.28%** over
+    the Phase-2 baseline. EXP_004 §6.1 names that as a limitation rather than
+    correcting for it: shedding 2_048 parameters means d = 511, which changes the
+    width -- a second variable, introduced to control for a smaller one.
+    """
+    return spiking_param_count(vocab_size, d_model, n_layers) + 2 * n_layers * d_model
+
+
+class TwoCompartmentCharLM(_CharLMStack):
+    """embedding -> [Linear -> two-compartment LIF] x K -> Linear head.
+
+    The Phase-4 candidate ranked #1 in `03_phase3_candidates.md` §6.3, pre-
+    registered in `experiments/logs/EXP_004_two_compartment.md`. The neuron and the
+    reasons for its shape live in `snn.twocomp`; this class is only the wiring.
+
+    Invariants: I1 binary spikes between layers, I2 leaky integration (twice over),
+    I3 hard threshold, I4 surrogate BPTT, **I5 upheld** -- the §4.6 ruling admits
+    multiple learned timescales per neuron (row 2) because they are O(1) parameters
+    per neuron and introduce no cross-neuron mixing. The scan owns `w` and
+    `beta_s`, both `[1, d]`, both diagonal in the channel axis; there is still no
+    `[d, d]` parameter anywhere except `layers.k.weight`, which is applied to the
+    *previous* layer's output before the scan begins.
+
+    Per-layer state is one `[B, 2d]` tensor -- the fast half then the slow half --
+    rather than two `[B, d]` tensors, so that `train.py`, `evaluate.py`'s carried
+    protocol, and `EXP_001`'s horizon probe keep one code path for every arm.
+
+    `beta_s` is stored unconstrained and squashed with a sigmoid **outside the time
+    loop**: one kernel per layer per forward pass, against K*L inside it. The mix
+    `w` is stored directly and is deliberately unconstrained -- nothing requires it
+    to be positive, and forcing it would be an unlogged hyperparameter choice.
+    """
+
+    def __init__(self, *args, beta_slow: float = 0.95, w_init: float = 0.1,
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if not 0.0 < beta_slow < 1.0:
+            raise ValueError(f"beta_slow must lie in (0, 1), got {beta_slow!r}")
+        self.beta_slow_init = float(beta_slow)
+        self.w_init = float(w_init)
+
+        d = self.d_model
+        # logit(beta_slow): the sigmoid's own inverse, so the realised initial
+        # decay is beta_slow to fp32 rather than approximately it.
+        raw = math.log(beta_slow / (1.0 - beta_slow))
+        self.w = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(w_init))) for _ in range(self.n_layers)]
+        )
+        self.beta_s_raw = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(raw))) for _ in range(self.n_layers)]
+        )
+
+    def init_state(
+        self, batch_size: int, device: torch.device | str | None = None
+    ) -> list[Tensor]:
+        """One [B, 2d] fp32 tensor per layer: `[:, :d]` fast, `[:, d:]` slow.
+
+        fp32 unconditionally, for the same reason as every other arm: the
+        threshold comparison must not be quantised (§3.11 C2).
+        """
+        if device is None:
+            device = self.embed.weight.device
+        return [
+            torch.zeros(batch_size, 2 * self.d_model, device=device,
+                        dtype=torch.float32)
+            for _ in range(self.n_layers)
+        ]
+
+    def slow_decay(self, layer: int) -> Tensor:
+        """The realised `beta_s` for one layer, `[1, d]` in (0, 1).
+
+        A method rather than an inline expression so that the reachability screen,
+        the gradient gate and the results scripts all read the same quantity the
+        forward pass uses, instead of each re-deriving it from `beta_s_raw`.
+        """
+        return torch.sigmoid(self.beta_s_raw[layer])
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        return twocomp_scan(
+            cur,
+            v0,
+            self.w[layer],
+            self.slow_decay(layer),   # one kernel per layer, NOT per timestep
+            self.beta,                # beta_f: the baseline's fixed fast pole
+            self.threshold,
+            self.surrogate_alpha,
+            self.fused,
         )
 
 
@@ -624,7 +737,7 @@ def build_model(cfg: "Config") -> nn.Module:
         )
 
     arch = cfg.arch
-    if arch in ("snn", "analogue"):
+    if arch in ("snn", "analogue", "twocomp"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -632,8 +745,7 @@ def build_model(cfg: "Config") -> nn.Module:
                 "only the arctangent surrogate is implemented in Phase 2, got "
                 f"{cfg.surrogate!r}"
             )
-        cls = SpikingCharLM if arch == "snn" else AnalogueCharLM
-        model: nn.Module = cls(
+        common = dict(
             vocab_size=cfg.vocab_size,
             d_model=cfg.d_model,
             n_layers=cfg.n_layers,
@@ -645,6 +757,25 @@ def build_model(cfg: "Config") -> nn.Module:
             fused=cfg.fused,
             t_steps=cfg.t_steps,
         )
+        if arch == "twocomp":
+            if cfg.reset != "hard":
+                # EXP_004 §2 fixes the reset rule: hard on the fast pole, shielded
+                # on the slow one. `cfg.reset` still selects the fast pole's rule
+                # for the baseline arms, and silently ignoring it here would let a
+                # run's config.json describe a neuron that never ran. The reset
+                # ablation is candidate #7 and is a separate kernel.
+                raise NotImplementedError(
+                    "the two-compartment neuron is pre-registered with hard reset "
+                    f"on its fast pole (EXP_004 §2); got reset={cfg.reset!r}. "
+                    "Reset variants are candidate #7 and need their own kernel "
+                    "and their own R10 gate."
+                )
+            model: nn.Module = TwoCompartmentCharLM(
+                beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
+            )
+        else:
+            cls = SpikingCharLM if arch == "snn" else AnalogueCharLM
+            model = cls(**common)
     elif arch == "gru":
         if cfg.dtype != "fp32":
             raise NotImplementedError(
@@ -657,6 +788,8 @@ def build_model(cfg: "Config") -> nn.Module:
             n_layers=cfg.n_layers,
         )
     else:
-        raise ValueError(f"arch must be 'snn', 'analogue' or 'gru', got {arch!r}")
+        raise ValueError(
+            f"arch must be 'snn', 'analogue', 'twocomp' or 'gru', got {arch!r}"
+        )
 
     return model.to(cfg.device)
