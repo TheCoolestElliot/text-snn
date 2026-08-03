@@ -50,6 +50,7 @@ import torch.nn as nn
 from torch import Tensor
 
 from snn.neuron import lif_scan
+from snn.prescan import threshold_gain, token_shift
 from snn.surrogate import atan_value
 from snn.twocomp import twocomp_scan
 
@@ -60,11 +61,14 @@ __all__ = [
     "SpikingCharLM",
     "AnalogueCharLM",
     "TwoCompartmentCharLM",
+    "TokenShiftCharLM",
+    "LearnedThresholdCharLM",
     "GRUCharLM",
     "build_model",
     "count_params",
     "spiking_param_count",
     "twocomp_param_count",
+    "prescan_param_count",
     "gru_param_count",
     "match_gru_width",
     "resolve_gemm_dtype",
@@ -594,6 +598,150 @@ class TwoCompartmentCharLM(_CharLMStack):
 
 
 # ---------------------------------------------------------------------------
+# Arms 5 and 6: the Phase-4 pre-scan arms (EXP_007, EXP_008)
+# ---------------------------------------------------------------------------
+
+
+def prescan_param_count(vocab_size: int, d_model: int, n_layers: int) -> int:
+    """Closed form for both pre-scan arms: the spiking count plus one `[1, d]`
+    per layer. At V=205, d=512, K=2 this is 735_437 + 1_024 = 736_461, **+0.14%**
+    over the Phase-2 baseline -- half the two-compartment arm's +0.28%.
+
+    EXP_007 §2 and EXP_008 §2 both name the parameter increase as a limitation
+    rather than correcting for it, for the reason `twocomp_param_count` records:
+    shedding 1_024 parameters means d = 511, which changes the width -- a second
+    variable introduced to control for a smaller one.
+
+    For the threshold arm the figure is +0.14% in *parameters* and **+0.00% in
+    function-space dimension** (EXP_008 §1.1, Identity 2). Both are reported.
+    """
+    return spiking_param_count(vocab_size, d_model, n_layers) + n_layers * d_model
+
+
+class TokenShiftCharLM(_CharLMStack):
+    """The Phase-2 baseline with a per-neuron 2-tap FIR on its input current.
+
+    Pre-registered in `experiments/logs/EXP_007_token_shift.md`. The transform and
+    the reasons for its shape live in `snn.prescan`; this class is only the
+    wiring, exactly as `TwoCompartmentCharLM` is only the wiring for `snn.twocomp`.
+
+    **I5 status: NOT RULED.** Token-shift is one of the three boundary questions
+    `03_phase3_candidates.md` §6.3 referred to Elliot and that remain referred. It
+    passes §4.6's stated O(1)-parameters-per-neuron test and fails its spirit -- an
+    explicit lag index is not neuron state. This class exists so the question can
+    be *priced*; it does not answer it, and every table it appears in labels it a
+    diagnostic.
+
+    Invariants that are not in question: I1 binary spikes between layers (the scan
+    is the committed one), I2 leaky integration, I3 hard threshold, I4 surrogate
+    BPTT. There is still no `[d, d]` parameter anywhere except `layers.k.weight`;
+    `mu` is `[1, d]` and diagonal in the channel axis.
+
+    `mu` is stored unconstrained and initialised at 1.0, where the mix is the
+    identity: the baseline is nested in the *interior* of the parameter rather
+    than at the boundary of a squashed one (EXP_007 §1.2).
+    """
+
+    def __init__(self, *args, mu_init: float = 1.0, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.mu_init = float(mu_init)
+        d = self.d_model
+        self.mu = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(mu_init)))
+             for _ in range(self.n_layers)]
+        )
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        return lif_scan(
+            token_shift(cur, self.mu[layer]),
+            v0,
+            self.beta,
+            self.threshold,
+            self.surrogate_alpha,
+            self.reset,
+            self.fused,
+        )
+
+
+class LearnedThresholdCharLM(_CharLMStack):
+    """The Phase-2 baseline with a learned per-channel threshold `thr*exp(theta_c)`.
+
+    Pre-registered in `experiments/logs/EXP_008_learned_threshold.md`; the arm
+    `EXP_004` §10.11 item 2 named and nothing ran. Realised as a per-channel gain
+    on the current (`snn.prescan`, Identity 1), so the committed threshold, the
+    committed kernel and its R10 gate are untouched.
+
+    **This arm's function class is identical to the Phase-2 baseline's**
+    (EXP_008 §1.1, Identity 2): the gain folds into the layer's own `nn.Linear`
+    rows, which are already free parameters. The `K*d` parameters it adds are
+    exactly redundant, so any difference it makes is an *optimisation* effect --
+    a different trajectory under AdamW, not a larger reachable set.
+    `fold_into_spiking_state_dict` is what turns that from algebra into something
+    a script can check.
+
+    All five invariants hold and none of them is in question: this is the
+    committed neuron driven by a scaled current.
+    """
+
+    def __init__(self, *args, thr_log_init: float = 0.0, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.thr_log_init = float(thr_log_init)
+        d = self.d_model
+        self.thr_log = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(thr_log_init)))
+             for _ in range(self.n_layers)]
+        )
+
+    def threshold_multiplier(self, layer: int) -> Tensor:
+        """`exp(theta)` -- the factor the firing threshold is multiplied by, [1, d].
+
+        A method rather than an inline expression so that the results script, the
+        tests and any future screen read the same quantity the forward pass uses,
+        instead of each re-deriving it from `thr_log`. Same reason
+        `TwoCompartmentCharLM.slow_decay` is a method.
+        """
+        return torch.exp(self.thr_log[layer])
+
+    def input_gain(self, layer: int) -> Tensor:
+        """`exp(-theta)` -- the equivalent gain on the current, [1, d]."""
+        return torch.exp(-self.thr_log[layer])
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        return lif_scan(
+            threshold_gain(cur, self.thr_log[layer]),
+            v0,
+            self.beta,
+            self.threshold,
+            self.surrogate_alpha,
+            self.reset,
+            self.fused,
+        )
+
+    @torch.no_grad()
+    def fold_into_spiking_state_dict(self) -> dict[str, Tensor]:
+        """This model's weights, rewritten as a plain `SpikingCharLM` state dict.
+
+        EXP_008 §1.1's Identity 2, executed: `g_c*(W_c·h + b_c)` is the model with
+        row `c` of `W` and entry `c` of `b` scaled by `g_c`, so the gain is
+        absorbed and `thr_log` disappears. The result has the baseline's parameter
+        count exactly and loads into `arch="snn"`.
+
+        It is NOT bit-exact and is not claimed to be: `g*(W·h + b)` and
+        `(g*W)·h + g*b` round differently because the GEMM accumulates in a
+        different order. EXP_008's W1 fixes the tolerance at 1e-3 bpc -- `EXP_001`'s
+        F1 tolerance, this project's standing bar for one number reached by two
+        code paths -- and requires the measured residual to be reported.
+        """
+        sd = {k: v.detach().clone() for k, v in self.state_dict().items()}
+        for k in range(self.n_layers):
+            g = self.input_gain(k).flatten()          # [d]
+            sd[f"layers.{k}.weight"] = sd[f"layers.{k}.weight"] * g.unsqueeze(1)
+            sd[f"layers.{k}.bias"] = sd[f"layers.{k}.bias"] * g
+            del sd[f"thr_log.{k}"]
+        return sd
+
+
+# ---------------------------------------------------------------------------
 # Arm 3: the external anchor (deliberately violates I5)
 # ---------------------------------------------------------------------------
 
@@ -737,7 +885,7 @@ def build_model(cfg: "Config") -> nn.Module:
         )
 
     arch = cfg.arch
-    if arch in ("snn", "analogue", "twocomp"):
+    if arch in ("snn", "analogue", "twocomp", "tokenshift", "threshold"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -773,6 +921,10 @@ def build_model(cfg: "Config") -> nn.Module:
             model: nn.Module = TwoCompartmentCharLM(
                 beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
             )
+        elif arch == "tokenshift":
+            model = TokenShiftCharLM(mu_init=cfg.mu_init, **common)
+        elif arch == "threshold":
+            model = LearnedThresholdCharLM(thr_log_init=cfg.thr_log_init, **common)
         else:
             cls = SpikingCharLM if arch == "snn" else AnalogueCharLM
             model = cls(**common)
@@ -789,7 +941,8 @@ def build_model(cfg: "Config") -> nn.Module:
         )
     else:
         raise ValueError(
-            f"arch must be 'snn', 'analogue', 'twocomp' or 'gru', got {arch!r}"
+            "arch must be 'snn', 'analogue', 'twocomp', 'tokenshift', "
+            f"'threshold' or 'gru', got {arch!r}"
         )
 
     return model.to(cfg.device)

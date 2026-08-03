@@ -103,6 +103,26 @@ ARMS: dict[str, str] = {
     "twocomp_s4": "twocomp",
     "twocomp_s5": "twocomp",
     "twocomp_s6": "twocomp",
+    # EXP_007's token-shift control, EXP_008's learned-threshold arm and
+    # EXP_009's distilled students. Registry entries and nothing else, for the
+    # third time and for the same reason `EXP_005`'s were: the statistic, the
+    # k-sweep and the F1 tolerance are untouched, so these horizons are
+    # comparable with every row above. Each experiment runs this file with an
+    # explicit `--out` so no committed artifact is overwritten.
+    #
+    # The arm names matter. `by_arm` aggregates on this value, so an unregistered
+    # run falls into a shared "other" bucket -- and two different arms probed in
+    # one invocation would be averaged together into a number that describes
+    # neither.
+    "tokenshift_s0": "tokenshift",
+    "tokenshift_s1": "tokenshift",
+    "tokenshift_s2": "tokenshift",
+    "threshold_s0": "threshold",
+    "threshold_s1": "threshold",
+    "threshold_s2": "threshold",
+    "twocomp_distill_s0": "twocomp_distill",
+    "twocomp_distill_s1": "twocomp_distill",
+    "twocomp_distill_s2": "twocomp_distill",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
