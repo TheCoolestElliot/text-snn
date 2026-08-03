@@ -267,7 +267,75 @@ measurement of it.
 - [ ] Existing test suite green — the baseline path unregressed (J9)
 - [ ] No other process importing `snn` while the mutation campaign runs (J5)
 
-**Init selected by the screen:** _(to be filled from the screen's output, before the first training run)_
+### 9.1 Entry conditions, resolved — 2026-08-03, before the first training run
+
+| # | Condition | Outcome |
+|---|---|---|
+| J3 | kernel semantics vs plain torch | **pass** — `v_pre` bit-identical to a twice-rounded reference on 32 768 of 32 768 elements |
+| J1 | R10 gate, all legs | **pass** — 25 tests; forward spikes bit-identical, membrane exact, all four gradients within rtol 1e-4 / atol 1e-6 against an eager reference, an independent transcription, and an fp64 reference; gradcheck on the slow pole |
+| J2 | mutation campaign | **47 / 47 caught**, source tree restored clean — but **not on the first attempt**; see §9.2 |
+| J4 | §7.2 reachability screen | **run**; see below |
+| — | kernels per timestep | **1.027** at B=128, L=256, d=512, against the 1.05 bar |
+| J9 | existing suite unregressed | **242 passed** (217 before, 25 new) |
+| J5 | no other process importing `snn` during the campaign | held — the campaign's own guard, and no training was launched until it finished |
+
+**Init selected by the screen: `w_init = 0.1`, `beta_slow = 0.95` — the
+pre-registered fallback.** `docs/reports/data/exp_004_gradient_reachability.json`.
+
+**T0 held, exactly as §2.2 derived it.** At the proposed `w = 0`, the slow decay's
+gradient is **identically zero** — `|dL/d raw_beta_s|` RMS is `0.000e+00` in both
+layers, on both the fused and the eager path — while the mix itself is not merely
+reachable but carries a gradient **5.0× and 7.1× the layer weights'**. The
+attractive initialisation, the one that nests the Phase-2 baseline exactly, would
+have trained the arm with a frozen slow pole in every seed and said nothing about
+it in any log.
+
+| init | `\|dL/dw\|` vs `\|dL/dW\|` | `\|dL/dbeta_s\|` vs `\|dL/dW\|` | verdict |
+|---|---:|---:|---|
+| `w = 0.0` (proposed, exact nesting) | ×5.02 / ×7.14 | **×0.000 — exactly zero** | **FAIL** |
+| `w = 0.1` (pre-registered fallback) | ×3.21 / ×4.80 | ×0.259 / ×0.401 | **PASS** |
+
+This is the first time the §7.2 screen has been run. It was proposed in Phase 3
+because §6.4 found the rotational membrane's proposed initialisation to be an
+exact saddle *on paper*; it has now caught the same class of defect on a different
+candidate, before any GPU time was spent, and the fallback it selected was named
+in advance rather than chosen after seeing which one worked.
+
+**Recorded because it is not the candidate's doing:** at initialisation the firing
+rate is 0.091 in layer 0 and **0.005 in layer 1** — layer 1 is essentially silent
+at step 0. That is the §5 initialisation pathology the Phase-2 baseline already
+has (`audit_07_init_pathology.json`) and which `EXP_003` R4 found worsens with
+depth, not something introduced here. It is noted now so that it cannot later be
+mistaken for a two-compartment effect, and it is a live suspect if the arm
+underperforms — candidate #8, variance-scaled initialisation, is the follow-up.
+
+### 9.2 The mutation campaign did not pass on its first run
+
+Reported here rather than absorbed, because a gate that needed fixing is exactly
+what the entry conditions exist to surface.
+
+The first extended campaign came back **46 / 47**, with **T05 — "let NVRTC
+contract the MIX into an FMA" — escaped.** `M18`, the identical mutation applied
+to the Phase-2 LIF's own membrane, has always been caught, so the harness was
+working and this candidate's gate had a specific hole.
+
+The mechanism, measured rather than guessed: the contracted mix moves `v_pre` on
+**5 866 of 32 768 elements** by up to **4.8e-07**, and flips **zero** spikes. The
+mix appears nowhere else — the scan does not return `v_pre`, and the state it does
+return, `(vf_after_reset, vs)`, does not depend on the mix at all. So the only
+assertion that could have seen the drift was the spike pattern, which changes only
+where the membrane lands within an ulp of the threshold. Whether any element lands
+there is luck. It came up tails.
+
+The fix asserts the contract where the quantity lives: one step of the real
+forward kernel against a plain-torch statement of the same three roundings.
+Re-run: **47 / 47**.
+
+The lesson generalises past this kernel, and is worth carrying into every later
+candidate: **a numerical contract is only guarded where the quantity it constrains
+is actually observed.** An intermediate that no assertion reads is unguarded no
+matter how many tests surround it — and the two-compartment neuron introduced
+exactly one such intermediate that the single-compartment baseline never had.
 
 ---
 
