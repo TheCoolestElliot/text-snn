@@ -589,3 +589,31 @@ qualifications that belong in the adoption rather than beside it:
    horizon-buying arms have been flagged by it; it has never been uninformative.
 6. **`EXP_002`'s systems numbers are forward-only.** Quote 1.32× and 1.61 GiB for a
    trained two-state neuron, not 1.08× and "identical memory".
+
+---
+
+## 11. Addendum, 2026-08-03 — what later experiments did to §10.11
+
+Appended rather than backdated, and the text above is left exactly as it was
+written. `03_phase3_candidates.md` §7.2's precedent: a correction goes in as an
+addendum, with the original left standing, so that what was believed *before* the
+evidence stays legible.
+
+| §10.11 item | Status | Source |
+|---|---|---|
+| 1. two-compartment is the backbone at 2.1174 | **Holds, number updated to 2.11869** (n=7, was n=3) | `EXP_005` §9 |
+| 2. learned per-channel threshold is the cheapest unclaimed win | **Run as `EXP_008`**, and §10.6's framing is sharpened: the arm is a *reparameterisation* of the baseline, so its 1 024 parameters add no functions and neither of §10.6's "two live explanations" is capacity | `EXP_008` §1.1 |
+| 3. within-reach is the largest piece, at 52 % | **Holds; 51.8 % at n=7.** Attacked for the first time by `EXP_007` | `EXP_005` §9.6 |
+| 4. ~3 % of channels carry the horizon, so capacity is "far from saturated" | **First half established causally. Second half NOT established, and `EXP_006` argues against it**: `beta_s` started at 0.95 on all 512 channels and training pulled 97 % down, so the tail's size is a learned outcome, not a ceiling | `EXP_006` §9.1–9.2, §9.6 |
+| 5. §6.2 promoted to a ranking input | Holds, and `EXP_005` found the bar itself is built on the wrong scale. **The redefinition is referred to Elliot and not applied** | `EXP_005` §9.4 |
+| 6. systems numbers are forward-only | Holds | — |
+
+**Item 4 is the one that changed direction**, and it is the item the phrase "far
+from saturated" was doing the most work in. Do not rank "widen the slow tail" on
+§10.5 or on `EXP_006`'s necessity result; the experiment that would justify it is
+the frozen-`beta_s` ladder named in `EXP_006` §9.6, at ~1.3 GPU-hours.
+
+**§10.6's own algebra is unchanged and is now load-bearing in a second place.**
+`EXP_006` §1.1 used it to choose `beta_s` over `w` as the thing to ablate — an
+ablation on `w` would have moved the timescale and the learned threshold together
+— and `EXP_008` §1.1 uses it as the starting point for Identity 1.
