@@ -341,4 +341,251 @@ exactly one such intermediate that the single-compartment baseline never had.
 
 ## 10. Results
 
-_(appended after the run; the sections above are not edited)_
+**Run 2026-08-03.** Three seeds, 20 000 steps each, run **sequentially** so that no
+arm measures contention (the phase-3 report §8's reason for not quoting wall-clock
+on the depth ladder). Raw JSON: `docs/reports/data/exp_004_twocomp_results.json`,
+`docs/reports/data/exp_004_memory_horizon.json`.
+
+### 10.1 The headline
+
+| Arm | n | Test bpc (fresh) | Test bpc (carried) | **Horizon** |
+|---|---:|---:|---:|---:|
+| SNN baseline (β=0.5) | 5 | 2.2697 ± 0.0045 | 2.2531 ± 0.0046 | **7** *(7, 7, 7, 7, 7)* |
+| **Two-compartment** | **3** | **2.1443 ± 0.0045** | **2.1174 ± 0.0049** | **45** *(38, 47, 45)* |
+| GRU anchor *(violates I5)* | 3 | 1.8064 | 1.7674 | **57–60** |
+
+Per-seed carried: **2.1216, 2.1121, 2.1184**.
+
+**−0.1357 bpc against the baseline, 29.4 σ.** It is the best result this project
+has produced under I1–I5 by a wide margin — the previous best was `EXP_003`'s
+K = 4 at 2.2348 carried, single-seed and never adopted. It closes **29 %** of the
+0.4633 bpc I5 gap, and the horizon goes from **7 characters to 45** against the
+anchor's 57–60.
+
+### 10.2 The predictions, resolved as written
+
+| # | Prediction | Measured | Verdict |
+|---|---|---|---|
+| **T0** | `w = 0` is an exact saddle for `beta_s` | `\|dL/d raw_beta_s\|` = 0.000e+00, both layers, both paths | **held** (§9.1) |
+| **T1** | median horizon ≥ 14 | **45** (38 / 47 / 45) | **held** |
+| **T2** | carried bpc does **not** improve by > 2σ | improved by **0.1357** = 29.4 σ | **FAILED — falsified** |
+| **T3** | worse at ≥ 1 short context beyond its own bar | worse at **5** of them (c = 3…7) | **held** |
+| **T4** | `\|w\|` ≥ 2× its init in both layers | **4.9×** (layer 0), **3.6×** (layer 1) | **held** |
+| **T5** | any improvement < 0.2279 bpc | 0.1357 | **held** |
+
+**T2 was stated in the direction that hurts the candidate, and it was wrong.** §3
+said a falsified T2 is a real result and not a vindication, and that is how it is
+recorded. The mechanical argument in its favour — that a reset-shielded slow pole
+has a clean `beta_s` adjoint with no reset factor, so gradient can reach back over
+tens of steps — turned out to be the one that mattered.
+
+**Decision cell (§4): T1 holds ∧ T2 falsified ⇒ ADOPT**, subject to publishing the
+§6.2 curve and naming the trade. §10.4 does that, and §10.3 is why the adoption
+must be worded carefully.
+
+### 10.3 Where the gain actually came from — the part that changes the plan
+
+Decomposing the gain by context length, on the same basis §5 of the phase-3 report
+used (fresh asymptote; negative = the arm is better):
+
+| Component | Gain | Share of the total gain |
+|---|---:|---:|
+| **At zero context** (c = 0) | **+0.0508** | **+40.6 %** |
+| **Within the baseline's 7-character reach** | **−0.0598** | **−47.7 %** |
+| **Beyond the horizon** | **+0.1343** | **+107.2 %** |
+| Total | **+0.1254** | 100 % |
+
+**The arm did not simply get better. It got substantially better beyond the
+horizon, meaningfully better at zero context, and genuinely worse inside the seven
+characters it already reached** — and the three nearly cancel to something that,
+quoted as a single mean, would look like a uniform improvement.
+
+Against the anchor, the *composition* of the remaining gap has changed more than
+its size:
+
+| Component | baseline vs GRU | **twocomp vs GRU** | change |
+|---|---:|---:|---|
+| At zero context | 0.1193 (26 %) | **0.0685** (20 %) | −43 % |
+| Within the 7-char reach | 0.1161 (25 %) | **0.1759** (52 %) | **+52 % — worse** |
+| Beyond the horizon | 0.2279 (49 %) | **0.0936** (28 %) | **−59 %** |
+| **Total** | **0.4633** | **0.3380** | −27 % |
+
+**The candidate recovered 59 % of the beyond-horizon component — the thing it was
+ranked to attack — and made the within-reach component 52 % worse.** §5's
+denominator was the right one to have insisted on: quoted against the whole 0.4633
+this looks like a 27 % win, and quoted against the 0.2279 it was actually aimed at
+it is a 59 % win with a named cost. T5 held, but only in the sense that the ceiling
+was not exceeded; a majority of what was available on the targeted component was
+in fact captured.
+
+### 10.4 The §6.2 criterion, applied in full
+
+The arm is worse than the baseline at **5 of 128 context lengths**, and they are
+**contiguous — c = 3, 4, 5, 6, 7** — which is exactly the region inside the
+baseline's own reach.
+
+| c | Δ bpc vs baseline | that context's 2σ bar | multiple of the bar |
+|---:|---:|---:|---:|
+| 3 | **+0.0511** | 0.0179 | 2.9× |
+| **4** | **+0.0560** | 0.0086 | **6.5×** |
+| 5 | **+0.0392** | 0.0052 | 7.6× |
+| 6 | **+0.0225** | 0.0060 | 3.8× |
+| 7 | **+0.0090** | 0.0027 | 3.4× |
+
+**The trade, named as §6.2 requires:** *this arm buys 0.134 bpc beyond seven
+characters of context by giving up 0.060 bpc inside them, concentrated entirely at
+three to seven characters, worst at c = 4 where it is 6.5× that context's own noise
+bar.* It may not be reported as a uniform gain.
+
+| Arm | contexts worse | worst short-context regression |
+|---|---:|---:|
+| GRU anchor | 0 / 128 | −0.0248 |
+| **Two-compartment** | **5 / 128** | **+0.0560 at c = 4** |
+| Depth K = 4 | 5 / 128 | +0.0764 at c = 3 |
+| SNN β=0.9 | 126 / 128 | +0.2498 at c = 4 |
+
+The signature is the **same shape as depth K = 4's and milder in magnitude**, and
+nothing like the β arms'. Per §4's rider, the criterion has now flagged **three of
+the three** arms this project has produced that lengthen the horizon, and has never
+once been uninformative: **it is promoted from a reporting requirement to a ranking
+input for Phase 5.**
+
+### 10.5 What the network did with the freedom, which was not what was expected
+
+`beta_s` was initialised at 0.95 for every channel. It did not stay there, and it
+did not move uniformly — the population went **bimodal**:
+
+| | layer 0 | layer 1 |
+|---|---:|---:|
+| `beta_s` mean | 0.578 | 0.592 |
+| `beta_s` sd | 0.117 | 0.132 |
+| `beta_s` max | 0.986 | 0.973 |
+| channels with `beta_s` > 0.9 | **2.8 %** (13–16 of 512) | **2.9 %** (12–19 of 512) |
+| their mean time constant | **26 chars** | **18 chars** |
+| `\|w\|` mean | 0.49 | 0.35 |
+
+**About 3 % of channels kept a long time constant; the other 97 % pulled their
+"slow" pole down to ~0.5–0.6 — essentially a second fast compartment.** All three
+seeds agree on this to within a percent.
+
+If those ~15 channels per layer are what carries the horizon from 7 to 45, then the
+capacity this project is devoting to long memory is **3 % of its width**, and is
+nowhere near saturated. That is the single most actionable thing in this
+experiment.
+
+**It is not established here.** The association is correlational: this experiment
+did not ablate the slow tail, and `|w|` on the tail channels is not meaningfully
+larger than on the rest (0.99× in layer 0, 1.16× in layer 1), which is *not* what
+one would naively expect if those channels were carrying the load. The causal
+question — zero the tail's mix and re-measure the horizon — is a Phase-5 experiment
+and must be pre-registered like anything else.
+
+### 10.6 Forty per cent of the gain is provably not a memory effect
+
+At zero context both compartments start from zero, so at the first character
+
+```
+v_0 = vf_0 + w_c * vs_0 = cur_0 + w_c * cur_0 = cur_0 * (1 + w_c)
+```
+
+and the neuron fires iff `cur_0 >= thr / (1 + w_c)`. **At c = 0 the
+two-compartment neuron is exactly the Phase-2 baseline with a learned per-channel
+threshold.** That is algebra, not inference, and it explains the +0.0508 at zero
+context — 40.6 % of the total gain — with no reference to memory at all.
+
+Measured: the learned effective threshold is **thr × 0.69** in layer 0 and
+**thr × 0.79** in layer 1 (10th–90th percentile 0.56–0.83 and 0.57–1.05). The
+network lowered its firing threshold, per channel, by about a quarter.
+
+The consequence for Phase 5 is concrete and cheap: **a learned per-channel
+threshold is one parameter, no second state variable, no new kernel, and no
+gradient gate**, and it is the natural candidate to capture that 40 % on its own.
+It is close to candidate **#6** (adaptive threshold), which §6.3 warned "may buy
+rate homeostasis rather than horizon — measure, do not assume". This result says
+the static half of that is worth having regardless.
+
+The **+0.28 % parameter increase** (§6.1) is the other live explanation for a
+zero-context gain, and this experiment cannot separate the two: 2 048 of the extra
+parameters and the per-channel threshold are the same 2 048 parameters. A
+one-parameter threshold arm would separate them, which is a further reason to run
+it.
+
+### 10.7 σ appears to transfer, on a weak estimate
+
+§6.4 flagged that every 2σ verdict here assumes a σ measured on a *one-state*
+neuron transfers to a two-state one, and §4 promotes candidate #14 to blocking on
+adoption. The three seeds give a first, weak reading:
+
+| | fresh sd | carried sd |
+|---|---:|---:|
+| one-state baseline, n = 5 | 0.00450 | 0.00461 |
+| **two-compartment, n = 3** | **0.00445** | **0.00487** |
+
+Essentially unchanged. **This does not close candidate #14** — n = 3 estimates a
+standard deviation to about ±40 %, and the pre-registration said in advance it
+would not substitute. It does mean the verdicts above are not obviously resting on
+a broken bar.
+
+### 10.8 Systems: the realised cost, against what `EXP_002` priced
+
+| | baseline | two-compartment | ratio |
+|---|---:|---:|---:|
+| Parameters | 735 437 | 737 485 | +0.28 % |
+| Kernels per timestep (forward) | 1.016 | **1.027** | 1.01× |
+| Wall-clock, 20 000 steps | 398.9 s | **525.3 s** (537 / 529 / 510) | **1.32×** |
+| Peak VRAM | 0.609 GiB | **0.980 GiB** | 1.61× |
+
+`EXP_002` priced N2's *forward* at 1.08× and said plainly (§5.1) that "a prototype
+kernel is not a trained neuron". The realised end-to-end training step is **1.32×**,
+and the gap is the backward: the deferred reduction that keeps the one-kernel floor
+costs three `[B, L, d]` stacks per layer instead of one, which is also the 1.61×
+memory. **`EXP_002`'s conclusion survives — the systems column still does not
+discriminate** (2 minutes per run, 0.37 GiB on a 7.96 GiB card) — but its forward-only
+1.08× should not be quoted as the cost of a trained two-state neuron. 1.32× should.
+
+### 10.9 Reproduction checks
+
+Everything this experiment re-measured came back unchanged:
+
+* **F1 passed on 11 of 11 checkpoints**, residuals 4.3e-10 to 1.3e-08 bpc. This is
+  the check that caught a contaminated run in Phase 3.
+* **All five baseline seeds returned horizon 7 again**, and the GRU 57 / 58 / 60 —
+  identical to `EXP_001`'s committed values, from a re-run of the same script.
+* The five committed Phase-2 test scores reproduce the report's quoted 2.2697 /
+  2.2531 means; the results script aborts if they do not.
+* No mutation campaign ran while any training process was alive (J5).
+
+### 10.10 Status
+
+**CLOSED. T1, T3, T4, T5 held; T2 was falsified; T0 held and changed the
+initialisation before any GPU time was spent.**
+
+**Verdict: ADOPT**, with the §10.4 trade named and published, and with two
+qualifications that belong in the adoption rather than beside it:
+
+1. **It is not a uniform improvement.** 40.6 % of the gain is at zero context and
+   has an exact one-parameter explanation (§10.6); 47.7 % of the gain's magnitude
+   is given back inside the baseline's own reach (§10.3).
+2. **Candidate #14 is now blocking** for any further 2σ verdict in this family,
+   though §10.7 suggests it will pass.
+
+### 10.11 What Phase 5 inherits
+
+1. **The two-compartment neuron is the new backbone**, at 2.1174 carried. Candidates
+   **#5** (learned per-channel decay) and **#6** (adaptive threshold) are re-ranked
+   against *it*, not against 2.2531 — and #5 is now partly subsumed, since this arm
+   already learns a per-channel decay on one of its two poles.
+2. **A learned per-channel threshold is the cheapest unclaimed win on the board.**
+   §10.6 shows it accounts for 40 % of this arm's gain, at one parameter and no new
+   kernel. It should be run against the baseline *and* against this arm, because in
+   this arm it is already present and would not add twice.
+3. **The within-reach component is now the largest single piece of the remaining gap
+   at 52 %**, up from 25 %. The ranking that put horizon first was right for Phase 4
+   and is wrong for Phase 5: **short-range fidelity is where the gap now lives.**
+4. **~3 % of channels appear to carry the horizon** (§10.5), which if true means the
+   long-memory capacity is far from saturated. The ablation that would establish it
+   is cheap and is the highest-information single run available.
+5. **The §6.2 criterion is promoted to a ranking input.** Three of three
+   horizon-buying arms have been flagged by it; it has never been uninformative.
+6. **`EXP_002`'s systems numbers are forward-only.** Quote 1.32× and 1.61 GiB for a
+   trained two-state neuron, not 1.08× and "identical memory".
