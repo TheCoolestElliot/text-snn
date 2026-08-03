@@ -263,7 +263,11 @@ def learned_parameters(run: str, key: str) -> dict:
     k = 0
     while f"{key}.{k}" in sd:
         raw = sd[f"{key}.{k}"].flatten().float()
+        # `mu` is used directly by the forward; `thr_log` is not -- the equations
+        # contain `exp(theta)`, and reporting the raw would be reporting a number
+        # no equation in the project mentions. The label follows the value.
         realised = raw if key == "mu" else torch.exp(raw)
+        realised_name = "mu" if key == "mu" else "exp(theta) = thr multiplier"
         q = torch.quantile(realised, torch.tensor([0.1, 0.5, 0.9]))
         layers.append({
             "layer": k,
@@ -275,7 +279,8 @@ def learned_parameters(run: str, key: str) -> dict:
             "abs_movement_from_one": float((realised - 1.0).abs().mean()),
         })
         k += 1
-    return {"run": run, "parameter": key, "step": ck.get("step"), "layers": layers}
+    return {"run": run, "parameter": key, "reported_quantity": realised_name,
+            "step": ck.get("step"), "layers": layers}
 
 
 # ---------------------------------------------------------------------------
@@ -643,7 +648,8 @@ def main(argv: list[str] | None = None) -> int:
                       f"   ({f['arm_param_count']:,} -> {f['folded_param_count']:,} params)")
         for ly in c.get("learned", []):
             for row in ly["layers"]:
-                print(f"  {ly['run']} layer {row['layer']}: {ly['parameter']} "
+                print(f"  {ly['run']} layer {row['layer']}: "
+                      f"{ly['reported_quantity']} "
                       f"mean {row['mean']:.4f} +/- {row['sd']:.4f}  "
                       f"p10-p90 {row['p10']:.3f}-{row['p90']:.3f}")
         print("  " + "-" * (w - 2))
