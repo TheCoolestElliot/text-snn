@@ -319,7 +319,7 @@ def main(argv: list[str] | None = None) -> int:
         "n": len(carried),
         "mean": statistics.fmean(carried),
         # Sample sd (n-1). EXP_011 C2 bars this at 0.005; the driver reports it
-        # and does not judge it -- 010's resolver applies the bars.
+        # and does not judge it -- `011_compose_results.py` applies the bars.
         "sd": statistics.stdev(carried) if len(carried) > 1 else None,
     }
 
