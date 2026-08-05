@@ -623,7 +623,7 @@ def main(argv: list[str] | None = None) -> int:
             "arch": cfg.arch,
             "folds_to": target,
             "threshold_multiplier_exp_theta": [
-                float(arm.threshold_multiplier(k).mean())
+                float(arm.threshold_multiplier(k).detach().mean())
                 for k in range(cfg.n_layers)],
             "identity": identity_on_the_current(arm, base, h, 0),
             "cascade": spikes_and_logits(arm, base, idx),

@@ -1,0 +1,82 @@
+{
+  "experiment": "EXP_012_fold_gap",
+  "status": "POST-HOC -- hypothesis formed after reading leg 3's ladder",
+  "question": "why is the LIF's near-threshold mass concentrated rather than smoothly distributed?",
+  "runs": [
+    {
+      "run": "threshold_s0",
+      "neuron": "lif",
+      "half_width": 1e-06,
+      "n_sites": 16777216,
+      "n_near_threshold": 10962,
+      "post_spike_fraction_overall": 0.34359991550445557,
+      "post_spike_fraction_near": 0.8981025815010071,
+      "n_distinct_u_values_near": 20,
+      "n_channels_carrying_them": 60,
+      "max_per_channel": 1596,
+      "d_model": 512,
+      "repeats_per_distinct_value": 548.1,
+      "post_spike_enrichment": 2.613803266460236
+    },
+    {
+      "run": "threshold_s1",
+      "neuron": "lif",
+      "half_width": 1e-06,
+      "n_sites": 16777216,
+      "n_near_threshold": 12436,
+      "post_spike_fraction_overall": 0.35863202810287476,
+      "post_spike_fraction_near": 0.9075265526771545,
+      "n_distinct_u_values_near": 23,
+      "n_channels_carrying_them": 68,
+      "max_per_channel": 3603,
+      "d_model": 512,
+      "repeats_per_distinct_value": 540.695652173913,
+      "post_spike_enrichment": 2.5305228801729545
+    },
+    {
+      "run": "threshold_s2",
+      "neuron": "lif",
+      "half_width": 1e-06,
+      "n_sites": 16777216,
+      "n_near_threshold": 9213,
+      "post_spike_fraction_overall": 0.3515893816947937,
+      "post_spike_fraction_near": 0.8696407079696655,
+      "n_distinct_u_values_near": 23,
+      "n_channels_carrying_them": 69,
+      "max_per_channel": 1286,
+      "d_model": 512,
+      "repeats_per_distinct_value": 400.5652173913044,
+      "post_spike_enrichment": 2.4734555514096264
+    },
+    {
+      "run": "compose_s1",
+      "neuron": "twocomp",
+      "half_width": 1e-06,
+      "n_sites": 16777216,
+      "n_near_threshold": 5,
+      "post_spike_fraction_overall": 0.3797200322151184,
+      "post_spike_fraction_near": 0.800000011920929,
+      "n_distinct_u_values_near": 4,
+      "n_channels_carrying_them": 5,
+      "max_per_channel": 1,
+      "d_model": 512,
+      "repeats_per_distinct_value": 1.25,
+      "post_spike_enrichment": 2.1068154009523368
+    },
+    {
+      "run": "compose_s2",
+      "neuron": "twocomp",
+      "half_width": 1e-06,
+      "n_sites": 16777216,
+      "n_near_threshold": 2,
+      "post_spike_fraction_overall": 0.3758088946342468,
+      "post_spike_fraction_near": 0.0,
+      "n_distinct_u_values_near": 2,
+      "n_channels_carrying_them": 2,
+      "max_per_channel": 1,
+      "d_model": 512,
+      "repeats_per_distinct_value": 1.0,
+      "post_spike_enrichment": 0.0
+    }
+  ]
+}
