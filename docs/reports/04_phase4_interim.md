@@ -1,6 +1,6 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 3, 2026-08-04.** Interim, not final: Phase 4 is open and this document
+**Revision 4, 2026-08-05.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
@@ -9,6 +9,30 @@ logs cannot be reviewed as a phase.
 Elliot's and remain open, untouched.** The eighth was a scheduling question — *does
 the composition run inside Phase 4?* — and it was answered **inside Phase 4**, on
 Elliot's instruction. §8 marks it resolved and **no other row is edited.**
+
+**What rev 4 does.** It adds §11: `EXP_012`, which chases the one thing §10.5
+named as unexplained and **not** offered as evidence for decision #6 — why the
+composed arm's fold-in residual is ~1000× tighter than `EXP_008`'s, given the
+same identity, the same six-line fold and the same metric. The answer is that
+**the baseline LIF's decision variable is degenerate near its threshold**: ~11 000
+sites sit within 1e-6 of it and they are **twenty distinct values replayed ~548
+times each**, because layer 0 sees one of 205 embedding rows and the hard reset
+zeroes the membrane exactly. The two-compartment neuron's unreset slow pole
+destroys that replay — 5 sites, 4 values — and flips **1 342–5 339× fewer**
+spikes under an identical perturbation.
+
+**Three of `EXP_012`'s six predictions failed, and two of the failures are at the
+resolution floor.** Its own decision rule, applied verbatim, returns a verdict
+(*"an operating-point effect, not a neuron effect"*) that §11.4 explains must not
+be read as the finding — because the leg that carried the failure compares **0
+flips against 1**, which that experiment's limitations section had declared
+unresolvable *before* it ran. The rule is **reported as it fired and is not
+repaired.** In consequence **§6.5's noise-floor sentence stands exactly as
+written** (`EXP_012` §4's trigger did not fire), and the scope qualifier its
+evidence supports is **referred, not applied**.
+
+**Rev 4 changes no earlier number, verdict or threshold**, adopts nothing, and
+moves none of §8's seven open rows.
 
 **What rev 3 does.** It adds §10: `EXP_011`, the composition of the adopted
 two-compartment neuron with `EXP_008`'s learned per-channel threshold. **The arms
@@ -25,7 +49,7 @@ die of `EXP_009`'s bug**, which decision #7 would have fixed.
 **What rev 2 did.** It read `EXP_007`, `EXP_008` and `EXP_009` *together* rather
 than one after another (§6.7), stated a verdict for every Phase-4 arm against its
 own pre-registered rule (§6.8), re-ran every gate in §9 from a clean tree, and
-corrected five numbers rev 1 got wrong (§11). **No verdict, threshold or decision
+corrected five numbers rev 1 got wrong (§12). **No verdict, threshold or decision
 changed.** Two of the corrections make an arm look worse, one makes the adopted
 arm look slightly better, and all five restore a committed measurement rather than
 redefining anything — the redefinitions on the table are still in §8, still
@@ -41,10 +65,10 @@ unapplied.
 
 | | |
 |---|---|
-| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10** |
-| Ranked candidates closed | 5 of 14 (#1, #14, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011` closes no ranked candidate** — it composes two arms already counted here |
+| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10**; **`EXP_012` in §11** |
+| Ranked candidates closed | 5 of 14 (#1, #14, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011` and `EXP_012` close no ranked candidate** — the first composes two arms already counted here, the second is a mechanism study and trains nothing |
 | Arms adopted | **1** — the two-compartment neuron (`EXP_004`). Two more are **recommended and not taken**: the threshold arm (§8 #5) and the composed arm (§10) |
-| GPU-hours spent | ~4.4 of ~30 |
+| GPU-hours spent | ~4.6 of ~30 (`EXP_012` cost ~0.2 and trained nothing) |
 | Unexplained divergences | **2** — `twocomp_distill_s1` (§6.4) and `compose_s0` (§10.4), chased to **different** causes |
 | Phase-3 §9 sign-off | **still unticked**; Phase 4 was opened without it on instruction |
 
@@ -271,7 +295,7 @@ is the mean over the seeds that were *scored*. Rev 1 had two entries that were n
 the adopted arm at 1.35× was `twocomp_s0` alone against `EXP_004`'s committed
 three-seed **1.32×** (all seven seeds give 1.30×), and the distilled arm's 1.58×
 was measured against the two-compartment arm — correct in `EXP_009` §9.1, wrong in
-a column whose reference row is the baseline, where it is **2.13×**. §11 records
+a column whose reference row is the baseline, where it is **2.13×**. §12 records
 both.
 
 Both new arms clear the adoption bar — token-shift by **4.2×** and the threshold
@@ -387,6 +411,23 @@ rewritten into an equivalent form — folding, quantisation, weight normalisatio
 per-context bars at c ≥ 16 (≈ 0.0003) are an order of magnitude *below* it. Any
 future claim that rests on a reparameterisation needs this floor beside it rather
 than the seed σ.
+
+> **Rev 4 — a scope qualifier is REFERRED here and deliberately not applied.**
+> The sentence above says *"this architecture"*. `EXP_012` (§11) measured the same
+> fold on the **adopted** neuron and got **1.4e-05 / 9.3e-06** on the same
+> 512-window metric that gives 2.0e-03 / 6.2e-04 / 1.6e-03 here — and traced the
+> difference to a degeneracy that exists in the baseline LIF's decision variable
+> and not in the two-compartment one (§11.3, §11.6). On that evidence the floor
+> looks like a property of **the neuron it was measured on**, not of the
+> architecture family, which would be `EXP_005`'s σ-non-transfer lesson in a new
+> place.
+>
+> **It is not applied, for a reason that is not a formality.** `EXP_012` §4
+> pre-registered exactly this correction behind a trigger — `Y2 ∧ Y5` — and
+> **Y5 failed** (§11.4). Applying the qualifier anyway would be adopting a
+> correction whose own pre-registered gate did not open, immediately after
+> watching it not open. **§6.5 therefore stands as written**, and the qualifier is
+> §11.7's referral (`EXP_012` §9.7 item 9), for Elliot.
 
 ### 6.6 Predictions resolved, including the ones that failed
 
@@ -647,17 +688,44 @@ decision gets made quietly, so the correction is recorded here instead:
 Rev 3 adds no new decision. If the composed arm is to be adopted, that is #5 and
 #1, already on the list.
 
+**Rev 4 adds no new decision either, and edits no row. It sharpens #6, which was
+the one item on this list that could not be decided at all**, and the correction
+is again recorded here rather than in the row:
+
+* **#6 (the fold-in tolerance)** reads that `EXP_008`'s W1 failed at 1e-3 and that
+  §6.5 measures why the precedent was wrong. Both still stand. What was missing is
+  that the project's only *other* fold-in measurement — `EXP_011` C4 at 1.05e-06 —
+  disagreed with it by three orders of magnitude, and §10.5 explicitly withheld it
+  as evidence "until understood". **`EXP_012` (§11) understands it**: the two
+  residuals differ because the two neurons put wildly different amounts of
+  probability mass at the firing threshold, and `EXP_011`'s number is now
+  available to #6 rather than withheld from it.
+* **What that does to the decision is narrow and worth stating plainly.** It does
+  **not** propose a tolerance — `EXP_012` sets none, by design. It establishes
+  that **a fold-in tolerance cannot be one project constant**: the same identity,
+  through the same fold, costs 2.0e-03 bpc on the baseline neuron and 1.4e-05 on
+  the adopted one. Any single number for W1 will be far too loose for one arm or
+  far too tight for the other, and **that is the shape of the choice #6 is**.
+* **#4 (Phase 5 authorisation)** now reads against **~4.6** of ~30 GPU-hours, not
+  the ~3.5 in its row or the ~4.4 rev 3 corrected it to; `EXP_012` cost ~0.2 and
+  trained nothing. **5 of 14 candidates closed is unchanged** — `EXP_012` is a
+  mechanism study and closes none. **#4 is still open and still Elliot's.**
+
 ---
 
 ## 9. Gates, at the close of this revision
 
-**Every row was re-run for rev 3 on 2026-08-04.** Rev 2's rows were re-run from
-the clean tree at `dcc8f82`; rev 3 re-runs them again with `EXP_011` in the tree
-and adds four rows of its own.
+**Every row was re-run for rev 3 on 2026-08-04**, and the suite and the two
+`EXP_012` rows again for **rev 4 on 2026-08-05**. Rev 2's rows were re-run from
+the clean tree at `dcc8f82`; rev 3 re-ran them with `EXP_011` in the tree and
+added four rows; rev 4 adds three.
 
 | Gate | State |
 |---|---|
-| Test suite | **272 passed**, 1 warning, 38 s — rev 2's 262 unchanged, plus **10 in `tests/test_compose_equivalence.py`** |
+| Test suite | **280 passed**, 1 warning, 38 s — rev 3's 272 unchanged, plus **8 in `tests/test_fold_gap_probe.py`** |
+| **`EXP_012` S3 — the environment has not drifted** | `008_chase_fold.py` re-run to a scratch path reproduces the committed `exp_008_fold_residual.json` at **0 differences**, every field, bit-for-bit. Run **before** any cross-arm comparison was formed, because the comparison is the experiment |
+| **`EXP_012` S1 — the probe reproduces the committed kernel** | leg 3 must recompute the membrane recursion to observe `u` at all, so its spikes are asserted **bit-identical** (`torch.equal`) to `lif_scan` / `twocomp_scan` on every run and both layers: **10/10 pass**. Guarded in the suite by `tests/test_fold_gap_probe.py` across three firing rates, with **two mutation legs** — resetting `vs`, and a soft reset — so the check has been seen to fail |
+| **`EXP_012` sets no tolerance** | asserted structurally: `resolve()` reads its bars from constants transcribed at the top of the file, and the artifact carries `"sets_no_tolerance": true` and `"decision_6": "UNTOUCHED AND OPEN"`. No fold in this experiment is gated |
 | **`EXP_011` C5/K5 — Identity 1 on the two-compartment neuron** | float64, at a nowhere-zero per-channel `θ`, against a reference transcribed from `EXP_011` §1.1 rather than from the source: **spikes exact, membranes ≤1e-12** on four (`beta_f`, `thr`) regimes. A mutation leg asserts the check can fail. Run as the driver's entry condition **before** any training step |
 | **`EXP_011` K4 — the composed arm nests the adopted arm** | at `θ = 0`, forward and backward **bitwise** (`== 0.0`, not a tolerance) against `TwoCompartmentCharLM` |
 | **`EXP_011` K1 — the arm is the adopted arm plus one thing** | every composed run's `config.json` field-by-field against **`twocomp_s0`** (not the Phase-2 baseline): only `arch`, `run_name`, `seed`, `thr_log_init` differ; `mu_init` excused at the `Config` default and recorded in the manifest |
@@ -674,6 +742,13 @@ and adds four rows of its own.
 synthesised them; **rev 3 closes `EXP_011` and resolves the one scheduling
 decision that authorised it.** It authorises no phase, adopts no arm, and
 redefines no threshold — and seven decisions in §8 are untouched.
+
+**Rev 4 closes `EXP_012`**, which trains nothing, adopts nothing and sets no
+tolerance. It leaves all seven decisions open and all seven rows unedited; what
+it changes is that **#6 is now a decision that can be made** — §10.5's withheld
+evidence is released to it, and the shape of the choice is stated in §8's rev-4
+note. It also **declines to apply** the §6.5 scope qualifier its own evidence
+supports, because the trigger it pre-registered for that correction did not fire.
 
 ---
 
@@ -798,16 +873,178 @@ little else, and it is **not** evidence of stability against whatever killed see
 0. Not settled either: which arithmetic in layer 0's backward makes the NaN
 (bounded, not localised); **why this fold is ~1000× tighter than `EXP_008` W1's
 1.86e-3** — same identity, same class of fp32 reordering, and this experiment
-does not explain it, so it is **not** offered as evidence for decision #6; and
+does not explain it, so it is **not** offered as evidence for decision #6 *(rev 4:
+`EXP_012` explains it in §11, and the number is released to #6 there; this
+paragraph records what `EXP_011` did and did not settle and is left as it was)*;
+and
 whether either parent's initialisation is right for the composition, which is one
 unswept point in a two-dimensional space.
 
 ---
 
-## 11. Changelog
+## 11. `EXP_012` — the fold gap is a degeneracy, and the rule that measured it misfired
+
+Pre-registered in `experiments/logs/EXP_012_fold_gap.md` and closed the same day.
+It is the second of the two things §10.5 left standing, and the one this report
+had **refused to use** as evidence for decision #6 until something explained it.
+**No training, ~0.2 GPU-hours**, five existing checkpoints.
+
+### 11.1 Two explanations were removed before anything was measured
+
+Read from the committed source and recorded in that file's §0, so that neither
+could later be reported as a discovery: `fold_into_spiking_state_dict` and
+`fold_into_twocomp_state_dict` have the **same six-line body**, and `fold_check`
+and `fold_check_composed` compute the **same quantity by the same code path**.
+Neither the fold's arithmetic nor the metric can be the explanation, which leaves
+exactly two candidates — **the neuron** and **the operating point** — and the
+experiment is built to separate them.
+
+### 11.2 The controls held: it is not the algebra and not the perturbation
+
+| | `EXP_008` arm (→ `snn`) | composed arm (→ `twocomp`) |
+|---|---|---|
+| leg C — the algebra, fp64 fold and fp64 GEMM | 6.9 / 6.8 / 8.3 fp64 eps | **3.6 / 7.4 fp64 eps** |
+| leg A — the perturbation actually injected | 5.8 / 6.1 / 8.3 fp32 eps | **6.4 / 8.2 fp32 eps** |
+
+Identity 2 is exact on **both** neurons, and the fold perturbs both currents by
+the same relative amount to within the spread of `EXP_008`'s own three seeds.
+**Whatever separates the two folds happens after the GEMM.**
+
+### 11.3 Where the gap is, and what sets it
+
+| | layer-0 flips | fraction | 512-window bpc residual |
+|---|---:|---:|---:|
+| `threshold_s0/s1/s2` | 5 339 / 2 684 / 2 851 | 3.18e-04 / 1.60e-04 / 1.70e-04 | 2.03e-03 / 6.23e-04 / 1.62e-03 |
+| `compose_s1/s2` | **1 / 2** | **5.96e-08 / 1.19e-07** | **1.44e-05 / 9.29e-06** |
+
+**1 342–5 339× fewer flips.** And the flip count tracks the probability mass the
+decision variable puts *at* the threshold — `P(|u| < 1e-6)` is **5.5e-04 – 7.4e-04**
+on the baseline neuron against **1.2e-07 – 3.0e-07** on the two-compartment one,
+a factor of **1 843–6 218**, while the membrane's overall spread differs by only
+~1.19× (sd 5.42 vs 4.55). **It is not a wider distribution. It is a concentration
+at the threshold**, and the ladder's shape says so: the composed arm's
+`P(|u| < h)` is **linear in `h`** across four decades — a smooth density — while
+the baseline's grows only **~9× across the same four decades**.
+
+**Three ratios, three different quantities — and this report quotes all three
+rather than the most impressive.** Flip count 1 342–5 339×; 512-window bpc
+residual **43–219×**; the committed full-test residuals (`EXP_008` W1 against
+`EXP_011` C4) **515× at closest approach, 1 770× headline-to-headline and 9 841×
+at the extremes**. The chain from a flipped spike to a bpc is signed and
+cancels, and it cancels differently at different sample sizes. **"~1000×" is a
+fair headline for the committed numbers and is not the flip-count ratio.**
+
+**`EXP_012` §1's derivation was wrong in both of its terms, in opposite
+directions, and the log says so.** It predicted the unreset slow pole would make
+the perturbation *larger*; `E|du|` is ~100× **smaller**. It predicted the density
+would fall because the spread widens; **the spread does not widen.** The `du`
+result is a **consequence of the flip count, not a cause of it** — a flipped
+spike moves the LIF's state by an O(1) reset rather than an O(ulp) rounding, so
+every later step of that channel carries a macroscopic perturbation. Quoting
+`du/dcur` as the mechanism would have inverted the causation.
+
+### 11.4 The decision rule fired on a leg with no power, and is reported unrepaired
+
+The cross-over drives **both** neurons with the **identical** current and
+perturbation. On `threshold_s0`'s current — where the LIF's 5 339 flips sit far
+above the resolution floor — the two-compartment neuron flips **2**:
+
+| | thr | firing rate | flips |
+|---|---:|---:|---:|
+| LIF | 1.0000 | 0.344880 | **5 339** |
+| LIF, rate-matched to twocomp | 0.3256 | 0.398950 | **205** |
+| two-compartment | 1.0000 | 0.398939 | **2** |
+| two-compartment, rate-matched to LIF | 1.8887 | 0.344880 | **1** |
+
+**102.5× at matched rate 0.399, 5 339× at matched rate 0.345.** But Y5 required
+*every* cross-over leg to reach 10×, and the second leg — on `compose_s1`'s
+current — compares **0 flips against 1**. Ratio 0.0. **Y5 FAILED**, and
+`EXP_012` §4's truth table therefore returns *"an operating-point effect, not a
+neuron effect"*.
+
+**That verdict is not this report's finding, and the reason is not
+after-the-fact.** `EXP_012`'s own limitation 2 and failure mode P3 stated in
+advance that a zero count would be reported as *"below what one batch resolves"*,
+not as a number — and Y5 was then specified without that guard. **The rule is
+recorded as it fired and is not rewritten**, because rewriting a bar after seeing
+which way it fell is precisely what `EXP_005` §9.4, `EXP_008` §9.4 and `EXP_011`
+§0 established the practice of refusing. The 102.5× is a **marker with no verdict
+attached**; the corrected wording for Y5 is referred, not adopted.
+
+### 11.5 Three of six predictions failed, and one failure is the mechanism showing
+
+Y1, Y2, Y3 held. Y4 failed (34.0× amplification against a `< 5×` prediction — but
+that is 34/1 and 68/2, and **an amplification ratio built on a denominator of 1
+is not a measurement of one**, so it is not offered as evidence in the other
+direction either). Y5 failed as above.
+
+**Y6 — the flip model — failed, and the shape of its failure is informative.**
+Predicted ÷ measured is **1.11 / 1.19 / 1.17** on the baseline's layer 1 and
+**0.97 / 0.84** on the composed arm's, but **3.50 / 8.82 / 5.69** on the
+baseline's layer 0. The model assumes a *smooth* density; it works wherever §11.3
+says the density is smooth and over-predicts by 3.5–8.8× exactly where §11.6 says
+there is a point mass. Per `EXP_012` §3, **no quantitative mechanistic claim is
+made** from Y3 or Y5 on the back of a failed Y6.
+
+### 11.6 What the concentration is made of — post-hoc, and labelled so
+
+**This subsection is post-hoc**: the hypothesis was formed after reading §11.3's
+ladder, and `scripts/exp/012_posthoc_pileup.py` carries the same label.
+`EXP_008` §9.5 is the precedent for a chase that follows a result.
+
+Sites with `|u| < 1e-6` at layer 0:
+
+| | count | distinct `u` values | repeats each | channels |
+|---|---:|---:|---:|---:|
+| `threshold_s0/s1/s2` | 10 962 / 12 436 / 9 213 | **20 / 23 / 23** | **548 / 541 / 401** | 60 / 68 / 69 of 512 |
+| `compose_s1/s2` | 5 / 2 | 4 / 2 | 1.2 / 1.0 | 5 / 2 of 512 |
+
+**The baseline's ten thousand near-threshold sites are twenty numbers.** Layer 0's
+input is one of only **205 embedding rows**, so `cur` takes 205 values per
+channel; the hard reset sets `v` to **exactly 0**, so the step after a spike has
+`v_pre = cur`, drawn from that small set. A channel whose `cur` lands within an
+ulp of `thr` replays the *same* `u` every time that token follows a spike —
+87–91 % of these sites are post-spike steps. The two-compartment neuron never
+resets `vs`, so `u = vf + w·vs` carries a continuously-varying history and lands
+on a repeated value 1.0–1.2 times.
+
+**Post-spike enrichment does not discriminate** — 2.61× on the baseline, 2.11× on
+the composed arm — so an analysis that stopped there would have found a false
+positive. **The repeat count is the discriminator**, and it was named as the
+falsifier in the script's docstring before it ran.
+
+### 11.7 What this releases, and what it refuses to apply
+
+**Released to decision #6.** §10.5 withheld `EXP_011` C4's 1.05e-06 as evidence
+"until understood". It is understood, and it is released. What it establishes is
+**not** a tolerance — `EXP_012` proposes none by design — but the **shape of the
+choice**: the same identity, through the same fold, costs **2.0e-03 bpc on the
+baseline neuron and 1.4e-05 on the adopted one**, for a structural reason. **A
+single W1-style constant will be far too loose for one arm or far too tight for
+the other.**
+
+**Refused.** The §6.5 scope qualifier — that the ~2e-3 floor belongs to the
+baseline LIF rather than to "this architecture" — is supported by §11.3 and
+§11.6 and is **not applied**, because `EXP_012` §4 pre-registered it behind
+`Y2 ∧ Y5` and Y5 failed. §6.5 stands as written and carries a referral note.
+**Adopting a correction whose own gate did not open, seconds after watching it
+not open, is the failure mode this protocol exists to prevent** — and it would
+have been an easy one to commit, because the correction is almost certainly
+right.
+
+**Still unexplained after this revision:** which arithmetic in layer 0's backward
+makes `compose_s0`'s NaN (§10.4), and whether any of §11 survives at another
+scale or under another reparameterisation — quantisation and weight
+normalisation are the two §6.5's floor was written to cover, and `EXP_012`
+measured one fold on one architecture pair.
+
+---
+
+## 12. Changelog
 
 | Rev | Change |
 |---|---|
+| 4 | 2026-08-05. **`EXP_012`: the fold gap explained, and a rule that misfired reported rather than repaired.** (a) §11 added: the ~1000× gap between `EXP_008` W1 and `EXP_011` C4 is **not** the algebra (leg C exact on both neurons) and **not** the injected perturbation (leg A 6.4–8.2 fp32 eps against 5.8–8.3), but the **layer-0 flip count** — 1/2 flips against 2 684–5 339, a factor of **1 342–5 339** — which tracks the probability mass the decision variable puts at the threshold: **1 843–6 218× more** within 1e-6 of it, at a membrane spread that differs by only 1.19×. (b) §11.6, **post-hoc and labelled so**: the baseline's ~11 000 near-threshold sites are **20–23 distinct values replayed 400–548 times each**, because layer 0 sees one of 205 embedding rows and the hard reset zeroes `v` exactly; the unreset slow pole destroys the replay (4 values, 1.2 repeats). Post-spike enrichment does **not** discriminate (2.61× vs 2.11×) and is reported as a near-miss for the analysis. (c) **Three of six predictions failed.** Y5's rule resolved on a leg comparing **0 flips against 1**, which `EXP_012`'s own limitation 2 had declared unresolvable before it ran; the rule is **recorded as it fired and not rewritten**, and the powered leg's 102.5× is a marker with no verdict. Y4's 34× is 34/1 and 68/2 and is not offered as evidence either way. Y6 failed, and its failure pattern — accurate wherever the density is smooth, 3.5–8.8× over wherever there is an atom — is consistent with (b). (d) §6.5 **stands exactly as written**; the scope qualifier its own evidence supports is **referred, not applied**, because the trigger `EXP_012` §4 pre-registered for it (`Y2 ∧ Y5`) did not fire. (e) §8: **no row edited**; #6's evidence is sharpened in prose beneath the table — §10.5's withheld number is **released** to it, and the finding is that a fold-in tolerance **cannot be one project constant**. #4 re-evidenced at ~4.6 of ~30 GPU-hours. (f) §9 adds three gate rows; test suite **272 → 280**. (g) the changelog renumbered §11 → §12 and the header's rev-2 reference retargeted — the same slip rev 3's item (f) records. **No earlier number, verdict or threshold changes; nothing is adopted and no phase is authorised.** |
 | 1 | 2026-08-03. First Phase-4 report: the adopted arm and the shape of its gain, σ's non-transfer, `EXP_006`'s causal tail result and what it withdraws, `EXP_007`/`EXP_008`/`EXP_009` resolved against their pre-registrations, the reparameterisation noise floor, a revised ranking offered and not applied, and seven open decisions. |
 | 3 | 2026-08-04. **`EXP_011`, and the resolution of the one decision that was a scheduling question.** (a) §10 added: the composed arm (adopted two-compartment neuron + `EXP_008`'s learned per-channel threshold) at **2.08326 ± 0.00049 carried, −0.03543 against the adopted arm at −28.7 se, 0/128 contexts regressed, folding to the adopted arm's exact inference cost** — and **provisional at n = 2 of a pre-registered 3**. (b) §10.3: the composition's gain is **102.4 % within-reach and 1.4 % zero-context**, which confirms `EXP_004` §10.6's overlap argument in its strong form and relocates the value to the component the adopted arm damaged — the second time in Phase 4 that an arm has not moved the component it was ranked for. (c) §10.4: `compose_s0` diverged, was chased to step 17 598 and is **not** `EXP_009`'s mechanism — gradients of 0.03, fp32 and fp64 norms equal, an identical NaN on the eager path — so **decision #7's fix would not have prevented it** and the fused backward is exonerated. The seed was excluded and **not replaced**. (d) §8 row 8 marked **RESOLVED (inside Phase 4)**; **rows 1–7 are not edited**, and the two whose evidence `EXP_011` overtakes (#4, #7) are corrected in prose beneath the table rather than in the rows. (e) §9 re-run with four new gate rows; test suite **262 → 272**. (f) the header's §10 reference retargeted to §11 as the changelog renumbered. **No earlier number, verdict or threshold changes.** |
 | 2 | 2026-08-04. **Synthesis and corrections. No verdict, threshold or decision changes.** (a) §6.7 added: the three arms read together — two of them are the same mechanism, only the arm that added the least structure moved the within-reach component, token-shift is dominated at 13.3 se, and essentially none of the three gains is attributable to a larger function class. (b) §6.8 added: the verdict on every Phase-4 arm against its own rule, including that `EXP_008`'s cell is `W1 fails` and its headline is quoted under that caveat. (c) §7.2 added: the order Phase 5's arms should run in and what must be settled first. (d) §8 item 8 added; #3, #4, #5 re-evidenced; **all eight remain open**. (e) §9 re-run from a clean tree, with the resolver's 0-difference reproduction as a new row. **Corrections:** (f) §6.1's wall-clock for the adopted arm was **1.35×**, which is `twocomp_s0` alone — `EXP_004`'s committed three-seed figure is **1.32×** (1.30× over all seven), and `EXP_004` §10 item 6 said to quote it; *this correction flatters the adopted arm and is made because it restores a committed measurement*. (g) §6.1's distilled row was **1.58×**, correct against the two-compartment arm in `EXP_009` §9.1 and wrong in a column referenced to the baseline, where it is **2.13×**. (h) "clear the adoption bar by an order of magnitude" → **4.2×** and **6.4×** (8.4σ and 12.8σ). (i) the adopted arm recovered **58.2 %** of the beyond-horizon component, not 59 %, in §2 and §7.1. (j) Identity 2 holds to **6.8–8.3** fp64 eps; `EXP_008` §9.5's "≈7" is its first two seeds. Closed experiment logs are **not** rewritten for (f)–(j); the corrected numbers live here. (k) adding §7.2 made three bare "§7.2"/"§7.3" references read as self-references when they meant `03_phase3_candidates.md`; all three are now qualified — the same slip the Phase-3 report's own changelog records as (d). |

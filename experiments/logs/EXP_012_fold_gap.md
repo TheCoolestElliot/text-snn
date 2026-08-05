@@ -333,7 +333,7 @@ explanation entirely**: whatever separates the two folds happens after the GEMM.
 of magnitude more than that.
 
 **Three different ratios, and they are not the same number — say so.** The flip
-count differs by 1 342–5 339×; the 512-window bpc residual by **43–141×**; the
+count differs by 1 342–5 339×; the 512-window bpc residual by **43–219×**; the
 committed full-test residual (`EXP_008` W1 against `EXP_011` C4) by 515–1 770×.
 The chain from a flipped spike to a bpc is signed and cancels, and it cancels
 differently at different sample sizes. **"~1000×" is a fair headline for the
@@ -494,7 +494,7 @@ docstring named in advance of running it.
 2. The gap is in the **layer-0 flip count**, by 1 342–5 339× (Y3).
 3. The flip count tracks the **mass of the decision variable at the threshold**,
    which differs by 1 843–6 218× at `h = 1e-6` while the membrane's overall
-   spread differs by only ~1.15× (§9.3).
+   spread differs by only ~1.19× (§9.3).
 4. The LIF's near-threshold mass is a **degeneracy, not a density**: 20–23
    distinct values repeated 400–548 times each (§9.6, post-hoc).
 
