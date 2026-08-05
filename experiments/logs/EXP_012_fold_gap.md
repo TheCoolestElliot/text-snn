@@ -281,7 +281,259 @@ stands as written and this paragraph is reported as not triggered.
 
 ## 9. Results
 
-*(appended after the run; hypotheses above are not edited)*
+**Closed 2026-08-05. Y1, Y2 and Y3 held; Y4, Y5 and Y6 failed.** S1 held on every
+run and both layers, S3 reproduced `exp_008_fold_residual.json` at **0
+differences**. Artifacts: `docs/reports/data/exp_012_fold_gap.json` and
+`docs/reports/data/exp_012_pileup.json`.
+
+**The one-line answer: the gap is in the flip count, the flip count is set by how
+much probability mass the decision variable puts *at* the threshold, and the
+LIF's mass there is 20 distinct values replayed ~548 times each — a degeneracy
+the two-compartment neuron's unreset slow pole destroys.**
+
+### 9.0 The mechanical resolution, as `resolve()` printed it
+
+| | verdict | measured | bar |
+|---|---|---|---|
+| **Y1** identity exact on the composed arm | **HELD** | 7.937e-16, 1.639e-15 (3.6 / 7.4 fp64 eps) | ≤ 1e-14 |
+| **Y2** injected perturbation matches | **HELD** | 7.575e-07, 9.833e-07 (6.4 / 8.2 fp32 eps) | [2.3e-07, 3.0e-06] |
+| **Y3** far fewer layer-0 flips | **HELD** | 5.960e-08, 1.192e-07 | < 1.6e-05 |
+| **Y4** less per-layer amplification | **FAILED** | 34.0, 34.0 | < 5 |
+| **Y5** the neuron, not the operating point | **FAILED** | 102.5 and **0.0** | ≥ 10, all legs |
+| **Y6** the flip model predicts the counts | **FAILED** | 0.84 – 8.82 | within 3× |
+
+§4's truth table, resolved on Y2 then Y5, returns: *"the gap is real and is an
+**operating-point** effect, not a neuron effect."* **§9.4 is why that verdict must
+not be read as this experiment's finding**, and §9.7 says what is reported
+instead. The rule is recorded as it fired; it is not rewritten.
+
+### 9.1 The two controls held, so the gap is neither the algebra nor the input
+
+Leg C lands at 3.6 and 7.4 fp64 eps on the composed arm against `EXP_008`'s
+6.8–8.3. **Identity 2 is exact on both neurons** and §0 item 1's reading of the
+source is confirmed numerically.
+
+Leg A — the perturbation the fold actually injects — is **6.4 and 8.2 fp32 eps**
+against `EXP_008`'s **5.8, 6.1, 8.3**. The two arms are perturbed by the same
+relative amount, by the same mechanism, to within the spread of `EXP_008`'s own
+three seeds. **Y2 is the load-bearing control and it removes the upstream
+explanation entirely**: whatever separates the two folds happens after the GEMM.
+
+### 9.2 Y3: the gap is in the flip count, and it is enormous
+
+| | layer-0 flips | fraction | layer-1 flips | logits max \|diff\| | 512-window bpc residual |
+|---|---:|---:|---:|---:|---:|
+| `threshold_s0` | 5 339 | 3.182e-04 | 77 953 | 27.13 / 263.6 | 2.03e-03 |
+| `threshold_s1` | 2 684 | 1.600e-04 | 42 653 | 20.58 / 272.4 | 6.23e-04 |
+| `threshold_s2` | 2 851 | 1.699e-04 | 51 081 | 23.52 / 288.3 | 1.62e-03 |
+| **`compose_s1`** | **1** | **5.960e-08** | 34 | 6.23 / 232.6 | **1.44e-05** |
+| **`compose_s2`** | **2** | **1.192e-07** | 68 | 8.68 / 232.7 | **9.29e-06** |
+
+**1 342× to 5 339× fewer layer-0 flips.** Y3 asked for 10× and got three orders
+of magnitude more than that.
+
+**Three different ratios, and they are not the same number — say so.** The flip
+count differs by 1 342–5 339×; the 512-window bpc residual by **43–141×**; the
+committed full-test residual (`EXP_008` W1 against `EXP_011` C4) by 515–1 770×.
+The chain from a flipped spike to a bpc is signed and cancels, and it cancels
+differently at different sample sizes. **"~1000×" is a fair headline for the
+committed numbers and is not the flip-count ratio**, and no row above should be
+quoted as though it were another.
+
+### 9.3 Why: the density at the threshold, not the spread of the membrane
+
+`u`'s overall spread is *comparable* on the two neurons — sd **5.27 / 5.42 /
+5.30** against **4.59 / 4.55**. So §1's "the slow pole widens the distribution"
+is not what happens. What differs is the mass *at* the threshold:
+
+`P(|u| < h)`, layer 0:
+
+| h | `threshold_s0/s1/s2` | `compose_s1/s2` |
+|---|---|---|
+| 1e-6 | 6.53e-04 / 7.41e-04 / 5.49e-04 | **2.98e-07 / 1.19e-07** |
+| 1e-5 | 1.34e-03 / 1.43e-03 / 1.09e-03 | 3.34e-06 / 4.17e-06 |
+| 1e-4 | 2.06e-03 / 2.76e-03 / 1.92e-03 | 3.45e-05 / 3.34e-05 |
+| 1e-3 | 3.17e-03 / 3.79e-03 / 2.99e-03 | 2.99e-04 / 3.05e-04 |
+| 1e-2 | 6.00e-03 / 6.42e-03 / 5.48e-03 | 2.85e-03 / 2.86e-03 |
+
+**Read the shape, not only the level.** The composed arm's row is **linear in
+`h`** across four decades — a smooth density, `rho_u(0) ≈ 0.17` per unit `u`. The
+threshold arm's grows only **~9× across the same four decades** while sitting
+**1 843–6 218× higher at h = 1e-6**. At h = 1e-2 the two are within 2×. **The LIF
+does not have a higher density; it has an atom.** That is the whole finding, and
+§9.6 is what it is made of.
+
+**§1's derivation was wrong in both of its terms, and in opposite directions.**
+It predicted `du` would be *larger* under the two-compartment neuron because the
+slow pole integrates without reset; measured, `E|du|` is **1.48e-06 / 1.52e-06
+against 1.05e-04 – 1.99e-04**, i.e. ~100× *smaller*. And it predicted the density
+would fall because the spread widens; the spread does not widen. Both halves are
+recorded as falsified.
+
+The `du` result is a **consequence, not a cause**, and the direction of causation
+matters: mean |Δcur| is nearly identical across all five runs (**1.30e-06 –
+1.38e-06** vs **9.12e-07 – 9.20e-07**), but the membrane multiplies it by
+**76–148×** in the LIF and **1.6×** in the two-compartment neuron. That factor is
+the hard reset feeding back: once a spike flips, `v ← v_pre·(1−s)` moves the
+state by an O(1) amount rather than an O(ulp) one, so every subsequent step of
+that channel carries a macroscopic `du`. **Few flips ⇒ little feedback ⇒ small
+`E|du|`.** Reporting `du/dcur` as a cause would have inverted the mechanism.
+
+### 9.4 Y5 failed, on a leg this design had already declared unresolvable
+
+Leg 4, layer 0, identical current and identical perturbation through both
+neurons. Two-compartment parameters for the `threshold_s0` direction come from
+`twocomp_s0`, which has none of its own (`--twocomp-params-from`).
+
+**Direction 1 — `threshold_s0`'s current (the leg with power):**
+
+| neuron | thr | firing rate | flips | fraction |
+|---|---:|---:|---:|---:|
+| two-compartment | 1.0000 | 0.398939 | **2** | 1.192e-07 |
+| LIF | 1.0000 | 0.344880 | **5 339** | 3.182e-04 |
+| LIF, rate-matched to twocomp | 0.3256 | 0.398950 | **205** | 1.222e-05 |
+| twocomp, rate-matched to LIF | 1.8887 | 0.344880 | **1** | 5.960e-08 |
+
+Matched at rate 0.399: **205 vs 2 = 102.5×.** Matched at rate 0.345: **5 339 vs
+1 = 5 339×.** At the committed thresholds: 2 669×.
+
+**Direction 2 — `compose_s1`'s current:** two-compartment 1 flip; LIF **0**;
+LIF rate-matched **0**. Ratio **0.0**.
+
+**Y5's rule required every leg to reach 10×, so Y5 FAILED.** The failure is
+carried by direction 2, where the counts are **0 and 1 out of 16 777 216**, at a
+resolution floor of 5.96e-08. That comparison cannot distinguish a ratio of 0.1
+from a ratio of 100.
+
+**The pre-registration said this in advance and the rule ignored it.**
+Limitation 2: *"If the composed arm's flip count is 0, the report says 'below
+what one batch resolves', not 'zero'."* P3 names the same failure mode. Y5 was
+specified without the guard its own limitations section had already written down
+— it should have required the reference leg's count to clear the floor by some
+margin before a ratio was formed.
+
+**That is a defect in the rule, and it is being reported, not repaired.**
+Rewriting a bar after seeing which way it fell is the thing this protocol exists
+to prevent, and `EXP_005` §9.4, `EXP_008` §9.4 and `EXP_011` §0 are three
+precedents for referring instead. **Y5 is FAILED.** The 102.5× is reported as a
+**marker with no verdict attached**, in the `EXP_011` §0 sense.
+
+What the marker says, stated without a verdict: **on the one current pair where
+the measurement has power, feeding the identical perturbation through the
+two-compartment neuron instead of the LIF removes 99.0–99.98 % of the flips at
+matched firing rate.**
+
+### 9.5 Y4 and Y6 also failed, and Y6's failure is the mechanism showing through
+
+**Y4 — amplification.** Composed arm **34.0×** on both seeds against `EXP_008`'s
+14.6 / 15.9 / 17.9. Predicted `< 5×`; the direction is **opposite** to the
+prediction — the composed arm amplifies *more* per layer. But both figures are
+34/1 and 68/2: **an "amplification ratio" built from a denominator of 1 and 2 is
+not a measurement of one**, and limitation 2 applies to it exactly as it applies
+to Y5. Reported as **FAILED with its counts beside it**, and not offered as
+evidence that the two-compartment neuron amplifies more.
+
+**Y6 — the flip model.** Predicted ÷ measured:
+
+| | layer 0 | layer 1 |
+|---|---:|---:|
+| `threshold_s0/s1/s2` | **3.50 / 8.82 / 5.69** | 1.11 / 1.19 / 1.17 |
+| `compose_s1/s2` | 4.50 / 1.75 | **0.97 / 0.84** |
+
+Bar was 3× on every cell, so **Y6 FAILED**. Per §3's Y6 row, **no mechanistic
+claim is made at the quantitative level** from Y3 or Y5.
+
+**The pattern of the failure is itself informative and is reported as such.** The
+model assumes a *smooth* density — it estimates `rho_u(0)` from `P(|u| < E|du|)`
+and multiplies. It predicts within 1.2× exactly where §9.3 says the density is
+smooth (both composed layers; the LIF's layer 1, whose input is 512 binary spikes
+rather than 205 embedding rows) and over-predicts by 3.5–8.8× exactly where §9.3
+says there is an atom (the LIF's layer 0). **A first-order density model cannot
+predict flips through a point mass**, and Y6 failing on precisely those four
+cells is consistent with §9.6 rather than with §1's mechanism being absent.
+
+### 9.6 POST-HOC — the LIF's near-threshold mass is 20 values replayed 548 times
+
+**This subsection is post-hoc.** Its hypothesis was formed after reading §9.3's
+ladder, `scripts/exp/012_posthoc_pileup.py` carries the same label in its
+docstring, and it is separated from §9.0–9.5 so that nothing here is counted as
+a pre-registered hit. `EXP_008` §9.5 is the precedent for a chase that follows a
+result rather than preceding it.
+
+Sites with `|u| < 1e-6` at layer 0:
+
+| | count | distinct `u` values | repeats per value | previous step spiked | channels |
+|---|---:|---:|---:|---:|---:|
+| `threshold_s0` | 10 962 | **20** | **548.1** | 0.898 (2.61× baseline) | 60 / 512 |
+| `threshold_s1` | 12 436 | **23** | **540.7** | 0.908 (2.53×) | 68 / 512 |
+| `threshold_s2` | 9 213 | **23** | **400.6** | 0.870 (2.47×) | 69 / 512 |
+| `compose_s1` | 5 | 4 | 1.2 | 0.800 (2.11×) | 5 / 512 |
+| `compose_s2` | 2 | 2 | 1.0 | 0.000 | 2 / 512 |
+
+**The LIF's ten thousand near-threshold sites are twenty numbers.** Layer 0's
+input is one of only `V = 205` embedding rows, so `cur` takes 205 values per
+channel; the hard reset sets `v` to **exactly 0**, so the step after a spike has
+`v_pre = cur` — a value from that small set. A channel whose `cur` happens to
+land within an ulp of `thr` therefore reproduces the *same* `u` every time that
+token follows a spike, in 60–69 channels of 512. The two-compartment neuron never
+resets `vs`, so `u = vf + w·vs` carries a continuously-varying history and lands
+on the same value 1.0–1.2 times.
+
+**Note what does *not* discriminate.** Post-spike enrichment is 2.61× on the LIF
+and 2.11× on the composed arm — *both* neurons' near-threshold sites are enriched
+for the step after a spike, so enrichment alone would have been a false positive.
+**The repeat count is the discriminator**, and it is the falsifier the script's
+docstring named in advance of running it.
+
+### 9.7 What is established, what is not, and what is referred
+
+**Established:**
+
+1. The gap is **not** the algebra (Y1) and **not** the injected perturbation
+   (Y2). Both controls held on both arms.
+2. The gap is in the **layer-0 flip count**, by 1 342–5 339× (Y3).
+3. The flip count tracks the **mass of the decision variable at the threshold**,
+   which differs by 1 843–6 218× at `h = 1e-6` while the membrane's overall
+   spread differs by only ~1.15× (§9.3).
+4. The LIF's near-threshold mass is a **degeneracy, not a density**: 20–23
+   distinct values repeated 400–548 times each (§9.6, post-hoc).
+
+**Not established:**
+
+5. **That the neuron causes it.** The powered cross-over leg says so at
+   102.5–5 339×, but **Y5 as written failed** and this file does not overturn its
+   own rule. §9.4's number is a marker.
+6. **The quantitative mechanism.** Y6 failed; §9.5's pattern is consistent with
+   §9.6 but is not a validated model.
+7. **That any of it holds at another scale, on another reparameterisation
+   (quantisation, weight normalisation), or on `compose_s0`**, which diverged and
+   was not replaced (§10 items 3–4, and `EXP_011`'s provisional n = 2).
+
+**Referred to Elliot, applied nowhere:**
+
+8. **Decision #6 is untouched and still open.** This experiment set no tolerance
+   and proposes no number for W1. What it adds is that **a fold-in tolerance
+   cannot be one project constant**: the same identity through the same fold
+   costs 2.0e-03 bpc on one neuron and 1.4e-05 on another, and the difference is
+   structural rather than incidental.
+9. **§4's pre-registered consequence did NOT fire.** The trigger was `Y2 ∧ Y5`,
+   and Y5 failed. **So the Phase-4 report §6.5's noise-floor sentence stands as
+   written**, exactly as §4 said it would in that case. Items 2–4 above are
+   nonetheless evidence that the ~2e-3 floor is a property of the *baseline LIF
+   neuron* and not of "this architecture", and **that scope qualifier is referred
+   as a recommendation, not applied.** Redefining it is Elliot's, and the trigger
+   this file wrote for itself did not fire.
+10. **Y5's specification.** It should have required the reference leg to clear
+    the resolution floor before forming a ratio. The corrected wording is *not*
+    adopted here.
+
+### 9.8 Status
+
+**CLOSED.** Y1, Y2, Y3 held; Y4, Y5, Y6 failed. Three of six predictions failed
+and two of the three failures are at the resolution floor — which is a design
+weakness this file names in §9.4 and §9.5 rather than a property of the arms.
+Nothing is adopted, no tolerance is set, no phase is authorised, and the §6.5
+scope qualifier is **not** applied.
 
 ---
 
