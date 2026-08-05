@@ -49,7 +49,8 @@ import torch  # noqa: E402
 # --------------------------------------------------------------------------
 
 CORPUS_CHOICES = ("enwik8", "text8")
-ARCH_CHOICES = ("snn", "analogue", "twocomp", "tokenshift", "threshold", "gru")
+ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
+                "threshold", "gru")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -89,7 +90,7 @@ class Config:
     surrogate_alpha: float = 2.0
     t_steps: int = 1                # T
 
-    # --- two-compartment neuron (arch="twocomp" only; EXP_004 §2) ---------
+    # --- two-compartment neuron (arch="twocomp"/"twocomp_threshold"; EXP_004 §2) -
     # Ignored by every other arm. They are Config fields rather than constants in
     # model.py so that a run's config.json records the neuron it actually trained
     # -- the initialisation is the thing EXP_004's §7.2 screen selects, and an
@@ -105,7 +106,12 @@ class Config:
     # run that forgets to set them trains the baseline rather than something
     # undocumented.
     mu_init: float = 1.0            # tokenshift only: 2-tap mix; 1.0 nests the baseline
-    thr_log_init: float = 0.0       # threshold only: log threshold; 0.0 nests it
+    # EXP_011 composes the threshold arm onto the two-compartment neuron, so
+    # thr_log_init is read by `twocomp_threshold` too. At 0.0 that arm nests the
+    # ADOPTED arm bitwise, not the Phase-2 baseline -- a different nesting from the
+    # one the comment above describes, and the reason this line is not "threshold
+    # only" any more.
+    thr_log_init: float = 0.0       # threshold/twocomp_threshold: 0.0 nests the parent
 
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
@@ -286,10 +292,11 @@ _HELP: dict[str, str] = {
     "surrogate": "surrogate gradient family",
     "surrogate_alpha": "surrogate width alpha; derivative(0) = alpha/2",
     "t_steps": "micro-steps per character T",
-    "beta_slow": "twocomp only: slow-pole decay at init, in (0, 1)",
-    "w_init": "twocomp only: initial fast/slow mix; 0.0 nests the Phase-2 baseline",
+    "beta_slow": "twocomp/twocomp_threshold: slow-pole decay at init, in (0, 1)",
+    "w_init": "twocomp/twocomp_threshold: initial fast/slow mix; 0.0 nests Phase 2",
     "mu_init": "tokenshift only: 2-tap input mix; 1.0 nests the Phase-2 baseline",
-    "thr_log_init": "threshold only: log per-channel threshold; 0.0 nests the baseline",
+    "thr_log_init": "threshold/twocomp_threshold: log per-channel threshold; "
+                    "0.0 nests the arm's own parent",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",

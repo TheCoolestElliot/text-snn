@@ -63,11 +63,13 @@ __all__ = [
     "TwoCompartmentCharLM",
     "TokenShiftCharLM",
     "LearnedThresholdCharLM",
+    "TwoCompThresholdCharLM",
     "GRUCharLM",
     "build_model",
     "count_params",
     "spiking_param_count",
     "twocomp_param_count",
+    "twocomp_threshold_param_count",
     "prescan_param_count",
     "gru_param_count",
     "match_gru_width",
@@ -742,6 +744,130 @@ class LearnedThresholdCharLM(_CharLMStack):
 
 
 # ---------------------------------------------------------------------------
+# Arm 7: the composition of arms 4 and 6 (EXP_011)
+# ---------------------------------------------------------------------------
+
+
+def twocomp_threshold_param_count(vocab_size: int, d_model: int, n_layers: int) -> int:
+    """Closed form for TwoCompThresholdCharLM: the two-compartment count plus one
+    `[1, d]` per layer. At V=205, d=512, K=2 this is 737_485 + 1_024 = 738_509 --
+    **+0.42%** over the Phase-2 baseline and **+0.14%** over the adopted arm.
+
+    The second figure is the one that means anything here, and EXP_011 §1.1 is why
+    it is misleading on its own: those 1_024 parameters add **+0.00% in
+    function-space dimension** over the two-compartment arm, because the gain folds
+    into `layers.k.weight`. Both numbers are reported wherever this arm appears.
+    """
+    return twocomp_param_count(vocab_size, d_model, n_layers) + n_layers * d_model
+
+
+class TwoCompThresholdCharLM(TwoCompartmentCharLM):
+    """The adopted two-compartment neuron with EXP_008's learned per-channel threshold.
+
+    Pre-registered in `experiments/logs/EXP_011_composition.md`. This is the
+    composition Elliot's decision #8 authorised: the adopted arm plus exactly one
+    thing, and the one thing is `EXP_008`'s arm verbatim -- `snn.prescan`'s
+    `threshold_gain` on the current, before the scan starts.
+
+    It subclasses `TwoCompartmentCharLM` rather than copying its wiring, for the
+    reason `_CharLMStack` exists at all: the adopted arm's `w`, `beta_s_raw`,
+    `slow_decay` and its `[B, 2d]` state layout are inherited *by construction*, so
+    a future edit to the adopted arm cannot silently desynchronise the composition
+    from the thing it is supposed to be a composition of. The only override is
+    `_scan`, which is the single variable.
+
+    **This arm's function class is identical to the two-compartment arm's**
+    (EXP_011 §1.1). The derivation is not `EXP_008`'s -- that one covered the
+    single-compartment LIF, and a reset-shielded second pole is exactly the
+    structure that breaks a substitution argument, so it was redone. Both poles
+    scale linearly with the current, the mix is linear, and the fast reset is
+    multiplicative, so `cur -> g*cur` gives `v -> g*v` and the spike condition
+    `g*v >= thr` is `v >= thr/g`. The mix `w` and the decay `beta_s` are untouched
+    by the substitution.
+
+    So the `K*d` parameters this adds to the adopted arm are exactly redundant, and
+    any difference they make is an **optimisation** effect. What is *not* invariant
+    is the backward: the surrogate is evaluated at `g*v - thr` here and at
+    `v - thr/g` in the folded form, which is the mechanism by which a redundant
+    parameter can change where training lands.
+
+    Invariants: unchanged from `TwoCompartmentCharLM`. I1 binary spikes, I2 leaky
+    integration (twice), I3 hard threshold, I4 surrogate BPTT, **I5 upheld** --
+    `thr_log` is `[1, d]` and diagonal in the channel axis, so it introduces no
+    cross-neuron mixing. No new kernel, no new backward, and no new R10 gate: the
+    scan is `snn.twocomp.twocomp_scan`, unchanged and still guarded by its own
+    mutation campaign.
+    """
+
+    def __init__(self, *args, thr_log_init: float = 0.0, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.thr_log_init = float(thr_log_init)
+        d = self.d_model
+        # exp(0) = 1.0 exactly in fp32, so thr_log_init = 0.0 nests the adopted
+        # arm BITWISE, in the interior of an unconstrained parameter. Same choice
+        # and same reason as `w_init = 0.0` nesting the Phase-2 baseline.
+        self.thr_log = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(thr_log_init)))
+             for _ in range(self.n_layers)]
+        )
+
+    def threshold_multiplier(self, layer: int) -> Tensor:
+        """`exp(theta)` -- the factor the firing threshold is multiplied by, [1, d].
+
+        A method for the same reason `slow_decay` and
+        `LearnedThresholdCharLM.threshold_multiplier` are: the screens, the tests
+        and the results scripts read the quantity the forward pass uses instead of
+        each re-deriving it from `thr_log`.
+        """
+        return torch.exp(self.thr_log[layer])
+
+    def input_gain(self, layer: int) -> Tensor:
+        """`exp(-theta)` -- the equivalent gain on the current, [1, d]."""
+        return torch.exp(-self.thr_log[layer])
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        return twocomp_scan(
+            threshold_gain(cur, self.thr_log[layer]),
+            v0,
+            self.w[layer],
+            self.slow_decay(layer),   # one kernel per layer, NOT per timestep
+            self.beta,                # beta_f: the baseline's fixed fast pole
+            self.threshold,
+            self.surrogate_alpha,
+            self.fused,
+        )
+
+    @torch.no_grad()
+    def fold_into_twocomp_state_dict(self) -> dict[str, Tensor]:
+        """This model's weights, rewritten as a plain `TwoCompartmentCharLM` dict.
+
+        EXP_011 §1.1's Identity 2, executed. `cur = W·h + b`, so scaling output
+        channel `c` by `g_c` is the model with `(W_c, b_c)` replaced by
+        `(g_c*W_c, g_c*b_c)`; `thr_log` is absorbed and disappears. `w` and
+        `beta_s_raw` are carried through **untouched**, which is a claim the
+        derivation makes and `tests/test_compose_equivalence.py` checks: they enter
+        the induction only through a linear combination, which commutes with the
+        scaling.
+
+        The result has `twocomp_param_count` exactly and loads into `arch="twocomp"`.
+
+        It is NOT bit-exact and is not claimed to be, for `EXP_008`
+        §9.5's reason: `g*(W·h + b)` and `(g*W)·h + g*b` round differently because
+        the GEMM accumulates in a different order, and a hard threshold sits
+        downstream of that perturbation. EXP_011 C4 **reports** the residual rather
+        than gating on it -- the fold-in tolerance is decision #6 and is still
+        Elliot's.
+        """
+        sd = {k: v.detach().clone() for k, v in self.state_dict().items()}
+        for k in range(self.n_layers):
+            g = self.input_gain(k).flatten()          # [d]
+            sd[f"layers.{k}.weight"] = sd[f"layers.{k}.weight"] * g.unsqueeze(1)
+            sd[f"layers.{k}.bias"] = sd[f"layers.{k}.bias"] * g
+            del sd[f"thr_log.{k}"]
+        return sd
+
+
+# ---------------------------------------------------------------------------
 # Arm 3: the external anchor (deliberately violates I5)
 # ---------------------------------------------------------------------------
 
@@ -885,7 +1011,8 @@ def build_model(cfg: "Config") -> nn.Module:
         )
 
     arch = cfg.arch
-    if arch in ("snn", "analogue", "twocomp", "tokenshift", "threshold"):
+    if arch in ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
+                "threshold"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -905,7 +1032,7 @@ def build_model(cfg: "Config") -> nn.Module:
             fused=cfg.fused,
             t_steps=cfg.t_steps,
         )
-        if arch == "twocomp":
+        if arch in ("twocomp", "twocomp_threshold"):
             if cfg.reset != "hard":
                 # EXP_004 §2 fixes the reset rule: hard on the fast pole, shielded
                 # on the slow one. `cfg.reset` still selects the fast pole's rule
@@ -918,9 +1045,18 @@ def build_model(cfg: "Config") -> nn.Module:
                     "Reset variants are candidate #7 and need their own kernel "
                     "and their own R10 gate."
                 )
-            model: nn.Module = TwoCompartmentCharLM(
-                beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
-            )
+            if arch == "twocomp":
+                model: nn.Module = TwoCompartmentCharLM(
+                    beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
+                )
+            else:
+                # EXP_011: the adopted arm plus EXP_008's threshold. Both parents'
+                # committed inits are passed through unchanged; neither is
+                # re-tuned for the composition, which §5 names as a limitation.
+                model = TwoCompThresholdCharLM(
+                    beta_slow=cfg.beta_slow, w_init=cfg.w_init,
+                    thr_log_init=cfg.thr_log_init, **common
+                )
         elif arch == "tokenshift":
             model = TokenShiftCharLM(mu_init=cfg.mu_init, **common)
         elif arch == "threshold":
@@ -941,8 +1077,8 @@ def build_model(cfg: "Config") -> nn.Module:
         )
     else:
         raise ValueError(
-            "arch must be 'snn', 'analogue', 'twocomp', 'tokenshift', "
-            f"'threshold' or 'gru', got {arch!r}"
+            "arch must be 'snn', 'analogue', 'twocomp', 'twocomp_threshold', "
+            f"'tokenshift', 'threshold' or 'gru', got {arch!r}"
         )
 
     return model.to(cfg.device)
