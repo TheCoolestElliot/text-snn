@@ -313,22 +313,44 @@ def main(argv: list[str] | None = None) -> int:
               f"{test['results']['carried']['bpc']:.5f}", flush=True)
 
     carried = [r["test_bpc"]["carried"] for r in manifest["runs"]]
+    # A diverged seed scores NaN, and a NaN in this list would poison the mean
+    # and the sd into NaN -- a manifest that reports nothing about the seeds that
+    # DID finish. Both lists are recorded: the raw one so the failure is visible
+    # in the artifact, and the finite one so the surviving seeds are readable.
+    #
+    # This changes no bar and no verdict. `011_compose_results.py` applies every
+    # EXP_011 criterion and does its own exclusion under the post-hoc rule in its
+    # header; this block is a record, not a decision.
+    finite = [v for v in carried if v == v and abs(v) != float("inf")]
+    diverged = [r["run"] for r in manifest["runs"]
+                if not (r["test_bpc"]["carried"] == r["test_bpc"]["carried"])]
     manifest["elapsed_s"] = round(time.time() - started, 1)
     manifest["carried_bpc"] = {
         "values": carried,
         "n": len(carried),
-        "mean": statistics.fmean(carried),
+        "diverged_runs": diverged,
+        "n_finite": len(finite),
+        "mean_finite_only": statistics.fmean(finite) if finite else None,
         # Sample sd (n-1). EXP_011 C2 bars this at 0.005; the driver reports it
         # and does not judge it -- `011_compose_results.py` applies the bars.
-        "sd": statistics.stdev(carried) if len(carried) > 1 else None,
+        "sd_finite_only": statistics.stdev(finite) if len(finite) > 1 else None,
     }
 
     out = _REPO / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(f"\nwrote {out.relative_to(_REPO)}", flush=True)
-    print(f"carried bpc: mean {manifest['carried_bpc']['mean']:.5f} "
-          f"sd {manifest['carried_bpc']['sd']}", flush=True)
+    cb = manifest["carried_bpc"]
+    if cb["diverged_runs"]:
+        print(f"DIVERGED (excluded from the means below, NOT replaced): "
+              f"{cb['diverged_runs']}", flush=True)
+    if cb["mean_finite_only"] is not None:
+        print(f"carried bpc (n={cb['n_finite']} finite of {cb['n']}): "
+              f"mean {cb['mean_finite_only']:.5f} sd {cb['sd_finite_only']}",
+              flush=True)
+    else:
+        print("carried bpc: every seed diverged; there is no mean to report",
+              flush=True)
     return 0
 
 
