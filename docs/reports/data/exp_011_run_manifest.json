@@ -1,0 +1,128 @@
+{
+  "experiment": "EXP_011_composition",
+  "log": "experiments/logs/EXP_011_composition.md",
+  "arch": "twocomp_threshold",
+  "reference_run": "twocomp_s0",
+  "reference_note": "K1 anchors to the ADOPTED arm, not the Phase-2 baseline: the composed arm is twocomp plus one thing.",
+  "baseline_wall_clock_s": 398.88,
+  "baseline_wall_clock_run": "snn_beta0.5_s0",
+  "twocomp_wall_clock": {
+    "runs": [
+      "twocomp_s0",
+      "twocomp_s1",
+      "twocomp_s2"
+    ],
+    "n": 3,
+    "mean_wall_clock_s": 525.29
+  },
+  "sequential": true,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "dispatch": {
+    "cuda_available": true,
+    "jiterator_available": true,
+    "fused_path_taken": true,
+    "device_name": "NVIDIA GeForce RTX 5060",
+    "torch": "2.12.1+cu130"
+  },
+  "runs": [
+    {
+      "run": "compose_s0",
+      "arch": "twocomp_threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "mu_init"
+      ],
+      "same_arm": true,
+      "seed": 0,
+      "trained_in_this_invocation": false,
+      "train_seconds": 0.0,
+      "eval_seconds": 0.0,
+      "reported_wall_clock_s": 592.94,
+      "wall_clock_vs_phase2_baseline": 1.487,
+      "wall_clock_vs_twocomp": 1.129,
+      "peak_vram_gib": 1.1047,
+      "params": 738509,
+      "test_bpc": {
+        "fresh": NaN,
+        "carried": NaN
+      }
+    },
+    {
+      "run": "compose_s1",
+      "arch": "twocomp_threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "seed",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "mu_init"
+      ],
+      "same_arm": true,
+      "seed": 1,
+      "trained_in_this_invocation": false,
+      "train_seconds": 0.0,
+      "eval_seconds": 0.0,
+      "reported_wall_clock_s": 569.43,
+      "wall_clock_vs_phase2_baseline": 1.428,
+      "wall_clock_vs_twocomp": 1.084,
+      "peak_vram_gib": 1.1047,
+      "params": 738509,
+      "test_bpc": {
+        "fresh": 2.1100955401238504,
+        "carried": 2.082909176662117
+      }
+    },
+    {
+      "run": "compose_s2",
+      "arch": "twocomp_threshold",
+      "differs_in": [
+        "arch",
+        "run_name",
+        "seed",
+        "thr_log_init"
+      ],
+      "absent_from_reference_and_left_at_default": [
+        "mu_init"
+      ],
+      "same_arm": true,
+      "seed": 2,
+      "trained_in_this_invocation": false,
+      "train_seconds": 0.0,
+      "eval_seconds": 0.0,
+      "reported_wall_clock_s": 558.34,
+      "wall_clock_vs_phase2_baseline": 1.4,
+      "wall_clock_vs_twocomp": 1.063,
+      "peak_vram_gib": 1.1047,
+      "params": 738509,
+      "test_bpc": {
+        "fresh": 2.111034548425589,
+        "carried": 2.083603581507201
+      }
+    }
+  ],
+  "elapsed_s": 0.2,
+  "carried_bpc": {
+    "values": [
+      NaN,
+      2.082909176662117,
+      2.083603581507201
+    ],
+    "n": 3,
+    "diverged_runs": [
+      "compose_s0"
+    ],
+    "n_finite": 2,
+    "mean_finite_only": 2.083256379084659,
+    "sd_finite_only": 0.000491018374847915
+  }
+}

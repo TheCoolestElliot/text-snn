@@ -1,0 +1,349 @@
+{
+  "experiment": "EXP_011_composition",
+  "run": "compose_s0",
+  "from_checkpoint": "experiments\\runs\\compose_s0\\ckpt_best.pt",
+  "compares_with": "docs/reports/data/exp_009_divergence.json",
+  "reproduced": true,
+  "first_nonfinite_step": 17598,
+  "origin": "backward",
+  "trace": [
+    {
+      "step": 17500,
+      "loss": 1.3953760862350464,
+      "grad_norm": 0.2255839705467224,
+      "firing_rate": [
+        0.3804251551628113,
+        0.3853752017021179
+      ]
+    },
+    {
+      "step": 17550,
+      "loss": 1.4972546100616455,
+      "grad_norm": 0.2620576322078705,
+      "firing_rate": [
+        0.3781222105026245,
+        0.3809501528739929
+      ]
+    },
+    {
+      "step": 17598,
+      "loss": 1.4621869325637817,
+      "grad_norm": NaN,
+      "firing_rate": [
+        0.38004738092422485,
+        0.3824915885925293
+      ]
+    }
+  ],
+  "resumed_at_step": 17500,
+  "steps_after_resume": 98,
+  "instrumented_from_step": 17592,
+  "eager_replay_of_bad_step": {
+    "step": 17598,
+    "fused": false,
+    "loss": 1.4621869325637817,
+    "nonfinite_forward": [],
+    "nonfinite_grads": [
+      "embed.weight",
+      "layers.0.weight",
+      "layers.0.bias",
+      "w.0",
+      "beta_s_raw.0",
+      "thr_log.0"
+    ],
+    "grad_abs_max_finite": 0.00955398939549923
+  },
+  "r10_separation": "BOTH paths produce NaN -- the fused kernel is exonerated and the arithmetic is the origin on either path.",
+  "fused_only_nonfinite_params": [],
+  "instrumented_steps": [
+    {
+      "step": 17592,
+      "loss": 1.4017434120178223,
+      "grad_norm_fp32": 0.23393937945365906,
+      "grad_norm_fp64": 0.23393939030904243,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.012340445071458817,
+      "grad_abs_max_param": "layers.0.bias",
+      "top_grads": [
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.012340445071458817
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.0036184932105243206
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.0034818139392882586
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 0.003468805691227317
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.003154117614030838
+        }
+      ],
+      "param_abs_max": 4.144738674163818,
+      "logits_abs_max_finite": 225.70687866210938,
+      "state_abs_max_finite": [
+        23.877864837646484,
+        68.06546783447266
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17593,
+      "loss": 1.510554313659668,
+      "grad_norm_fp32": 0.24340014159679413,
+      "grad_norm_fp64": 0.24340013138398356,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.007931247353553772,
+      "grad_abs_max_param": "layers.0.bias",
+      "top_grads": [
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.007931247353553772
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.004418644588440657
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.004096426069736481
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.00403639068827033
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 0.00394456647336483
+        }
+      ],
+      "param_abs_max": 4.144700527191162,
+      "logits_abs_max_finite": 228.41909790039062,
+      "state_abs_max_finite": [
+        31.0564022064209,
+        69.25291442871094
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17594,
+      "loss": 1.4565484523773193,
+      "grad_norm_fp32": 0.24183323979377747,
+      "grad_norm_fp64": 0.24183324743281553,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.013375361450016499,
+      "grad_abs_max_param": "layers.0.bias",
+      "top_grads": [
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.013375361450016499
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.0036703182850033045
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.0035676779225468636
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 0.0033314309548586607
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.0031283004209399223
+        }
+      ],
+      "param_abs_max": 4.144661903381348,
+      "logits_abs_max_finite": 227.54393005371094,
+      "state_abs_max_finite": [
+        33.07872009277344,
+        62.103355407714844
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17595,
+      "loss": 1.4668192863464355,
+      "grad_norm_fp32": 0.24941956996917725,
+      "grad_norm_fp64": 0.24941957250259633,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.027858417481184006,
+      "grad_abs_max_param": "layers.0.bias",
+      "top_grads": [
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.027858417481184006
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.004789847414940596
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 0.004224386066198349
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.003559353994205594
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.0033715746831148863
+        }
+      ],
+      "param_abs_max": 4.144623756408691,
+      "logits_abs_max_finite": 226.38909912109375,
+      "state_abs_max_finite": [
+        27.78208351135254,
+        64.93762969970703
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17596,
+      "loss": 1.480072259902954,
+      "grad_norm_fp32": 0.2282806634902954,
+      "grad_norm_fp64": 0.2282806611362165,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.027537262067198753,
+      "grad_abs_max_param": "layers.0.bias",
+      "top_grads": [
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.027537262067198753
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.01628657802939415
+        },
+        {
+          "param": "beta_s_raw.0",
+          "abs_max": 0.005569943692535162
+        },
+        {
+          "param": "layers.0.weight",
+          "abs_max": 0.004216560162603855
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.0032538108061999083
+        }
+      ],
+      "param_abs_max": 4.144585609436035,
+      "logits_abs_max_finite": 225.89566040039062,
+      "state_abs_max_finite": [
+        38.146446228027344,
+        64.90238189697266
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17597,
+      "loss": 1.470343828201294,
+      "grad_norm_fp32": 0.22274629771709442,
+      "grad_norm_fp64": 0.22274630148834354,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.03079327754676342,
+      "grad_abs_max_param": "w.0",
+      "top_grads": [
+        {
+          "param": "w.0",
+          "abs_max": 0.03079327754676342
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.02579532004892826
+        },
+        {
+          "param": "beta_s_raw.0",
+          "abs_max": 0.010619199834764004
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.00405372679233551
+        },
+        {
+          "param": "layers.0.weight",
+          "abs_max": 0.003968925680965185
+        }
+      ],
+      "param_abs_max": 4.144546985626221,
+      "logits_abs_max_finite": 226.65956115722656,
+      "state_abs_max_finite": [
+        29.328323364257812,
+        67.2203369140625
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 17598,
+      "loss": 1.4621869325637817,
+      "grad_norm_fp32": NaN,
+      "grad_norm_fp64": NaN,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": NaN,
+      "grad_abs_max_param": "embed.weight",
+      "top_grads": [
+        {
+          "param": "embed.weight",
+          "abs_max": NaN
+        },
+        {
+          "param": "layers.0.weight",
+          "abs_max": NaN
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": NaN
+        },
+        {
+          "param": "w.0",
+          "abs_max": Infinity
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 0.0075579313561320305
+        }
+      ],
+      "param_abs_max": 4.1445088386535645,
+      "logits_abs_max_finite": 223.0091094970703,
+      "state_abs_max_finite": [
+        38.067970275878906,
+        68.94954681396484
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": [
+        "embed.weight",
+        "layers.0.weight",
+        "layers.0.bias",
+        "w.0",
+        "beta_s_raw.0",
+        "thr_log.0"
+      ]
+    }
+  ],
+  "clip_fp32_overflow_reproduced": false,
+  "verdict": "NOT EXP_009's mechanism: the fp32 clip norm did not overflow while fp64 stayed finite. A different origin; see `origin` and the trace."
+}
