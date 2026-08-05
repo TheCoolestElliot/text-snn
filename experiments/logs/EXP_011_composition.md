@@ -362,5 +362,204 @@ the composed forward at `θ` must equal the two-compartment forward at
 
 ## 9. Results
 
-*To be appended after the runs complete. Nothing above this line is to be
-rewritten when they do.*
+**Closed 2026-08-04. C1–C5 all held; the verdict is `C1 holds, C2 holds` — THE
+ARMS COMPOSE — and it is PROVISIONAL at n = 2 of a pre-registered 3.** One seed
+diverged and was not replaced. Nothing above this line was rewritten.
+
+### 9.1 The headline, and the seed that is missing from it
+
+| | n | test bpc, carried | vs adopted arm | vs Phase-2 | wall-clock | peak VRAM |
+|---|---:|---:|---:|---:|---:|---:|
+| Phase-2 baseline | 5 | 2.25311 | — | — | 1.00× | 0.609 GiB |
+| two-compartment *(adopted)* | 7 | 2.11869 | — | −0.13442 | 1.32× | 0.980 GiB |
+| learned threshold | 3 | 2.19416 | — | −0.05896 | 1.12× | 0.734 GiB |
+| **composed** *(this arm)* | **2** | **2.08326 ± 0.00049** | **−0.03543** | **−0.16986** | **1.41×** | 1.105 GiB |
+| GRU anchor *(violates I5)* | 3 | 1.76741 | — | — | 1.11× | 0.864 GiB |
+
+Seeds: `compose_s1` **2.08291**, `compose_s2` **2.08360**. `compose_s0` diverged
+(§9.5) and is excluded under the post-hoc rule in
+`scripts/exp/011_compose_results.py`'s header — **excluded, not replaced**.
+
+**The wall-clock column is against `snn_beta0.5_s0`'s 398.9 s**, this project's
+standing denominator. Against the adopted arm's own three-seed 525.3 s the
+composed arm is **1.074×** — the cost of one elementwise multiply per layer
+outside the time loop, and the manifest records both denominators rather than
+leaving the reader to guess which one a ratio is against.
+
+−0.03543 bpc is **−28.7 se** of the difference and **7.7× the 2σ adoption bar**.
+Both surviving seeds beat the adopted arm individually, and the spread between
+them is 0.00069 bpc.
+
+### 9.2 Where the gain lives, and it is not where either parent's headline is
+
+`EXP_004` §10.3's decomposition, cut at the baseline's horizon of 7, **against
+the adopted arm**:
+
+| component | bpc | share |
+|---|---:|---:|
+| Zero context | **+0.00050** | **1.4 %** |
+| Within the baseline's reach | **+0.03597** | **102.4 %** |
+| Beyond the horizon | −0.00134 | −3.8 % |
+| **Total** | **+0.03513** | 100 % |
+
+**This is the finding, and it confirms `EXP_004` §10.6 in the strong form while
+inverting what that implied about the composition's value.**
+
+§10.6 argued the two mechanisms are the same mechanism *at zero context*: the
+two-compartment neuron there **is** the baseline with a learned per-channel
+threshold. If that is right, stacking a real per-channel threshold on top should
+buy nothing at c = 0. **It buys 0.00050 bpc — 1.4 %, and below the ~2e-3
+reparameterisation noise floor `EXP_008` §9.6 measured.** The prediction is
+confirmed about as cleanly as this design can confirm anything.
+
+So the composition's entire gain is the **within-reach** component — the one the
+adopted arm *damaged*. Against the Phase-2 baseline the composed arm decomposes
+as zero **+0.05113** (32.2 %), within-reach **−0.02386** (−15.0 %), beyond
+**+0.13139** (82.8 %): it still gives back within-reach ground, but **less** than
+the adopted arm alone does, and the +0.03597 above is exactly that repair.
+
+Two facts sharpen it:
+
+* the threshold arm moved within-reach by **+0.0288** against the Phase-2
+  baseline — the first arm in this project to move that component at all;
+* composed onto the adopted arm it moves the same component by **+0.03597**,
+  *more* than it managed against the baseline, because the two-compartment
+  neuron had left more room there to recover.
+
+**The arms compose because they act on different components than their headline
+numbers advertise.** §10.6 was right that they collide at zero context, and that
+collision is precisely why the composition's value shows up somewhere else.
+
+### 9.3 The per-context curve, the horizon, and the fold
+
+* **§6.2 against the adopted arm: 0 / 128 contexts significantly worse.** The
+  worst delta anywhere is −0.0005, at c = 0. The composition regresses nothing
+  relative to the arm it is built on.
+* Against the Phase-2 baseline: **3 / 128**, where the adopted arm alone is
+  5 / 128. Worst short-context +0.0307 at c = 3 — still the adopted arm's own
+  short-range cost, partially repaired.
+* **Median horizon 48** (48 on both seeds) against the adopted arm's 47. The
+  composition is not a horizon effect and was not expected to be.
+* **C4, the fold.** `compose_s1` residual **1.05e-06**, `compose_s2`
+  **1.89e-07**, 738 509 → 737 485 parameters, loading into `arch="twocomp"`.
+  Identity 2 executed: the gain folds into the layer's `Linear` and `thr_log`
+  disappears, so **the composed arm costs the adopted arm exactly at inference.**
+
+  These residuals are **three to four orders of magnitude smaller** than
+  `EXP_008` W1's 1.86e-3, which failed its bar. Both are the same identity
+  through the same kind of fp32 GEMM reordering, so the gap is worth stating and
+  **this experiment does not explain it.** It is reported as an open observation,
+  not as evidence about decision #6, and §10 names it as a thing to chase.
+
+* The learned thresholds: `exp(θ)` mean **0.449 / 0.529** (layers 0 / 1) on
+  `compose_s1` and **0.456 / 0.523** on `compose_s2`. `EXP_008`'s threshold arm
+  alone reached 0.342 / 0.428 and the two-compartment arm's effective figure was
+  0.69 / 0.79; composed, the arm settles between them — consistent with the two
+  mechanisms partially substituting for one another, which is what §9.2 measures
+  directly.
+
+### 9.4 The predictions, resolved as written
+
+| | statement | measured | verdict |
+|---|---|---:|---|
+| **C1** | carried mean ≤ 2.11869 (no negative interaction) | **2.08326** | **HELD**, by 0.0354 |
+| **C2** | cross-seed sd ≤ 0.005 | **0.00049** | **HELD** — but see below |
+| **C3** | carried mean > 2.05973 (sub-additive) | 2.08326 | **HELD** |
+| **C4** | folds into `arch="twocomp"`; residual reported | 1.05e-06 / 1.89e-07 | **HELD** (no bar applied) |
+| **C5** | Identity 1 holds for the two-compartment neuron (fp64) | exact spikes; ≤1e-12 membrane | **HELD** |
+
+**C2 is the prediction the missing seed costs most, and its verdict should be
+read weakly.** A sample sd over two values is a number, not an estimate. §3.1
+priced this design at n = 3 and even there it resolved only ~0.004 bpc; at n = 2
+the 0.00049 says the two surviving seeds agreed, and little else. It is not
+evidence that the arm is stable, and it is certainly not evidence that it is
+stable *against the failure that killed seed 0*.
+
+**C3 held: the gain is sub-additive.** 60.1 % of the threshold arm's 0.05896
+carried over. `EXP_004` §10.11 item 2 predicted the numbers "would not add
+twice", and they did not. §3.1 stated in advance that this design cannot
+separate 60 % from, say, 55 % or 70 %, so **60.1 % is a point estimate with a
+wide interval** and is quoted as one.
+
+### 9.5 `compose_s0` — chased, and it is not the failure the project expected
+
+The seed trained cleanly to step 17 500 (loss 1.3954, grad-norm 0.2256, firing
+0.380/0.385) and was NaN by 17 750, for the remaining 2 250 steps.
+`scripts/exp/011_chase_compose_divergence.py` replays it from its last healthy
+checkpoint. **It reproduces deterministically at step 17 598**, and:
+
+| | `EXP_009`'s dead seed | **`compose_s0`** |
+|---|---|---|
+| forward at the bad step | finite | **finite** (logits max 223.0) |
+| loss | finite | **finite** (1.4622) |
+| gradients before it | finite, largest **5.46e31** | **1.2e-2 – 3.1e-2, no run-up at all** |
+| ‖g‖ fp32 vs fp64 | **inf vs finite** — the clip overflowed | **both NaN; equal at every healthy step** |
+| origin | backward, layer 0 + embedding | **backward, layer 0 + embedding** |
+| eager path at the same step | not tested | **identical NaN — kernel exonerated** |
+
+**This is not `EXP_009` §9.4's mechanism.** That seed died because
+`clip_grad_norm_`'s fp32 sum of squares overflowed on a genuinely enormous
+gradient. This one died with gradients of 0.03, every quantity in the same range
+as the six preceding healthy steps, and the parameters at its last healthy
+checkpoint sitting **inside** the ranges the two surviving seeds occupy —
+`compose_s2` reached a *larger* maximum gain (7.71 against 5.40) and lived.
+
+**Decision #7's fix would not have saved this seed.** Two divergences that look
+identical in a training log have different causes, which is the protocol's
+"chase a NaN to its origin" earning its place.
+
+Pass 3 replays the same step with `fused=False`. The eager path produces an
+identical NaN in the identical six tensors, so the hand-written two-compartment
+backward is **exonerated** and this is **not** an R10-class defect.
+
+What is established: the NaN is generated inside layer 0's backward, on **both**
+dispatch paths, from a finite forward, a finite loss and unremarkable gradients.
+What is **not** established is which arithmetic step produces it — that needs
+instrumentation inside the scan's backward, and §10 names it rather than
+guessing at it here.
+
+### 9.6 The stretch markers, reported without a verdict (§4.3)
+
+| marker | value | composed arm below it? |
+|---|---:|---|
+| the tasking's 2.083 | 2.083 | **No** — 2.08326, a miss by **0.00026** |
+| half-gain midpoint | 2.08921 | Yes |
+
+**The 2.083 marker is reported as a miss, because that is what it is** — §4.3
+attached no verdict to it and the protocol's rule (`EXP_008` W3, failed at 49.7 %
+against 50 %) is that a near-miss is a miss.
+
+But the size of the miss is the point. **0.00026 bpc is roughly an eighth of the
+~2e-3 reparameterisation noise floor** and two orders of magnitude below what
+§3.1 said this design resolves. Had 2.083 been pre-registered as C1 — as this
+experiment's tasking specified, and as §0 item 1 declined — **EXP_011 would now
+be recording a FAIL on a margin it cannot measure, in the same table where the
+arms demonstrably composed at −28.7 se.** The bar and its own justification would
+have disagreed, and the number would have won.
+
+### 9.7 Status
+
+**CLOSED**, provisional at n = 2. The composed arm is a **Phase-5 candidate**;
+adoption is Elliot's and Phase-3 §9 is still unticked. This experiment closes
+**no** other open decision.
+
+Nine training runs' worth of GPU time was not needed: **three runs, ~0.51
+GPU-hours**, plus ~0.35 GPU-hours for the 17-checkpoint horizon probe and the
+divergence chase, which §2.2 committed to and the tasking's estimate did not
+include.
+
+## 10. What this experiment does not answer
+
+1. **Which arithmetic in layer 0's backward makes the NaN.** Bounded to the
+   backward on both dispatch paths from finite inputs (§9.5); not localised
+   further. The next step is instrumenting inside `twocomp_scan`'s backward, and
+   it is now the **second** unexplained divergence in Phase 4.
+2. **Why this fold is 1000× tighter than `EXP_008`'s** (§9.3). Same identity,
+   same class of fp32 reordering, wildly different residual. Bears on decision #6
+   and is deliberately not offered as evidence for it until it is understood.
+3. **Whether n = 3 would have held C2.** It cannot be known from n = 2, and the
+   seed was not replaced.
+4. **Whether either parent's initialisation is right for the composition.** One
+   point in a two-dimensional init space (`θ`, `w`), §5's limitation, unswept.
+5. **Whether the within-reach repair survives at another width, depth or corpus.**
+   Nothing here speaks to scale.

@@ -1,0 +1,474 @@
+{
+  "experiment": "EXP_011_composition",
+  "log": "experiments/logs/EXP_011_composition.md",
+  "horizon_artifact": "docs/reports/data/exp_011_memory_horizon.json",
+  "bars": {
+    "C1": 2.11869,
+    "C2_sd_max": 0.005,
+    "C3_additive_point": 2.05973,
+    "whole_split_2sigma": 0.00922,
+    "twocomp_family_2sigma": 0.00627,
+    "baseline_horizon": 7
+  },
+  "references": {
+    "snn_beta0.5": {
+      "runs": [
+        "snn_beta0.5_s0",
+        "snn_beta0.5_s1",
+        "snn_beta0.5_s2",
+        "snn_beta0.5_s3",
+        "snn_beta0.5_s4"
+      ],
+      "n": 5,
+      "fresh": {
+        "values": [
+          2.2718995629892054,
+          2.2706395479381665,
+          2.270503900016693,
+          2.261929842996634,
+          2.273487375841324
+        ],
+        "mean": 2.269692045956405,
+        "sd": 0.0045023972002364255,
+        "reported": 2.2697,
+        "residual_vs_reported": -7.954043594882165e-06
+      },
+      "carried": {
+        "values": [
+          2.2554769668134713,
+          2.2541719952712036,
+          2.2537585127716557,
+          2.2451818205700587,
+          2.25698491861649
+        ],
+        "mean": 2.253114842808576,
+        "sd": 0.004610364431390589,
+        "reported": 2.2531,
+        "residual_vs_reported": 1.4842808575998845e-05
+      }
+    },
+    "twocomp": {
+      "runs": [
+        "twocomp_s0",
+        "twocomp_s1",
+        "twocomp_s2",
+        "twocomp_s3",
+        "twocomp_s4",
+        "twocomp_s5",
+        "twocomp_s6"
+      ],
+      "n": 7,
+      "fresh": {
+        "values": [
+          2.148255252098026,
+          2.139476603611329,
+          2.1451368049678763,
+          2.1472929209121934,
+          2.1477288233869185,
+          2.1463147480875797,
+          2.145421741750553
+        ],
+        "mean": 2.1456609849734964,
+        "sd": 0.0029629763629815367,
+        "reported": 2.14566,
+        "residual_vs_reported": 9.84973496542807e-07
+      },
+      "carried": {
+        "values": [
+          2.121642396466609,
+          2.1120658288139103,
+          2.118391221725656,
+          2.1199276547608297,
+          2.1208154993554014,
+          2.1191277758977796,
+          2.1188636976688446
+        ],
+        "mean": 2.118690582098433,
+        "sd": 0.0031346693158309127,
+        "reported": 2.11869,
+        "residual_vs_reported": 5.820984330107137e-07
+      }
+    },
+    "gru": {
+      "runs": [
+        "gru_s0",
+        "gru_s1",
+        "gru_s2"
+      ],
+      "n": 3,
+      "fresh": {
+        "values": [
+          1.8026171769592991,
+          1.8046689231953035,
+          1.8060067304120404
+        ],
+        "mean": 1.8044309435222143,
+        "sd": 0.0017072621051995181,
+        "reported": 1.80443,
+        "residual_vs_reported": 9.435222143583388e-07
+      },
+      "carried": {
+        "values": [
+          1.7651176305736433,
+          1.7675346815376582,
+          1.7695715637204759
+        ],
+        "mean": 1.7674079586105924,
+        "sd": 0.0022296690660939854,
+        "reported": 1.76741,
+        "residual_vs_reported": -2.0413894075144157e-06
+      }
+    }
+  },
+  "arm": {
+    "bpc": {
+      "fresh": {
+        "values": [
+          2.1100955401238504,
+          2.111034548425589
+        ],
+        "mean": 2.1105650442747197,
+        "sd": 0.0006639791377498653,
+        "n": 2,
+        "reference_arm": "twocomp",
+        "reference_mean": 2.1456609849734964,
+        "delta_vs_reference": -0.03509594069877675,
+        "se_of_difference": 0.0012143350891609065,
+        "difference_in_se": -28.90136422149153,
+        "delta_vs_phase2_baseline": -0.15912700168168525
+      },
+      "carried": {
+        "values": [
+          2.082909176662117,
+          2.083603581507201
+        ],
+        "mean": 2.083256379084659,
+        "sd": 0.000491018374847915,
+        "n": 2,
+        "reference_arm": "twocomp",
+        "reference_mean": 2.118690582098433,
+        "delta_vs_reference": -0.03543420301377376,
+        "se_of_difference": 0.0012346195698123745,
+        "difference_in_se": -28.700503280665398,
+        "delta_vs_phase2_baseline": -0.16985846372391666
+      }
+    },
+    "identity_gate": "passed",
+    "decomposition": {
+      "cut_at_context": 7,
+      "total_gain_bpc": 0.03512956166286063,
+      "zero_context_gain_bpc": 0.000496756014291222,
+      "within_reach_gain_bpc": 0.03597118312487302,
+      "beyond_horizon_gain_bpc": -0.0013383774763036094,
+      "zero_context_share": 0.014140683537659909,
+      "within_reach_share": 1.0239576420021819,
+      "beyond_horizon_share": -0.038098325539841764
+    },
+    "decomposition_vs_phase2_baseline": {
+      "cut_at_context": 7,
+      "total_gain_bpc": 0.15865986394658993,
+      "zero_context_gain_bpc": 0.051131544978145094,
+      "within_reach_gain_bpc": -0.023864028817183858,
+      "beyond_horizon_gain_bpc": 0.1313923477856287,
+      "zero_context_share": 0.32227145357541487,
+      "within_reach_share": -0.15040999168647506,
+      "beyond_horizon_share": 0.8281385381110602
+    },
+    "context_vs_twocomp": {
+      "n_contexts_significantly_worse": 0,
+      "contexts_significantly_worse": [],
+      "n_short_contexts_significantly_worse": 0,
+      "worst_delta_bpc": -0.000496756014291222,
+      "worst_delta_at_context": 0,
+      "worst_short_context_delta_bpc": -0.000496756014291222,
+      "worst_short_context_at": 0,
+      "short_context_table": [
+        {
+          "c": 0,
+          "delta_bpc": -0.000496756014291222,
+          "bar_2sigma": 0.012674544370151216,
+          "multiple_of_bar": -0.03919320488246437
+        },
+        {
+          "c": 1,
+          "delta_bpc": -0.008174385625956404,
+          "bar_2sigma": 0.028399723774112824,
+          "multiple_of_bar": -0.28783327932955444
+        },
+        {
+          "c": 2,
+          "delta_bpc": -0.008254258061134223,
+          "bar_2sigma": 0.015299793671628273,
+          "multiple_of_bar": -0.5395012663759515
+        },
+        {
+          "c": 3,
+          "delta_bpc": -0.018315197725999877,
+          "bar_2sigma": 0.017933458672268452,
+          "multiple_of_bar": -1.021286415560303
+        },
+        {
+          "c": 4,
+          "delta_bpc": -0.028513506125599886,
+          "bar_2sigma": 0.00861324559081464,
+          "multiple_of_bar": -3.310425300772491
+        },
+        {
+          "c": 5,
+          "delta_bpc": -0.030702053567689624,
+          "bar_2sigma": 0.005185604935767067,
+          "multiple_of_bar": -5.920631044591541
+        },
+        {
+          "c": 6,
+          "delta_bpc": -0.03607510436157568,
+          "bar_2sigma": 0.005994232571342174,
+          "multiple_of_bar": -6.018302415232793
+        },
+        {
+          "c": 7,
+          "delta_bpc": -0.03646793913916424,
+          "bar_2sigma": 0.0026590415336810403,
+          "multiple_of_bar": -13.714693312322918
+        },
+        {
+          "c": 8,
+          "delta_bpc": -0.037601562306885494,
+          "bar_2sigma": 0.0020423988925800485,
+          "multiple_of_bar": -18.410488981114526
+        }
+      ]
+    },
+    "context_vs_baseline": {
+      "n_contexts_significantly_worse": 3,
+      "contexts_significantly_worse": [
+        3,
+        4,
+        5
+      ],
+      "n_short_contexts_significantly_worse": 3,
+      "worst_delta_bpc": 0.030732525335335215,
+      "worst_delta_at_context": 3,
+      "worst_short_context_delta_bpc": 0.030732525335335215,
+      "worst_short_context_at": 3,
+      "short_context_table": [
+        {
+          "c": 0,
+          "delta_bpc": -0.051131544978145094,
+          "bar_2sigma": 0.012674544370151216,
+          "multiple_of_bar": -4.034191958691692
+        },
+        {
+          "c": 1,
+          "delta_bpc": -0.06855235656423275,
+          "bar_2sigma": 0.028399723774112824,
+          "multiple_of_bar": -2.4138388496130454
+        },
+        {
+          "c": 2,
+          "delta_bpc": -0.0030695614785396508,
+          "bar_2sigma": 0.015299793671628273,
+          "multiple_of_bar": -0.20062763880481627
+        },
+        {
+          "c": 3,
+          "delta_bpc": 0.030732525335335215,
+          "bar_2sigma": 0.017933458672268452,
+          "multiple_of_bar": 1.7136976138829652
+        },
+        {
+          "c": 4,
+          "delta_bpc": 0.027138289605186827,
+          "bar_2sigma": 0.00861324559081464,
+          "multiple_of_bar": 3.1507623135845226
+        },
+        {
+          "c": 5,
+          "delta_bpc": 0.010166377001091575,
+          "bar_2sigma": 0.005185604935767067,
+          "multiple_of_bar": 1.9604997154662227
+        },
+        {
+          "c": 6,
+          "delta_bpc": -0.01251888155135683,
+          "bar_2sigma": 0.005994232571342174,
+          "multiple_of_bar": -2.0884877926172485
+        },
+        {
+          "c": 7,
+          "delta_bpc": -0.027267516160961236,
+          "bar_2sigma": 0.0026590415336810403,
+          "multiple_of_bar": -10.254640935680868
+        },
+        {
+          "c": 8,
+          "delta_bpc": -0.042439080846994326,
+          "bar_2sigma": 0.0020423988925800485,
+          "multiple_of_bar": -20.77903635826173
+        }
+      ]
+    },
+    "horizon": {
+      "per_seed": [
+        48,
+        48
+      ],
+      "median": 48.0
+    },
+    "learned": [
+      {
+        "run": "compose_s1",
+        "parameter": "thr_log",
+        "reported_quantity": "exp(theta) = thr multiplier",
+        "step": 20000,
+        "layers": [
+          {
+            "layer": 0,
+            "mean": 0.4492872655391693,
+            "sd": 0.1515977531671524,
+            "min": 0.197684183716774,
+            "max": 1.496690034866333,
+            "p10": 0.312527060508728,
+            "p50": 0.4178650379180908,
+            "p90": 0.629647970199585,
+            "abs_movement_from_one": 0.5543689131736755
+          },
+          {
+            "layer": 1,
+            "mean": 0.5286766290664673,
+            "sd": 0.2166767567396164,
+            "min": 0.2859854996204376,
+            "max": 1.8670037984848022,
+            "p10": 0.3769969046115875,
+            "p50": 0.4564160108566284,
+            "p90": 0.7998334765434265,
+            "abs_movement_from_one": 0.49761611223220825
+          }
+        ]
+      },
+      {
+        "run": "compose_s2",
+        "parameter": "thr_log",
+        "reported_quantity": "exp(theta) = thr multiplier",
+        "step": 20000,
+        "layers": [
+          {
+            "layer": 0,
+            "mean": 0.45616644620895386,
+            "sd": 0.1556856632232666,
+            "min": 0.12967120110988617,
+            "max": 1.429844617843628,
+            "p10": 0.31220030784606934,
+            "p50": 0.4279513359069824,
+            "p90": 0.6096371412277222,
+            "abs_movement_from_one": 0.5474496483802795
+          },
+          {
+            "layer": 1,
+            "mean": 0.5232367515563965,
+            "sd": 0.21001027524471283,
+            "min": 0.2788408100605011,
+            "max": 1.815733551979065,
+            "p10": 0.3832094967365265,
+            "p50": 0.4574629068374634,
+            "p90": 0.7575498223304749,
+            "abs_movement_from_one": 0.5011166334152222
+          }
+        ]
+      }
+    ],
+    "fold": [
+      {
+        "run": "compose_s1",
+        "arm_fresh_bpc": 2.1100955401238504,
+        "folded_fresh_bpc": 2.1100944867301137,
+        "residual_bpc": 1.053393736683006e-06,
+        "gated": false,
+        "note": "reported, not gated -- EXP_011 C4; fold-in tolerance is decision #6 and is open",
+        "folded_param_count": 737485,
+        "arm_param_count": 738509,
+        "folds_to_arch": "twocomp"
+      },
+      {
+        "run": "compose_s2",
+        "arm_fresh_bpc": 2.111034548425589,
+        "folded_fresh_bpc": 2.111034737380212,
+        "residual_bpc": 1.889546230593453e-07,
+        "gated": false,
+        "note": "reported, not gated -- EXP_011 C4; fold-in tolerance is decision #6 and is open",
+        "folded_param_count": 737485,
+        "arm_param_count": 738509,
+        "folds_to_arch": "twocomp"
+      }
+    ],
+    "composition": {
+      "twocomp_carried_mean": 2.118690582098433,
+      "threshold_arm_carried_mean": 2.19415951670898,
+      "threshold_arm_gain_vs_baseline_bpc": 0.05895532609959586,
+      "full_additivity_point_bpc": 2.059735255998837,
+      "realised_gain_over_twocomp_bpc": 0.03543420301377376,
+      "carry_over_fraction": 0.6010348064891232,
+      "carry_over_note": "a point estimate with a wide interval -- EXP_011 \u00a73.1 states this design resolves ~0.004 bpc at 2sigma and cannot separate 90% from 100% carry-over"
+    },
+    "stretch_markers_no_verdict": {
+      "tasking_2.083": {
+        "bar": 2.083,
+        "below": false
+      },
+      "half_gain_midpoint": {
+        "bar": 2.08921,
+        "below": true
+      },
+      "note": "EXP_011 \u00a74.3: reported, no verdict attached, cannot change C1/C2"
+    },
+    "gap_to_gru": {
+      "gru_carried_mean": 1.7674079586105924,
+      "gap_before_bpc": 0.35128262348784056,
+      "gap_after_bpc": 0.3158484204740668
+    },
+    "predictions": {
+      "C1": {
+        "statement": "composed carried mean <= 2.11869 (no negative interaction)",
+        "measured": 2.083256379084659,
+        "held": true,
+        "margin_bpc": 0.03543362091534075,
+        "note": "the hypothesis's own bar; see EXP_011 \u00a70 item 1 for why it is not the tasking's 2.083"
+      },
+      "C2": {
+        "statement": "cross-seed sd <= 0.005",
+        "measured": 0.000491018374847915,
+        "held": true,
+        "note": "sd over n=2 seeds. EXP_011 \u00a73.1 priced this design at n=3; at n=2 the sd is reported but resolves almost nothing, and C2's verdict should be read as provisional in the strong sense."
+      },
+      "C3": {
+        "statement": "composed carried mean > 2.05973 (gain is sub-additive)",
+        "measured": 2.083256379084659,
+        "held": true,
+        "note": "a prediction that can fail: if it does, EXP_004 \u00a710.6's overlap argument is wrong about the composed case"
+      },
+      "C4": {
+        "statement": "the composed arm folds into arch=twocomp; residual REPORTED",
+        "measured": [
+          1.053393736683006e-06,
+          1.889546230593453e-07
+        ],
+        "held": true,
+        "note": "no bar applied -- EXP_011 C4. `held` is null when the fold was skipped and true when it ran, because there is nothing to fail."
+      },
+      "C5": {
+        "statement": "Identity 1 holds for the two-compartment neuron (fp64)",
+        "measured": "passed",
+        "held": true,
+        "note": "entry condition; checked by tests/test_compose_equivalence.py before training, not here"
+      }
+    },
+    "decision": {
+      "cell": "C1 holds, C2 holds",
+      "verdict": "THE ARMS COMPOSE. The composed arm becomes a Phase-5 candidate. Recommendation, not adoption: adoption is Elliot's and \u00a79 is unticked.",
+      "rule": "EXP_011 \u00a74",
+      "n": 2,
+      "provisional": true,
+      "provisional_reason": "n = 2 of a pre-registered 3. `compose_s0` diverged to NaN and is excluded under the post-hoc rule in this file's header; it was NOT replaced, so the pre-registered n is unmet and every verdict above is provisional. EXP_009 reported n=2 the same way and for the same reason."
+    }
+  }
+}

@@ -1,18 +1,32 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 2, 2026-08-04.** Interim, not final: Phase 4 is open and this document
+**Revision 3, 2026-08-04.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
 
-**Nothing in this document is a decision.** Eight decisions are Elliot's and are
-listed unresolved in §8. Rev 2 adds one of them and decides none.
+**Nothing in this document is a decision.** Of the eight items in §8, **seven are
+Elliot's and remain open, untouched.** The eighth was a scheduling question — *does
+the composition run inside Phase 4?* — and it was answered **inside Phase 4**, on
+Elliot's instruction. §8 marks it resolved and **no other row is edited.**
 
-**What rev 2 does.** It reads `EXP_007`, `EXP_008` and `EXP_009` *together* rather
-than one after another (§6.7), states a verdict for every Phase-4 arm against its
-own pre-registered rule (§6.8), re-runs every gate in §9 from a clean tree, and
-corrects five numbers rev 1 got wrong (§10). **No verdict, threshold or decision
-changes.** Two of the corrections make an arm look worse, one makes the adopted
+**What rev 3 does.** It adds §10: `EXP_011`, the composition of the adopted
+two-compartment neuron with `EXP_008`'s learned per-channel threshold. **The arms
+compose** — 2.08326 carried against the adopted arm's 2.11869, at −28.7 se, with
+0/128 contexts regressed — and the result is **provisional at n = 2 of a
+pre-registered 3**, because one seed diverged and was not replaced. Two findings
+in it are worth more than the headline: **the composition's entire gain is the
+within-reach component**, which confirms `EXP_004` §10.6's overlap argument in
+its strong form while relocating where the value is; and **the dead seed did not
+die of `EXP_009`'s bug**, which decision #7 would have fixed.
+
+**Rev 3 changes no earlier number, verdict or threshold**, and it adopts nothing.
+
+**What rev 2 did.** It read `EXP_007`, `EXP_008` and `EXP_009` *together* rather
+than one after another (§6.7), stated a verdict for every Phase-4 arm against its
+own pre-registered rule (§6.8), re-ran every gate in §9 from a clean tree, and
+corrected five numbers rev 1 got wrong (§11). **No verdict, threshold or decision
+changed.** Two of the corrections make an arm look worse, one makes the adopted
 arm look slightly better, and all five restore a committed measurement rather than
 redefining anything — the redefinitions on the table are still in §8, still
 unapplied.
@@ -27,10 +41,11 @@ unapplied.
 
 | | |
 |---|---|
-| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6 |
-| Ranked candidates closed | 5 of 14 (#1, #14, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics) |
-| Arms adopted | **1** — the two-compartment neuron (`EXP_004`). A second is **recommended** in §8 and not taken |
-| GPU-hours spent | ~3.5 of ~30 |
+| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10** |
+| Ranked candidates closed | 5 of 14 (#1, #14, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011` closes no ranked candidate** — it composes two arms already counted here |
+| Arms adopted | **1** — the two-compartment neuron (`EXP_004`). Two more are **recommended and not taken**: the threshold arm (§8 #5) and the composed arm (§10) |
+| GPU-hours spent | ~4.4 of ~30 |
+| Unexplained divergences | **2** — `twocomp_distill_s1` (§6.4) and `compose_s0` (§10.4), chased to **different** causes |
 | Phase-3 §9 sign-off | **still unticked**; Phase 4 was opened without it on instruction |
 
 The phase has moved the project's answer to its own question twice, and both
@@ -256,7 +271,7 @@ is the mean over the seeds that were *scored*. Rev 1 had two entries that were n
 the adopted arm at 1.35× was `twocomp_s0` alone against `EXP_004`'s committed
 three-seed **1.32×** (all seven seeds give 1.30×), and the distilled arm's 1.58×
 was measured against the two-compartment arm — correct in `EXP_009` §9.1, wrong in
-a column whose reference row is the baseline, where it is **2.13×**. §10 records
+a column whose reference row is the baseline, where it is **2.13×**. §11 records
 both.
 
 Both new arms clear the adoption bar — token-shift by **4.2×** and the threshold
@@ -527,7 +542,7 @@ reject:
 
 | rank | arm | why | GPU-h |
 |---:|---|---|---:|
-| **1** | **threshold × two-compartment composition** | the only way to know whether Phase 4's two best arms add. §10.11 item 2 asked for it in advance | 0.5 |
+| ~~1~~ | ~~threshold × two-compartment composition~~ | **DONE at rev 3 — this is `EXP_011` (§10).** Kept in the table struck through rather than deleted, so the ranking still reads as the list rev 2 offered. The arms compose; the gain is within-reach, not zero-context | ~~0.5~~ → 0.86 actual |
 | **2** | **#2 current normalisation (RMSNorm on `cur`)** | the real §6.3 #2, passes the Phase-3 §7.2 screen, attacks the same components by a different route, still unrun | 0.4 |
 | **3** | **why the threshold arm helps within reach** | a mechanism study, not an arm. The only measurement pointed at the largest remaining component | 0.3 |
 | **4** | **frozen-`beta_s` ladder**, N ∈ {16, 64, 256} | the only thing that can license tail-widening (§4.5) | 1.3 |
@@ -551,6 +566,16 @@ on it; **#5** because rank 1 measures the composition of an arm that is only
 *recommended*, and if #5 is "no" the composition run answers a question about an
 arm nobody is shipping; **#4** because it decides whether any of this is Phase 4
 or Phase 5 — which is the new decision #8.
+
+> **Rev 3, recorded rather than quietly dropped: rank 1 ran without #1 or #5
+> being answered.** Decision #8 was resolved "inside Phase 4" and `EXP_011` ran on
+> that instruction, so the caveat this paragraph raised is now live rather than
+> hypothetical — **the composition is measured on top of an arm that is
+> recommended and not adopted, and against a Phase-3 sign-off that is still
+> unticked.** That does not weaken §10's numbers, which stand on their own
+> pre-registration; it means §10 cannot be read as "the project's best model" until
+> #1 and #5 are answered. The remaining items in §7.1 still have this paragraph's
+> prerequisites in front of them.
 
 Given those, the order below is not arbitrary — each step's result changes whether
 the next is worth running:
@@ -583,9 +608,15 @@ quoted.
 
 ## 8. What is Elliot's, and is still open
 
-Nothing in this list has been decided. Seven items stood open at rev 1 and all
-seven still do; **#8 is new at rev 2**. Rev 2 sharpened the evidence under #3, #4
-and #5 without moving any of them.
+**Seven of these eight are Elliot's, are undecided, and are unchanged by rev 3 —
+not one of rows 1–7 has been edited.** Rev 2 sharpened the evidence under #3, #4
+and #5 without moving any of them; rev 3 moves none of them either.
+
+**#8 is resolved, and it is the only one.** It was the single *scheduling*
+question in the list — whether the composition ran inside Phase 4 or opened
+Phase 5 — and Elliot directed it to run inside Phase 4. It did, as `EXP_011`
+(§10). **Resolving it decides nothing about the arm it measured**: adopting the
+composed arm is #5's and #1's business, and both are still open.
 
 | # | Decision | Status | Evidence, as of rev 2 |
 |---:|---|---|---|
@@ -596,35 +627,187 @@ and #5 without moving any of them.
 | 5 | **Adopt the learned per-channel threshold?** | **open** | −0.0590 bpc at 23.6 se (6.4× the bar), 0/128 contexts regressed, 1.12× wall-clock, folds to zero cost. **Recommended for adoption**, with §6.5's ~2e-3 drift caveat and §7 item 4's composition warning. **Coupled to #6**: its own load-bearing check, W1, failed as written (§6.8) |
 | 6 | **The fold-in tolerance** | **open** | `EXP_008` W1 failed at 1e-3, a bar borrowed from F1, which compares two evaluations of the *same* weights. §6.5 measures why that was the wrong precedent; the algebra holds at 6.8–8.3 fp64 eps. **Referred, not redefined** |
 | 7 | **The gradient clip's fp32 accumulator** | **open** | `EXP_009` §9.4: the clip overflows at ‖g‖ = 5.5e31 and silently zeroes the update. Two one-line changes named, **neither applied** — both touch committed Phase-2 code and both would flatter the work. Independent of every decision about the three new arms: the exploding gradient is in the **adopted** neuron's backward |
-| **8** | **Does the composition experiment run inside Phase 4, or as Phase 5's first arm?** | **NEW, open** | §7.1 rank 1 is 0.5 GPU-h and answers a question `EXP_004` §10.11 item 2 asked in advance. Rev 1 implied it in #4 without separating it. Inside Phase 4 it keeps the phase open past its report; as Phase 5's opener it closes Phase 4 with the composition unmeasured — **and today the project cannot state what its best model scores either way**. Recommendation: **inside Phase 4**, because the arm it composes is the one #5 is being asked about |
+| **8** | **Does the composition experiment run inside Phase 4, or as Phase 5's first arm?** | **RESOLVED at rev 3 — inside Phase 4** | Elliot's instruction, 2026-08-04, matching rev 2's recommendation. Ran as `EXP_011` (§10): the arms compose at 2.08326 carried, −28.7 se, 0/128 contexts regressed, **provisional at n = 2** after one seed diverged and was not replaced. The composed arm is a **Phase-5 candidate; adopting it is #5's and #1's business and neither has moved.** ~0.86 GPU-hours including the probe and the divergence chase |
+
+**Two rows above now carry evidence `EXP_011` has overtaken, and the rows are
+deliberately left as they were.** Editing an open decision's evidence is how a
+decision gets made quietly, so the correction is recorded here instead:
+
+* **#4 (Phase 5 authorisation)** reads *"§7.1 item 1 — whether Phase 4's two best
+  arms compose — is unmeasured and costs 0.5 GPU-hours."* **It is now measured**
+  (§10) and it cost ~0.86 GPU-hours. That removes rev 2's stated reason for
+  recommending "not yet"; the other reasons stand — 5 of 14 candidates closed and
+  ~4.4 of ~30 GPU-hours spent — and **#4 is still open and still Elliot's.**
+* **#7 (the gradient clip's fp32 accumulator)** reads that the fix is independent
+  of the three new arms. It still is. But §10.4 shows the clip overflow is **not**
+  what killed `compose_s0`, so **fixing it would not have prevented Phase 4's
+  second divergence.** That is an argument for chasing the second mechanism, not
+  against fixing the first, and **#7 is unchanged and still open.**
+
+Rev 3 adds no new decision. If the composed arm is to be adopted, that is #5 and
+#1, already on the list.
 
 ---
 
 ## 9. Gates, at the close of this revision
 
-**Every row was re-run for rev 2 on 2026-08-04**, from the clean tree at `dcc8f82`,
-rather than carried over from rev 1.
+**Every row was re-run for rev 3 on 2026-08-04.** Rev 2's rows were re-run from
+the clean tree at `dcc8f82`; rev 3 re-runs them again with `EXP_011` in the tree
+and adds four rows of its own.
 
 | Gate | State |
 |---|---|
-| Test suite | **262 passed**, 1 warning, 42 s — the 242 from `EXP_006` unchanged, plus 20 in `tests/test_prescan.py`, four of which test Identity 2 directly |
-| **Resolver reproduces its own artifact** | `010_phase4_arm_results.py` re-run to a scratch path: **0 differences** against the committed `exp_007_009_arm_results.json` — every reference, decomposition, prediction and the three GPU fold-in evaluations, bit-for-bit |
+| Test suite | **272 passed**, 1 warning, 38 s — rev 2's 262 unchanged, plus **10 in `tests/test_compose_equivalence.py`** |
+| **`EXP_011` C5/K5 — Identity 1 on the two-compartment neuron** | float64, at a nowhere-zero per-channel `θ`, against a reference transcribed from `EXP_011` §1.1 rather than from the source: **spikes exact, membranes ≤1e-12** on four (`beta_f`, `thr`) regimes. A mutation leg asserts the check can fail. Run as the driver's entry condition **before** any training step |
+| **`EXP_011` K4 — the composed arm nests the adopted arm** | at `θ = 0`, forward and backward **bitwise** (`== 0.0`, not a tolerance) against `TwoCompartmentCharLM` |
+| **`EXP_011` K1 — the arm is the adopted arm plus one thing** | every composed run's `config.json` field-by-field against **`twocomp_s0`** (not the Phase-2 baseline): only `arch`, `run_name`, `seed`, `thr_log_init` differ; `mu_init` excused at the `Config` default and recorded in the manifest |
+| **Resolvers reproduce their own artifacts** | `010_phase4_arm_results.py`: **0 differences** against the committed `exp_007_009_arm_results.json`. `011_compose_results.py` re-run to a scratch path: **0 differences** against `exp_011_arm_results.json` — every reference, decomposition, prediction and both GPU fold evaluations, bit-for-bit |
 | Committed references recomputed | the resolver's own guard: baseline **2.25311**, twocomp **2.11869**, GRU **1.76741** carried, each recomputed from per-run `final_test.json` and asserted against the figure the reports quote (worst residual **1.5e-5**, tolerance 5e-4) |
 | Phase-3 §7.2 reachability screen | re-run: `thr` **PASS**, `ctl_live` **PASS**, `ctl_dead` SADDLE and `ctl_faint` FAINT as expected, all three self-tests held, and it reproduces `exp_004_gradient_reachability.json` at **0.00e+00** worst relative residual |
-| R10 gradient gates | untouched: neither new arm has a hand-written backward, and both call the committed `lif_scan` |
-| `EXP_001` F1 (probe reproduces committed bpc) | **23 / 23** runs, `f1_failures` empty in the horizon artifact |
-| Mutation campaign | none run during any training run; lockfile checked before each |
-| Working tree | clean at `dcc8f82` before this revision; **rev 2 modifies exactly one file — this one.** No script, artifact, experiment log or run directory is touched, and nothing is committed |
+| R10 gradient gates | untouched. `EXP_007`/`EXP_008`'s arms call the committed `lif_scan`; **`EXP_011`'s calls the committed `twocomp_scan`** and adds no hand-written backward. Independently, §10.4's pass 3 replayed `compose_s0`'s failing step on the **eager** path and got an identical NaN, which exonerates the fused two-compartment backward rather than merely leaving it unaccused |
+| `EXP_001` F1 (probe reproduces committed bpc) | **23 / 23** in the `EXP_007`–`EXP_009` artifact; **17 / 17** in `exp_011_memory_horizon.json` (worst residual 1.3e-08), `f1_failures` empty in both |
+| Mutation campaign | none run during any training run; lockfile checked before each, including all three `EXP_011` runs |
+| Sequential GPU use | the `EXP_011` driver blocks on each child in turn, and the horizon probe and divergence chase ran only **after** the last training run exited — so no wall-clock figure in §10.2 overlaps other GPU work |
+| Working tree | rev 2 modified exactly one file and committed nothing. **Rev 3 is different and says so:** it adds `EXP_011`'s pre-registration, arm, gate, driver, resolver and chase, a registry entry in `001_memory_horizon.py`, four artifacts under `docs/reports/data/`, three run directories, and this file. Every piece was **committed before the numbers it produces were read** — the pre-registration at `f0eebe4`, the arm and its gate at `ca94f01`, the driver at `5e3d5e5`, the resolver at `bc0dd08` |
 
 **Phase 4 remains open.** Rev 1 closed `EXP_007`, `EXP_008` and `EXP_009`; rev 2
-synthesises them, corrects five numbers and states a verdict for every arm. **It
-authorises nothing, adopts nothing, and redefines no threshold.**
+synthesised them; **rev 3 closes `EXP_011` and resolves the one scheduling
+decision that authorised it.** It authorises no phase, adopts no arm, and
+redefines no threshold — and seven decisions in §8 are untouched.
 
 ---
 
-## 10. Changelog
+## 10. `EXP_011` — the two best arms compose, and the seed that died proving something else
+
+Pre-registered in `experiments/logs/EXP_011_composition.md` and closed the same
+day. It is §7.1's rank-1 candidate and the measurement `EXP_004` §10.11 item 2
+asked for in advance. **Three training runs, ~0.51 GPU-hours**, plus ~0.35 for
+the 17-checkpoint horizon probe and the divergence chase.
+
+### 10.1 The arm, and why its parameters add nothing
+
+`arch="twocomp_threshold"`: the adopted neuron with `snn.prescan.threshold_gain`
+on the current before the scan. `EXP_011` §1.1 derives, **before any code
+existed**, that `EXP_008`'s Identity 1 extends to the two-compartment neuron —
+both poles scale linearly with the current, the mix is linear, and the fast reset
+is multiplicative, so `cur → g·cur` gives `v → g·v` and firing at `g·v ≥ thr` is
+firing at `v ≥ thr/g`. The reset-shielded slow pole carries the induction
+untouched, which is the step that had to be redone rather than inherited.
+
+`tests/test_compose_equivalence.py` checks it in float64 against a
+per-channel-threshold reference transcribed from the derivation rather than from
+the source, at a nowhere-zero `θ` so it cannot pass vacuously: **spikes exact,
+membranes ≤1e-12.** So the composed arm's 1 024 extra parameters are **exactly
+redundant** over the adopted arm — +0.14 % in parameters, **+0.00 % in
+function-space dimension** — and whatever it buys is an optimisation effect.
+
+### 10.2 The scoreboard
+
+| | n | test bpc, carried | vs adopted | se | wall-clock | peak VRAM |
+|---|---:|---:|---:|---:|---:|---:|
+| Phase-2 baseline | 5 | 2.25311 | — | — | 1.00× | 0.609 GiB |
+| learned threshold | 3 | 2.19416 | — | — | 1.12× | 0.734 GiB |
+| two-compartment *(adopted)* | 7 | 2.11869 | — | — | 1.32× | 0.980 GiB |
+| **composed** | **2** | **2.08326 ± 0.00049** | **−0.03543** | **−28.7** | **1.41×** | 1.105 GiB |
+| GRU anchor *(violates I5)* | 3 | 1.76741 | — | — | 1.11× | 0.864 GiB |
+
+Wall-clock is against `snn_beta0.5_s0`'s 398.9 s, the standing denominator;
+against the adopted arm's own three-seed 525.3 s the composed arm is **1.074×**.
+Seeds: 2.08291 and 2.08360. **`compose_s0` diverged and is excluded, not
+replaced** (§10.4). The gap to the GRU anchor narrows 0.35128 → 0.31585.
+
+**60.1 % of the threshold arm's 0.05896 carried over.** `EXP_004` §10.11 item 2
+predicted the numbers "would not add twice" and they did not — the arm's
+pre-registered C3 (sub-additivity) held. The design cannot separate 60 % from
+55 % or 70 %, and `EXP_011` §3.1 said so before it ran.
+
+### 10.3 The gain is entirely within-reach, which confirms §10.6 by relocating it
+
+`EXP_004` §10.3's decomposition, **against the adopted arm**:
+
+| component | bpc | share |
+|---|---:|---:|
+| Zero context | **+0.00050** | **1.4 %** |
+| Within the baseline's reach | **+0.03597** | **102.4 %** |
+| Beyond the horizon | −0.00134 | −3.8 % |
+
+**`EXP_004` §10.6 argued the two mechanisms are the same mechanism at zero
+context.** If so, stacking a real per-channel threshold on the adopted neuron
+should buy nothing there. It buys **0.00050 bpc — 1.4 %, and below the ~2e-3
+noise floor §6.5 measured.** The prediction is confirmed about as cleanly as this
+project can confirm anything.
+
+And that is *why* the composition is worth having. Its entire gain is the
+**within-reach** component — the one the adopted arm made **worse** (§6.2:
+−48.4 % inside the baseline's own reach) and the one the threshold arm was the
+first arm in this project to move (+0.0288 against the baseline). Composed, it
+moves that component by **+0.03597 — more than it managed against the baseline**,
+because the adopted arm had left more room there to recover.
+
+Against the Phase-2 baseline the composed arm decomposes as zero **+0.05113**
+(32.2 %), within-reach **−0.02386** (−15.0 %), beyond **+0.13139** (82.8 %): it
+still gives back short-range ground, but **less than the adopted arm alone**.
+
+**The two arms compose because they act on different components than their
+headline numbers advertise.** Phase 4's ranked list is built on the assumption
+that arms attack the component they were ranked for; this is the second time in
+Phase 4 that assumption has failed (§6.7 was the first), and it is the finding
+here that most affects Phase 5.
+
+Supporting rows: **§6.2 against the adopted arm — 0 / 128 contexts significantly
+worse**, worst delta −0.0005 at c = 0; against the baseline 3 / 128, where the
+adopted arm alone is 5 / 128. **Median horizon 48** against the adopted arm's 47 —
+the composition is not a horizon effect and was not expected to be. **The fold
+(C4) executes**: residuals 1.05e-06 and 1.89e-07, 738 509 → 737 485 parameters,
+loading into `arch="twocomp"` — so **the composed arm costs the adopted arm
+exactly at inference.**
+
+### 10.4 `compose_s0` — chased, and decision #7 would not have saved it
+
+The seed trained cleanly to step 17 500 and was NaN by 17 750.
+`scripts/exp/011_chase_compose_divergence.py` reproduces it **deterministically
+at step 17 598** from the last healthy checkpoint:
+
+| | `EXP_009`'s dead seed | **`compose_s0`** |
+|---|---|---|
+| forward / loss at the bad step | finite | **finite** (logits 223.0, loss 1.4622) |
+| gradients before it | finite, largest **5.46e31** | **1.2e-2 – 3.1e-2, no run-up** |
+| ‖g‖ fp32 vs fp64 | **inf vs finite** — the clip overflowed | **both NaN; equal at every healthy step** |
+| eager path, same step | not tested | **identical NaN — kernel exonerated** |
+| origin | backward, layer 0 + embedding | backward, layer 0 + embedding |
+
+**This is not `EXP_009` §9.4's mechanism, and that matters for decision #7.** That
+seed died to an fp32 overflow inside `clip_grad_norm_` on a genuinely enormous
+gradient. This one died with gradients of 0.03, every quantity in the range of the
+six preceding healthy steps, and parameters at its last healthy checkpoint sitting
+**inside** the range the two surviving seeds occupy — `compose_s2` reached a
+*larger* maximum gain (7.71 vs 5.40) and lived. Pass 3 replays the step on the
+eager path and gets an identical NaN in the identical six tensors, which
+**exonerates the hand-written two-compartment backward and rules out an R10
+defect.**
+
+Two divergences that look identical in a training log have different causes.
+Phase 4 now has **two unexplained ones**, and the fix named in §8 row 7 addresses
+only the first.
+
+### 10.5 What this does not settle
+
+**The verdict is provisional at n = 2**, and C2 (cross-seed sd ≤ 0.005) is the
+prediction that costs most: 0.00049 says the two surviving seeds agreed and
+little else, and it is **not** evidence of stability against whatever killed seed
+0. Not settled either: which arithmetic in layer 0's backward makes the NaN
+(bounded, not localised); **why this fold is ~1000× tighter than `EXP_008` W1's
+1.86e-3** — same identity, same class of fp32 reordering, and this experiment
+does not explain it, so it is **not** offered as evidence for decision #6; and
+whether either parent's initialisation is right for the composition, which is one
+unswept point in a two-dimensional space.
+
+---
+
+## 11. Changelog
 
 | Rev | Change |
 |---|---|
 | 1 | 2026-08-03. First Phase-4 report: the adopted arm and the shape of its gain, σ's non-transfer, `EXP_006`'s causal tail result and what it withdraws, `EXP_007`/`EXP_008`/`EXP_009` resolved against their pre-registrations, the reparameterisation noise floor, a revised ranking offered and not applied, and seven open decisions. |
+| 3 | 2026-08-04. **`EXP_011`, and the resolution of the one decision that was a scheduling question.** (a) §10 added: the composed arm (adopted two-compartment neuron + `EXP_008`'s learned per-channel threshold) at **2.08326 ± 0.00049 carried, −0.03543 against the adopted arm at −28.7 se, 0/128 contexts regressed, folding to the adopted arm's exact inference cost** — and **provisional at n = 2 of a pre-registered 3**. (b) §10.3: the composition's gain is **102.4 % within-reach and 1.4 % zero-context**, which confirms `EXP_004` §10.6's overlap argument in its strong form and relocates the value to the component the adopted arm damaged — the second time in Phase 4 that an arm has not moved the component it was ranked for. (c) §10.4: `compose_s0` diverged, was chased to step 17 598 and is **not** `EXP_009`'s mechanism — gradients of 0.03, fp32 and fp64 norms equal, an identical NaN on the eager path — so **decision #7's fix would not have prevented it** and the fused backward is exonerated. The seed was excluded and **not replaced**. (d) §8 row 8 marked **RESOLVED (inside Phase 4)**; **rows 1–7 are not edited**, and the two whose evidence `EXP_011` overtakes (#4, #7) are corrected in prose beneath the table rather than in the rows. (e) §9 re-run with four new gate rows; test suite **262 → 272**. (f) the header's §10 reference retargeted to §11 as the changelog renumbered. **No earlier number, verdict or threshold changes.** |
 | 2 | 2026-08-04. **Synthesis and corrections. No verdict, threshold or decision changes.** (a) §6.7 added: the three arms read together — two of them are the same mechanism, only the arm that added the least structure moved the within-reach component, token-shift is dominated at 13.3 se, and essentially none of the three gains is attributable to a larger function class. (b) §6.8 added: the verdict on every Phase-4 arm against its own rule, including that `EXP_008`'s cell is `W1 fails` and its headline is quoted under that caveat. (c) §7.2 added: the order Phase 5's arms should run in and what must be settled first. (d) §8 item 8 added; #3, #4, #5 re-evidenced; **all eight remain open**. (e) §9 re-run from a clean tree, with the resolver's 0-difference reproduction as a new row. **Corrections:** (f) §6.1's wall-clock for the adopted arm was **1.35×**, which is `twocomp_s0` alone — `EXP_004`'s committed three-seed figure is **1.32×** (1.30× over all seven), and `EXP_004` §10 item 6 said to quote it; *this correction flatters the adopted arm and is made because it restores a committed measurement*. (g) §6.1's distilled row was **1.58×**, correct against the two-compartment arm in `EXP_009` §9.1 and wrong in a column referenced to the baseline, where it is **2.13×**. (h) "clear the adoption bar by an order of magnitude" → **4.2×** and **6.4×** (8.4σ and 12.8σ). (i) the adopted arm recovered **58.2 %** of the beyond-horizon component, not 59 %, in §2 and §7.1. (j) Identity 2 holds to **6.8–8.3** fp64 eps; `EXP_008` §9.5's "≈7" is its first two seeds. Closed experiment logs are **not** rewritten for (f)–(j); the corrected numbers live here. (k) adding §7.2 made three bare "§7.2"/"§7.3" references read as self-references when they meant `03_phase3_candidates.md`; all three are now qualified — the same slip the Phase-3 report's own changelog records as (d). |
