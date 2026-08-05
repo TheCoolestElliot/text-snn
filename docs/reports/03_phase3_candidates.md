@@ -713,7 +713,14 @@ wrong code into the source tree must own the machine while it runs.**
       **P1, P4's GRU half, R1 and Q5 all failed and are recorded as failed**
 - [x] One contaminated run detected by a self-check, discarded, re-run, and the
       tooling fixed (§8)
-- [ ] **Reviewed by Elliot — Phase 4 does not begin until this is signed off**
+- [x] **Reviewed by Elliot — Phase 4 does not begin until this is signed off** —
+      **signed off 2026-08-05** on Elliot's instruction of that date. **Recorded as
+      a retrospective sign-off and labelled as one:** Phase 4 opened on a separate
+      instruction without it, and `EXP_004`–`EXP_009`, `EXP_011` and `EXP_012` all
+      ran before this box was ticked. The box's own wording — *"Phase 4 does not
+      begin until"* — was therefore **not** honoured in sequence, and this tick does
+      not pretend otherwise. What it settles is the review, not the ordering. See
+      §10 rev 3 for provenance and for what it unblocks in the Phase-4 report.
 
 ### 9.1 What Phase 4 inherits
 
@@ -740,4 +747,5 @@ wrong code into the source tree must own the machine while it runs.**
 | Rev | Change |
 |---|---|
 | 1 | Phase-3 deliverable: three pre-registered experiments, the horizon measurement and its confound, the I5 gap decomposition, the calibrated acceptance criterion, 14 ranked candidates, the mutation harness, and one contaminated run reported. |
+| 3 | 2026-08-05. **§9's sign-off box ticked, and nothing else in this file changes.** Elliot signed off Phase 3 on 2026-08-05, which is Phase-4 decision #1 and the last open item in §9. **It is recorded as a retrospective sign-off** — Phase 4 opened without it on a separate instruction, eight experiments ran before it, and the box's "Phase 4 does not begin until" was not honoured in sequence; the tick says so in place rather than leaving the record to read as though it had been. **No candidate, ranking, number or verdict in §§1–8 is touched.** What it unblocks is stated in the Phase-4 report: `EXP_008` §4's rider made the threshold arm's adoption conditional on this box, so decision **#5 is now ungated by #1**, and §7.2's first prerequisite is met. **One known defect is signed off with the rest and is named here rather than quietly included:** §9's "Phase-4 acceptance criterion derived from measurement and calibrated per-context" is ticked, and `EXP_005` has since found that bar built on the wrong scale (45× too small at c = 127). That is Phase-4 decision **#2, still open and still Elliot's**; the count it governs is unchanged at 5/128 under all three constructions, so nothing downstream of it moves. |
 | 2 | **Corrections, 2026-08-03, made from Phase 4 after an audit found three claims this report could not back.** No result, ranking or number in §§1–5 changes. (a) §7.2 grouped a screen that was only *specified* with two that were *built*; retitled, and the implementation recorded separately as §7.3 rather than backdated. (b) §6's counts did not close arithmetically — the 18 is the final set (14 + 1 + 3) reached by merging 20 proposals, now stated and enumerated in `docs/reports/data/phase3_candidates.json`. (c) §6.3's total said "~7.9 GPU-hours"; its rows sum to **7.80**. (d) §2.5's bare "§7.2" read as a self-reference and meant `02_baseline_report.md` §7.2. (e) §6.5 added: the generation step's provenance is thinner than the rest of the report, and says how. (f) §6.4's saddle, derived on paper in rev 1, is now measured. |

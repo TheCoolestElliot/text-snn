@@ -1,14 +1,25 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 4, 2026-08-05.** Interim, not final: Phase 4 is open and this document
+**Revision 5, 2026-08-05.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
 
-**Nothing in this document is a decision.** Of the eight items in §8, **seven are
-Elliot's and remain open, untouched.** The eighth was a scheduling question — *does
-the composition run inside Phase 4?* — and it was answered **inside Phase 4**, on
-Elliot's instruction. §8 marks it resolved and **no other row is edited.**
+**Nothing in this document is a decision — every decision in it is Elliot's, and
+two of the eight have now been made by Elliot rather than here.** #8 was a
+scheduling question — *does the composition run inside Phase 4?* — answered
+**inside Phase 4**. **#1 is Phase-3 §9's sign-off, signed off 2026-08-05 and
+recorded as retrospective.** §8 marks both resolved in their rows; **the other six
+rows are unedited and the six decisions are open.**
+
+**What rev 5 does, and it is small.** It records **decision #1** and nothing else.
+It runs no experiment, moves no number, re-runs no gate and does not claim to have.
+Its one consequence for the rest of the report is that `EXP_008` §4's rider —
+which made the threshold arm's adoption *"recommended to Elliot, not taken"*
+partly because Phase-3 §9 was unticked — **no longer applies, so #5 is ungated by
+#1 and still undecided on its own merits.** Its one deliberate non-consequence:
+the sign-off does **not** close **#2**, whose defect sits under a §9 box that is
+now ticked, and both files say so in place rather than letting the tick absorb it.
 
 **What rev 4 does.** It adds §11: `EXP_012`, which chases the one thing §10.5
 named as unexplained and **not** offered as evidence for decision #6 — why the
@@ -70,7 +81,8 @@ unapplied.
 | Arms adopted | **1** — the two-compartment neuron (`EXP_004`). Two more are **recommended and not taken**: the threshold arm (§8 #5) and the composed arm (§10) |
 | GPU-hours spent | ~4.6 of ~30 (`EXP_012` cost ~0.2 and trained nothing) |
 | Unexplained divergences | **2** — `twocomp_distill_s1` (§6.4) and `compose_s0` (§10.4), chased to **different** causes |
-| Phase-3 §9 sign-off | **still unticked**; Phase 4 was opened without it on instruction |
+| Phase-3 §9 sign-off | **signed off 2026-08-05** (decision #1), and **recorded as retrospective**: Phase 4 was opened without it on instruction and eight experiments ran before it |
+| Decisions open | **6 of 8** (§8). #8 resolved at rev 3, #1 at rev 5 |
 
 The phase has moved the project's answer to its own question twice, and both
 moves were away from the thing the ranking was built around.
@@ -536,7 +548,10 @@ committed at `f9c509c`, before any of these numbers were read.
 
 **Nothing here is adopted by this report.** `EXP_008` §4's rider is explicit that
 the adoption is recommended *to Elliot* and that Phase 3's §9 is still unticked;
-§8 items 1 and 5 are where that lives.
+§8 items 1 and 5 are where that lives. *(Rev 5: **§9 is now ticked** — #1 is
+signed off — so the second half of that rider is discharged and #5 is ungated by
+#1. **Nothing here is adopted by this report** is unchanged: #5 is Elliot's and is
+still undecided, and this section's verdicts are untouched.)*
 
 **And the threshold arm's headline is quoted under a caveat, every time.** Its
 decision cell is `W1 fails`, whose text is "no bpc verdict is issued until the
@@ -617,6 +632,13 @@ or Phase 5 — which is the new decision #8.
 > pre-registration; it means §10 cannot be read as "the project's best model" until
 > #1 and #5 are answered. The remaining items in §7.1 still have this paragraph's
 > prerequisites in front of them.
+>
+> **Rev 5: #1 is answered — signed off 2026-08-05 — and #5 is not.** One of this
+> paragraph's two conditions is met, so §10 still cannot be read as "the project's
+> best model", and the retrospective character of the sign-off does not change what
+> rev 3 recorded here: rank 1 *did* run before either was answered, and this
+> paragraph is left standing as the record of that. **§7.2's gate is now #5 and
+> #4.**
 
 Given those, the order below is not arbitrary — each step's result changes whether
 the next is worth running:
@@ -651,7 +673,11 @@ quoted.
 
 **Seven of these eight are Elliot's, are undecided, and are unchanged by rev 3 —
 not one of rows 1–7 has been edited.** Rev 2 sharpened the evidence under #3, #4
-and #5 without moving any of them; rev 3 moves none of them either.
+and #5 without moving any of them; rev 3 moves none of them either. *(Rev 5: **#1
+is now signed off**, so the count is **six** open, and row 1 **is** edited — the
+first row in this table to be edited since #8. This paragraph records what was
+true at rev 3 and is left as it was; the rev-5 note below the table carries the
+change, and rev 4 likewise edited nothing.)*
 
 **#8 is resolved, and it is the only one.** It was the single *scheduling*
 question in the list — whether the composition ran inside Phase 4 or opened
@@ -661,7 +687,7 @@ composed arm is #5's and #1's business, and both are still open.
 
 | # | Decision | Status | Evidence, as of rev 2 |
 |---:|---|---|---|
-| 1 | **Phase-3 §9 sign-off** | **open** — still unticked | none; nothing is left for it to wait on. It now **gates #5**: `EXP_008` §4's rider makes the adoption conditional on it |
+| 1 | **Phase-3 §9 sign-off** | **RESOLVED at rev 5 — signed off 2026-08-05** | Elliot's instruction, 2026-08-05. Ticked in `03_phase3_candidates.md` §9 and **labelled there as retrospective**: Phase 4 opened without it and eight experiments ran before it, so the box's "Phase 4 does not begin until" was not honoured in sequence. Rev 2's evidence cell said *"nothing is left for it to wait on"* and that was still true at rev 4 — `EXP_011` and `EXP_012` are both Phase-4 work and neither touches a Phase-3 deliverable. **This releases the `EXP_008` §4 rider, so #5 is no longer gated by #1.** It does **not** decide #5, and it does not close #2, which is a defect under a ticked §9 box and is named as such in that file's rev 3 |
 | 2 | **§6.2 bar definition** (SE-on-the-absolute-curve, per arm) | **open** | `EXP_005` §9.4. Verified since: the per-arm sd it needs is already computed from the ≥3 seeds the adoption rule requires, so the cost `EXP_005` flagged is already paid |
 | 3 | **The three I5 boundary questions** | **open**, and **now cheap** | token-shift and distillation ran as labelled diagnostics. §6.7 item 2: token-shift is dominated by the threshold arm on bits (0.0203 bpc, 13.3 se), wall-clock (1.49× vs 1.12×), VRAM and inference cost, and its own second tap is worth −0.0009 bpc. **Ruling it either way changes nothing about what to build** |
 | 4 | **Phase 5 authorisation** | **open** | recommend **not yet**: 5 of 14 candidates closed, ~3.5 of ~30 GPU-hours, and §7.1 item 1 — whether Phase 4's two best arms compose — is unmeasured and costs 0.5 GPU-hours |
@@ -711,6 +737,33 @@ is again recorded here rather than in the row:
   trained nothing. **5 of 14 candidates closed is unchanged** — `EXP_012` is a
   mechanism study and closes none. **#4 is still open and still Elliot's.**
 
+**Rev 5 edits exactly one row — #1 — because #1 is now decided, and a decided row
+is edited rather than annotated.** That is `#8`'s precedent at rev 3, not a new
+one: the rule this report follows is that an *open* decision's evidence is never
+edited (the correction goes in prose beneath the table, as rev 3 and rev 4 both
+did), while a decision that has actually been made is recorded in its own row so
+the table cannot be read as still asking the question.
+
+* **#1 (Phase-3 §9 sign-off)** — **signed off by Elliot on 2026-08-05.** The tick
+  is in `03_phase3_candidates.md` §9 and is **labelled retrospective in place**,
+  because Phase 4 opened without it and `EXP_004`–`EXP_009`, `EXP_011` and
+  `EXP_012` all ran before it. Nothing in `EXP_011` or `EXP_012` bore on it either
+  way; both are Phase-4 work and neither touches a Phase-3 deliverable, so rev 2's
+  *"nothing is left for it to wait on"* was still accurate when it was ticked.
+* **What #1 does to #5, and it is only this.** `EXP_008` §4's rider made the
+  threshold arm's adoption *"recommended to Elliot, not taken"* on the ground that
+  "§9 of the Phase-3 report is still unticked". That ground is gone. **#5 is
+  therefore ungated by #1 and is still undecided** — its own substance, and its
+  coupling to #6, are untouched by this tick. **Six decisions remain open.**
+* **What #1 does not do.** It does not close **#2**, and #2 is a defect sitting
+  under a §9 box that is now ticked: §9's "acceptance criterion derived from
+  measurement and calibrated per-context" is ticked, and `EXP_005` §9.4 has since
+  shown that bar built on the wrong scale. The sign-off does not launder it. It is
+  named in `03_phase3_candidates.md` rev 3, it remains Elliot's, and the count it
+  governs is unchanged at 5/128 under all three constructions.
+* **§7.2's first prerequisite is met, and its other two are not.** That paragraph
+  requires #1, #5 and #4 before anything in §7.1 starts. One of three.
+
 ---
 
 ## 9. Gates, at the close of this revision
@@ -749,6 +802,15 @@ it changes is that **#6 is now a decision that can be made** — §10.5's withhe
 evidence is released to it, and the shape of the choice is stated in §8's rev-4
 note. It also **declines to apply** the §6.5 scope qualifier its own evidence
 supports, because the trigger it pre-registered for that correction did not fire.
+
+**Rev 5 runs no experiment, adds no gate row and changes no number.** It records
+Elliot's sign-off of Phase-3 §9 — decision **#1**, the first of the seven to be
+decided — in that file's §9 and changelog and in §8 row 1 here. **Six decisions
+remain open**, Phase 4 remains open, no arm is adopted, no tolerance is set and no
+phase is authorised. The gate table above was **not** re-run for rev 5, and is not
+claimed to have been: rev 5 touches two report files and no code, no artifact and
+no run directory, so every row still describes the tree at rev 4's commit
+`677793d`.
 
 ---
 
@@ -1044,6 +1106,7 @@ measured one fold on one architecture pair.
 
 | Rev | Change |
 |---|---|
+| 5 | 2026-08-05. **Decision #1 is decided, and it is the only thing in this revision.** Elliot signed off Phase-3 §9. (a) `03_phase3_candidates.md` §9's last box is ticked and **labelled retrospective in place** — Phase 4 opened without it and eight experiments ran before it, so the box's "Phase 4 does not begin until" was not honoured in sequence and the tick says so rather than letting the record read as though it had been; that file gains a rev 3 carrying the provenance. (b) §8 **row 1 edited to RESOLVED** — the first of rows 1–7 ever edited, following #8's rev-3 precedent that a *decided* row is edited while an *open* row is only annotated in prose. (c) A rev-5 note beneath §8 states the one consequence and two non-consequences: it **releases `EXP_008` §4's rider so #5 is ungated by #1**, it does **not** decide #5, and it does **not** launder **#2** — a defect `EXP_005` §9.4 found under a §9 box that is now ticked, named in both files rather than absorbed. (d) §8's rev-3 preamble is left as written with a rev-5 parenthetical, per the §10.5 precedent. (e) §9 gains a closing paragraph stating that the gate table was **not** re-run and is not claimed to have been, because rev 5 touches two report files and no code, artifact or run directory. **Six decisions remain open. No experiment ran, no number moved, no arm is adopted, no tolerance is set, and no phase is authorised.** |
 | 4 | 2026-08-05. **`EXP_012`: the fold gap explained, and a rule that misfired reported rather than repaired.** (a) §11 added: the ~1000× gap between `EXP_008` W1 and `EXP_011` C4 is **not** the algebra (leg C exact on both neurons) and **not** the injected perturbation (leg A 6.4–8.2 fp32 eps against 5.8–8.3), but the **layer-0 flip count** — 1/2 flips against 2 684–5 339, a factor of **1 342–5 339** — which tracks the probability mass the decision variable puts at the threshold: **1 843–6 218× more** within 1e-6 of it, at a membrane spread that differs by only 1.19×. (b) §11.6, **post-hoc and labelled so**: the baseline's ~11 000 near-threshold sites are **20–23 distinct values replayed 400–548 times each**, because layer 0 sees one of 205 embedding rows and the hard reset zeroes `v` exactly; the unreset slow pole destroys the replay (4 values, 1.2 repeats). Post-spike enrichment does **not** discriminate (2.61× vs 2.11×) and is reported as a near-miss for the analysis. (c) **Three of six predictions failed.** Y5's rule resolved on a leg comparing **0 flips against 1**, which `EXP_012`'s own limitation 2 had declared unresolvable before it ran; the rule is **recorded as it fired and not rewritten**, and the powered leg's 102.5× is a marker with no verdict. Y4's 34× is 34/1 and 68/2 and is not offered as evidence either way. Y6 failed, and its failure pattern — accurate wherever the density is smooth, 3.5–8.8× over wherever there is an atom — is consistent with (b). (d) §6.5 **stands exactly as written**; the scope qualifier its own evidence supports is **referred, not applied**, because the trigger `EXP_012` §4 pre-registered for it (`Y2 ∧ Y5`) did not fire. (e) §8: **no row edited**; #6's evidence is sharpened in prose beneath the table — §10.5's withheld number is **released** to it, and the finding is that a fold-in tolerance **cannot be one project constant**. #4 re-evidenced at ~4.6 of ~30 GPU-hours. (f) §9 adds three gate rows; test suite **272 → 280**. (g) the changelog renumbered §11 → §12 and the header's rev-2 reference retargeted — the same slip rev 3's item (f) records. **No earlier number, verdict or threshold changes; nothing is adopted and no phase is authorised.** |
 | 1 | 2026-08-03. First Phase-4 report: the adopted arm and the shape of its gain, σ's non-transfer, `EXP_006`'s causal tail result and what it withdraws, `EXP_007`/`EXP_008`/`EXP_009` resolved against their pre-registrations, the reparameterisation noise floor, a revised ranking offered and not applied, and seven open decisions. |
 | 3 | 2026-08-04. **`EXP_011`, and the resolution of the one decision that was a scheduling question.** (a) §10 added: the composed arm (adopted two-compartment neuron + `EXP_008`'s learned per-channel threshold) at **2.08326 ± 0.00049 carried, −0.03543 against the adopted arm at −28.7 se, 0/128 contexts regressed, folding to the adopted arm's exact inference cost** — and **provisional at n = 2 of a pre-registered 3**. (b) §10.3: the composition's gain is **102.4 % within-reach and 1.4 % zero-context**, which confirms `EXP_004` §10.6's overlap argument in its strong form and relocates the value to the component the adopted arm damaged — the second time in Phase 4 that an arm has not moved the component it was ranked for. (c) §10.4: `compose_s0` diverged, was chased to step 17 598 and is **not** `EXP_009`'s mechanism — gradients of 0.03, fp32 and fp64 norms equal, an identical NaN on the eager path — so **decision #7's fix would not have prevented it** and the fused backward is exonerated. The seed was excluded and **not replaced**. (d) §8 row 8 marked **RESOLVED (inside Phase 4)**; **rows 1–7 are not edited**, and the two whose evidence `EXP_011` overtakes (#4, #7) are corrected in prose beneath the table rather than in the rows. (e) §9 re-run with four new gate rows; test suite **262 → 272**. (f) the header's §10 reference retargeted to §11 as the changelog renumbered. **No earlier number, verdict or threshold changes.** |
