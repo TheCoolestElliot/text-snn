@@ -123,6 +123,21 @@ ARMS: dict[str, str] = {
     "twocomp_distill_s0": "twocomp_distill",
     "twocomp_distill_s1": "twocomp_distill",
     "twocomp_distill_s2": "twocomp_distill",
+    # EXP_011's composed arm: the adopted two-compartment neuron with EXP_008's
+    # learned per-channel threshold. A registry entry and nothing else, for the
+    # fourth time and for the same reason -- the statistic, the k-sweep and the
+    # F1 tolerance are untouched, so this horizon is comparable with every row
+    # above, and EXP_011 runs this file with an explicit `--out`.
+    #
+    # It matters more here than in any previous entry that these three land under
+    # ONE arm name. EXP_011 is a composition, so its whole result is a comparison
+    # against `twocomp` on exactly these statistics; if the composed runs fell
+    # into the shared "other" bucket they would be averaged with whatever else was
+    # unregistered, and the comparison would be against a number describing
+    # neither arm.
+    "compose_s0": "compose",
+    "compose_s1": "compose",
+    "compose_s2": "compose",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
