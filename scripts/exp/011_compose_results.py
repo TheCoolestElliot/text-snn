@@ -87,8 +87,43 @@ RUNS = _REPO / "experiments" / "runs"
 # ===========================================================================
 
 ARM = "compose"
-COMPOSE_RUNS = [f"compose_s{i}" for i in range(3)]
+ALL_COMPOSE_RUNS = [f"compose_s{i}" for i in range(3)]
 THRESHOLD_RUNS = [f"threshold_s{i}" for i in range(3)]
+
+# ---------------------------------------------------------------------------
+# POST-HOC, and flagged as such everywhere it has an effect.
+#
+# `compose_s0` trained cleanly to step 17 500 and was NaN by 17 750, for the
+# remaining 2 250 steps. EXP_011 §2 fixed n = 3 and did not anticipate a
+# divergence, so there is no pre-registered rule for this and one is being made
+# after seeing the outcome. **This block was written before seeds 1 and 2
+# finished training**, so the rule is fixed before the evidence that would bias
+# it -- but it is still post-hoc with respect to seed 0 and is labelled so.
+#
+# The rule is `EXP_009`'s, verbatim, because the situation is the same one and
+# inventing a second rule for it would be choosing the more convenient of two:
+#
+#   * a diverged seed is excluded from every mean, because a NaN is not a score;
+#   * it is **NOT** replaced by a fourth seed. Swapping a diverged seed for a
+#     fresh one is how a failure disappears from a record, and EXP_011 would
+#     then report a clean n = 3 that never happened;
+#   * every prediction it touches is reported at the surviving n with the
+#     pre-registered n = 3 unmet, so the verdicts are **PROVISIONAL** and the
+#     JSON says so in `provisional_reason`.
+#
+# `scripts/exp/011_chase_compose_divergence.py` replays it from its last healthy
+# checkpoint and localises the origin; it is a finding of this experiment, not
+# an accident to be routed around.
+# ---------------------------------------------------------------------------
+
+
+def _diverged(run: str) -> bool:
+    """True iff the run's committed test scores are non-finite."""
+    try:
+        vals = R._test_bpc(run)
+    except SystemExit:
+        return False
+    return any(v != v or abs(v) == float("inf") for v in vals.values())
 
 #: C1. The adopted arm's carried figure (EXP_005, n=7). `R.reference` recomputes
 #: it from per-run artifacts and aborts if it does not reproduce, so this literal
@@ -223,8 +258,25 @@ def resolve(ctx: dict) -> dict:
             "NEGATIVE INTERACTION DEMONSTRATED. The composed arm is not carried "
             "forward, and EXP_004 §10.6's overlap argument is confirmed in the "
             "strong form.")
-    return {"predictions": p,
-            "decision": {"cell": cell, "verdict": verdict, "rule": "EXP_011 §4"}}
+    n = bpc["n"]
+    provisional = n < 3
+    decision = {"cell": cell, "verdict": verdict, "rule": "EXP_011 §4",
+                "n": n, "provisional": provisional}
+    if provisional:
+        decision["provisional_reason"] = (
+            f"n = {n} of a pre-registered 3. `compose_s0` diverged to NaN and is "
+            "excluded under the post-hoc rule in this file's header; it was NOT "
+            "replaced, so the pre-registered n is unmet and every verdict above "
+            "is provisional. EXP_009 reported n=2 the same way and for the same "
+            "reason.")
+        # C2 is the prediction the missing seed hurts most: a sample sd over two
+        # values is a number, but it is not an estimate anyone should lean on.
+        if p["C2"]["held"] is not None:
+            p["C2"]["note"] = (
+                f"sd over n={n} seeds. EXP_011 §3.1 priced this design at n=3; "
+                "at n=2 the sd is reported but resolves almost nothing, and C2's "
+                "verdict should be read as provisional in the strong sense.")
+    return {"predictions": p, "decision": decision}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -241,6 +293,19 @@ def main(argv: list[str] | None = None) -> int:
 
     hz = json.loads((_REPO / args.horizon).read_text(encoding="utf-8"))
     bars = hz["per_context_2sigma"]["bars"]
+
+    # ---- the post-hoc divergence rule, applied and announced ---------------
+    excluded = [r for r in ALL_COMPOSE_RUNS if _diverged(r)]
+    compose_runs = [r for r in ALL_COMPOSE_RUNS if r not in excluded]
+    if not compose_runs:
+        raise SystemExit(
+            "every compose seed diverged; there is no arm to resolve. That is "
+            "the result, and it is a larger finding than any bpc verdict.")
+    if excluded:
+        print(f"  NOTE: excluding {excluded} -- diverged to NaN. The rule is "
+              f"post-hoc (EXP_009's, verbatim); see the module header. "
+              f"n = {len(compose_runs)} of a pre-registered 3, so every verdict "
+              f"below is PROVISIONAL.")
 
     # ---- references, recomputed and asserted against the reports -----------
     refs = {
@@ -269,7 +334,7 @@ def main(argv: list[str] | None = None) -> int:
             f"reproduce the pre-registered {C3_ADDITIVE_BPC:.6f}.")
 
     # ---- F1 on every composed run ------------------------------------------
-    f1 = {r: hz["arms"][r].get("f1_pass") for r in COMPOSE_RUNS if r in hz["arms"]}
+    f1 = {r: hz["arms"][r].get("f1_pass") for r in compose_runs if r in hz["arms"]}
     if not f1 or not all(f1.values()):
         raise SystemExit(
             f"F1 self-check failed or missing for {ARM}: {f1}. The probe's k=L "
@@ -277,10 +342,10 @@ def main(argv: list[str] | None = None) -> int:
             "is the check that caught a contaminated run in Phase 3.")
 
     # ---- the arm ------------------------------------------------------------
-    per_seed = {r: R._test_bpc(r) for r in COMPOSE_RUNS}
+    per_seed = {r: R._test_bpc(r) for r in compose_runs}
     bpc: dict = {}
     for protocol in ("fresh", "carried"):
-        vals = [per_seed[r][protocol] for r in COMPOSE_RUNS]
+        vals = [per_seed[r][protocol] for r in compose_runs]
         m, sd = R._mean_sd(vals)
         ref_m = refs["twocomp"][protocol]["mean"]
         sd_ref = refs["twocomp"][protocol]["sd"]
@@ -313,9 +378,9 @@ def main(argv: list[str] | None = None) -> int:
         "context_vs_twocomp": R.context_comparison(compose_curve, twocomp_curve, bars),
         "context_vs_baseline": R.context_comparison(compose_curve, base_curve, bars),
         "horizon": {"per_seed": per_seed_hz, "median": median_hz},
-        "learned": [R.learned_parameters(r, "thr_log") for r in COMPOSE_RUNS],
+        "learned": [R.learned_parameters(r, "thr_log") for r in compose_runs],
         "fold": ([] if args.no_fold
-                 else [fold_check_composed(r) for r in COMPOSE_RUNS]),
+                 else [fold_check_composed(r) for r in compose_runs]),
         "composition": {
             "twocomp_carried_mean": tc_mean,
             "threshold_arm_carried_mean": thr_mean,
