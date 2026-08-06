@@ -1,0 +1,9 @@
+chat-v3d-aligned/ckpt_best.pt   # 2026-08-06 responsiveness round; see docs/chat/QUALITY.md
+# Still the ship after the short-conversation round of the same day:
+# chat-v4a-short raised the window-coverage dose 3.4x and scored BELOW this
+# checkpoint on topic propensity (0.0723 vs 0.0908). See docs/chat/QUALITY_v4.md.
+# Still the ship after the reply-length round of 2026-08-06:
+# chat-v5a-short300 matched this checkpoint's reply length (188.3 vs 188.9 chars),
+# closing the length confound QUALITY_v4.md §4.2 left open. It beats this
+# checkpoint on topic propensity (0.0957 vs 0.0908, inside the bar) and loses the
+# pre-registered headline 0.2779 vs 0.2969 on `list`. See docs/chat/QUALITY_v5.md.
