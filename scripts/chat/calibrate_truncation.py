@@ -88,8 +88,18 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--raw-dir", default="data/chat_raw")
     p.add_argument("--stories", type=int, default=20_000)
     p.add_argument("--seed", type=int, default=11)
+    p.add_argument("--candidates", default=None,
+                   help="extra ranges to measure, 'lo,hi;lo,hi;...'. The search "
+                        "that chose SHORT300 is the default below, so a reader "
+                        "can reproduce the ranking rather than take it on trust")
     p.add_argument("--out", default=None)
     args = p.parse_args(argv)
+
+    targets = [("short", SHORT), ("short300", SHORT300)]
+    if args.candidates:
+        for spec in args.candidates.split(";"):
+            lo, hi = (int(x) for x in spec.split(","))
+            targets.append((f"[{lo},{hi}]", Truncation(lo, hi, hi)))
 
     raw = str(Path(args.raw_dir) / "tinystories.txt")
     stories: list[str] = []
@@ -100,8 +110,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"read {len(stories):,} stories from {raw}", flush=True)
 
     out = {"stories": len(stories), "seed": args.seed,
-           "targets": {name: measure(stories, t, args.seed)
-                       for name, t in (("short", SHORT), ("short300", SHORT300))}}
+           "targets": {name: measure(stories, t, args.seed) for name, t in targets}}
 
     hdr = f"{'target':>10} {'range':>12} {'mid':>6} {'kept mean':>10} {'median':>7} " \
           f"{'p90':>5} {'kept/mid':>9} {'topic':>7} {'conv mean':>10} {'fits 256':>9}"

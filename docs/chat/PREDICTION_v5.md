@@ -241,8 +241,11 @@ a promotion.
 
 ## 6. The dose, measured before training
 
-From `scripts/chat/window_coverage.py`, run after `stories_short300` was packed
-and **before `chat-v5a-short300` started**, so that §3's coupling 1 is a number
+Columns through `dose @0.74` are from `scripts/chat/window_coverage.py`; the
+**`requests / M chars` column is `conversations / chars_train` from
+`data/chat/manifest.json`**, which that script does not emit *(provenance
+corrected — §7 item 6)*. Both were run after `stories_short300` was packed and
+**before `chat-v5a-short300` started**, so that §3's coupling 1 is a number
 rather than an expectation. **The predictions in §4 were written before this was
 computed and are not conditioned on it** — that ordering is the only reason the
 table can be quoted next to them.
@@ -270,4 +273,100 @@ is the whole reason §7 item 2 asked for this arm.
 longer truncation keeps more of each story. At 0.40 mixture weight the run
 consumes ~229 M characters from this source over 14,000 steps, so **neither
 source repeats within the run** and the difference in packed size does not become
-a difference in epochs seen.
+a difference in epochs seen. *(Amended — see §7 item 4. This note is left as
+written; the correction is below it, not inside it.)*
+
+## 7. Amendments, made after an audit and before any number was read
+
+`chat-v5a-short300` was still training when §§1–6 were put through a structured
+adversarial audit (40 agents, four lenses: post-hoc leakage, falsifiability,
+unnamed confounds, code correctness; every finding then given to an independent
+verifier instructed to refute it by default). **Seven findings survived
+refutation.** They are recorded here as amendments with their reasons rather than
+edited into §§1–6, because a pre-registration that is quietly rewritten is not one.
+
+**Every amendment below was written and committed before `quality.py` was run on
+this arm and before any of its numbers existed.** That ordering is the only thing
+that makes them amendments rather than excuses, and it is checkable: the commit
+that carries this section precedes the commit that carries
+`experiments/chat/_quality/chat-v5a-short300.json`.
+
+**1. The reading row is now pinned, and this is the one that mattered.** §4's
+thresholds were quoted as if `story_dodge`, `list (strict)`, `identity`, `fact`
+and `headline` were one number per arm. **They are not.** `quality.py` scores
+every arm at **19 (n, λ) reranking settings** and each of those metrics is
+computed from the *selected* reply, so each changes per row. Across that grid
+`chat-v4a-short`'s `story_dodge` runs **0.021 – 0.396** — below P1's 0.125 band in
+8 of 19 rows and at or above its 0.146 band in 9 — **on the very checkpoint that
+anchors both bands.** `chat-v3d-aligned`'s headline is 0.297 at n=1, 0.262 at the
+shipped setting and 0.308 at its own argmax, a 0.047 spread wider than every
+inter-arm gap in the package. Left unpinned, **the row choice and not the model
+would have decided P1**, after the numbers existed.
+
+> **Reading rule, fixed now.** Every threshold in §4 — P1's 0.125/0.146 bands,
+> P3's 0.087, P4's 0.0723, P5's 0.033/0.000, P6's `fact` ~0.036 and `identity`
+> ≥ 0.938 — and the ship gate's headline comparison are read at the **n = 1,
+> λ = 0** row, which is the row every figure quoted from `QUALITY_v4.md` §4.3 and
+> §4.4 comes from. The shipped-decoder row (n = 8, λ = 0.6) and each arm's
+> headline argmax are reported alongside as **labelled diagnostic columns and
+> cannot resolve any prediction.**
+
+**2. The 300+ band is a point mass, so P2 and P3 mean something narrower than
+they say.** `--max-new 300` caps a candidate at 300 characters, so every candidate
+in the "300+" band is *exactly* at the cap — `chat-v3d-aligned`'s 817 are all
+cap-hits that never emitted `<|eot|>`. P2's "≥ 150 in the 300+ band" is therefore
+a prediction that the arm **fails to stop**, not that it writes long replies, and
+P3's within-band comparison is **between two sets of truncated replies**. That is
+still a genuine length-matched comparison — both sides are censored identically,
+which is the point — but it is a comparison of cap-hits and is to be reported as
+one. **The 200–300 band is the one where both arms end their own replies**, and
+P3 will be reported there as well as at 300+.
+
+**3. The story source's raw-narrative share differs between the two arms by
+character, not by record.** `RAW_FRACTION = 0.08` emits whole untruncated stories
+at the same *rate* in both sources, but a whole story is ~880 characters against a
+truncated 161 or 299 — so by **character** the raw, unconditioned narrative is
+**~24 % of `stories_short` and ~16 % of `stories_short300`.** `chat-v4a-short`
+therefore trained on half again as much bare narrative-with-no-request, per
+character of story source, as this arm does. That is a plausible driver of
+`story_dodge` in its own right, it moves with the manipulation, and **it was not
+named in §3.** It is named now.
+
+**4. The two sources are not drawn from the same story pool.**
+`stories_short300` hit the 320 M-character pack limit (`chars_total` 320,000,158)
+while `stories_short` **exhausted** `tinystories.txt` below it (243,844,359). So
+`stories_short300` is built from roughly the **first 86 %** of that file —
+869,777 conversations against 1,012,158 — and any ordering structure in its final
+~14 % is confounded with truncation length. Repacking at a higher limit and
+retraining was priced at ~45 minutes and **not done**; the confound is disclosed
+instead, and it is judged small because TinyStories is not ordered by any
+property this round measures. Recorded as a limitation, not as a null.
+
+**5. §2's "six candidate ranges" was not reproducible from anything committed.**
+The claim was true — six ranges were measured — but the committed script
+hard-coded two, so a reader could verify "[242, 407] gives kept mean 298.5" and
+could **not** verify that it was the nearest of six to 300, which is the part
+that selects the number. `calibrate_truncation.py` now takes `--candidates`, and
+the full six-row table is committed at
+`experiments/chat/_quality/truncation_calibration.json`.
+
+**6. §6's `requests / M chars` column was mis-attributed.** §6 credits the whole
+table to `scripts/chat/window_coverage.py`, which emits no such quantity — the
+column is `conversations / chars_train` from `data/chat/manifest.json`. The
+numbers are correct; the provenance line was not.
+
+**7. A false claim in committed code, corrected in place.**
+`short_conversation`'s docstring said `trunc` "changes the *value* of the first
+draw and not the number or order of draws, so two sources built at different
+targets from the same seed stay comparable story-for-story." **The second half is
+false**: `rng.randint` consumes a different number of Mersenne-Twister words for
+different range widths, so the streams diverge after the first story. **Nothing in
+this round's design rested on it** — the comparison is distributional over ~10⁶
+conversations, not paired — but the claim was load-bearing-looking and is now
+corrected in `src/snnchat/shortform.py` rather than deleted.
+
+**What the audit did not find, which is worth as much.** It did not find that the
+calibration read a model, a checkpoint, an arm or a held-out split; it verified
+that `read_source` opens only `tinystories.txt`, that `ChatTokenizer` reads no
+file, and that the val split is the last `VAL_FRACTION` by position while the
+calibration takes the first 20,000 stories. §2's central disclosure holds.

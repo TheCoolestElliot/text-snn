@@ -1098,6 +1098,16 @@ def test_the_default_truncation_is_the_one_stories_short_was_packed_at():
         assert a == b
 
 
+def test_the_long_target_is_pinned_to_what_was_pre_registered():
+    """`docs/chat/PREDICTION_v5.md` §2 fixes SHORT300 at [242, 407] by measurement
+    and every number in that round is read against it. Without this, SHORT300
+    could be moved to [236, 250] and every other shortform test stays green --
+    which is how a pre-registered target gets edited after the fact."""
+    from snnchat.shortform import SHORT300
+
+    assert (SHORT300.lo, SHORT300.hi, SHORT300.cap) == (242, 407, 407)
+
+
 def test_the_long_target_overruns_a_256_window_and_says_so():
     """`stories_short300` gives up the property `stories_short` was built for.
     That is `docs/chat/PREDICTION_v5.md` §3's declared coupling, and a test that
