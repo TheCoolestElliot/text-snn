@@ -1,0 +1,104 @@
+# Continuous integration.
+#
+# HONEST STATUS: this workflow has NOT been executed. The repository has no git
+# remote, so it could not be run before being committed. The `lint` job is
+# low-risk (ruff only, no torch). The `tests` job depends on a CPU torch wheel
+# existing for the pinned version on the runner's Python, which is the one thing
+# here that cannot be checked locally -- see the note in that job.
+#
+# What IS verified, on the development machine (Windows, Python 3.14.6, CUDA):
+#   ruff check .                        -> All checks passed
+#   pytest -m "not cuda and not data"   -> 165 passed, 1 skipped, ~7s
+#   pytest                              -> 303 passed, ~42s
+#
+# WHAT THIS CI DOES NOT DO, deliberately: it does not train anything, and it does
+# not attempt to reproduce a committed number. Those need a Blackwell GPU and
+# GPU-hours. CI is a regression gate on the code, not on the science. The
+# scientific gates are the equivalence tests and the mutation campaign, and they
+# are run on the machine that owns the GPU.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same branch cancels the previous run: nothing here is a
+# deployment, so an outdated result is only noise.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # ruff is installed alone, without the project, on purpose: the lint gate
+      # must be able to run and report even when the torch install below is
+      # broken for a reason that has nothing to do with the code.
+      - name: Install ruff
+        run: pip install "ruff>=0.16"
+
+      - name: Lint
+        run: ruff check --no-cache .
+
+  tests:
+    name: tests (CPU)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      # THE FRAGILE STEP, AND WHY IT IS SHAPED LIKE THIS.
+      #
+      # requirements.txt pins the CUDA 13.0 / sm_120 build, which no GitHub
+      # runner can use. CI therefore installs the CPU build of the same version
+      # from PyTorch's CPU index. The version pin is kept so that CI tests the
+      # torch the project actually targets rather than whatever is newest.
+      #
+      # If this step fails with "no matching distribution", a CPU wheel for
+      # torch 2.12.1 does not exist for this runner's Python. The fix is to drop
+      # the python-version above to one that has a wheel -- NOT to unpin torch,
+      # which would silently start testing a different library than the one every
+      # committed number was produced with.
+      - name: Install torch (CPU build)
+        run: pip install torch==2.12.1 --index-url https://download.pytorch.org/whl/cpu
+
+      # snntorch is installed because scripts/audit/06 cross-checks the
+      # hand-written neuron against it; matplotlib because report scripts import
+      # it at module scope. Neither is needed by the model.
+      - name: Install project
+        run: |
+          pip install numpy==2.5.0 matplotlib==3.11.0 snntorch==1.0.0
+          pip install -e . --no-deps
+          pip install pytest==9.1.1
+
+      # `data/` is gitignored and never present here. The corpus fixtures detect
+      # that and synthesise a full-size stand-in of random bytes -- the
+      # equivalence gates check graphed==eager and resume==no-resume, which do
+      # not need the data to be real, only to be fixed. Tests that DO need the
+      # real corpus carry the `data` marker and are deselected.
+      #
+      # `cuda`-marked tests are deselected because the runner has no GPU. That
+      # deselects 137 of 303 tests, and it means CI CANNOT catch a regression in
+      # the fused kernels, the CUDA-graph capture path, or determinism under
+      # replay. Those are covered only by running the full suite on the GPU
+      # machine before a phase closes.
+      - name: Run tests
+        run: pytest -m "not cuda and not data" --durations=10

@@ -46,7 +46,6 @@ if _SRC not in sys.path:
 from snn.config import Config  # noqa: E402
 from snn.model import (  # noqa: E402
     LearnedThresholdCharLM,
-    SpikingCharLM,
     TokenShiftCharLM,
     build_model,
     count_params,

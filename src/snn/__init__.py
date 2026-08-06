@@ -12,6 +12,16 @@ Import the submodules explicitly:
     from snn.data import Corpus, ensure_corpus
 """
 
-__version__ = "2.0.0-phase2"
+# PEP 440. The previous spelling, "2.0.0-phase2", is NOT a valid version and
+# setuptools refuses to build metadata from it, so the package could not be
+# installed at all; pyproject.toml reads this attribute as the single source of
+# truth. The local segment after "+" carries the phase, which is what the old
+# suffix was for, and it is now current: the tree is on Phase 4.
+#
+# This attribute is read by pyproject.toml and by nothing else. It has never been
+# stamped into a run manifest or a report artifact -- every version recorded in
+# docs/reports/data/ is torch's, numpy's or snntorch's -- so moving it changes no
+# committed number and invalidates no provenance.
+__version__ = "2.0.0+phase4"
 
 __all__ = ["__version__"]

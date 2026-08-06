@@ -1,0 +1,167 @@
+# Packaging and tool configuration for the character-level spiking LM.
+#
+# This file was added for repository hygiene. It changes no default of the
+# training code, introduces no new runtime dependency, and is not read by
+# anything under src/ at runtime -- `import snn` behaves exactly as it did
+# before it existed.
+#
+# WHY IT EXISTS AT ALL. Before this file, `import snn` worked only because
+# conftest.py and every script under scripts/ prepended `src/` to sys.path by
+# hand. That works, but it means the package a test imports and the package an
+# editor, a type checker or a fresh shell imports are not guaranteed to be the
+# same one. `pip install -e .` makes them the same one. conftest.py's manual
+# insert is DELIBERATELY LEFT IN PLACE: it prepends, so the working tree still
+# wins over any installed copy, which is the property its own docstring is
+# about.
+
+[build-system]
+# 61 is the first release that reads [project] from pyproject.toml. The floor is
+# kept there ON PURPOSE rather than raised to 77 (which would allow PEP 639's
+# `license = "MIT"` string form), because 77 is NEWER THAN THE SETUPTOOLS ON THE
+# AUDITED MACHINE (70.2.0). Requiring it would make `pip install -e .` depend on
+# a network fetch of a newer setuptools into an isolated build environment, and
+# would fail outright under `--no-build-isolation`. The license is therefore
+# declared with the classifier below, which every version in range accepts.
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snn"
+description = "Character-level spiking language model: a phased, pre-registered study"
+readme = "README.md"
+authors = [{ name = "Elliot Asher Caudill" }]
+dynamic = ["version"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.14",
+    "Private :: Do Not Upload",
+]
+
+# The audited interpreter is 3.14.6 and it is the ONLY one this project has ever
+# been measured on (01_reconnaissance.md §2.2). This floor therefore records what
+# was measured, not the earliest version that would work -- the project's own
+# standard is to state what was observed rather than what is probably true. Lower
+# it when, and only when, a run on an older interpreter reproduces the committed
+# numbers.
+requires-python = ">=3.14"
+
+# Mirrors requirements.txt, which stays the canonical install path because it
+# carries the ordering warning below in full prose.
+#
+# TORCH IS PINNED AND THE PIN IS LOAD-BEARING TWICE OVER: the wheel must be the
+# CUDA 13.0 / sm_120 build for Blackwell, and `torch.cuda.jiterator` -- a private
+# API this project's fusion depends on (risk R11) -- is only guaranteed at this
+# version. `pip install -e .` on a machine WITHOUT torch already present will
+# resolve torch from PyPI and can fetch a build that is not the sm_120 one.
+# Install torch from NVIDIA's index FIRST; see README.md "Install".
+dependencies = [
+    "torch==2.12.1",
+    "numpy==2.5.0",
+    "matplotlib==3.11.0",
+    # Not a dependency of the model: the LIF neuron is written from scratch in
+    # src/snn/neuron.py. snnTorch is kept as an INDEPENDENT third implementation
+    # to cross-check the eager reference against (scripts/audit/06).
+    "snntorch==1.0.0",
+]
+
+[project.optional-dependencies]
+# Everything needed to run the gates, and nothing needed to run the model.
+dev = [
+    "pytest==9.1.1",
+    "ruff>=0.16",
+]
+
+[project.urls]
+Reports = "https://github.com/"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Single source of truth: the version lives in src/snn/__init__.py and this file
+# reads it, so the two can never disagree.
+[tool.setuptools.dynamic]
+version = { attr = "snn.__version__" }
+
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+# The markers were already registered in conftest.py's pytest_configure and are
+# NOT duplicated here -- one registration, one place. What this section adds is
+# the default invocation, so that a bare `pytest` does the same thing for
+# everyone rather than depending on what each person remembers to pass.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# -ra so skipped GPU/corpus tests are listed by name. A suite that silently
+# skips half of itself and prints "passed" is the failure mode this project
+# already met once, in a training run that imported a mutated kernel.
+addopts = "-ra --strict-markers"
+xfail_strict = true
+
+
+# ---------------------------------------------------------------------------
+# ruff
+# ---------------------------------------------------------------------------
+# THE RULESET IS CURATED, AND DELIBERATELY NARROW.
+#
+# The broad ruff default set reports 388 findings on this tree and essentially
+# none of them are defects. Two families dominate and both are false positives
+# created by patterns this project uses on purpose:
+#
+#   F821 (39x) -- `del a, b` frees GPU memory after a benchmark; ruff then treats
+#     the name as unbound inside a lambda that was already evaluated. See
+#     scripts/audit/01_gpu_capability.py:49 and tests/test_graph_equivalence.py.
+#   B023 (37x) -- a lambda closing over a loop variable, consumed by `timeit`
+#     inside that same iteration. The late-binding hazard the rule exists for
+#     cannot occur when the closure never outlives the iteration.
+#
+# A gate that fires 388 times on non-defects is a gate nobody reads, which is the
+# same failure as no gate at all. So the set below is the subset that is (a) about
+# correctness rather than style and (b) ALREADY CLEAN on src/, meaning it starts
+# green and any future hit is a real regression rather than a backlog item.
+#
+# Rewriting rule families are excluded on purpose, not overlooked. NPY002 would
+# rewrite legacy numpy RNG calls and CHANGE THE RANDOM STREAM, which would
+# invalidate reproduction of committed numbers. `I` (import sorting) would hoist
+# imports above the `sys.path.insert` lines the scripts depend on and break them.
+# Neither belongs anywhere near this repository.
+#
+# `ruff format` is NOT enabled and is not run. It would reformat 60 of 84 files,
+# producing a diff across every experiment script in the tree for zero behavioural
+# gain, and burying any future real change in it. Formatting is a matter of taste
+# here and the tree is already internally consistent.
+[tool.ruff]
+# 100, not 88: exactly one line in the tree exceeds it (src/snn/data.py:366, at
+# 112) against 84 lines that exceed 88, so 100 is where this code already lives.
+# It is recorded rather than enforced -- E501 is deliberately NOT in the select
+# list below and the formatter is off, so nothing currently fails on it. It is
+# here so that a future decision to enforce a width starts from the tree's real
+# shape instead of a default someone would then have to reflow 84 lines to meet.
+line-length = 100
+target-version = "py314"
+extend-exclude = ["__pycache__", ".pytest_cache", "data", "runs", "checkpoints"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "W", "B", "PLE"]
+ignore = [
+    "B023",  # see above: loop-variable closures consumed within the iteration
+    "B905",  # zip(..., strict=) -- 46 sites, all equal-length by construction
+]
+
+[tool.ruff.lint.per-file-ignores]
+# src/ is held to the full set above and is clean. tests/ and scripts/ carry
+# narrow, itemised exemptions rather than a blanket lower standard, so that each
+# one names the thing it is forgiving.
+#
+# NOTE ON scripts/: these files produced numbers that are committed under
+# docs/reports/data/. They are evidence, and they are not edited for cosmetics --
+# the exemptions below are how that decision is recorded in a machine-checkable
+# place instead of in a comment nobody runs. Every entry here is style; none is a
+# suspected defect. The full itemisation is in CONTRIBUTING.md.
+"tests/test_graph_equivalence.py" = ["F821"]   # `del tr` frees the graph pool; see line 154
+"tests/*" = ["E702"]                           # `a = 1; b = 2` setup pairs
+"scripts/*" = ["E731", "E741", "F541", "B007", "F841", "F401", "F821"]
+"conftest.py" = ["E402"]
