@@ -1,0 +1,46 @@
+{
+  "seed": 11,
+  "stories": 20000,
+  "targets": {
+    "short": {
+      "conv_fits_256": 0.9647,
+      "conv_fits_512": 1.0,
+      "conv_mean": 198.8,
+      "conv_p90": 244,
+      "kept_max": 234,
+      "kept_mean": 160.8,
+      "kept_median": 161.0,
+      "kept_over_midpoint": 0.858,
+      "kept_p10": 116,
+      "kept_p90": 205,
+      "n_usable": 20000,
+      "target": {
+        "cap": 235,
+        "hi": 235,
+        "lo": 140
+      },
+      "target_midpoint": 187.5,
+      "topic_survival": 0.8882
+    },
+    "short300": {
+      "conv_fits_256": 0.0545,
+      "conv_fits_512": 1.0,
+      "conv_mean": 336.7,
+      "conv_p90": 406,
+      "kept_max": 406,
+      "kept_mean": 298.5,
+      "kept_median": 298.0,
+      "kept_over_midpoint": 0.92,
+      "kept_p10": 232,
+      "kept_p90": 368,
+      "n_usable": 20000,
+      "target": {
+        "cap": 407,
+        "hi": 407,
+        "lo": 242
+      },
+      "target_midpoint": 324.5,
+      "topic_survival": 0.9466
+    }
+  }
+}

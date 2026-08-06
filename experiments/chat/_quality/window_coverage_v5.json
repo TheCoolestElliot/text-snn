@@ -1,0 +1,53 @@
+[
+ {
+  "source": "stories_short300",
+  "chars_read": 60000000,
+  "conversations": 163225,
+  "mean_conversation_chars": 367.5904610200643,
+  "median_conversation_chars": 344.0,
+  "replies": 150241,
+  "mean_reply_chars": 298.81580261047253,
+  "mean_request_prefix_chars": 36.774136221138036,
+  "seq_len": 256,
+  "random_window_carries_prompt": 0.5489452166666666,
+  "window_starts_in_request": 0.09208305,
+  "reply_chars_in_frame_unaligned": 0.315804110824494,
+  "reply_chars_in_frame_aligned": 0.7307217372506606,
+  "align_frac_realised": 0.74,
+  "reply_chars_in_frame": 0.6228431543798573
+ },
+ {
+  "source": "stories_short",
+  "chars_read": 60000000,
+  "conversations": 249305,
+  "mean_conversation_chars": 240.66845029181124,
+  "median_conversation_chars": 203.0,
+  "replies": 229539,
+  "mean_reply_chars": 161.40735125621353,
+  "mean_request_prefix_chars": 36.38840894139994,
+  "seq_len": 256,
+  "random_window_carries_prompt": 0.8401570833333334,
+  "window_starts_in_request": 0.13920931666666667,
+  "reply_chars_in_frame_unaligned": 0.5310300732304003,
+  "reply_chars_in_frame_aligned": 0.9983401837584869,
+  "align_frac_realised": 0.74,
+  "reply_chars_in_frame": 0.8768395550211844
+ },
+ {
+  "source": "stories_topic",
+  "chars_read": 60000000,
+  "conversations": 79217,
+  "mean_conversation_chars": 757.4051908050039,
+  "median_conversation_chars": 737.0,
+  "replies": 67253,
+  "mean_reply_chars": 726.3543633741245,
+  "mean_request_prefix_chars": 34.99724919334454,
+  "seq_len": 256,
+  "random_window_carries_prompt": 0.2477183,
+  "window_starts_in_request": 0.03922783333333334,
+  "reply_chars_in_frame_unaligned": 0.13211316924225544,
+  "reply_chars_in_frame_aligned": 0.30426186465329946,
+  "align_frac_realised": 0.74,
+  "reply_chars_in_frame": 0.259503203846428
+ }
+]
