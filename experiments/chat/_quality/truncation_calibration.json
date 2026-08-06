@@ -2,6 +2,106 @@
   "seed": 11,
   "stories": 20000,
   "targets": {
+    "[220,370]": {
+      "conv_fits_256": 0.1645,
+      "conv_fits_512": 1.0,
+      "conv_mean": 307.0,
+      "conv_p90": 371,
+      "kept_max": 369,
+      "kept_mean": 268.7,
+      "kept_median": 269.0,
+      "kept_over_midpoint": 0.911,
+      "kept_p10": 207,
+      "kept_p90": 332,
+      "n_usable": 20000,
+      "target": {
+        "cap": 370,
+        "hi": 370,
+        "lo": 220
+      },
+      "target_midpoint": 295.0,
+      "topic_survival": 0.9459
+    },
+    "[228,383]": {
+      "conv_fits_256": 0.1182,
+      "conv_fits_512": 1.0,
+      "conv_mean": 317.7,
+      "conv_p90": 384,
+      "kept_max": 382,
+      "kept_mean": 279.5,
+      "kept_median": 279.0,
+      "kept_over_midpoint": 0.915,
+      "kept_p10": 216,
+      "kept_p90": 345,
+      "n_usable": 20000,
+      "target": {
+        "cap": 383,
+        "hi": 383,
+        "lo": 228
+      },
+      "target_midpoint": 305.5,
+      "topic_survival": 0.9462
+    },
+    "[235,395]": {
+      "conv_fits_256": 0.0795,
+      "conv_fits_512": 1.0,
+      "conv_mean": 327.4,
+      "conv_p90": 395,
+      "kept_max": 394,
+      "kept_mean": 289.2,
+      "kept_median": 289.0,
+      "kept_over_midpoint": 0.918,
+      "kept_p10": 224,
+      "kept_p90": 356,
+      "n_usable": 20000,
+      "target": {
+        "cap": 395,
+        "hi": 395,
+        "lo": 235
+      },
+      "target_midpoint": 315.0,
+      "topic_survival": 0.9464
+    },
+    "[250,420]": {
+      "conv_fits_256": 0.0343,
+      "conv_fits_512": 1.0,
+      "conv_mean": 347.1,
+      "conv_p90": 419,
+      "kept_max": 419,
+      "kept_mean": 308.8,
+      "kept_median": 308.0,
+      "kept_over_midpoint": 0.922,
+      "kept_p10": 240,
+      "kept_p90": 380,
+      "n_usable": 20000,
+      "target": {
+        "cap": 420,
+        "hi": 420,
+        "lo": 250
+      },
+      "target_midpoint": 335.0,
+      "topic_survival": 0.9466
+    },
+    "[261,438]": {
+      "conv_fits_256": 0.0156,
+      "conv_fits_512": 1.0,
+      "conv_mean": 361.6,
+      "conv_p90": 436,
+      "kept_max": 437,
+      "kept_mean": 323.0,
+      "kept_median": 323.0,
+      "kept_over_midpoint": 0.924,
+      "kept_p10": 252,
+      "kept_p90": 397,
+      "n_usable": 20000,
+      "target": {
+        "cap": 438,
+        "hi": 438,
+        "lo": 261
+      },
+      "target_midpoint": 349.5,
+      "topic_survival": 0.9466
+    },
     "short": {
       "conv_fits_256": 0.9647,
       "conv_fits_512": 1.0,

@@ -254,9 +254,20 @@ def short_conversation(story: str, rng: random.Random,
     The random draws happen in a fixed order regardless of which branch is taken,
     for the same reason `MixtureSampler._windows` fixes its generator order: a
     packing whose stream position depends on the content of the story it just
-    read cannot be reproduced from a seed alone. `trunc` changes the *value* of
-    the first draw and not the number or order of draws, so two sources built at
-    different targets from the same seed stay comparable story-for-story.
+    read cannot be reproduced from a seed alone. That property is what makes each
+    source individually reproducible from its seed, and it is unaffected by
+    `trunc`.
+
+    **`trunc` does NOT make two sources story-for-story comparable, and an earlier
+    version of this docstring wrongly claimed it did.** `rng.randint` draws a
+    different number of Mersenne-Twister words for different range widths --
+    `SHORT`'s width of 96 takes `getrandbits(7)` and `SHORT300`'s 166 takes
+    `getrandbits(8)`, with different rejection probabilities -- so the two streams
+    diverge after the first story and the *n*th story of `stories_short` is not
+    the *n*th story of `stories_short300`. The claim is corrected here rather than
+    deleted, and `docs/chat/PREDICTION_v5.md` §7 records that nothing in that
+    round's design rested on it: the comparison is distributional over ~10^6
+    conversations, not paired.
     """
     kept = short_story(story, rng, trunc)
     if len(kept) < 40:
