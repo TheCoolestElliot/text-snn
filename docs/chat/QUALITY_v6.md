@@ -171,8 +171,59 @@ Written to `experiments/chat/_quality/story_dodge_resample_context.json`.
 
 ## 4. The instruction-weight ladder: `chat-v6-inst-a`, `chat-v6-inst-b`
 
-*(filled in after both arms train and score — predictions in
-`PREDICTION_v6.md` §4.)*
+**A defect in `PREDICTION_v6.md` §4, found before scoring, corrected here
+rather than silently worked around.** P1a's attribution rule was written
+against `chat-v4a-short` topic 0.0723 and `chat-v4b-balance` topic 0.0645 —
+those numbers do not match the committed data. Read directly from the JSON
+files (not a prose recap, the same discipline §4's own table used for the
+mixture weights): **both arms score topic = 0.0469 (3/64) at `n=1, λ=0`,
+identical to four decimal places.** The reference values in the
+pre-registration were a recall error, not a re-derivation, and the rule as
+written cannot be applied — it asks which of two numbers `chat-v6-inst-a`
+lands nearer to, and the two numbers are the same number. This is reported as
+a pre-registration defect, per the standing practice of amending rather than
+silently reinterpreting, and P1a is scored on the plain data below instead of
+through the broken conditional.
+
+**`chat-v6-inst-a` result** (story weight pinned at `v4a`'s 0.40, instruction
+raised to `v4b`'s exact 0.36, `soda` absorbing the difference), all at the
+pinned `n=1, λ=0` row:
+
+| arm | `stories_short` | instruction | `topic` | `list` | `list_strict` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `chat-v4a-short` | 0.40 | 0.23 | 0.0469 (3/64) | 0.0833 | 0.0333 |
+| `chat-v4b-balance` | 0.26 | 0.36 | 0.0469 (3/64) | 0.1833 | 0.0833 |
+| `chat-v6-inst-a` | **0.40** | **0.36** | **0.0938 (6/64)** | **0.2167** | **0.0500** |
+| `chat-v3d-aligned` (shipped) | — | 0.23 | 0.0938 (6/64) | 0.1667 | 0.0000 |
+
+Holding story weight fixed at 0.40 and raising instruction weight alone to
+0.36 **doubled the topic point estimate relative to both `v4a` and `v4b`**
+(0.0469 → 0.0938) and lifted `list`/`list_strict` above `v4a`'s (though not
+cleanly above `v4b`'s `list_strict`). **None of these differences resolve**:
+two-sample checks (same method as §1/§2) put `chat-v6-inst-a` vs. each of
+`v4a-short`, `v4b-balance`, and `chat-v3d-aligned` all at `|z| < 1.4` on both
+`topic` and `list` — every comparison in this table is `unresolved` at the
+standard 4-seed battery's 64-topic/20-list sample sizes.
+
+**The honest reading:** the point estimates are consistent with instruction
+weight (not the story cut) driving `list_strict`'s gain, and even hint that
+holding story weight fixed does *better* on topic than either confounded
+arm — but "consistent with" is not "established". This ladder needed the
+same treatment `story_dodge` got in §3 to actually resolve, and did not get
+it (a resample at these `n` values would cost per-arm what §3's context
+arms cost, ~20+ min each, not budgeted this round).
+
+**This round's own pattern, stated plainly:** every topic/list comparison in
+`QUALITY_v6.md` — §1, §2, and this section — has been `unresolved` at the
+standard battery's sample sizes. The one comparison that *did* resolve
+(`story_dodge`, §3) is the one place this round spent a resample on it. This
+is a structural observation about the measurement tool, not about any one
+arm, and belongs in §7 as a concrete next step: the standard 4-seed
+`quality.py` battery is underpowered for `topic`/`list`/headline comparisons
+in general, the same way it was for `story_dodge` before `PREDICTION_v5.md`'s
+P1 forced the issue.
+
+*(`chat-v6-inst-b` appended once it trains and scores.)*
 
 ## 5. Prediction scorecard
 
