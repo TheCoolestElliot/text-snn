@@ -1,0 +1,50 @@
+{
+  "run_name": "chat-v6-inst-a",
+  "steps": 14000,
+  "params": 4417637,
+  "wall_clock_s": 2375.87,
+  "peak_vram_gib": 3.831,
+  "val": {
+    "alpaca": 1.6217015778681096,
+    "dolly": 1.9425170848073328,
+    "oasst1": 1.8651809251406655,
+    "persona": 0.23000201569539475,
+    "soda": 1.2835451994209424,
+    "stories_short": 0.8123979018655539,
+    "tinystories": 1.1021217873828435,
+    "weighted": 1.1467458423588834
+  },
+  "description": {
+    "params": 4417637,
+    "d_model": 1024,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 1.39,
+        "tau_median": 2.7,
+        "tau_max": 8507.72
+      },
+      {
+        "layer": 1,
+        "tau_min": 1.07,
+        "tau_median": 13.21,
+        "tau_max": 2975.74
+      },
+      {
+        "layer": 2,
+        "tau_min": 1.1,
+        "tau_median": 10.05,
+        "tau_max": 428.25
+      },
+      {
+        "layer": 3,
+        "tau_min": 1.01,
+        "tau_median": 7.3,
+        "tau_max": 329.18
+      }
+    ]
+  }
+}
