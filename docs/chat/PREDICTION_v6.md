@@ -170,3 +170,37 @@ and the two named `story_dodge` suspects (ending-less truncation;
 inheriting the 48-draw unresolvability problem `CONVENTIONS.md` exists to fix
 — pricing them above a plain 40-minute arm. Named here as next-round
 candidates rather than silently dropped from this round's scope.
+
+## §5. A training-seed replicate — NOT a threshold test
+
+**Not proposed as a way to ship `chat-v6-inst-a`.** With remaining budget
+after §4, the question worth spending it on is not "can a resample resolve
+inst-a vs. the incumbent" — a power calculation says that needs ~180 seeds per
+arm (~108 min each, ~3.6 h for the pair, on top of build/debug/write-up time
+this session does not have) and would land the result right on the resolution
+boundary, where regression to the mean on a gap measured from 64/20 draws is
+more likely than not to erase it. **No component of this document, and no
+number `snnchat` has ever produced, has measured training-seed variance** —
+`docs/chat/CONVENTIONS.md`'s intervals are all over the *sampler*, at `n = 1`
+per arm, a limitation §3 of that document states plainly. Every arm-ranking
+claim in `QUALITY.md` through this document rests on one training run per
+arm. That is the actual gap, and it is answerable in one arm's cost.
+
+**Recipe: `chat-v6-inst-a-s1`.** Identical to `chat-v6-inst-a` in every
+field — same mix, same `init-from`, same `bot_loss_weight`/`align_frac`/
+`align_lookahead`, same step count and budget — except `--seed 1` instead of
+the default `0`. Since both runs initialise from the same `chat-v2-anneal`
+checkpoint, the only thing a different seed changes is which batches the
+14,000-step fine-tune sees, in what order.
+
+**No threshold is attached. This is a variance measurement, not a ship
+test.** Read at the same pinned `n=1, λ=0` row, report `chat-v6-inst-a-s1`'s
+headline and components next to `chat-v6-inst-a`'s. If the two seeds land
+close (near 0.31), `chat-v6-inst-a`'s point estimate gains some credibility as
+a real effect worth a properly-powered follow-up. If they land far apart
+(comparable to the spread already seen across this project's *different*
+arms, e.g. 0.25–0.31), that is a materially bigger finding than any single
+arm comparison: it would mean five rounds of `QUALITY*.md` arm rankings have
+been read at a resolution finer than run-to-run noise supports, and every
+comparison in this document (and its predecessors) needs that caveat
+attached, not just this one.
