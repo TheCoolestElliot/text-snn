@@ -1,0 +1,57 @@
+{
+ "seeds": 301,
+ "n_candidates": 16,
+ "draws_per_arm": 3612,
+ "lattice": 0.000277,
+ "p1_threshold": 0.125,
+ "p1_upper_band": 0.146,
+ "reading_row": {
+  "n": 1,
+  "lambda": 0.0
+ },
+ "sampling": {
+  "temperature": 0.85,
+  "top_p": 0.92,
+  "min_p": 0.02,
+  "max_new": 300
+ },
+ "arms": [
+  {
+   "arm": "chat-v5a-short300",
+   "step": 14000,
+   "seeds": 301,
+   "n_candidates": 16,
+   "row": {
+    "n": 1,
+    "lambda": 0.0
+   },
+   "story_dodge": {
+    "k": 374,
+    "n": 3612,
+    "rate": 0.1035,
+    "se": 0.0051,
+    "ci_low": 0.094,
+    "ci_high": 0.1139,
+    "lattice": 0.00028,
+    "z": 1.959963984540054
+   },
+   "story_dodge_opener": {
+    "k": 273,
+    "n": 3612,
+    "rate": 0.0756,
+    "se": 0.0044,
+    "ci_low": 0.0674,
+    "ci_high": 0.0847,
+    "lattice": 0.00028,
+    "z": 1.959963984540054
+   },
+   "p1_verdict": "below",
+   "superset_check": {
+    "file": "experiments\\chat\\_quality\\chat-v5a-short300.json",
+    "checked": 48,
+    "status": "identical"
+   },
+   "seconds": 3933.0
+  }
+ ]
+}
