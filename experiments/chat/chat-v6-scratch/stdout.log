@@ -1,0 +1,979 @@
+
+=== launch 2026-08-06T23:51:57 === C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe -u C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\train.py --run-name chat-v6-scratch --out-dir experiments/chat --max-steps 84000 --batch-size 160 --seq-len 256 --lr 5e-4 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --budget-minutes 240 --mix stories_topic=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02
+chat run 'chat-v6-scratch'
+  arch twocomp_threshold, d=1024, K=4, V=101 -> 4,417,637 parameters
+  B=160, L=256, 84,000 steps = 3.44 G characters
+  mix {'stories_topic': 0.4, 'soda': 0.2, 'alpaca': 0.15, 'tinystories': 0.09, 'persona': 0.08, 'dolly': 0.06, 'oasst1': 0.02}
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 3, 75% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  graph captured in 0.29s
+step       0  loss 4.6223  bpc 6.6686 (plain 6.6671)  lr 1.00e-06  |g| 2.52  rate [0.154, 0.117, 0.106, 0.079]
+step     100  loss 3.1509  bpc 4.5459 (plain 4.5759)  lr 1.01e-04  |g| 0.15  rate [0.457, 0.487, 0.517, 0.517]  eta 261m  budget 240m
+step     200  loss 2.7137  bpc 3.9151 (plain 3.9324)  lr 2.01e-04  |g| 1.34  rate [0.460, 0.498, 0.520, 0.505]  eta 260m  budget 239m
+step     300  loss 2.4085  bpc 3.4747 (plain 3.5043)  lr 3.01e-04  |g| 2.12  rate [0.439, 0.491, 0.518, 0.506]  eta 259m  budget 239m
+step     400  loss 2.2979  bpc 3.3152 (plain 3.3594)  lr 4.01e-04  |g| 4.91  rate [0.415, 0.470, 0.500, 0.513]  eta 259m  budget 239m
+step     500  loss 2.1036  bpc 3.0348 (plain 3.0567)  lr 5.00e-04  |g| 2.45  rate [0.401, 0.462, 0.495, 0.524]  eta 259m  budget 238m
+step     600  loss 1.9992  bpc 2.8842 (plain 2.9032)  lr 5.00e-04  |g| 3.73  rate [0.384, 0.450, 0.489, 0.526]  eta 258m  budget 238m
+step     700  loss 1.9358  bpc 2.7927 (plain 2.8151)  lr 5.00e-04  |g| 2.40  rate [0.368, 0.438, 0.483, 0.527]  eta 258m  budget 238m
+step     800  loss 1.7557  bpc 2.5330 (plain 2.5586)  lr 5.00e-04  |g| 3.12  rate [0.359, 0.432, 0.474, 0.525]  eta 257m  budget 238m
+step     900  loss 1.6373  bpc 2.3621 (plain 2.3872)  lr 5.00e-04  |g| 1.91  rate [0.349, 0.428, 0.473, 0.527]  eta 258m  budget 237m
+step    1000  loss 1.5811  bpc 2.2810 (plain 2.3023)  lr 5.00e-04  |g| 1.65  rate [0.341, 0.421, 0.467, 0.527]  eta 257m  budget 237m
+step    1100  loss 1.5324  bpc 2.2108 (plain 2.2613)  lr 5.00e-04  |g| 0.72  rate [0.336, 0.418, 0.459, 0.525]  eta 257m  budget 237m
+step    1200  loss 1.4547  bpc 2.0987 (plain 2.1279)  lr 5.00e-04  |g| 1.16  rate [0.331, 0.414, 0.453, 0.523]  eta 255m  budget 236m
+step    1300  loss 1.4871  bpc 2.1454 (plain 2.1802)  lr 5.00e-04  |g| 1.60  rate [0.329, 0.412, 0.450, 0.523]  eta 254m  budget 236m
+step    1400  loss 1.4587  bpc 2.1045 (plain 2.1394)  lr 5.00e-04  |g| 0.93  rate [0.324, 0.410, 0.448, 0.524]  eta 254m  budget 236m
+step    1500  loss 1.4025  bpc 2.0234 (plain 2.0617)  lr 5.00e-04  |g| 1.37  rate [0.320, 0.404, 0.446, 0.523]  eta 252m  budget 235m
+step    1600  loss 1.3726  bpc 1.9802 (plain 2.0374)  lr 5.00e-04  |g| 1.72  rate [0.320, 0.405, 0.437, 0.511]  eta 251m  budget 235m
+step    1700  loss 1.3988  bpc 2.0181 (plain 2.0322)  lr 5.00e-04  |g| 0.95  rate [0.315, 0.400, 0.436, 0.514]  eta 251m  budget 235m
+step    1800  loss 1.3910  bpc 2.0069 (plain 2.0231)  lr 5.00e-04  |g| 1.29  rate [0.317, 0.399, 0.432, 0.508]  eta 250m  budget 235m
+step    1900  loss 1.3153  bpc 1.8975 (plain 1.9348)  lr 5.00e-04  |g| 1.39  rate [0.311, 0.391, 0.423, 0.508]  eta 249m  budget 234m
+  eval step    2000  alpaca 2.8227  dolly 2.9902  oasst1 2.7290  persona 1.4645  soda 2.1286  stories_topic 1.9141  tinystories 1.9151  weighted 2.1383
+    ['hello'] -> 'I appy think it was a neural cat is so on.'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Sally. The loved to play in the din the trawen. One day, a little body and the park with his friends.\nTim was a time to should be be'
+step    2000  loss 1.3355  bpc 1.9267 (plain 1.9747)  lr 5.00e-04  |g| 1.06  rate [0.310, 0.393, 0.423, 0.507]  eta 252m  budget 234m
+step    2100  loss 1.2804  bpc 1.8472 (plain 1.9074)  lr 5.00e-04  |g| 1.15  rate [0.308, 0.389, 0.411, 0.494]  eta 251m  budget 234m
+step    2200  loss 1.2635  bpc 1.8228 (plain 1.8657)  lr 5.00e-04  |g| 0.51  rate [0.307, 0.387, 0.412, 0.493]  eta 250m  budget 233m
+step    2300  loss 1.2654  bpc 1.8255 (plain 1.8615)  lr 4.99e-04  |g| 0.90  rate [0.307, 0.384, 0.410, 0.487]  eta 249m  budget 233m
+step    2400  loss 1.1729  bpc 1.6921 (plain 1.7499)  lr 4.99e-04  |g| 0.64  rate [0.305, 0.382, 0.407, 0.492]  eta 248m  budget 233m
+step    2500  loss 1.2096  bpc 1.7450 (plain 1.8195)  lr 4.99e-04  |g| 0.83  rate [0.302, 0.378, 0.405, 0.493]  eta 248m  budget 232m
+step    2600  loss 1.1832  bpc 1.7069 (plain 1.7643)  lr 4.99e-04  |g| 0.88  rate [0.303, 0.379, 0.396, 0.489]  eta 247m  budget 232m
+step    2700  loss 1.2671  bpc 1.8280 (plain 1.8910)  lr 4.99e-04  |g| 1.00  rate [0.299, 0.374, 0.391, 0.484]  eta 246m  budget 232m
+step    2800  loss 1.2337  bpc 1.7798 (plain 1.8208)  lr 4.99e-04  |g| 0.78  rate [0.300, 0.375, 0.397, 0.492]  eta 245m  budget 232m
+step    2900  loss 1.1700  bpc 1.6879 (plain 1.7309)  lr 4.99e-04  |g| 0.67  rate [0.298, 0.372, 0.388, 0.487]  eta 245m  budget 231m
+step    3000  loss 1.1686  bpc 1.6859 (plain 1.7202)  lr 4.99e-04  |g| 0.96  rate [0.297, 0.371, 0.387, 0.488]  eta 244m  budget 231m
+step    3100  loss 1.1420  bpc 1.6476 (plain 1.6968)  lr 4.99e-04  |g| 0.53  rate [0.295, 0.367, 0.382, 0.486]  eta 243m  budget 231m
+step    3200  loss 1.1734  bpc 1.6929 (plain 1.7132)  lr 4.99e-04  |g| 0.77  rate [0.293, 0.366, 0.380, 0.484]  eta 243m  budget 230m
+step    3300  loss 1.1517  bpc 1.6615 (plain 1.6906)  lr 4.99e-04  |g| 0.79  rate [0.293, 0.362, 0.371, 0.477]  eta 242m  budget 230m
+step    3400  loss 1.1467  bpc 1.6543 (plain 1.6678)  lr 4.99e-04  |g| 0.75  rate [0.292, 0.360, 0.371, 0.477]  eta 242m  budget 230m
+step    3500  loss 1.1110  bpc 1.6029 (plain 1.6397)  lr 4.98e-04  |g| 0.59  rate [0.291, 0.359, 0.365, 0.474]  eta 241m  budget 230m
+step    3600  loss 1.1037  bpc 1.5923 (plain 1.6526)  lr 4.98e-04  |g| 0.50  rate [0.288, 0.355, 0.362, 0.474]  eta 240m  budget 229m
+step    3700  loss 1.1487  bpc 1.6572 (plain 1.6928)  lr 4.98e-04  |g| 0.56  rate [0.288, 0.351, 0.365, 0.478]  eta 240m  budget 229m
+step    3800  loss 1.1037  bpc 1.5923 (plain 1.6331)  lr 4.98e-04  |g| 0.67  rate [0.287, 0.350, 0.358, 0.473]  eta 240m  budget 229m
+step    3900  loss 1.0741  bpc 1.5496 (plain 1.5902)  lr 4.98e-04  |g| 0.55  rate [0.286, 0.345, 0.355, 0.473]  eta 239m  budget 228m
+  eval step    4000  alpaca 2.4578  dolly 2.6456  oasst1 2.4294  persona 0.7878  soda 1.8276  stories_topic 1.6194  tinystories 1.6305  weighted 1.7990
+    ['hello'] -> "Hello! I'm a small model and I get that ths wrong that. It was a lot of my to find often it."
+    ['tell me a story about a dog'] -> 'Once upon a time, in a small house, there lived in a little dog named Amy found a small boy named Mia. She was a big tree what down to he water. One day, Spot found a big, her mom'
+step    4000  loss 1.0827  bpc 1.5621 (plain 1.5968)  lr 4.98e-04  |g| 0.54  rate [0.285, 0.343, 0.348, 0.476]  eta 241m  budget 228m
+step    4100  loss 1.0526  bpc 1.5185 (plain 1.5542)  lr 4.98e-04  |g| 0.78  rate [0.282, 0.339, 0.341, 0.470]  eta 240m  budget 228m
+step    4200  loss 1.1156  bpc 1.6095 (plain 1.6331)  lr 4.98e-04  |g| 0.83  rate [0.281, 0.335, 0.344, 0.478]  eta 240m  budget 227m
+step    4300  loss 0.9656  bpc 1.3931 (plain 1.4758)  lr 4.98e-04  |g| 0.47  rate [0.280, 0.334, 0.343, 0.472]  eta 239m  budget 227m
+step    4400  loss 1.0162  bpc 1.4660 (plain 1.5006)  lr 4.97e-04  |g| 0.69  rate [0.280, 0.327, 0.337, 0.468]  eta 239m  budget 227m
+step    4500  loss 1.0914  bpc 1.5746 (plain 1.6347)  lr 4.97e-04  |g| 0.53  rate [0.278, 0.328, 0.337, 0.468]  eta 238m  budget 227m
+step    4600  loss 1.0671  bpc 1.5395 (plain 1.5750)  lr 4.97e-04  |g| 0.54  rate [0.277, 0.326, 0.330, 0.473]  eta 238m  budget 226m
+step    4700  loss 1.0676  bpc 1.5403 (plain 1.5614)  lr 4.97e-04  |g| 0.65  rate [0.275, 0.316, 0.331, 0.472]  eta 237m  budget 226m
+step    4800  loss 1.0369  bpc 1.4959 (plain 1.5469)  lr 4.97e-04  |g| 0.63  rate [0.274, 0.314, 0.329, 0.468]  eta 237m  budget 226m
+step    4900  loss 1.0130  bpc 1.4615 (plain 1.5080)  lr 4.97e-04  |g| 0.61  rate [0.274, 0.312, 0.326, 0.469]  eta 237m  budget 225m
+step    5000  loss 0.9864  bpc 1.4230 (plain 1.4746)  lr 4.97e-04  |g| 0.65  rate [0.272, 0.309, 0.324, 0.467]  eta 236m  budget 225m
+step    5100  loss 1.0644  bpc 1.5356 (plain 1.5633)  lr 4.96e-04  |g| 0.44  rate [0.272, 0.308, 0.326, 0.463]  eta 236m  budget 225m
+step    5200  loss 1.0320  bpc 1.4888 (plain 1.5252)  lr 4.96e-04  |g| 0.58  rate [0.271, 0.304, 0.316, 0.463]  eta 236m  budget 224m
+step    5300  loss 0.9170  bpc 1.3230 (plain 1.3816)  lr 4.96e-04  |g| 0.62  rate [0.269, 0.301, 0.312, 0.457]  eta 235m  budget 224m
+step    5400  loss 0.9802  bpc 1.4141 (plain 1.4860)  lr 4.96e-04  |g| 0.65  rate [0.268, 0.298, 0.314, 0.460]  eta 235m  budget 224m
+step    5500  loss 1.0255  bpc 1.4795 (plain 1.5178)  lr 4.96e-04  |g| 0.59  rate [0.267, 0.295, 0.315, 0.456]  eta 235m  budget 224m
+step    5600  loss 0.9567  bpc 1.3803 (plain 1.4485)  lr 4.96e-04  |g| 0.61  rate [0.267, 0.290, 0.306, 0.449]  eta 234m  budget 223m
+step    5700  loss 0.9844  bpc 1.4202 (plain 1.4481)  lr 4.95e-04  |g| 0.66  rate [0.267, 0.291, 0.308, 0.453]  eta 234m  budget 223m
+step    5800  loss 0.9936  bpc 1.4335 (plain 1.5021)  lr 4.95e-04  |g| 0.68  rate [0.265, 0.288, 0.305, 0.454]  eta 233m  budget 223m
+step    5900  loss 0.9536  bpc 1.3757 (plain 1.4360)  lr 4.95e-04  |g| 0.40  rate [0.264, 0.286, 0.305, 0.457]  eta 233m  budget 222m
+  eval step    6000  alpaca 2.2821  dolly 2.5240  oasst1 2.3441  persona 0.5581  soda 1.7095  stories_topic 1.4779  tinystories 1.4920  weighted 1.6526
+    ['hello'] -> "Hello! I'm a network of something my minters, my neurons."
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. He was a little boy named Tim. Tim was very excited because the toy called Tim. He put on his to climb it. Tim wanted to show hi'
+step    6000  loss 1.0075  bpc 1.4535 (plain 1.5110)  lr 4.95e-04  |g| 0.57  rate [0.264, 0.282, 0.306, 0.456]  eta 234m  budget 222m
+step    6100  loss 0.9647  bpc 1.3917 (plain 1.4392)  lr 4.95e-04  |g| 0.64  rate [0.263, 0.279, 0.303, 0.449]  eta 233m  budget 222m
+step    6200  loss 1.0312  bpc 1.4878 (plain 1.5126)  lr 4.95e-04  |g| 0.53  rate [0.263, 0.280, 0.303, 0.451]  eta 233m  budget 221m
+step    6300  loss 0.9553  bpc 1.3782 (plain 1.4510)  lr 4.94e-04  |g| 0.47  rate [0.262, 0.275, 0.300, 0.451]  eta 232m  budget 221m
+step    6400  loss 1.0156  bpc 1.4651 (plain 1.5123)  lr 4.94e-04  |g| 0.71  rate [0.262, 0.277, 0.299, 0.446]  eta 232m  budget 221m
+step    6500  loss 0.9242  bpc 1.3333 (plain 1.3957)  lr 4.94e-04  |g| 0.53  rate [0.260, 0.271, 0.295, 0.447]  eta 232m  budget 221m
+step    6600  loss 0.9581  bpc 1.3822 (plain 1.4402)  lr 4.94e-04  |g| 0.53  rate [0.260, 0.270, 0.296, 0.447]  eta 231m  budget 220m
+step    6700  loss 0.9603  bpc 1.3854 (plain 1.4360)  lr 4.94e-04  |g| 0.55  rate [0.259, 0.269, 0.293, 0.446]  eta 231m  budget 220m
+step    6800  loss 0.9863  bpc 1.4230 (plain 1.4656)  lr 4.93e-04  |g| 0.59  rate [0.259, 0.265, 0.294, 0.444]  eta 231m  budget 220m
+step    6900  loss 0.9703  bpc 1.3998 (plain 1.4402)  lr 4.93e-04  |g| 0.55  rate [0.258, 0.265, 0.296, 0.445]  eta 230m  budget 219m
+step    7000  loss 0.9115  bpc 1.3150 (plain 1.3568)  lr 4.93e-04  |g| 0.43  rate [0.256, 0.262, 0.288, 0.441]  eta 230m  budget 219m
+step    7100  loss 0.9658  bpc 1.3934 (plain 1.4100)  lr 4.93e-04  |g| 0.54  rate [0.257, 0.261, 0.292, 0.445]  eta 229m  budget 219m
+step    7200  loss 0.9510  bpc 1.3720 (plain 1.3959)  lr 4.92e-04  |g| 0.45  rate [0.257, 0.259, 0.288, 0.441]  eta 229m  budget 219m
+step    7300  loss 0.9372  bpc 1.3521 (plain 1.3926)  lr 4.92e-04  |g| 0.51  rate [0.256, 0.258, 0.289, 0.440]  eta 229m  budget 218m
+step    7400  loss 0.9952  bpc 1.4357 (plain 1.4540)  lr 4.92e-04  |g| 0.48  rate [0.256, 0.262, 0.291, 0.441]  eta 228m  budget 218m
+step    7500  loss 0.9214  bpc 1.3293 (plain 1.3822)  lr 4.92e-04  |g| 0.47  rate [0.255, 0.256, 0.286, 0.440]  eta 228m  budget 218m
+step    7600  loss 0.8577  bpc 1.2373 (plain 1.2871)  lr 4.92e-04  |g| 0.52  rate [0.254, 0.254, 0.285, 0.436]  eta 227m  budget 217m
+step    7700  loss 0.8839  bpc 1.2753 (plain 1.3132)  lr 4.91e-04  |g| 0.54  rate [0.255, 0.253, 0.286, 0.439]  eta 227m  budget 217m
+step    7800  loss 0.9129  bpc 1.3171 (plain 1.3618)  lr 4.91e-04  |g| 0.50  rate [0.253, 0.253, 0.288, 0.447]  eta 227m  budget 217m
+step    7900  loss 0.9860  bpc 1.4225 (plain 1.4899)  lr 4.91e-04  |g| 0.64  rate [0.254, 0.253, 0.282, 0.438]  eta 226m  budget 217m
+  eval step    8000  alpaca 2.1637  dolly 2.3836  oasst1 2.2129  persona 0.4587  soda 1.6229  stories_topic 1.3950  tinystories 1.4066  weighted 1.5577
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a boy named Tim. Tim liked to swim and playing with his friends. One day, Tim saw a big tree and wanted to play with the sand. He did not know what to t'
+step    8000  loss 0.9078  bpc 1.3097 (plain 1.3675)  lr 4.91e-04  |g| 0.43  rate [0.254, 0.251, 0.284, 0.437]  eta 227m  budget 216m
+step    8100  loss 0.9358  bpc 1.3501 (plain 1.3825)  lr 4.90e-04  |g| 0.52  rate [0.253, 0.249, 0.281, 0.438]  eta 226m  budget 216m
+step    8200  loss 0.9044  bpc 1.3048 (plain 1.3532)  lr 4.90e-04  |g| 0.41  rate [0.253, 0.248, 0.282, 0.441]  eta 226m  budget 216m
+step    8300  loss 0.9349  bpc 1.3487 (plain 1.3894)  lr 4.90e-04  |g| 0.48  rate [0.253, 0.248, 0.282, 0.439]  eta 226m  budget 215m
+step    8400  loss 0.8492  bpc 1.2251 (plain 1.2984)  lr 4.90e-04  |g| 0.43  rate [0.253, 0.247, 0.282, 0.440]  eta 225m  budget 215m
+step    8500  loss 0.8838  bpc 1.2750 (plain 1.3433)  lr 4.89e-04  |g| 0.41  rate [0.252, 0.246, 0.281, 0.439]  eta 225m  budget 215m
+step    8600  loss 0.9206  bpc 1.3281 (plain 1.3708)  lr 4.89e-04  |g| 0.55  rate [0.252, 0.244, 0.284, 0.440]  eta 224m  budget 214m
+step    8700  loss 0.8826  bpc 1.2733 (plain 1.3222)  lr 4.89e-04  |g| 0.43  rate [0.252, 0.241, 0.282, 0.438]  eta 224m  budget 214m
+step    8800  loss 0.8665  bpc 1.2501 (plain 1.3107)  lr 4.89e-04  |g| 0.53  rate [0.252, 0.240, 0.280, 0.437]  eta 224m  budget 214m
+step    8900  loss 0.9350  bpc 1.3490 (plain 1.3861)  lr 4.88e-04  |g| 0.42  rate [0.252, 0.239, 0.281, 0.438]  eta 223m  budget 214m
+step    9000  loss 0.9107  bpc 1.3139 (plain 1.3327)  lr 4.88e-04  |g| 0.46  rate [0.251, 0.239, 0.277, 0.430]  eta 223m  budget 213m
+step    9100  loss 0.9538  bpc 1.3760 (plain 1.4091)  lr 4.88e-04  |g| 0.51  rate [0.251, 0.237, 0.277, 0.429]  eta 223m  budget 213m
+step    9200  loss 0.8592  bpc 1.2396 (plain 1.3052)  lr 4.87e-04  |g| 0.39  rate [0.251, 0.240, 0.279, 0.433]  eta 222m  budget 213m
+step    9300  loss 0.8821  bpc 1.2727 (plain 1.3052)  lr 4.87e-04  |g| 0.48  rate [0.251, 0.237, 0.277, 0.432]  eta 222m  budget 212m
+step    9400  loss 0.8641  bpc 1.2466 (plain 1.2853)  lr 4.87e-04  |g| 0.60  rate [0.250, 0.235, 0.276, 0.435]  eta 221m  budget 212m
+step    9500  loss 0.9127  bpc 1.3168 (plain 1.3619)  lr 4.87e-04  |g| 0.50  rate [0.251, 0.235, 0.278, 0.430]  eta 221m  budget 212m
+step    9600  loss 0.9013  bpc 1.3003 (plain 1.3517)  lr 4.86e-04  |g| 0.54  rate [0.250, 0.236, 0.277, 0.434]  eta 221m  budget 212m
+step    9700  loss 0.8496  bpc 1.2257 (plain 1.2952)  lr 4.86e-04  |g| 0.51  rate [0.250, 0.234, 0.278, 0.436]  eta 220m  budget 211m
+step    9800  loss 0.8501  bpc 1.2264 (plain 1.2767)  lr 4.86e-04  |g| 0.46  rate [0.249, 0.232, 0.276, 0.433]  eta 220m  budget 211m
+step    9900  loss 0.8586  bpc 1.2387 (plain 1.2714)  lr 4.85e-04  |g| 0.50  rate [0.250, 0.233, 0.277, 0.432]  eta 219m  budget 211m
+  eval step   10000  alpaca 2.0946  dolly 2.3117  oasst1 2.1542  persona 0.4092  soda 1.5625  stories_topic 1.3530  tinystories 1.3625  weighted 1.5050
+    ['hello'] -> "Hey there. What's one welcome?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She loved her favorite cartons. One day, she went to the park with her friend, a perfect trained in the big tree. They decided'
+step   10000  loss 0.9470  bpc 1.3662 (plain 1.3877)  lr 4.85e-04  |g| 0.66  rate [0.249, 0.234, 0.277, 0.433]  eta 219m  budget 210m
+step   10100  loss 0.8833  bpc 1.2743 (plain 1.3195)  lr 4.85e-04  |g| 0.45  rate [0.249, 0.230, 0.278, 0.430]  eta 219m  budget 210m
+step   10200  loss 0.8314  bpc 1.1994 (plain 1.2685)  lr 4.84e-04  |g| 0.54  rate [0.248, 0.230, 0.276, 0.428]  eta 219m  budget 210m
+step   10300  loss 0.8884  bpc 1.2817 (plain 1.3232)  lr 4.84e-04  |g| 0.47  rate [0.249, 0.230, 0.274, 0.429]  eta 218m  budget 209m
+step   10400  loss 0.8655  bpc 1.2487 (plain 1.2991)  lr 4.84e-04  |g| 0.46  rate [0.248, 0.231, 0.275, 0.429]  eta 218m  budget 209m
+step   10500  loss 0.8170  bpc 1.1787 (plain 1.2219)  lr 4.83e-04  |g| 0.36  rate [0.248, 0.230, 0.274, 0.425]  eta 217m  budget 209m
+step   10600  loss 0.8466  bpc 1.2213 (plain 1.2495)  lr 4.83e-04  |g| 0.49  rate [0.248, 0.230, 0.272, 0.429]  eta 217m  budget 209m
+step   10700  loss 0.8782  bpc 1.2670 (plain 1.3188)  lr 4.83e-04  |g| 0.52  rate [0.247, 0.228, 0.276, 0.427]  eta 217m  budget 208m
+step   10800  loss 0.9072  bpc 1.3088 (plain 1.3550)  lr 4.82e-04  |g| 0.45  rate [0.248, 0.230, 0.276, 0.425]  eta 216m  budget 208m
+step   10900  loss 0.9000  bpc 1.2984 (plain 1.3393)  lr 4.82e-04  |g| 0.50  rate [0.248, 0.231, 0.276, 0.425]  eta 216m  budget 208m
+step   11000  loss 0.8638  bpc 1.2462 (plain 1.3317)  lr 4.82e-04  |g| 0.53  rate [0.248, 0.229, 0.274, 0.425]  eta 215m  budget 208m
+step   11100  loss 0.9025  bpc 1.3020 (plain 1.3375)  lr 4.81e-04  |g| 0.49  rate [0.247, 0.228, 0.273, 0.426]  eta 215m  budget 207m
+step   11200  loss 0.7951  bpc 1.1471 (plain 1.2273)  lr 4.81e-04  |g| 0.44  rate [0.247, 0.227, 0.272, 0.422]  eta 215m  budget 207m
+step   11300  loss 0.8219  bpc 1.1858 (plain 1.2506)  lr 4.81e-04  |g| 0.45  rate [0.246, 0.226, 0.277, 0.428]  eta 214m  budget 207m
+step   11400  loss 0.8484  bpc 1.2240 (plain 1.2632)  lr 4.80e-04  |g| 0.45  rate [0.247, 0.226, 0.274, 0.423]  eta 214m  budget 206m
+step   11500  loss 0.8286  bpc 1.1955 (plain 1.2280)  lr 4.80e-04  |g| 0.57  rate [0.246, 0.225, 0.272, 0.425]  eta 213m  budget 206m
+step   11600  loss 0.7932  bpc 1.1443 (plain 1.1955)  lr 4.80e-04  |g| 0.47  rate [0.246, 0.225, 0.269, 0.421]  eta 213m  budget 206m
+step   11700  loss 0.8685  bpc 1.2530 (plain 1.3132)  lr 4.79e-04  |g| 0.52  rate [0.246, 0.225, 0.270, 0.422]  eta 213m  budget 206m
+step   11800  loss 0.7986  bpc 1.1521 (plain 1.1993)  lr 4.79e-04  |g| 0.48  rate [0.246, 0.225, 0.272, 0.429]  eta 212m  budget 205m
+step   11900  loss 0.9025  bpc 1.3020 (plain 1.3484)  lr 4.78e-04  |g| 0.42  rate [0.245, 0.224, 0.274, 0.428]  eta 212m  budget 205m
+  eval step   12000  alpaca 2.0456  dolly 2.2745  oasst1 2.1173  persona 0.3957  soda 1.5269  stories_topic 1.3042  tinystories 1.3146  weighted 1.4627
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'One day, a cat and a garden went for a walk in the stree. The frog was scared, but he was very carefully. The cat was very happy.\nThe cat said, "Hello, little dog, can you tease?"'
+step   12000  loss 0.8363  bpc 1.2065 (plain 1.2504)  lr 4.78e-04  |g| 0.50  rate [0.246, 0.224, 0.273, 0.423]  eta 212m  budget 205m
+step   12100  loss 0.8657  bpc 1.2489 (plain 1.2760)  lr 4.78e-04  |g| 0.44  rate [0.245, 0.226, 0.273, 0.424]  eta 212m  budget 204m
+step   12200  loss 0.8328  bpc 1.2015 (plain 1.2453)  lr 4.77e-04  |g| 0.51  rate [0.245, 0.224, 0.270, 0.421]  eta 211m  budget 204m
+step   12300  loss 0.8993  bpc 1.2974 (plain 1.3572)  lr 4.77e-04  |g| 0.49  rate [0.245, 0.225, 0.274, 0.427]  eta 211m  budget 204m
+step   12400  loss 0.8552  bpc 1.2338 (plain 1.3028)  lr 4.77e-04  |g| 0.46  rate [0.246, 0.224, 0.275, 0.424]  eta 211m  budget 204m
+step   12500  loss 0.8644  bpc 1.2471 (plain 1.2904)  lr 4.76e-04  |g| 0.45  rate [0.244, 0.224, 0.271, 0.419]  eta 210m  budget 203m
+step   12600  loss 0.8097  bpc 1.1681 (plain 1.2353)  lr 4.76e-04  |g| 0.56  rate [0.245, 0.223, 0.268, 0.415]  eta 210m  budget 203m
+step   12700  loss 0.8165  bpc 1.1780 (plain 1.2436)  lr 4.75e-04  |g| 0.43  rate [0.246, 0.223, 0.271, 0.423]  eta 209m  budget 203m
+step   12800  loss 0.8217  bpc 1.1855 (plain 1.2222)  lr 4.75e-04  |g| 0.42  rate [0.244, 0.222, 0.272, 0.421]  eta 209m  budget 202m
+step   12900  loss 0.8636  bpc 1.2460 (plain 1.2827)  lr 4.75e-04  |g| 0.47  rate [0.245, 0.224, 0.272, 0.418]  eta 209m  budget 202m
+step   13000  loss 0.9043  bpc 1.3046 (plain 1.3375)  lr 4.74e-04  |g| 0.47  rate [0.243, 0.224, 0.274, 0.422]  eta 208m  budget 202m
+step   13100  loss 0.8048  bpc 1.1611 (plain 1.2172)  lr 4.74e-04  |g| 0.52  rate [0.245, 0.224, 0.271, 0.422]  eta 208m  budget 202m
+step   13200  loss 0.8424  bpc 1.2154 (plain 1.2676)  lr 4.73e-04  |g| 0.44  rate [0.244, 0.222, 0.270, 0.422]  eta 208m  budget 201m
+step   13300  loss 0.8064  bpc 1.1633 (plain 1.2099)  lr 4.73e-04  |g| 0.67  rate [0.245, 0.225, 0.272, 0.420]  eta 207m  budget 201m
+step   13400  loss 0.9323  bpc 1.3451 (plain 1.3905)  lr 4.73e-04  |g| 0.44  rate [0.244, 0.220, 0.270, 0.421]  eta 207m  budget 201m
+step   13500  loss 0.8483  bpc 1.2239 (plain 1.2763)  lr 4.72e-04  |g| 0.52  rate [0.244, 0.221, 0.273, 0.423]  eta 206m  budget 200m
+step   13600  loss 0.8760  bpc 1.2639 (plain 1.3049)  lr 4.72e-04  |g| 0.54  rate [0.244, 0.225, 0.271, 0.424]  eta 206m  budget 200m
+step   13700  loss 0.8178  bpc 1.1798 (plain 1.2255)  lr 4.71e-04  |g| 0.46  rate [0.244, 0.222, 0.268, 0.418]  eta 206m  budget 200m
+step   13800  loss 0.8794  bpc 1.2688 (plain 1.3065)  lr 4.71e-04  |g| 0.43  rate [0.243, 0.221, 0.272, 0.423]  eta 205m  budget 200m
+step   13900  loss 0.7967  bpc 1.1494 (plain 1.1900)  lr 4.70e-04  |g| 0.49  rate [0.243, 0.221, 0.268, 0.417]  eta 205m  budget 199m
+  eval step   14000  alpaca 2.0059  dolly 2.2261  oasst1 2.1145  persona 0.3537  soda 1.5032  stories_topic 1.2826  tinystories 1.2938  weighted 1.4352
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a little boy named Tim went to the park with his mom. They walked to buy a lot. They liked to play together. Tim was very happy.\nTim saw a good box and wanted to play. He'
+step   14000  loss 0.8728  bpc 1.2591 (plain 1.2737)  lr 4.70e-04  |g| 0.43  rate [0.243, 0.222, 0.271, 0.422]  eta 205m  budget 199m
+step   14100  loss 0.8308  bpc 1.1985 (plain 1.2259)  lr 4.70e-04  |g| 0.51  rate [0.242, 0.223, 0.271, 0.424]  eta 205m  budget 199m
+step   14200  loss 0.8433  bpc 1.2166 (plain 1.2798)  lr 4.69e-04  |g| 0.49  rate [0.243, 0.221, 0.270, 0.419]  eta 204m  budget 198m
+step   14300  loss 0.7934  bpc 1.1447 (plain 1.1972)  lr 4.69e-04  |g| 0.48  rate [0.242, 0.221, 0.270, 0.419]  eta 204m  budget 198m
+step   14400  loss 0.8300  bpc 1.1974 (plain 1.2431)  lr 4.68e-04  |g| 0.41  rate [0.242, 0.221, 0.270, 0.420]  eta 204m  budget 198m
+step   14500  loss 0.8042  bpc 1.1602 (plain 1.2101)  lr 4.68e-04  |g| 0.44  rate [0.242, 0.222, 0.269, 0.419]  eta 203m  budget 198m
+step   14600  loss 0.8452  bpc 1.2194 (plain 1.2476)  lr 4.67e-04  |g| 0.49  rate [0.243, 0.221, 0.265, 0.418]  eta 203m  budget 197m
+step   14700  loss 0.8522  bpc 1.2295 (plain 1.2789)  lr 4.67e-04  |g| 0.57  rate [0.242, 0.220, 0.271, 0.422]  eta 203m  budget 197m
+step   14800  loss 0.8981  bpc 1.2957 (plain 1.3391)  lr 4.66e-04  |g| 0.49  rate [0.241, 0.220, 0.272, 0.425]  eta 202m  budget 197m
+step   14900  loss 0.8384  bpc 1.2096 (plain 1.2406)  lr 4.66e-04  |g| 0.57  rate [0.241, 0.221, 0.268, 0.418]  eta 202m  budget 196m
+step   15000  loss 0.8477  bpc 1.2230 (plain 1.2685)  lr 4.66e-04  |g| 0.56  rate [0.241, 0.220, 0.267, 0.413]  eta 202m  budget 196m
+step   15100  loss 0.8728  bpc 1.2591 (plain 1.2892)  lr 4.65e-04  |g| 0.58  rate [0.240, 0.221, 0.268, 0.416]  eta 201m  budget 196m
+step   15200  loss 0.8388  bpc 1.2101 (plain 1.2469)  lr 4.65e-04  |g| 0.49  rate [0.241, 0.221, 0.269, 0.421]  eta 201m  budget 196m
+step   15300  loss 0.8380  bpc 1.2090 (plain 1.2680)  lr 4.64e-04  |g| 0.44  rate [0.240, 0.220, 0.266, 0.422]  eta 200m  budget 195m
+step   15400  loss 0.8608  bpc 1.2418 (plain 1.2860)  lr 4.64e-04  |g| 0.51  rate [0.241, 0.219, 0.269, 0.420]  eta 200m  budget 195m
+step   15500  loss 0.8747  bpc 1.2620 (plain 1.3126)  lr 4.63e-04  |g| 0.46  rate [0.240, 0.220, 0.265, 0.421]  eta 200m  budget 195m
+step   15600  loss 0.8073  bpc 1.1646 (plain 1.2233)  lr 4.63e-04  |g| 0.47  rate [0.240, 0.220, 0.267, 0.419]  eta 199m  budget 195m
+step   15700  loss 0.8219  bpc 1.1858 (plain 1.2442)  lr 4.62e-04  |g| 0.47  rate [0.239, 0.219, 0.267, 0.418]  eta 199m  budget 194m
+step   15800  loss 0.8059  bpc 1.1626 (plain 1.2335)  lr 4.62e-04  |g| 0.50  rate [0.239, 0.221, 0.266, 0.420]  eta 199m  budget 194m
+step   15900  loss 0.8087  bpc 1.1668 (plain 1.2342)  lr 4.61e-04  |g| 0.48  rate [0.239, 0.219, 0.266, 0.418]  eta 198m  budget 194m
+  eval step   16000  alpaca 1.9861  dolly 2.2073  oasst1 2.0656  persona 0.3571  soda 1.4735  stories_topic 1.2610  tinystories 1.2717  weighted 1.4138
+    ['hello'] -> 'Hello, what shall we talk about?'
+    ['tell me a story about a dog'] -> 'One day, a little girl named Lucy went to the park. She saw a big box of pass and running on the ground. She picked it up and sad. She ran away from the piece on the garden.\n"Mom,'
+step   16000  loss 0.7810  bpc 1.1267 (plain 1.1893)  lr 4.61e-04  |g| 0.43  rate [0.239, 0.218, 0.268, 0.420]  eta 198m  budget 193m
+step   16100  loss 0.7724  bpc 1.1144 (plain 1.1923)  lr 4.60e-04  |g| 0.39  rate [0.238, 0.220, 0.267, 0.417]  eta 198m  budget 193m
+step   16200  loss 0.8241  bpc 1.1890 (plain 1.2365)  lr 4.60e-04  |g| 0.43  rate [0.238, 0.218, 0.267, 0.416]  eta 198m  budget 193m
+step   16300  loss 0.7348  bpc 1.0601 (plain 1.1250)  lr 4.59e-04  |g| 0.44  rate [0.238, 0.218, 0.263, 0.418]  eta 197m  budget 192m
+step   16400  loss 0.7749  bpc 1.1179 (plain 1.1864)  lr 4.59e-04  |g| 0.38  rate [0.238, 0.219, 0.265, 0.418]  eta 197m  budget 192m
+step   16500  loss 0.8287  bpc 1.1956 (plain 1.2281)  lr 4.58e-04  |g| 0.46  rate [0.238, 0.221, 0.266, 0.419]  eta 197m  budget 192m
+step   16600  loss 0.8758  bpc 1.2635 (plain 1.3193)  lr 4.58e-04  |g| 0.39  rate [0.239, 0.220, 0.268, 0.421]  eta 196m  budget 192m
+step   16700  loss 0.8183  bpc 1.1806 (plain 1.2329)  lr 4.57e-04  |g| 0.45  rate [0.238, 0.219, 0.268, 0.420]  eta 196m  budget 191m
+step   16800  loss 0.7513  bpc 1.0839 (plain 1.1609)  lr 4.57e-04  |g| 0.40  rate [0.238, 0.217, 0.262, 0.415]  eta 196m  budget 191m
+step   16900  loss 0.8184  bpc 1.1807 (plain 1.2284)  lr 4.56e-04  |g| 0.38  rate [0.238, 0.219, 0.265, 0.418]  eta 195m  budget 191m
+step   17000  loss 0.8076  bpc 1.1652 (plain 1.2138)  lr 4.56e-04  |g| 0.52  rate [0.237, 0.220, 0.268, 0.419]  eta 195m  budget 191m
+step   17100  loss 0.8113  bpc 1.1705 (plain 1.2217)  lr 4.55e-04  |g| 0.39  rate [0.237, 0.218, 0.267, 0.419]  eta 195m  budget 190m
+step   17200  loss 0.8553  bpc 1.2340 (plain 1.2866)  lr 4.55e-04  |g| 0.50  rate [0.237, 0.218, 0.266, 0.420]  eta 194m  budget 190m
+step   17300  loss 0.8005  bpc 1.1549 (plain 1.2207)  lr 4.54e-04  |g| 0.36  rate [0.238, 0.218, 0.267, 0.419]  eta 194m  budget 190m
+step   17400  loss 0.8130  bpc 1.1729 (plain 1.2184)  lr 4.54e-04  |g| 0.49  rate [0.238, 0.218, 0.264, 0.414]  eta 194m  budget 189m
+step   17500  loss 0.8395  bpc 1.2111 (plain 1.2645)  lr 4.53e-04  |g| 0.55  rate [0.237, 0.217, 0.266, 0.422]  eta 193m  budget 189m
+step   17600  loss 0.8086  bpc 1.1666 (plain 1.2088)  lr 4.53e-04  |g| 0.49  rate [0.237, 0.218, 0.266, 0.420]  eta 193m  budget 189m
+step   17700  loss 0.8284  bpc 1.1952 (plain 1.2594)  lr 4.52e-04  |g| 0.50  rate [0.236, 0.217, 0.265, 0.419]  eta 193m  budget 189m
+step   17800  loss 0.7825  bpc 1.1289 (plain 1.1817)  lr 4.51e-04  |g| 0.42  rate [0.237, 0.218, 0.266, 0.420]  eta 192m  budget 188m
+step   17900  loss 0.8364  bpc 1.2067 (plain 1.2389)  lr 4.51e-04  |g| 0.38  rate [0.236, 0.217, 0.265, 0.421]  eta 192m  budget 188m
+  eval step   18000  alpaca 1.9641  dolly 2.1884  oasst1 2.0945  persona 0.3321  soda 1.4637  stories_topic 1.2448  tinystories 1.2545  weighted 1.3980
+    ['hello'] -> 'Hello. Ask me something, or ask me for a story.'
+    ['tell me a story about a dog'] -> 'One day, a cat and a dog went to the park. They saw a big tree and wanted to play with it. They saw a big tree with a big red ball. The ball was very happy.\nThe ball said, "I want'
+step   18000  loss 0.8051  bpc 1.1615 (plain 1.1923)  lr 4.50e-04  |g| 0.46  rate [0.237, 0.218, 0.266, 0.421]  eta 192m  budget 188m
+step   18100  loss 0.8631  bpc 1.2452 (plain 1.2814)  lr 4.50e-04  |g| 0.41  rate [0.237, 0.218, 0.269, 0.420]  eta 192m  budget 187m
+step   18200  loss 0.7921  bpc 1.1427 (plain 1.1748)  lr 4.49e-04  |g| 0.52  rate [0.237, 0.217, 0.262, 0.417]  eta 191m  budget 187m
+step   18300  loss 0.7799  bpc 1.1252 (plain 1.1777)  lr 4.49e-04  |g| 0.48  rate [0.237, 0.216, 0.263, 0.419]  eta 191m  budget 187m
+step   18400  loss 0.8096  bpc 1.1680 (plain 1.2170)  lr 4.48e-04  |g| 0.50  rate [0.237, 0.219, 0.266, 0.418]  eta 191m  budget 187m
+step   18500  loss 0.8325  bpc 1.2011 (plain 1.2547)  lr 4.48e-04  |g| 0.48  rate [0.237, 0.217, 0.265, 0.417]  eta 190m  budget 186m
+step   18600  loss 0.8473  bpc 1.2224 (plain 1.2579)  lr 4.47e-04  |g| 0.49  rate [0.236, 0.217, 0.264, 0.418]  eta 190m  budget 186m
+step   18700  loss 0.7238  bpc 1.0443 (plain 1.1155)  lr 4.46e-04  |g| 0.53  rate [0.236, 0.216, 0.261, 0.417]  eta 190m  budget 186m
+step   18800  loss 0.8013  bpc 1.1560 (plain 1.1901)  lr 4.46e-04  |g| 0.35  rate [0.235, 0.217, 0.264, 0.417]  eta 189m  budget 185m
+step   18900  loss 0.7868  bpc 1.1351 (plain 1.1867)  lr 4.45e-04  |g| 0.48  rate [0.236, 0.216, 0.263, 0.421]  eta 189m  budget 185m
+step   19000  loss 0.7824  bpc 1.1288 (plain 1.1736)  lr 4.45e-04  |g| 0.49  rate [0.237, 0.219, 0.262, 0.419]  eta 189m  budget 185m
+step   19100  loss 0.8303  bpc 1.1979 (plain 1.2368)  lr 4.44e-04  |g| 0.48  rate [0.235, 0.216, 0.264, 0.416]  eta 188m  budget 185m
+step   19200  loss 0.8150  bpc 1.1758 (plain 1.2196)  lr 4.44e-04  |g| 0.48  rate [0.236, 0.217, 0.264, 0.418]  eta 188m  budget 184m
+step   19300  loss 0.8160  bpc 1.1772 (plain 1.2288)  lr 4.43e-04  |g| 0.42  rate [0.236, 0.216, 0.264, 0.417]  eta 188m  budget 184m
+step   19400  loss 0.7312  bpc 1.0549 (plain 1.1184)  lr 4.42e-04  |g| 0.44  rate [0.235, 0.216, 0.264, 0.419]  eta 187m  budget 184m
+step   19500  loss 0.8044  bpc 1.1605 (plain 1.2093)  lr 4.42e-04  |g| 0.50  rate [0.236, 0.218, 0.267, 0.421]  eta 187m  budget 183m
+step   19600  loss 0.7807  bpc 1.1263 (plain 1.1870)  lr 4.41e-04  |g| 0.51  rate [0.236, 0.216, 0.264, 0.414]  eta 187m  budget 183m
+step   19700  loss 0.8437  bpc 1.2172 (plain 1.2434)  lr 4.41e-04  |g| 0.50  rate [0.236, 0.216, 0.265, 0.414]  eta 186m  budget 183m
+step   19800  loss 0.7684  bpc 1.1085 (plain 1.1642)  lr 4.40e-04  |g| 0.42  rate [0.235, 0.214, 0.265, 0.416]  eta 186m  budget 183m
+step   19900  loss 0.8039  bpc 1.1597 (plain 1.1998)  lr 4.39e-04  |g| 0.53  rate [0.236, 0.215, 0.263, 0.414]  eta 186m  budget 182m
+  eval step   20000  alpaca 1.9507  dolly 2.1601  oasst1 2.0545  persona 0.3393  soda 1.4515  stories_topic 1.2305  tinystories 1.2409  weighted 1.3846
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. Tim was a good cat. The cat loved to play in the big park. One day, he saw a shiny shelter in the garden.\nTom saw a small box. H'
+step   20000  loss 0.7830  bpc 1.1296 (plain 1.1838)  lr 4.39e-04  |g| 0.46  rate [0.235, 0.216, 0.264, 0.418]  eta 186m  budget 182m
+step   20100  loss 0.7918  bpc 1.1424 (plain 1.1795)  lr 4.38e-04  |g| 0.48  rate [0.235, 0.214, 0.266, 0.417]  eta 185m  budget 182m
+step   20200  loss 0.7590  bpc 1.0950 (plain 1.1444)  lr 4.38e-04  |g| 0.46  rate [0.236, 0.215, 0.266, 0.419]  eta 185m  budget 181m
+step   20300  loss 0.7522  bpc 1.0852 (plain 1.1290)  lr 4.37e-04  |g| 0.39  rate [0.236, 0.216, 0.264, 0.418]  eta 185m  budget 181m
+step   20400  loss 0.7452  bpc 1.0752 (plain 1.1341)  lr 4.36e-04  |g| 0.41  rate [0.235, 0.216, 0.260, 0.414]  eta 184m  budget 181m
+step   20500  loss 0.7906  bpc 1.1406 (plain 1.1941)  lr 4.36e-04  |g| 0.48  rate [0.235, 0.216, 0.263, 0.415]  eta 184m  budget 181m
+step   20600  loss 0.7720  bpc 1.1137 (plain 1.1683)  lr 4.35e-04  |g| 0.40  rate [0.235, 0.215, 0.264, 0.417]  eta 184m  budget 180m
+step   20700  loss 0.8083  bpc 1.1661 (plain 1.2113)  lr 4.35e-04  |g| 0.46  rate [0.235, 0.213, 0.263, 0.417]  eta 183m  budget 180m
+step   20800  loss 0.7705  bpc 1.1116 (plain 1.1808)  lr 4.34e-04  |g| 0.46  rate [0.235, 0.215, 0.263, 0.417]  eta 183m  budget 180m
+step   20900  loss 0.8040  bpc 1.1600 (plain 1.2342)  lr 4.33e-04  |g| 0.43  rate [0.235, 0.214, 0.263, 0.411]  eta 183m  budget 180m
+step   21000  loss 0.8077  bpc 1.1653 (plain 1.1832)  lr 4.33e-04  |g| 0.48  rate [0.234, 0.212, 0.263, 0.414]  eta 182m  budget 179m
+step   21100  loss 0.7535  bpc 1.0870 (plain 1.1452)  lr 4.32e-04  |g| 0.55  rate [0.234, 0.213, 0.261, 0.415]  eta 182m  budget 179m
+step   21200  loss 0.7598  bpc 1.0961 (plain 1.1576)  lr 4.32e-04  |g| 0.37  rate [0.235, 0.214, 0.263, 0.418]  eta 182m  budget 179m
+step   21300  loss 0.7681  bpc 1.1081 (plain 1.1541)  lr 4.31e-04  |g| 0.47  rate [0.234, 0.214, 0.263, 0.417]  eta 181m  budget 178m
+step   21400  loss 0.8222  bpc 1.1861 (plain 1.2317)  lr 4.30e-04  |g| 0.41  rate [0.235, 0.213, 0.267, 0.418]  eta 181m  budget 178m
+step   21500  loss 0.7765  bpc 1.1203 (plain 1.1741)  lr 4.30e-04  |g| 0.38  rate [0.235, 0.214, 0.261, 0.413]  eta 181m  budget 178m
+step   21600  loss 0.7907  bpc 1.1408 (plain 1.1812)  lr 4.29e-04  |g| 0.46  rate [0.234, 0.213, 0.265, 0.421]  eta 180m  budget 178m
+step   21700  loss 0.8227  bpc 1.1870 (plain 1.2364)  lr 4.28e-04  |g| 0.40  rate [0.234, 0.215, 0.265, 0.420]  eta 180m  budget 177m
+step   21800  loss 0.7882  bpc 1.1372 (plain 1.1623)  lr 4.28e-04  |g| 0.42  rate [0.234, 0.215, 0.263, 0.415]  eta 180m  budget 177m
+step   21900  loss 0.7288  bpc 1.0515 (plain 1.1183)  lr 4.27e-04  |g| 0.42  rate [0.234, 0.215, 0.264, 0.417]  eta 179m  budget 177m
+  eval step   22000  alpaca 1.9293  dolly 2.1425  oasst1 2.0334  persona 0.3128  soda 1.4348  stories_topic 1.2248  tinystories 1.2371  weighted 1.3719
+    ['hello'] -> 'Hey there. What shallen I help with?'
+    ['tell me a story about a dog'] -> 'One day, a little girl named Lily went for a walk. She was lost and round and water to make it out. She tried to play with the tall tree and like playing with her friends.\nWhile pl'
+step   22000  loss 0.7363  bpc 1.0622 (plain 1.1062)  lr 4.26e-04  |g| 0.43  rate [0.234, 0.213, 0.262, 0.417]  eta 179m  budget 176m
+step   22100  loss 0.8386  bpc 1.2099 (plain 1.2342)  lr 4.26e-04  |g| 0.38  rate [0.234, 0.214, 0.264, 0.413]  eta 179m  budget 176m
+step   22200  loss 0.8095  bpc 1.1678 (plain 1.2219)  lr 4.25e-04  |g| 0.48  rate [0.235, 0.216, 0.263, 0.414]  eta 179m  budget 176m
+step   22300  loss 0.7869  bpc 1.1352 (plain 1.1710)  lr 4.24e-04  |g| 0.38  rate [0.234, 0.215, 0.264, 0.416]  eta 178m  budget 176m
+step   22400  loss 0.8063  bpc 1.1633 (plain 1.2177)  lr 4.24e-04  |g| 0.47  rate [0.233, 0.213, 0.262, 0.415]  eta 178m  budget 175m
+step   22500  loss 0.8145  bpc 1.1751 (plain 1.2170)  lr 4.23e-04  |g| 0.50  rate [0.234, 0.213, 0.263, 0.419]  eta 178m  budget 175m
+step   22600  loss 0.7821  bpc 1.1284 (plain 1.1856)  lr 4.23e-04  |g| 0.39  rate [0.234, 0.214, 0.265, 0.414]  eta 177m  budget 175m
+step   22700  loss 0.7227  bpc 1.0426 (plain 1.1226)  lr 4.22e-04  |g| 0.54  rate [0.234, 0.213, 0.263, 0.413]  eta 177m  budget 174m
+step   22800  loss 0.7951  bpc 1.1471 (plain 1.2103)  lr 4.21e-04  |g| 0.47  rate [0.233, 0.215, 0.265, 0.421]  eta 177m  budget 174m
+step   22900  loss 0.7924  bpc 1.1432 (plain 1.1881)  lr 4.21e-04  |g| 0.49  rate [0.233, 0.214, 0.264, 0.415]  eta 176m  budget 174m
+step   23000  loss 0.7952  bpc 1.1472 (plain 1.1958)  lr 4.20e-04  |g| 0.39  rate [0.234, 0.215, 0.264, 0.415]  eta 176m  budget 174m
+step   23100  loss 0.7449  bpc 1.0746 (plain 1.1409)  lr 4.19e-04  |g| 0.40  rate [0.233, 0.214, 0.259, 0.412]  eta 176m  budget 173m
+step   23200  loss 0.7884  bpc 1.1375 (plain 1.2017)  lr 4.19e-04  |g| 0.43  rate [0.233, 0.214, 0.264, 0.420]  eta 176m  budget 173m
+step   23300  loss 0.7826  bpc 1.1290 (plain 1.1812)  lr 4.18e-04  |g| 0.43  rate [0.233, 0.213, 0.263, 0.417]  eta 175m  budget 173m
+step   23400  loss 0.8060  bpc 1.1629 (plain 1.2153)  lr 4.17e-04  |g| 0.37  rate [0.233, 0.213, 0.262, 0.415]  eta 175m  budget 172m
+step   23500  loss 0.8106  bpc 1.1695 (plain 1.2164)  lr 4.16e-04  |g| 0.59  rate [0.233, 0.214, 0.265, 0.413]  eta 175m  budget 172m
+step   23600  loss 0.7634  bpc 1.1013 (plain 1.1471)  lr 4.16e-04  |g| 0.42  rate [0.233, 0.212, 0.262, 0.415]  eta 174m  budget 172m
+step   23700  loss 0.7434  bpc 1.0725 (plain 1.1065)  lr 4.15e-04  |g| 0.41  rate [0.232, 0.213, 0.264, 0.415]  eta 174m  budget 172m
+step   23800  loss 0.7641  bpc 1.1024 (plain 1.1503)  lr 4.14e-04  |g| 0.40  rate [0.232, 0.214, 0.262, 0.414]  eta 174m  budget 171m
+step   23900  loss 0.8192  bpc 1.1819 (plain 1.2373)  lr 4.14e-04  |g| 0.48  rate [0.233, 0.214, 0.264, 0.419]  eta 173m  budget 171m
+  eval step   24000  alpaca 1.9163  dolly 2.1184  oasst1 2.0293  persona 0.3323  soda 1.4200  stories_topic 1.2101  tinystories 1.2211  weighted 1.3597
+    ['hello'] -> 'Hey there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'One day, a little girl named Lucy went to the park. She saw a big, green glow unit. Lucy wanted to see it to her mom. She saw a big tree and decided to put it up the car. She found'
+step   24000  loss 0.7545  bpc 1.0885 (plain 1.1309)  lr 4.13e-04  |g| 0.41  rate [0.232, 0.214, 0.260, 0.418]  eta 173m  budget 171m
+step   24100  loss 0.7858  bpc 1.1337 (plain 1.1726)  lr 4.12e-04  |g| 0.38  rate [0.233, 0.213, 0.262, 0.416]  eta 173m  budget 170m
+step   24200  loss 0.7606  bpc 1.0973 (plain 1.1461)  lr 4.12e-04  |g| 0.45  rate [0.232, 0.213, 0.261, 0.415]  eta 173m  budget 170m
+step   24300  loss 0.8027  bpc 1.1581 (plain 1.1814)  lr 4.11e-04  |g| 0.48  rate [0.233, 0.214, 0.262, 0.418]  eta 172m  budget 170m
+step   24400  loss 0.8546  bpc 1.2329 (plain 1.2533)  lr 4.10e-04  |g| 0.45  rate [0.232, 0.212, 0.264, 0.417]  eta 172m  budget 170m
+step   24500  loss 0.7607  bpc 1.0974 (plain 1.1563)  lr 4.10e-04  |g| 0.44  rate [0.233, 0.213, 0.263, 0.414]  eta 172m  budget 169m
+step   24600  loss 0.7818  bpc 1.1278 (plain 1.1789)  lr 4.09e-04  |g| 0.40  rate [0.232, 0.215, 0.266, 0.416]  eta 171m  budget 169m
+step   24700  loss 0.7467  bpc 1.0773 (plain 1.1386)  lr 4.08e-04  |g| 0.44  rate [0.232, 0.215, 0.264, 0.418]  eta 171m  budget 169m
+step   24800  loss 0.8395  bpc 1.2112 (plain 1.2378)  lr 4.07e-04  |g| 0.40  rate [0.232, 0.213, 0.265, 0.417]  eta 171m  budget 168m
+step   24900  loss 0.7871  bpc 1.1356 (plain 1.1655)  lr 4.07e-04  |g| 0.44  rate [0.232, 0.213, 0.261, 0.413]  eta 170m  budget 168m
+step   25000  loss 0.7197  bpc 1.0383 (plain 1.0886)  lr 4.06e-04  |g| 0.42  rate [0.232, 0.213, 0.261, 0.413]  eta 170m  budget 168m
+step   25100  loss 0.7531  bpc 1.0865 (plain 1.1350)  lr 4.05e-04  |g| 0.47  rate [0.232, 0.213, 0.261, 0.410]  eta 170m  budget 168m
+step   25200  loss 0.7276  bpc 1.0498 (plain 1.1011)  lr 4.05e-04  |g| 0.43  rate [0.232, 0.212, 0.261, 0.412]  eta 169m  budget 167m
+step   25300  loss 0.7664  bpc 1.1056 (plain 1.1450)  lr 4.04e-04  |g| 0.45  rate [0.232, 0.214, 0.261, 0.413]  eta 169m  budget 167m
+step   25400  loss 0.8248  bpc 1.1899 (plain 1.2260)  lr 4.03e-04  |g| 0.43  rate [0.232, 0.215, 0.263, 0.415]  eta 169m  budget 167m
+step   25500  loss 0.7638  bpc 1.1019 (plain 1.1716)  lr 4.02e-04  |g| 0.46  rate [0.232, 0.214, 0.261, 0.413]  eta 169m  budget 167m
+step   25600  loss 0.7853  bpc 1.1330 (plain 1.1769)  lr 4.02e-04  |g| 0.42  rate [0.232, 0.213, 0.262, 0.414]  eta 168m  budget 166m
+step   25700  loss 0.8145  bpc 1.1750 (plain 1.2379)  lr 4.01e-04  |g| 0.39  rate [0.232, 0.213, 0.260, 0.411]  eta 168m  budget 166m
+step   25800  loss 0.7480  bpc 1.0792 (plain 1.1402)  lr 4.00e-04  |g| 0.44  rate [0.231, 0.213, 0.264, 0.414]  eta 168m  budget 166m
+step   25900  loss 0.7630  bpc 1.1008 (plain 1.1667)  lr 4.00e-04  |g| 0.46  rate [0.231, 0.212, 0.262, 0.415]  eta 167m  budget 165m
+  eval step   26000  alpaca 1.9098  dolly 2.1363  oasst1 1.9928  persona 0.3264  soda 1.4137  stories_topic 1.2086  tinystories 1.2160  weighted 1.3562
+    ['hello'] -> 'Hi! How are you doing the neuron comet?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Sue. She had a big bag of small bugs. She loved her pocket and colors and loved to play with her friends.\nOne sunny day, Spot was pl'
+step   26000  loss 0.7367  bpc 1.0629 (plain 1.1141)  lr 3.99e-04  |g| 0.49  rate [0.231, 0.212, 0.262, 0.411]  eta 167m  budget 165m
+step   26100  loss 0.8005  bpc 1.1549 (plain 1.2081)  lr 3.98e-04  |g| 0.39  rate [0.232, 0.212, 0.263, 0.416]  eta 167m  budget 165m
+step   26200  loss 0.7926  bpc 1.1435 (plain 1.2021)  lr 3.97e-04  |g| 0.38  rate [0.231, 0.212, 0.261, 0.412]  eta 167m  budget 164m
+step   26300  loss 0.7803  bpc 1.1257 (plain 1.1677)  lr 3.97e-04  |g| 0.48  rate [0.232, 0.212, 0.261, 0.412]  eta 166m  budget 164m
+step   26400  loss 0.7866  bpc 1.1348 (plain 1.1575)  lr 3.96e-04  |g| 0.46  rate [0.232, 0.213, 0.264, 0.416]  eta 166m  budget 164m
+step   26500  loss 0.8689  bpc 1.2535 (plain 1.2828)  lr 3.95e-04  |g| 0.48  rate [0.232, 0.213, 0.262, 0.415]  eta 166m  budget 164m
+step   26600  loss 0.8165  bpc 1.1779 (plain 1.2032)  lr 3.94e-04  |g| 0.51  rate [0.231, 0.214, 0.262, 0.416]  eta 165m  budget 163m
+step   26700  loss 0.7600  bpc 1.0965 (plain 1.1467)  lr 3.94e-04  |g| 0.46  rate [0.231, 0.212, 0.263, 0.416]  eta 165m  budget 163m
+step   26800  loss 0.8161  bpc 1.1774 (plain 1.2347)  lr 3.93e-04  |g| 0.48  rate [0.231, 0.212, 0.263, 0.416]  eta 165m  budget 163m
+step   26900  loss 0.7490  bpc 1.0805 (plain 1.1232)  lr 3.92e-04  |g| 0.47  rate [0.232, 0.214, 0.262, 0.416]  eta 164m  budget 163m
+step   27000  loss 0.8252  bpc 1.1905 (plain 1.2249)  lr 3.91e-04  |g| 0.53  rate [0.231, 0.213, 0.261, 0.414]  eta 164m  budget 162m
+step   27100  loss 0.7692  bpc 1.1097 (plain 1.1531)  lr 3.91e-04  |g| 0.46  rate [0.231, 0.214, 0.262, 0.415]  eta 164m  budget 162m
+step   27200  loss 0.7385  bpc 1.0654 (plain 1.0982)  lr 3.90e-04  |g| 0.44  rate [0.231, 0.212, 0.260, 0.415]  eta 163m  budget 162m
+step   27300  loss 0.7379  bpc 1.0646 (plain 1.1146)  lr 3.89e-04  |g| 0.43  rate [0.231, 0.211, 0.258, 0.411]  eta 163m  budget 161m
+step   27400  loss 0.7291  bpc 1.0519 (plain 1.1242)  lr 3.88e-04  |g| 0.44  rate [0.231, 0.213, 0.262, 0.414]  eta 163m  budget 161m
+step   27500  loss 0.7580  bpc 1.0936 (plain 1.1638)  lr 3.88e-04  |g| 0.45  rate [0.231, 0.212, 0.262, 0.415]  eta 163m  budget 161m
+step   27600  loss 0.8086  bpc 1.1666 (plain 1.1845)  lr 3.87e-04  |g| 0.38  rate [0.231, 0.214, 0.261, 0.412]  eta 162m  budget 161m
+step   27700  loss 0.8119  bpc 1.1713 (plain 1.2061)  lr 3.86e-04  |g| 0.42  rate [0.231, 0.212, 0.262, 0.414]  eta 162m  budget 160m
+step   27800  loss 0.7900  bpc 1.1397 (plain 1.1815)  lr 3.85e-04  |g| 0.42  rate [0.231, 0.214, 0.263, 0.413]  eta 162m  budget 160m
+step   27900  loss 0.7837  bpc 1.1307 (plain 1.1530)  lr 3.85e-04  |g| 0.43  rate [0.231, 0.214, 0.262, 0.415]  eta 161m  budget 160m
+  eval step   28000  alpaca 1.8901  dolly 2.1265  oasst1 2.0082  persona 0.3104  soda 1.4125  stories_topic 1.2044  tinystories 1.2146  weighted 1.3497
+    ['hello'] -> 'Hello! What can I help you today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a boy named Tim. Tim loved to run and play in the park and sing ears in the sky. The sun was shining, and the birds like the birds. They have fun togeth'
+step   28000  loss 0.7247  bpc 1.0456 (plain 1.1134)  lr 3.84e-04  |g| 0.46  rate [0.230, 0.213, 0.263, 0.418]  eta 161m  budget 159m
+step   28100  loss 0.7485  bpc 1.0798 (plain 1.1318)  lr 3.83e-04  |g| 0.43  rate [0.230, 0.213, 0.261, 0.417]  eta 161m  budget 159m
+step   28200  loss 0.7973  bpc 1.1502 (plain 1.2058)  lr 3.82e-04  |g| 0.39  rate [0.231, 0.214, 0.263, 0.419]  eta 161m  budget 159m
+step   28300  loss 0.7664  bpc 1.1057 (plain 1.1250)  lr 3.82e-04  |g| 0.45  rate [0.231, 0.214, 0.259, 0.412]  eta 160m  budget 159m
+step   28400  loss 0.7709  bpc 1.1122 (plain 1.1707)  lr 3.81e-04  |g| 0.50  rate [0.231, 0.211, 0.262, 0.413]  eta 160m  budget 158m
+step   28500  loss 0.8152  bpc 1.1761 (plain 1.2285)  lr 3.80e-04  |g| 0.46  rate [0.231, 0.214, 0.264, 0.417]  eta 160m  budget 158m
+step   28600  loss 0.7626  bpc 1.1002 (plain 1.1439)  lr 3.79e-04  |g| 0.45  rate [0.230, 0.214, 0.263, 0.413]  eta 159m  budget 158m
+step   28700  loss 0.7249  bpc 1.0459 (plain 1.1098)  lr 3.78e-04  |g| 0.49  rate [0.230, 0.213, 0.258, 0.414]  eta 159m  budget 157m
+step   28800  loss 0.7591  bpc 1.0952 (plain 1.1215)  lr 3.78e-04  |g| 0.40  rate [0.230, 0.212, 0.258, 0.412]  eta 159m  budget 157m
+step   28900  loss 0.7473  bpc 1.0782 (plain 1.1132)  lr 3.77e-04  |g| 0.41  rate [0.231, 0.212, 0.260, 0.415]  eta 158m  budget 157m
+step   29000  loss 0.7446  bpc 1.0742 (plain 1.1647)  lr 3.76e-04  |g| 0.48  rate [0.231, 0.213, 0.260, 0.411]  eta 158m  budget 157m
+step   29100  loss 0.7816  bpc 1.1276 (plain 1.1700)  lr 3.75e-04  |g| 0.52  rate [0.230, 0.212, 0.261, 0.414]  eta 158m  budget 156m
+step   29200  loss 0.7780  bpc 1.1224 (plain 1.1769)  lr 3.74e-04  |g| 0.45  rate [0.231, 0.214, 0.262, 0.415]  eta 158m  budget 156m
+step   29300  loss 0.8174  bpc 1.1792 (plain 1.2106)  lr 3.74e-04  |g| 0.46  rate [0.230, 0.213, 0.263, 0.416]  eta 157m  budget 156m
+step   29400  loss 0.7842  bpc 1.1313 (plain 1.1640)  lr 3.73e-04  |g| 0.40  rate [0.230, 0.214, 0.260, 0.413]  eta 157m  budget 156m
+step   29500  loss 0.7198  bpc 1.0385 (plain 1.0855)  lr 3.72e-04  |g| 0.45  rate [0.230, 0.213, 0.261, 0.415]  eta 157m  budget 155m
+step   29600  loss 0.7339  bpc 1.0588 (plain 1.1289)  lr 3.71e-04  |g| 0.51  rate [0.230, 0.212, 0.261, 0.413]  eta 156m  budget 155m
+step   29700  loss 0.8405  bpc 1.2126 (plain 1.2262)  lr 3.71e-04  |g| 0.42  rate [0.230, 0.214, 0.263, 0.415]  eta 156m  budget 155m
+step   29800  loss 0.7911  bpc 1.1413 (plain 1.1989)  lr 3.70e-04  |g| 0.41  rate [0.230, 0.211, 0.262, 0.413]  eta 156m  budget 154m
+step   29900  loss 0.7920  bpc 1.1426 (plain 1.2095)  lr 3.69e-04  |g| 0.53  rate [0.230, 0.210, 0.262, 0.414]  eta 155m  budget 154m
+  eval step   30000  alpaca 1.8915  dolly 2.1252  oasst1 2.0448  persona 0.2944  soda 1.4042  stories_topic 1.1950  tinystories 1.2050  weighted 1.3430
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a little girl named Lucy was playing in her room. She had a big red ball on it. Lucy liked the ball very much. She loved to sit under it and sat down and watch the bell an'
+step   30000  loss 0.7377  bpc 1.0642 (plain 1.1256)  lr 3.68e-04  |g| 0.44  rate [0.230, 0.210, 0.260, 0.412]  eta 155m  budget 154m
+step   30100  loss 0.7475  bpc 1.0784 (plain 1.1165)  lr 3.67e-04  |g| 0.40  rate [0.230, 0.211, 0.259, 0.410]  eta 155m  budget 153m
+step   30200  loss 0.7711  bpc 1.1125 (plain 1.1768)  lr 3.67e-04  |g| 0.42  rate [0.230, 0.212, 0.262, 0.410]  eta 155m  budget 153m
+step   30300  loss 0.6884  bpc 0.9931 (plain 1.0616)  lr 3.66e-04  |g| 0.36  rate [0.230, 0.213, 0.261, 0.411]  eta 154m  budget 153m
+step   30400  loss 0.7339  bpc 1.0588 (plain 1.1101)  lr 3.65e-04  |g| 0.39  rate [0.230, 0.212, 0.262, 0.414]  eta 154m  budget 153m
+step   30500  loss 0.7316  bpc 1.0555 (plain 1.0980)  lr 3.64e-04  |g| 0.44  rate [0.230, 0.212, 0.259, 0.414]  eta 154m  budget 152m
+step   30600  loss 0.7670  bpc 1.1066 (plain 1.1392)  lr 3.63e-04  |g| 0.45  rate [0.230, 0.213, 0.264, 0.418]  eta 153m  budget 152m
+step   30700  loss 0.7773  bpc 1.1215 (plain 1.1676)  lr 3.62e-04  |g| 0.37  rate [0.229, 0.213, 0.262, 0.412]  eta 153m  budget 152m
+step   30800  loss 0.8006  bpc 1.1550 (plain 1.1778)  lr 3.62e-04  |g| 0.57  rate [0.230, 0.212, 0.264, 0.415]  eta 153m  budget 152m
+step   30900  loss 0.7094  bpc 1.0234 (plain 1.0965)  lr 3.61e-04  |g| 0.48  rate [0.230, 0.212, 0.258, 0.414]  eta 152m  budget 151m
+step   31000  loss 0.7265  bpc 1.0481 (plain 1.1239)  lr 3.60e-04  |g| 0.47  rate [0.230, 0.211, 0.260, 0.412]  eta 152m  budget 151m
+step   31100  loss 0.7442  bpc 1.0736 (plain 1.1247)  lr 3.59e-04  |g| 0.42  rate [0.229, 0.211, 0.261, 0.411]  eta 152m  budget 151m
+step   31200  loss 0.7675  bpc 1.1073 (plain 1.1592)  lr 3.58e-04  |g| 0.41  rate [0.230, 0.212, 0.262, 0.410]  eta 152m  budget 150m
+step   31300  loss 0.8018  bpc 1.1567 (plain 1.1972)  lr 3.58e-04  |g| 0.49  rate [0.230, 0.212, 0.263, 0.416]  eta 151m  budget 150m
+step   31400  loss 0.7535  bpc 1.0871 (plain 1.1312)  lr 3.57e-04  |g| 0.43  rate [0.229, 0.211, 0.261, 0.418]  eta 151m  budget 150m
+step   31500  loss 0.8417  bpc 1.2143 (plain 1.2499)  lr 3.56e-04  |g| 0.53  rate [0.230, 0.213, 0.264, 0.417]  eta 151m  budget 150m
+step   31600  loss 0.7508  bpc 1.0831 (plain 1.1303)  lr 3.55e-04  |g| 0.43  rate [0.229, 0.211, 0.263, 0.414]  eta 150m  budget 149m
+step   31700  loss 0.7559  bpc 1.0905 (plain 1.1317)  lr 3.54e-04  |g| 0.45  rate [0.229, 0.212, 0.262, 0.417]  eta 150m  budget 149m
+step   31800  loss 0.7464  bpc 1.0768 (plain 1.1328)  lr 3.53e-04  |g| 0.43  rate [0.229, 0.211, 0.260, 0.417]  eta 150m  budget 149m
+step   31900  loss 0.7494  bpc 1.0812 (plain 1.1529)  lr 3.53e-04  |g| 0.43  rate [0.230, 0.211, 0.261, 0.412]  eta 149m  budget 148m
+  eval step   32000  alpaca 1.8734  dolly 2.1190  oasst1 2.0170  persona 0.3137  soda 1.3950  stories_topic 1.1805  tinystories 1.1903  weighted 1.3319
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'One day, a little girl named Lily went to the park. She saw a big tree with a penny on the ground. She wanted to play with it, but she went to the park.\nLily said, "Let\'s play with'
+step   32000  loss 0.7069  bpc 1.0199 (plain 1.0591)  lr 3.52e-04  |g| 0.40  rate [0.229, 0.212, 0.260, 0.411]  eta 149m  budget 148m
+step   32100  loss 0.7761  bpc 1.1197 (plain 1.1725)  lr 3.51e-04  |g| 0.50  rate [0.229, 0.212, 0.260, 0.413]  eta 149m  budget 148m
+step   32200  loss 0.7314  bpc 1.0552 (plain 1.1149)  lr 3.50e-04  |g| 0.42  rate [0.229, 0.212, 0.261, 0.414]  eta 149m  budget 148m
+step   32300  loss 0.7235  bpc 1.0438 (plain 1.0983)  lr 3.49e-04  |g| 0.45  rate [0.230, 0.212, 0.258, 0.414]  eta 148m  budget 147m
+step   32400  loss 0.7996  bpc 1.1536 (plain 1.2085)  lr 3.49e-04  |g| 0.47  rate [0.230, 0.212, 0.261, 0.409]  eta 148m  budget 147m
+step   32500  loss 0.7771  bpc 1.1211 (plain 1.1549)  lr 3.48e-04  |g| 0.40  rate [0.229, 0.214, 0.263, 0.416]  eta 148m  budget 147m
+step   32600  loss 0.7040  bpc 1.0157 (plain 1.0817)  lr 3.47e-04  |g| 0.47  rate [0.229, 0.212, 0.261, 0.416]  eta 147m  budget 146m
+step   32700  loss 0.7613  bpc 1.0984 (plain 1.1515)  lr 3.46e-04  |g| 0.45  rate [0.229, 0.214, 0.264, 0.414]  eta 147m  budget 146m
+step   32800  loss 0.7753  bpc 1.1185 (plain 1.1667)  lr 3.45e-04  |g| 0.38  rate [0.229, 0.213, 0.261, 0.414]  eta 147m  budget 146m
+step   32900  loss 0.7269  bpc 1.0487 (plain 1.1109)  lr 3.44e-04  |g| 0.45  rate [0.229, 0.212, 0.260, 0.417]  eta 147m  budget 146m
+step   33000  loss 0.7262  bpc 1.0477 (plain 1.1011)  lr 3.43e-04  |g| 0.39  rate [0.229, 0.213, 0.261, 0.416]  eta 146m  budget 145m
+step   33100  loss 0.8039  bpc 1.1598 (plain 1.1856)  lr 3.43e-04  |g| 0.48  rate [0.229, 0.211, 0.261, 0.416]  eta 146m  budget 145m
+step   33200  loss 0.7479  bpc 1.0790 (plain 1.1446)  lr 3.42e-04  |g| 0.40  rate [0.229, 0.212, 0.261, 0.416]  eta 146m  budget 145m
+step   33300  loss 0.7520  bpc 1.0849 (plain 1.1362)  lr 3.41e-04  |g| 0.49  rate [0.229, 0.213, 0.261, 0.407]  eta 145m  budget 144m
+step   33400  loss 0.7684  bpc 1.1086 (plain 1.1371)  lr 3.40e-04  |g| 0.47  rate [0.229, 0.213, 0.263, 0.414]  eta 145m  budget 144m
+step   33500  loss 0.7313  bpc 1.0550 (plain 1.1008)  lr 3.39e-04  |g| 0.38  rate [0.228, 0.211, 0.261, 0.411]  eta 145m  budget 144m
+step   33600  loss 0.7750  bpc 1.1181 (plain 1.1532)  lr 3.38e-04  |g| 0.48  rate [0.229, 0.211, 0.261, 0.418]  eta 145m  budget 144m
+step   33700  loss 0.7636  bpc 1.1016 (plain 1.1540)  lr 3.38e-04  |g| 0.41  rate [0.228, 0.212, 0.262, 0.416]  eta 144m  budget 143m
+step   33800  loss 0.7919  bpc 1.1425 (plain 1.1805)  lr 3.37e-04  |g| 0.40  rate [0.229, 0.212, 0.260, 0.411]  eta 144m  budget 143m
+step   33900  loss 0.8318  bpc 1.2001 (plain 1.2256)  lr 3.36e-04  |g| 0.47  rate [0.229, 0.213, 0.263, 0.416]  eta 144m  budget 143m
+  eval step   34000  alpaca 1.8609  dolly 2.0982  oasst1 1.9744  persona 0.3039  soda 1.3850  stories_topic 1.1782  tinystories 1.1872  weighted 1.3239
+    ['hello'] -> "Hello! I'm listening."
+    ['tell me a story about a dog'] -> 'One day, a cat named Sam went to the park. He saw a big tree with a big tree. The tree was a tall pine tree. He wanted to ride it on it. He ran to the tree and said, "Do not find i'
+step   34000  loss 0.7543  bpc 1.0883 (plain 1.1447)  lr 3.35e-04  |g| 0.42  rate [0.229, 0.214, 0.263, 0.414]  eta 143m  budget 142m
+step   34100  loss 0.6940  bpc 1.0012 (plain 1.0679)  lr 3.34e-04  |g| 0.43  rate [0.228, 0.211, 0.258, 0.407]  eta 143m  budget 142m
+step   34200  loss 0.7636  bpc 1.1017 (plain 1.1501)  lr 3.33e-04  |g| 0.46  rate [0.228, 0.213, 0.261, 0.412]  eta 143m  budget 142m
+step   34300  loss 0.7120  bpc 1.0272 (plain 1.0919)  lr 3.32e-04  |g| 0.43  rate [0.228, 0.212, 0.261, 0.415]  eta 143m  budget 142m
+step   34400  loss 0.7537  bpc 1.0874 (plain 1.1469)  lr 3.32e-04  |g| 0.43  rate [0.228, 0.211, 0.261, 0.409]  eta 142m  budget 141m
+step   34500  loss 0.7711  bpc 1.1124 (plain 1.1908)  lr 3.31e-04  |g| 0.37  rate [0.228, 0.213, 0.262, 0.414]  eta 142m  budget 141m
+step   34600  loss 0.7383  bpc 1.0651 (plain 1.1239)  lr 3.30e-04  |g| 0.40  rate [0.228, 0.213, 0.263, 0.414]  eta 142m  budget 141m
+step   34700  loss 0.7180  bpc 1.0359 (plain 1.0904)  lr 3.29e-04  |g| 0.36  rate [0.229, 0.212, 0.260, 0.417]  eta 141m  budget 141m
+step   34800  loss 0.7599  bpc 1.0963 (plain 1.1418)  lr 3.28e-04  |g| 0.44  rate [0.228, 0.212, 0.262, 0.413]  eta 141m  budget 140m
+step   34900  loss 0.6812  bpc 0.9828 (plain 1.0432)  lr 3.27e-04  |g| 0.42  rate [0.228, 0.211, 0.260, 0.411]  eta 141m  budget 140m
+step   35000  loss 0.7562  bpc 1.0909 (plain 1.1346)  lr 3.26e-04  |g| 0.39  rate [0.228, 0.212, 0.262, 0.415]  eta 140m  budget 140m
+step   35100  loss 0.7179  bpc 1.0356 (plain 1.0963)  lr 3.26e-04  |g| 0.41  rate [0.228, 0.211, 0.262, 0.416]  eta 140m  budget 139m
+step   35200  loss 0.7637  bpc 1.1017 (plain 1.1391)  lr 3.25e-04  |g| 0.40  rate [0.228, 0.213, 0.264, 0.414]  eta 140m  budget 139m
+step   35300  loss 0.7775  bpc 1.1217 (plain 1.1637)  lr 3.24e-04  |g| 0.44  rate [0.228, 0.211, 0.258, 0.412]  eta 140m  budget 139m
+step   35400  loss 0.7274  bpc 1.0494 (plain 1.0850)  lr 3.23e-04  |g| 0.36  rate [0.228, 0.212, 0.259, 0.412]  eta 139m  budget 139m
+step   35500  loss 0.7040  bpc 1.0156 (plain 1.0528)  lr 3.22e-04  |g| 0.45  rate [0.228, 0.211, 0.259, 0.410]  eta 139m  budget 138m
+step   35600  loss 0.7232  bpc 1.0434 (plain 1.1074)  lr 3.21e-04  |g| 0.36  rate [0.228, 0.213, 0.260, 0.411]  eta 139m  budget 138m
+step   35700  loss 0.7058  bpc 1.0182 (plain 1.0828)  lr 3.20e-04  |g| 0.40  rate [0.228, 0.212, 0.260, 0.412]  eta 138m  budget 138m
+step   35800  loss 0.7842  bpc 1.1313 (plain 1.1778)  lr 3.20e-04  |g| 0.54  rate [0.228, 0.212, 0.264, 0.415]  eta 138m  budget 137m
+step   35900  loss 0.7769  bpc 1.1208 (plain 1.1812)  lr 3.19e-04  |g| 0.41  rate [0.228, 0.212, 0.262, 0.414]  eta 138m  budget 137m
+  eval step   36000  alpaca 1.8539  dolly 2.1015  oasst1 1.9798  persona 0.3129  soda 1.3739  stories_topic 1.1723  tinystories 1.1821  weighted 1.3189
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She had a toy box in the middle of the mule. It was soft, weight and drawing together. She was always compassionate and fortun'
+step   36000  loss 0.7523  bpc 1.0853 (plain 1.1218)  lr 3.18e-04  |g| 0.39  rate [0.228, 0.213, 0.261, 0.416]  eta 138m  budget 137m
+step   36100  loss 0.7638  bpc 1.1020 (plain 1.1283)  lr 3.17e-04  |g| 0.41  rate [0.228, 0.212, 0.261, 0.418]  eta 137m  budget 137m
+step   36200  loss 0.7572  bpc 1.0923 (plain 1.1441)  lr 3.16e-04  |g| 0.35  rate [0.228, 0.211, 0.263, 0.414]  eta 137m  budget 136m
+step   36300  loss 0.7629  bpc 1.1006 (plain 1.1392)  lr 3.15e-04  |g| 0.42  rate [0.227, 0.211, 0.261, 0.412]  eta 137m  budget 136m
+step   36400  loss 0.7707  bpc 1.1119 (plain 1.1487)  lr 3.14e-04  |g| 0.43  rate [0.227, 0.213, 0.261, 0.415]  eta 136m  budget 136m
+step   36500  loss 0.7770  bpc 1.1210 (plain 1.1701)  lr 3.13e-04  |g| 0.46  rate [0.228, 0.212, 0.262, 0.416]  eta 136m  budget 135m
+step   36600  loss 0.7676  bpc 1.1074 (plain 1.1568)  lr 3.13e-04  |g| 0.45  rate [0.228, 0.211, 0.259, 0.411]  eta 136m  budget 135m
+step   36700  loss 0.7355  bpc 1.0611 (plain 1.1099)  lr 3.12e-04  |g| 0.44  rate [0.228, 0.212, 0.261, 0.415]  eta 135m  budget 135m
+step   36800  loss 0.7181  bpc 1.0361 (plain 1.0928)  lr 3.11e-04  |g| 0.42  rate [0.227, 0.213, 0.261, 0.412]  eta 135m  budget 135m
+step   36900  loss 0.7295  bpc 1.0524 (plain 1.0880)  lr 3.10e-04  |g| 0.40  rate [0.227, 0.212, 0.263, 0.414]  eta 135m  budget 134m
+step   37000  loss 0.7576  bpc 1.0929 (plain 1.1413)  lr 3.09e-04  |g| 0.48  rate [0.228, 0.212, 0.262, 0.413]  eta 135m  budget 134m
+step   37100  loss 0.7525  bpc 1.0856 (plain 1.1338)  lr 3.08e-04  |g| 0.39  rate [0.227, 0.211, 0.261, 0.410]  eta 134m  budget 134m
+step   37200  loss 0.7093  bpc 1.0234 (plain 1.0756)  lr 3.07e-04  |g| 0.38  rate [0.228, 0.213, 0.258, 0.412]  eta 134m  budget 133m
+step   37300  loss 0.7397  bpc 1.0671 (plain 1.1160)  lr 3.06e-04  |g| 0.45  rate [0.227, 0.213, 0.261, 0.413]  eta 134m  budget 133m
+step   37400  loss 0.7764  bpc 1.1201 (plain 1.1637)  lr 3.06e-04  |g| 0.40  rate [0.228, 0.212, 0.262, 0.415]  eta 133m  budget 133m
+step   37500  loss 0.7199  bpc 1.0386 (plain 1.1156)  lr 3.05e-04  |g| 0.40  rate [0.227, 0.212, 0.260, 0.412]  eta 133m  budget 133m
+step   37600  loss 0.7074  bpc 1.0206 (plain 1.0781)  lr 3.04e-04  |g| 0.42  rate [0.228, 0.214, 0.261, 0.414]  eta 133m  budget 132m
+step   37700  loss 0.7538  bpc 1.0875 (plain 1.1402)  lr 3.03e-04  |g| 0.46  rate [0.227, 0.212, 0.261, 0.411]  eta 133m  budget 132m
+step   37800  loss 0.7525  bpc 1.0857 (plain 1.1406)  lr 3.02e-04  |g| 0.40  rate [0.228, 0.214, 0.260, 0.413]  eta 132m  budget 132m
+step   37900  loss 0.7231  bpc 1.0432 (plain 1.1114)  lr 3.01e-04  |g| 0.44  rate [0.226, 0.211, 0.258, 0.404]  eta 132m  budget 132m
+  eval step   38000  alpaca 1.8415  dolly 2.1058  oasst1 1.9700  persona 0.3018  soda 1.3754  stories_topic 1.1709  tinystories 1.1798  weighted 1.3158
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'One day, a boy named Tim went to the store with his mom. They saw a big dream on the ground. The shiny mood that was very happy. The man said, "Let\'s play with the home on in the s'
+step   38000  loss 0.7576  bpc 1.0930 (plain 1.1477)  lr 3.00e-04  |g| 0.40  rate [0.227, 0.213, 0.259, 0.409]  eta 132m  budget 131m
+step   38100  loss 0.6913  bpc 0.9973 (plain 1.0592)  lr 2.99e-04  |g| 0.44  rate [0.227, 0.213, 0.259, 0.411]  eta 131m  budget 131m
+step   38200  loss 0.7253  bpc 1.0463 (plain 1.1135)  lr 2.99e-04  |g| 0.38  rate [0.227, 0.214, 0.263, 0.417]  eta 131m  budget 131m
+step   38300  loss 0.7618  bpc 1.0990 (plain 1.1264)  lr 2.98e-04  |g| 0.40  rate [0.227, 0.212, 0.264, 0.412]  eta 131m  budget 130m
+step   38400  loss 0.7096  bpc 1.0237 (plain 1.0684)  lr 2.97e-04  |g| 0.42  rate [0.227, 0.212, 0.261, 0.411]  eta 131m  budget 130m
+step   38500  loss 0.7595  bpc 1.0958 (plain 1.1385)  lr 2.96e-04  |g| 0.41  rate [0.227, 0.213, 0.262, 0.411]  eta 130m  budget 130m
+step   38600  loss 0.8046  bpc 1.1608 (plain 1.2131)  lr 2.95e-04  |g| 0.49  rate [0.227, 0.213, 0.263, 0.411]  eta 130m  budget 130m
+step   38700  loss 0.6873  bpc 0.9916 (plain 1.0644)  lr 2.94e-04  |g| 0.40  rate [0.227, 0.212, 0.261, 0.411]  eta 130m  budget 129m
+step   38800  loss 0.7631  bpc 1.1009 (plain 1.1546)  lr 2.93e-04  |g| 0.43  rate [0.227, 0.210, 0.261, 0.415]  eta 129m  budget 129m
+step   38900  loss 0.7495  bpc 1.0813 (plain 1.1284)  lr 2.92e-04  |g| 0.39  rate [0.226, 0.213, 0.263, 0.415]  eta 129m  budget 129m
+step   39000  loss 0.7086  bpc 1.0223 (plain 1.0890)  lr 2.91e-04  |g| 0.41  rate [0.227, 0.213, 0.260, 0.413]  eta 129m  budget 128m
+step   39100  loss 0.7438  bpc 1.0731 (plain 1.1236)  lr 2.91e-04  |g| 0.46  rate [0.227, 0.213, 0.264, 0.414]  eta 128m  budget 128m
+step   39200  loss 0.7399  bpc 1.0675 (plain 1.1395)  lr 2.90e-04  |g| 0.45  rate [0.227, 0.215, 0.262, 0.414]  eta 128m  budget 128m
+step   39300  loss 0.7142  bpc 1.0304 (plain 1.1007)  lr 2.89e-04  |g| 0.48  rate [0.226, 0.212, 0.259, 0.411]  eta 128m  budget 128m
+step   39400  loss 0.7676  bpc 1.1074 (plain 1.1423)  lr 2.88e-04  |g| 0.46  rate [0.227, 0.212, 0.263, 0.416]  eta 128m  budget 127m
+step   39500  loss 0.7783  bpc 1.1229 (plain 1.1687)  lr 2.87e-04  |g| 0.48  rate [0.227, 0.212, 0.261, 0.413]  eta 127m  budget 127m
+step   39600  loss 0.6862  bpc 0.9900 (plain 1.0440)  lr 2.86e-04  |g| 0.39  rate [0.227, 0.212, 0.260, 0.414]  eta 127m  budget 127m
+step   39700  loss 0.7297  bpc 1.0528 (plain 1.0993)  lr 2.85e-04  |g| 0.49  rate [0.226, 0.212, 0.263, 0.417]  eta 127m  budget 126m
+step   39800  loss 0.7769  bpc 1.1209 (plain 1.1554)  lr 2.84e-04  |g| 0.40  rate [0.226, 0.213, 0.262, 0.415]  eta 126m  budget 126m
+step   39900  loss 0.7604  bpc 1.0970 (plain 1.1450)  lr 2.83e-04  |g| 0.43  rate [0.226, 0.211, 0.261, 0.412]  eta 126m  budget 126m
+  eval step   40000  alpaca 1.8489  dolly 2.1044  oasst1 1.9809  persona 0.2893  soda 1.3658  stories_topic 1.1598  tinystories 1.1680  weighted 1.3086
+    ['hello'] -> 'Hi. What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a cat named Tom. Tom liked to run and play all day long. One day, Tom saw a big pile of nut. Tom was sad and long and wanted to wear a hole to the door.'
+step   40000  loss 0.7265  bpc 1.0481 (plain 1.0971)  lr 2.83e-04  |g| 0.38  rate [0.226, 0.214, 0.261, 0.413]  eta 126m  budget 126m
+step   40100  loss 0.7448  bpc 1.0745 (plain 1.1210)  lr 2.82e-04  |g| 0.48  rate [0.226, 0.213, 0.264, 0.416]  eta 126m  budget 125m
+step   40200  loss 0.7845  bpc 1.1318 (plain 1.1922)  lr 2.81e-04  |g| 0.44  rate [0.227, 0.213, 0.261, 0.416]  eta 125m  budget 125m
+step   40300  loss 0.7889  bpc 1.1381 (plain 1.2023)  lr 2.80e-04  |g| 0.50  rate [0.226, 0.213, 0.262, 0.412]  eta 125m  budget 125m
+step   40400  loss 0.7312  bpc 1.0549 (plain 1.0971)  lr 2.79e-04  |g| 0.47  rate [0.226, 0.212, 0.265, 0.415]  eta 125m  budget 124m
+step   40500  loss 0.8252  bpc 1.1905 (plain 1.2206)  lr 2.78e-04  |g| 0.44  rate [0.226, 0.214, 0.263, 0.412]  eta 124m  budget 124m
+step   40600  loss 0.7567  bpc 1.0916 (plain 1.1348)  lr 2.77e-04  |g| 0.45  rate [0.226, 0.214, 0.262, 0.413]  eta 124m  budget 124m
+step   40700  loss 0.7388  bpc 1.0659 (plain 1.0890)  lr 2.76e-04  |g| 0.42  rate [0.226, 0.214, 0.259, 0.417]  eta 124m  budget 124m
+step   40800  loss 0.7391  bpc 1.0663 (plain 1.1066)  lr 2.75e-04  |g| 0.44  rate [0.226, 0.214, 0.260, 0.414]  eta 124m  budget 123m
+step   40900  loss 0.7704  bpc 1.1115 (plain 1.1511)  lr 2.75e-04  |g| 0.41  rate [0.226, 0.215, 0.263, 0.414]  eta 123m  budget 123m
+step   41000  loss 0.6985  bpc 1.0077 (plain 1.0593)  lr 2.74e-04  |g| 0.38  rate [0.226, 0.214, 0.261, 0.407]  eta 123m  budget 123m
+step   41100  loss 0.7474  bpc 1.0783 (plain 1.1300)  lr 2.73e-04  |g| 0.45  rate [0.226, 0.212, 0.262, 0.410]  eta 123m  budget 122m
+step   41200  loss 0.7284  bpc 1.0508 (plain 1.1122)  lr 2.72e-04  |g| 0.44  rate [0.226, 0.211, 0.262, 0.410]  eta 122m  budget 122m
+step   41300  loss 0.7467  bpc 1.0773 (plain 1.1330)  lr 2.71e-04  |g| 0.36  rate [0.226, 0.213, 0.262, 0.413]  eta 122m  budget 122m
+step   41400  loss 0.7582  bpc 1.0938 (plain 1.1421)  lr 2.70e-04  |g| 0.45  rate [0.226, 0.214, 0.261, 0.414]  eta 122m  budget 122m
+step   41500  loss 0.7317  bpc 1.0556 (plain 1.0975)  lr 2.69e-04  |g| 0.44  rate [0.225, 0.213, 0.260, 0.415]  eta 121m  budget 121m
+step   41600  loss 0.7371  bpc 1.0634 (plain 1.0951)  lr 2.68e-04  |g| 0.45  rate [0.226, 0.213, 0.262, 0.417]  eta 121m  budget 121m
+step   41700  loss 0.7111  bpc 1.0259 (plain 1.0724)  lr 2.67e-04  |g| 0.36  rate [0.225, 0.212, 0.263, 0.416]  eta 121m  budget 121m
+step   41800  loss 0.7101  bpc 1.0245 (plain 1.0886)  lr 2.67e-04  |g| 0.42  rate [0.225, 0.211, 0.261, 0.413]  eta 121m  budget 121m
+step   41900  loss 0.6797  bpc 0.9806 (plain 1.0407)  lr 2.66e-04  |g| 0.41  rate [0.226, 0.212, 0.261, 0.412]  eta 120m  budget 120m
+  eval step   42000  alpaca 1.8438  dolly 2.0859  oasst1 1.9853  persona 0.2941  soda 1.3633  stories_topic 1.1641  tinystories 1.1736  weighted 1.3089
+    ['hello'] -> 'Hello! I am should i do for your time.'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. Tim was an adventurous where he was very composed. He liked to play in the park with his friends.\nOne day, Tim went for a walk w'
+step   42000  loss 0.7627  bpc 1.1003 (plain 1.1441)  lr 2.65e-04  |g| 0.51  rate [0.225, 0.213, 0.263, 0.413]  eta 120m  budget 120m
+step   42100  loss 0.7232  bpc 1.0434 (plain 1.0872)  lr 2.64e-04  |g| 0.37  rate [0.226, 0.213, 0.261, 0.412]  eta 120m  budget 120m
+step   42200  loss 0.7439  bpc 1.0732 (plain 1.1191)  lr 2.63e-04  |g| 0.46  rate [0.225, 0.213, 0.260, 0.411]  eta 120m  budget 119m
+step   42300  loss 0.6775  bpc 0.9774 (plain 1.0405)  lr 2.62e-04  |g| 0.44  rate [0.226, 0.212, 0.260, 0.409]  eta 119m  budget 119m
+step   42400  loss 0.7399  bpc 1.0674 (plain 1.1344)  lr 2.61e-04  |g| 0.41  rate [0.225, 0.213, 0.262, 0.417]  eta 119m  budget 119m
+step   42500  loss 0.7870  bpc 1.1354 (plain 1.1676)  lr 2.60e-04  |g| 0.50  rate [0.225, 0.214, 0.262, 0.412]  eta 119m  budget 118m
+step   42600  loss 0.7060  bpc 1.0185 (plain 1.0840)  lr 2.59e-04  |g| 0.38  rate [0.226, 0.212, 0.261, 0.412]  eta 118m  budget 118m
+step   42700  loss 0.7708  bpc 1.1120 (plain 1.1466)  lr 2.58e-04  |g| 0.42  rate [0.226, 0.213, 0.262, 0.413]  eta 118m  budget 118m
+step   42800  loss 0.6987  bpc 1.0080 (plain 1.0661)  lr 2.58e-04  |g| 0.39  rate [0.225, 0.213, 0.260, 0.411]  eta 118m  budget 118m
+step   42900  loss 0.7239  bpc 1.0444 (plain 1.1016)  lr 2.57e-04  |g| 0.38  rate [0.225, 0.213, 0.259, 0.413]  eta 117m  budget 117m
+step   43000  loss 0.7506  bpc 1.0829 (plain 1.1199)  lr 2.56e-04  |g| 0.45  rate [0.226, 0.212, 0.261, 0.412]  eta 117m  budget 117m
+step   43100  loss 0.7611  bpc 1.0981 (plain 1.1397)  lr 2.55e-04  |g| 0.43  rate [0.225, 0.214, 0.263, 0.413]  eta 117m  budget 117m
+step   43200  loss 0.7614  bpc 1.0985 (plain 1.1613)  lr 2.54e-04  |g| 0.43  rate [0.225, 0.214, 0.263, 0.416]  eta 117m  budget 117m
+step   43300  loss 0.7517  bpc 1.0845 (plain 1.1258)  lr 2.53e-04  |g| 0.47  rate [0.225, 0.212, 0.262, 0.415]  eta 116m  budget 116m
+step   43400  loss 0.7290  bpc 1.0517 (plain 1.1093)  lr 2.52e-04  |g| 0.38  rate [0.225, 0.213, 0.261, 0.413]  eta 116m  budget 116m
+step   43500  loss 0.7530  bpc 1.0864 (plain 1.1330)  lr 2.51e-04  |g| 0.41  rate [0.225, 0.215, 0.263, 0.414]  eta 116m  budget 116m
+step   43600  loss 0.7342  bpc 1.0593 (plain 1.1227)  lr 2.50e-04  |g| 0.41  rate [0.225, 0.213, 0.263, 0.417]  eta 115m  budget 115m
+step   43700  loss 0.7356  bpc 1.0612 (plain 1.1147)  lr 2.50e-04  |g| 0.44  rate [0.225, 0.214, 0.261, 0.411]  eta 115m  budget 115m
+step   43800  loss 0.7569  bpc 1.0920 (plain 1.1171)  lr 2.49e-04  |g| 0.45  rate [0.225, 0.213, 0.262, 0.412]  eta 115m  budget 115m
+step   43900  loss 0.7220  bpc 1.0417 (plain 1.1002)  lr 2.48e-04  |g| 0.41  rate [0.226, 0.213, 0.263, 0.413]  eta 115m  budget 115m
+  eval step   44000  alpaca 1.8359  dolly 2.0745  oasst1 1.9914  persona 0.3035  soda 1.3544  stories_topic 1.1520  tinystories 1.1623  weighted 1.3003
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a cat named Tom went to the fat cat. The cat was very good at coutside. The cat was very happy to have fun. The cat wanted to eat the dog from the boat.\nThe cat said, "Don'
+step   44000  loss 0.7762  bpc 1.1199 (plain 1.1837)  lr 2.47e-04  |g| 0.48  rate [0.225, 0.213, 0.263, 0.416]  eta 114m  budget 114m
+step   44100  loss 0.7479  bpc 1.0790 (plain 1.1346)  lr 2.46e-04  |g| 0.40  rate [0.225, 0.215, 0.261, 0.409]  eta 114m  budget 114m
+step   44200  loss 0.7806  bpc 1.1261 (plain 1.1541)  lr 2.45e-04  |g| 0.42  rate [0.226, 0.214, 0.262, 0.416]  eta 114m  budget 114m
+step   44300  loss 0.7195  bpc 1.0380 (plain 1.0888)  lr 2.44e-04  |g| 0.41  rate [0.225, 0.212, 0.261, 0.411]  eta 113m  budget 113m
+step   44400  loss 0.7619  bpc 1.0992 (plain 1.1228)  lr 2.43e-04  |g| 0.44  rate [0.225, 0.214, 0.265, 0.413]  eta 113m  budget 113m
+step   44500  loss 0.7435  bpc 1.0726 (plain 1.1255)  lr 2.42e-04  |g| 0.42  rate [0.225, 0.214, 0.262, 0.410]  eta 113m  budget 113m
+step   44600  loss 0.7423  bpc 1.0708 (plain 1.1089)  lr 2.42e-04  |g| 0.47  rate [0.225, 0.213, 0.262, 0.410]  eta 113m  budget 113m
+step   44700  loss 0.7143  bpc 1.0305 (plain 1.0727)  lr 2.41e-04  |g| 0.42  rate [0.225, 0.213, 0.262, 0.406]  eta 112m  budget 112m
+step   44800  loss 0.7413  bpc 1.0695 (plain 1.1255)  lr 2.40e-04  |g| 0.42  rate [0.225, 0.214, 0.262, 0.415]  eta 112m  budget 112m
+step   44900  loss 0.7410  bpc 1.0691 (plain 1.1266)  lr 2.39e-04  |g| 0.39  rate [0.225, 0.212, 0.260, 0.413]  eta 112m  budget 112m
+step   45000  loss 0.7385  bpc 1.0654 (plain 1.1042)  lr 2.38e-04  |g| 0.51  rate [0.225, 0.215, 0.262, 0.410]  eta 111m  budget 111m
+step   45100  loss 0.7290  bpc 1.0517 (plain 1.1097)  lr 2.37e-04  |g| 0.47  rate [0.225, 0.213, 0.262, 0.415]  eta 111m  budget 111m
+step   45200  loss 0.7195  bpc 1.0380 (plain 1.1087)  lr 2.36e-04  |g| 0.41  rate [0.225, 0.213, 0.262, 0.412]  eta 111m  budget 111m
+step   45300  loss 0.7177  bpc 1.0354 (plain 1.0848)  lr 2.35e-04  |g| 0.45  rate [0.225, 0.213, 0.264, 0.413]  eta 111m  budget 111m
+step   45400  loss 0.6638  bpc 0.9576 (plain 1.0040)  lr 2.34e-04  |g| 0.37  rate [0.225, 0.214, 0.257, 0.414]  eta 110m  budget 110m
+step   45500  loss 0.7585  bpc 1.0944 (plain 1.1344)  lr 2.34e-04  |g| 0.41  rate [0.225, 0.213, 0.264, 0.416]  eta 110m  budget 110m
+step   45600  loss 0.7750  bpc 1.1181 (plain 1.1466)  lr 2.33e-04  |g| 0.47  rate [0.225, 0.214, 0.263, 0.417]  eta 110m  budget 110m
+step   45700  loss 0.7442  bpc 1.0737 (plain 1.1328)  lr 2.32e-04  |g| 0.41  rate [0.225, 0.214, 0.263, 0.414]  eta 109m  budget 110m
+step   45800  loss 0.7688  bpc 1.1091 (plain 1.1428)  lr 2.31e-04  |g| 0.38  rate [0.225, 0.213, 0.261, 0.413]  eta 109m  budget 109m
+step   45900  loss 0.7165  bpc 1.0337 (plain 1.0780)  lr 2.30e-04  |g| 0.41  rate [0.225, 0.214, 0.262, 0.416]  eta 109m  budget 109m
+  eval step   46000  alpaca 1.8260  dolly 2.0680  oasst1 1.9547  persona 0.2938  soda 1.3487  stories_topic 1.1486  tinystories 1.1583  weighted 1.2940
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'One day, a girl named Sue went to the park. She saw a big rope on the ground. She picked up the race and thought it was a nice door. She was very curious and wanted to show her fri'
+step   46000  loss 0.7262  bpc 1.0477 (plain 1.1044)  lr 2.29e-04  |g| 0.38  rate [0.225, 0.213, 0.262, 0.411]  eta 109m  budget 109m
+step   46100  loss 0.6595  bpc 0.9515 (plain 1.0081)  lr 2.28e-04  |g| 0.40  rate [0.225, 0.213, 0.259, 0.410]  eta 108m  budget 108m
+step   46200  loss 0.7221  bpc 1.0418 (plain 1.0872)  lr 2.27e-04  |g| 0.47  rate [0.225, 0.212, 0.260, 0.409]  eta 108m  budget 108m
+step   46300  loss 0.7314  bpc 1.0552 (plain 1.0943)  lr 2.26e-04  |g| 0.50  rate [0.225, 0.214, 0.262, 0.414]  eta 108m  budget 108m
+step   46400  loss 0.6737  bpc 0.9719 (plain 1.0263)  lr 2.26e-04  |g| 0.38  rate [0.225, 0.214, 0.260, 0.410]  eta 107m  budget 107m
+step   46500  loss 0.7355  bpc 1.0611 (plain 1.1293)  lr 2.25e-04  |g| 0.47  rate [0.225, 0.214, 0.261, 0.411]  eta 107m  budget 107m
+step   46600  loss 0.7155  bpc 1.0323 (plain 1.0785)  lr 2.24e-04  |g| 0.42  rate [0.225, 0.214, 0.262, 0.414]  eta 107m  budget 107m
+step   46700  loss 0.7854  bpc 1.1331 (plain 1.1624)  lr 2.23e-04  |g| 0.41  rate [0.225, 0.214, 0.265, 0.415]  eta 107m  budget 107m
+step   46800  loss 0.7431  bpc 1.0721 (plain 1.1009)  lr 2.22e-04  |g| 0.46  rate [0.225, 0.213, 0.260, 0.411]  eta 106m  budget 106m
+step   46900  loss 0.7355  bpc 1.0610 (plain 1.1123)  lr 2.21e-04  |g| 0.45  rate [0.225, 0.214, 0.259, 0.409]  eta 106m  budget 106m
+step   47000  loss 0.6763  bpc 0.9756 (plain 1.0476)  lr 2.20e-04  |g| 0.41  rate [0.225, 0.213, 0.261, 0.408]  eta 106m  budget 106m
+step   47100  loss 0.6913  bpc 0.9973 (plain 1.0512)  lr 2.19e-04  |g| 0.41  rate [0.224, 0.214, 0.258, 0.410]  eta 105m  budget 106m
+step   47200  loss 0.7029  bpc 1.0141 (plain 1.0791)  lr 2.19e-04  |g| 0.40  rate [0.225, 0.214, 0.262, 0.410]  eta 105m  budget 105m
+step   47300  loss 0.7143  bpc 1.0305 (plain 1.0897)  lr 2.18e-04  |g| 0.44  rate [0.225, 0.215, 0.262, 0.411]  eta 105m  budget 105m
+step   47400  loss 0.7664  bpc 1.1057 (plain 1.1609)  lr 2.17e-04  |g| 0.42  rate [0.225, 0.214, 0.264, 0.414]  eta 104m  budget 105m
+step   47500  loss 0.7581  bpc 1.0937 (plain 1.1469)  lr 2.16e-04  |g| 0.37  rate [0.225, 0.214, 0.263, 0.417]  eta 104m  budget 104m
+step   47600  loss 0.7114  bpc 1.0264 (plain 1.0720)  lr 2.15e-04  |g| 0.41  rate [0.225, 0.214, 0.259, 0.411]  eta 104m  budget 104m
+step   47700  loss 0.7752  bpc 1.1183 (plain 1.1509)  lr 2.14e-04  |g| 0.43  rate [0.225, 0.214, 0.263, 0.413]  eta 104m  budget 104m
+step   47800  loss 0.7367  bpc 1.0628 (plain 1.0996)  lr 2.13e-04  |g| 0.37  rate [0.225, 0.217, 0.264, 0.412]  eta 103m  budget 104m
+step   47900  loss 0.7577  bpc 1.0932 (plain 1.1564)  lr 2.12e-04  |g| 0.44  rate [0.224, 0.213, 0.262, 0.412]  eta 103m  budget 103m
+  eval step   48000  alpaca 1.8271  dolly 2.0782  oasst1 1.9846  persona 0.2907  soda 1.3481  stories_topic 1.1453  tinystories 1.1537  weighted 1.2933
+    ['hello'] -> 'Hello. Ask me something, or ask me for a story.'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a gray cat named Kitty. Kitty loved to play with her friends. She had a big party and a small toy bottom. They were very happy.\nOne day, they found a bi'
+step   48000  loss 0.6920  bpc 0.9984 (plain 1.0614)  lr 2.12e-04  |g| 0.41  rate [0.225, 0.214, 0.259, 0.410]  eta 103m  budget 103m
+step   48100  loss 0.7562  bpc 1.0909 (plain 1.1261)  lr 2.11e-04  |g| 0.41  rate [0.225, 0.214, 0.260, 0.411]  eta 102m  budget 103m
+step   48200  loss 0.7377  bpc 1.0643 (plain 1.1321)  lr 2.10e-04  |g| 0.43  rate [0.225, 0.214, 0.261, 0.409]  eta 102m  budget 102m
+step   48300  loss 0.6581  bpc 0.9494 (plain 1.0199)  lr 2.09e-04  |g| 0.33  rate [0.224, 0.214, 0.261, 0.412]  eta 102m  budget 102m
+step   48400  loss 0.6801  bpc 0.9812 (plain 1.0731)  lr 2.08e-04  |g| 0.40  rate [0.225, 0.213, 0.261, 0.408]  eta 102m  budget 102m
+step   48500  loss 0.7821  bpc 1.1284 (plain 1.1671)  lr 2.07e-04  |g| 0.44  rate [0.224, 0.214, 0.264, 0.414]  eta 101m  budget 102m
+step   48600  loss 0.7632  bpc 1.1010 (plain 1.1355)  lr 2.06e-04  |g| 0.53  rate [0.225, 0.215, 0.262, 0.408]  eta 101m  budget 101m
+step   48700  loss 0.7283  bpc 1.0507 (plain 1.0975)  lr 2.05e-04  |g| 0.41  rate [0.224, 0.214, 0.262, 0.413]  eta 101m  budget 101m
+step   48800  loss 0.7818  bpc 1.1279 (plain 1.1504)  lr 2.05e-04  |g| 0.46  rate [0.224, 0.215, 0.263, 0.411]  eta 100m  budget 101m
+step   48900  loss 0.7463  bpc 1.0768 (plain 1.1034)  lr 2.04e-04  |g| 0.46  rate [0.225, 0.215, 0.263, 0.408]  eta 100m  budget 100m
+step   49000  loss 0.6904  bpc 0.9960 (plain 1.0603)  lr 2.03e-04  |g| 0.45  rate [0.224, 0.214, 0.261, 0.407]  eta 100m  budget 100m
+step   49100  loss 0.6983  bpc 1.0074 (plain 1.0720)  lr 2.02e-04  |g| 0.39  rate [0.224, 0.213, 0.261, 0.408]  eta 100m  budget 100m
+step   49200  loss 0.7532  bpc 1.0867 (plain 1.1289)  lr 2.01e-04  |g| 0.44  rate [0.225, 0.215, 0.265, 0.415]  eta 99m  budget 100m
+step   49300  loss 0.7534  bpc 1.0869 (plain 1.1236)  lr 2.00e-04  |g| 0.46  rate [0.224, 0.214, 0.262, 0.412]  eta 99m  budget 99m
+step   49400  loss 0.7452  bpc 1.0751 (plain 1.1205)  lr 1.99e-04  |g| 0.52  rate [0.224, 0.215, 0.262, 0.411]  eta 99m  budget 99m
+step   49500  loss 0.7100  bpc 1.0242 (plain 1.0718)  lr 1.99e-04  |g| 0.45  rate [0.225, 0.213, 0.262, 0.414]  eta 98m  budget 99m
+step   49600  loss 0.7499  bpc 1.0819 (plain 1.1126)  lr 1.98e-04  |g| 0.48  rate [0.224, 0.215, 0.263, 0.417]  eta 98m  budget 98m
+step   49700  loss 0.7636  bpc 1.1016 (plain 1.1235)  lr 1.97e-04  |g| 0.41  rate [0.224, 0.214, 0.263, 0.411]  eta 98m  budget 98m
+step   49800  loss 0.7515  bpc 1.0843 (plain 1.1178)  lr 1.96e-04  |g| 0.48  rate [0.224, 0.215, 0.263, 0.411]  eta 98m  budget 98m
+step   49900  loss 0.7114  bpc 1.0263 (plain 1.0839)  lr 1.95e-04  |g| 0.38  rate [0.225, 0.214, 0.261, 0.410]  eta 97m  budget 98m
+  eval step   50000  alpaca 1.8055  dolly 2.0832  oasst1 1.9691  persona 0.2847  soda 1.3456  stories_topic 1.1456  tinystories 1.1563  weighted 1.2894
+    ['hello'] -> 'Hey there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'One day, a big dog named Max wanted to get to play. He walked and started to climb. He saw a big tree and wanted to climb it. Max was very happy to see it.\nMax said to his friend,'
+step   50000  loss 0.7202  bpc 1.0391 (plain 1.0760)  lr 1.94e-04  |g| 0.50  rate [0.225, 0.214, 0.261, 0.413]  eta 97m  budget 97m
+step   50100  loss 0.7063  bpc 1.0190 (plain 1.0550)  lr 1.93e-04  |g| 0.36  rate [0.224, 0.214, 0.262, 0.409]  eta 97m  budget 97m
+step   50200  loss 0.7506  bpc 1.0828 (plain 1.1017)  lr 1.93e-04  |g| 0.49  rate [0.225, 0.214, 0.263, 0.414]  eta 96m  budget 97m
+step   50300  loss 0.6866  bpc 0.9906 (plain 1.0693)  lr 1.92e-04  |g| 0.44  rate [0.224, 0.214, 0.263, 0.411]  eta 96m  budget 96m
+step   50400  loss 0.7088  bpc 1.0226 (plain 1.0601)  lr 1.91e-04  |g| 0.47  rate [0.225, 0.214, 0.262, 0.411]  eta 96m  budget 96m
+step   50500  loss 0.7288  bpc 1.0514 (plain 1.0943)  lr 1.90e-04  |g| 0.46  rate [0.224, 0.214, 0.259, 0.407]  eta 96m  budget 96m
+step   50600  loss 0.7187  bpc 1.0369 (plain 1.0899)  lr 1.89e-04  |g| 0.40  rate [0.224, 0.215, 0.263, 0.412]  eta 95m  budget 96m
+step   50700  loss 0.7687  bpc 1.1090 (plain 1.1534)  lr 1.88e-04  |g| 0.45  rate [0.224, 0.215, 0.264, 0.413]  eta 95m  budget 95m
+step   50800  loss 0.7175  bpc 1.0351 (plain 1.0933)  lr 1.87e-04  |g| 0.45  rate [0.224, 0.215, 0.262, 0.413]  eta 95m  budget 95m
+step   50900  loss 0.7269  bpc 1.0486 (plain 1.1058)  lr 1.87e-04  |g| 0.45  rate [0.224, 0.214, 0.263, 0.411]  eta 94m  budget 95m
+step   51000  loss 0.7278  bpc 1.0501 (plain 1.0983)  lr 1.86e-04  |g| 0.41  rate [0.224, 0.214, 0.261, 0.414]  eta 94m  budget 95m
+step   51100  loss 0.7363  bpc 1.0622 (plain 1.0995)  lr 1.85e-04  |g| 0.37  rate [0.224, 0.215, 0.263, 0.413]  eta 94m  budget 94m
+step   51200  loss 0.7746  bpc 1.1176 (plain 1.1519)  lr 1.84e-04  |g| 0.44  rate [0.224, 0.215, 0.262, 0.413]  eta 94m  budget 94m
+step   51300  loss 0.7613  bpc 1.0983 (plain 1.1337)  lr 1.83e-04  |g| 0.40  rate [0.224, 0.215, 0.262, 0.411]  eta 93m  budget 94m
+step   51400  loss 0.6988  bpc 1.0082 (plain 1.0541)  lr 1.82e-04  |g| 0.39  rate [0.224, 0.213, 0.261, 0.412]  eta 93m  budget 93m
+step   51500  loss 0.6943  bpc 1.0017 (plain 1.0428)  lr 1.82e-04  |g| 0.51  rate [0.225, 0.215, 0.261, 0.410]  eta 93m  budget 93m
+step   51600  loss 0.7650  bpc 1.1036 (plain 1.1231)  lr 1.81e-04  |g| 0.44  rate [0.225, 0.215, 0.262, 0.412]  eta 92m  budget 93m
+step   51700  loss 0.7134  bpc 1.0293 (plain 1.0710)  lr 1.80e-04  |g| 0.46  rate [0.224, 0.214, 0.262, 0.411]  eta 92m  budget 93m
+step   51800  loss 0.6810  bpc 0.9825 (plain 1.0531)  lr 1.79e-04  |g| 0.43  rate [0.224, 0.215, 0.264, 0.414]  eta 92m  budget 92m
+step   51900  loss 0.7264  bpc 1.0479 (plain 1.0774)  lr 1.78e-04  |g| 0.44  rate [0.225, 0.215, 0.262, 0.410]  eta 92m  budget 92m
+  eval step   52000  alpaca 1.8155  dolly 2.0625  oasst1 1.9676  persona 0.2892  soda 1.3331  stories_topic 1.1344  tinystories 1.1441  weighted 1.2819
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little dog named Spot. Spot loved to play with his ball. He would dig in the pond and make it moves all day. He had a big sack of things where he want'
+step   52000  loss 0.7479  bpc 1.0790 (plain 1.1072)  lr 1.77e-04  |g| 0.45  rate [0.225, 0.215, 0.262, 0.414]  eta 91m  budget 92m
+step   52100  loss 0.7746  bpc 1.1175 (plain 1.1387)  lr 1.76e-04  |g| 0.48  rate [0.224, 0.216, 0.267, 0.416]  eta 91m  budget 91m
+step   52200  loss 0.6974  bpc 1.0062 (plain 1.0700)  lr 1.76e-04  |g| 0.48  rate [0.224, 0.214, 0.262, 0.412]  eta 91m  budget 91m
+step   52300  loss 0.7441  bpc 1.0736 (plain 1.1247)  lr 1.75e-04  |g| 0.45  rate [0.225, 0.214, 0.264, 0.413]  eta 90m  budget 91m
+step   52400  loss 0.7008  bpc 1.0110 (plain 1.0525)  lr 1.74e-04  |g| 0.42  rate [0.224, 0.213, 0.262, 0.414]  eta 90m  budget 91m
+step   52500  loss 0.6902  bpc 0.9958 (plain 1.0432)  lr 1.73e-04  |g| 0.43  rate [0.224, 0.215, 0.264, 0.412]  eta 90m  budget 90m
+step   52600  loss 0.7153  bpc 1.0319 (plain 1.0824)  lr 1.72e-04  |g| 0.40  rate [0.225, 0.216, 0.263, 0.410]  eta 90m  budget 90m
+step   52700  loss 0.7207  bpc 1.0397 (plain 1.1006)  lr 1.72e-04  |g| 0.41  rate [0.224, 0.215, 0.263, 0.412]  eta 89m  budget 90m
+step   52800  loss 0.7163  bpc 1.0334 (plain 1.0737)  lr 1.71e-04  |g| 0.41  rate [0.224, 0.215, 0.262, 0.414]  eta 89m  budget 89m
+step   52900  loss 0.7200  bpc 1.0388 (plain 1.0765)  lr 1.70e-04  |g| 0.41  rate [0.224, 0.215, 0.264, 0.415]  eta 89m  budget 89m
+step   53000  loss 0.6832  bpc 0.9856 (plain 1.0364)  lr 1.69e-04  |g| 0.41  rate [0.225, 0.213, 0.261, 0.409]  eta 88m  budget 89m
+step   53100  loss 0.7645  bpc 1.1030 (plain 1.1258)  lr 1.68e-04  |g| 0.41  rate [0.224, 0.215, 0.264, 0.415]  eta 88m  budget 89m
+step   53200  loss 0.6934  bpc 1.0003 (plain 1.0492)  lr 1.67e-04  |g| 0.41  rate [0.224, 0.215, 0.262, 0.414]  eta 88m  budget 88m
+step   53300  loss 0.7111  bpc 1.0259 (plain 1.0818)  lr 1.67e-04  |g| 0.41  rate [0.225, 0.215, 0.261, 0.413]  eta 88m  budget 88m
+step   53400  loss 0.7309  bpc 1.0544 (plain 1.0915)  lr 1.66e-04  |g| 0.44  rate [0.224, 0.216, 0.263, 0.414]  eta 87m  budget 88m
+step   53500  loss 0.7345  bpc 1.0596 (plain 1.1003)  lr 1.65e-04  |g| 0.44  rate [0.224, 0.214, 0.263, 0.411]  eta 87m  budget 87m
+step   53600  loss 0.6636  bpc 0.9574 (plain 1.0126)  lr 1.64e-04  |g| 0.44  rate [0.224, 0.216, 0.261, 0.413]  eta 87m  budget 87m
+step   53700  loss 0.7238  bpc 1.0442 (plain 1.1014)  lr 1.63e-04  |g| 0.43  rate [0.225, 0.215, 0.264, 0.416]  eta 86m  budget 87m
+step   53800  loss 0.6985  bpc 1.0077 (plain 1.0483)  lr 1.63e-04  |g| 0.45  rate [0.224, 0.215, 0.263, 0.414]  eta 86m  budget 87m
+step   53900  loss 0.7257  bpc 1.0469 (plain 1.1056)  lr 1.62e-04  |g| 0.44  rate [0.224, 0.214, 0.264, 0.411]  eta 86m  budget 86m
+  eval step   54000  alpaca 1.8025  dolly 2.0768  oasst1 1.9487  persona 0.2797  soda 1.3313  stories_topic 1.1366  tinystories 1.1456  weighted 1.2803
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a big, red button. It was very tidy for a special stretch. The store was very small and crawled. The car was very sad and scary.\nOne day, the rake came'
+step   54000  loss 0.7179  bpc 1.0357 (plain 1.0842)  lr 1.61e-04  |g| 0.40  rate [0.224, 0.215, 0.263, 0.411]  eta 86m  budget 86m
+step   54100  loss 0.8136  bpc 1.1737 (plain 1.1859)  lr 1.60e-04  |g| 0.46  rate [0.224, 0.216, 0.265, 0.417]  eta 85m  budget 86m
+step   54200  loss 0.7854  bpc 1.1331 (plain 1.1733)  lr 1.59e-04  |g| 0.46  rate [0.225, 0.215, 0.264, 0.413]  eta 85m  budget 85m
+step   54300  loss 0.6750  bpc 0.9739 (plain 1.0303)  lr 1.58e-04  |g| 0.39  rate [0.224, 0.215, 0.262, 0.413]  eta 85m  budget 85m
+step   54400  loss 0.7169  bpc 1.0343 (plain 1.0919)  lr 1.58e-04  |g| 0.40  rate [0.225, 0.217, 0.264, 0.415]  eta 84m  budget 85m
+step   54500  loss 0.7041  bpc 1.0157 (plain 1.0663)  lr 1.57e-04  |g| 0.37  rate [0.224, 0.214, 0.264, 0.411]  eta 84m  budget 85m
+step   54600  loss 0.7069  bpc 1.0198 (plain 1.0598)  lr 1.56e-04  |g| 0.52  rate [0.225, 0.215, 0.263, 0.410]  eta 84m  budget 84m
+step   54700  loss 0.7683  bpc 1.1084 (plain 1.1279)  lr 1.55e-04  |g| 0.49  rate [0.225, 0.215, 0.265, 0.414]  eta 84m  budget 84m
+step   54800  loss 0.7323  bpc 1.0566 (plain 1.1011)  lr 1.54e-04  |g| 0.46  rate [0.224, 0.215, 0.264, 0.412]  eta 83m  budget 84m
+step   54900  loss 0.7277  bpc 1.0499 (plain 1.1095)  lr 1.54e-04  |g| 0.45  rate [0.225, 0.214, 0.262, 0.412]  eta 83m  budget 84m
+step   55000  loss 0.7002  bpc 1.0102 (plain 1.0577)  lr 1.53e-04  |g| 0.39  rate [0.225, 0.215, 0.264, 0.413]  eta 83m  budget 83m
+step   55100  loss 0.7320  bpc 1.0561 (plain 1.1096)  lr 1.52e-04  |g| 0.44  rate [0.224, 0.215, 0.263, 0.409]  eta 82m  budget 83m
+step   55200  loss 0.7850  bpc 1.1326 (plain 1.1792)  lr 1.51e-04  |g| 0.41  rate [0.225, 0.216, 0.266, 0.414]  eta 82m  budget 83m
+step   55300  loss 0.6960  bpc 1.0041 (plain 1.0674)  lr 1.51e-04  |g| 0.42  rate [0.224, 0.214, 0.262, 0.410]  eta 82m  budget 82m
+step   55400  loss 0.7230  bpc 1.0430 (plain 1.0865)  lr 1.50e-04  |g| 0.44  rate [0.225, 0.215, 0.262, 0.412]  eta 82m  budget 82m
+step   55500  loss 0.7383  bpc 1.0651 (plain 1.0989)  lr 1.49e-04  |g| 0.41  rate [0.225, 0.216, 0.263, 0.412]  eta 81m  budget 82m
+step   55600  loss 0.7388  bpc 1.0658 (plain 1.0830)  lr 1.48e-04  |g| 0.38  rate [0.224, 0.216, 0.264, 0.411]  eta 81m  budget 82m
+step   55700  loss 0.6701  bpc 0.9668 (plain 0.9981)  lr 1.47e-04  |g| 0.39  rate [0.224, 0.215, 0.263, 0.410]  eta 81m  budget 81m
+step   55800  loss 0.7423  bpc 1.0709 (plain 1.1197)  lr 1.47e-04  |g| 0.48  rate [0.225, 0.216, 0.263, 0.409]  eta 80m  budget 81m
+step   55900  loss 0.7321  bpc 1.0561 (plain 1.1125)  lr 1.46e-04  |g| 0.40  rate [0.224, 0.216, 0.265, 0.413]  eta 80m  budget 81m
+  eval step   56000  alpaca 1.7911  dolly 2.0686  oasst1 1.9592  persona 0.2779  soda 1.3288  stories_topic 1.1315  tinystories 1.1391  weighted 1.2751
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lucy. She lived in a small house with her mommy, daddy. Lucy loved to draw and play with her dolls and run around the yard.\nOne day,'
+step   56000  loss 0.7003  bpc 1.0103 (plain 1.0696)  lr 1.45e-04  |g| 0.42  rate [0.224, 0.216, 0.262, 0.411]  eta 80m  budget 80m
+step   56100  loss 0.7037  bpc 1.0153 (plain 1.0802)  lr 1.44e-04  |g| 0.38  rate [0.225, 0.216, 0.264, 0.413]  eta 80m  budget 80m
+step   56200  loss 0.6870  bpc 0.9912 (plain 1.0499)  lr 1.43e-04  |g| 0.40  rate [0.224, 0.215, 0.263, 0.411]  eta 79m  budget 80m
+step   56300  loss 0.7280  bpc 1.0504 (plain 1.0825)  lr 1.43e-04  |g| 0.44  rate [0.225, 0.215, 0.262, 0.413]  eta 79m  budget 80m
+step   56400  loss 0.7212  bpc 1.0405 (plain 1.0818)  lr 1.42e-04  |g| 0.43  rate [0.224, 0.216, 0.262, 0.412]  eta 79m  budget 79m
+step   56500  loss 0.6578  bpc 0.9489 (plain 0.9982)  lr 1.41e-04  |g| 0.50  rate [0.225, 0.216, 0.261, 0.409]  eta 78m  budget 79m
+step   56600  loss 0.7286  bpc 1.0512 (plain 1.1114)  lr 1.40e-04  |g| 0.44  rate [0.224, 0.216, 0.264, 0.412]  eta 78m  budget 79m
+step   56700  loss 0.7022  bpc 1.0131 (plain 1.0703)  lr 1.40e-04  |g| 0.43  rate [0.225, 0.217, 0.264, 0.411]  eta 78m  budget 78m
+step   56800  loss 0.6878  bpc 0.9923 (plain 1.0323)  lr 1.39e-04  |g| 0.38  rate [0.225, 0.216, 0.263, 0.413]  eta 78m  budget 78m
+step   56900  loss 0.6798  bpc 0.9808 (plain 1.0477)  lr 1.38e-04  |g| 0.41  rate [0.225, 0.216, 0.264, 0.411]  eta 77m  budget 78m
+step   57000  loss 0.7439  bpc 1.0732 (plain 1.1283)  lr 1.37e-04  |g| 0.38  rate [0.224, 0.216, 0.267, 0.413]  eta 77m  budget 78m
+step   57100  loss 0.6562  bpc 0.9467 (plain 0.9972)  lr 1.37e-04  |g| 0.42  rate [0.224, 0.214, 0.264, 0.411]  eta 77m  budget 77m
+step   57200  loss 0.6724  bpc 0.9701 (plain 1.0243)  lr 1.36e-04  |g| 0.36  rate [0.224, 0.215, 0.262, 0.410]  eta 76m  budget 77m
+step   57300  loss 0.7667  bpc 1.1061 (plain 1.1477)  lr 1.35e-04  |g| 0.46  rate [0.224, 0.216, 0.266, 0.415]  eta 76m  budget 77m
+step   57400  loss 0.7161  bpc 1.0331 (plain 1.0671)  lr 1.34e-04  |g| 0.45  rate [0.224, 0.215, 0.264, 0.411]  eta 76m  budget 76m
+step   57500  loss 0.7236  bpc 1.0440 (plain 1.0895)  lr 1.34e-04  |g| 0.48  rate [0.225, 0.216, 0.263, 0.411]  eta 75m  budget 76m
+step   57600  loss 0.6817  bpc 0.9835 (plain 1.0412)  lr 1.33e-04  |g| 0.36  rate [0.224, 0.215, 0.262, 0.412]  eta 75m  budget 76m
+step   57700  loss 0.7493  bpc 1.0811 (plain 1.1321)  lr 1.32e-04  |g| 0.47  rate [0.225, 0.216, 0.265, 0.411]  eta 75m  budget 76m
+step   57800  loss 0.6678  bpc 0.9634 (plain 1.0244)  lr 1.31e-04  |g| 0.38  rate [0.225, 0.216, 0.263, 0.412]  eta 75m  budget 75m
+step   57900  loss 0.6767  bpc 0.9763 (plain 1.0415)  lr 1.31e-04  |g| 0.41  rate [0.225, 0.215, 0.263, 0.412]  eta 74m  budget 75m
+  eval step   58000  alpaca 1.8030  dolly 2.0624  oasst1 1.9511  persona 0.2737  soda 1.3291  stories_topic 1.1279  tinystories 1.1397  weighted 1.2747
+    ['hello'] -> 'Hi! How can I help you today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. Tim had a big red toy. He liked to play with his toy see and eat it. One day, Tim saw a little girl named Sue. Sue was sad.\nTim'
+step   58000  loss 0.6976  bpc 1.0064 (plain 1.0639)  lr 1.30e-04  |g| 0.46  rate [0.225, 0.216, 0.263, 0.413]  eta 74m  budget 75m
+step   58100  loss 0.6650  bpc 0.9593 (plain 1.0338)  lr 1.29e-04  |g| 0.43  rate [0.224, 0.215, 0.262, 0.409]  eta 74m  budget 74m
+step   58200  loss 0.6878  bpc 0.9923 (plain 1.0582)  lr 1.28e-04  |g| 0.40  rate [0.225, 0.215, 0.262, 0.412]  eta 74m  budget 74m
+step   58300  loss 0.7261  bpc 1.0475 (plain 1.0881)  lr 1.28e-04  |g| 0.38  rate [0.225, 0.216, 0.264, 0.414]  eta 73m  budget 74m
+step   58400  loss 0.6814  bpc 0.9831 (plain 1.0445)  lr 1.27e-04  |g| 0.44  rate [0.224, 0.215, 0.262, 0.410]  eta 73m  budget 74m
+step   58500  loss 0.7107  bpc 1.0253 (plain 1.0552)  lr 1.26e-04  |g| 0.41  rate [0.225, 0.217, 0.263, 0.414]  eta 73m  budget 73m
+step   58600  loss 0.6912  bpc 0.9973 (plain 1.0618)  lr 1.25e-04  |g| 0.41  rate [0.224, 0.217, 0.264, 0.414]  eta 72m  budget 73m
+step   58700  loss 0.7378  bpc 1.0644 (plain 1.1005)  lr 1.25e-04  |g| 0.43  rate [0.225, 0.217, 0.263, 0.410]  eta 72m  budget 73m
+step   58800  loss 0.7680  bpc 1.1080 (plain 1.1609)  lr 1.24e-04  |g| 0.45  rate [0.224, 0.215, 0.266, 0.411]  eta 72m  budget 72m
+step   58900  loss 0.7266  bpc 1.0482 (plain 1.1227)  lr 1.23e-04  |g| 0.40  rate [0.225, 0.216, 0.267, 0.412]  eta 71m  budget 72m
+step   59000  loss 0.6838  bpc 0.9865 (plain 1.0324)  lr 1.23e-04  |g| 0.42  rate [0.224, 0.215, 0.263, 0.410]  eta 71m  budget 72m
+step   59100  loss 0.7257  bpc 1.0469 (plain 1.1025)  lr 1.22e-04  |g| 0.46  rate [0.224, 0.216, 0.265, 0.413]  eta 71m  budget 72m
+step   59200  loss 0.7214  bpc 1.0408 (plain 1.1084)  lr 1.21e-04  |g| 0.39  rate [0.224, 0.215, 0.265, 0.412]  eta 71m  budget 71m
+step   59300  loss 0.7689  bpc 1.1092 (plain 1.1416)  lr 1.20e-04  |g| 0.46  rate [0.225, 0.217, 0.264, 0.415]  eta 70m  budget 71m
+step   59400  loss 0.6862  bpc 0.9899 (plain 1.0546)  lr 1.20e-04  |g| 0.40  rate [0.224, 0.217, 0.263, 0.414]  eta 70m  budget 71m
+step   59500  loss 0.6931  bpc 0.9999 (plain 1.0393)  lr 1.19e-04  |g| 0.38  rate [0.224, 0.216, 0.263, 0.411]  eta 70m  budget 71m
+step   59600  loss 0.7580  bpc 1.0936 (plain 1.1218)  lr 1.18e-04  |g| 0.37  rate [0.224, 0.217, 0.266, 0.416]  eta 69m  budget 70m
+step   59700  loss 0.6940  bpc 1.0012 (plain 1.0597)  lr 1.18e-04  |g| 0.43  rate [0.224, 0.217, 0.264, 0.412]  eta 69m  budget 70m
+step   59800  loss 0.7035  bpc 1.0149 (plain 1.0748)  lr 1.17e-04  |g| 0.54  rate [0.225, 0.217, 0.265, 0.412]  eta 69m  budget 70m
+step   59900  loss 0.7166  bpc 1.0339 (plain 1.0847)  lr 1.16e-04  |g| 0.40  rate [0.225, 0.216, 0.265, 0.413]  eta 69m  budget 69m
+  eval step   60000  alpaca 1.7928  dolly 2.0479  oasst1 1.9500  persona 0.2842  soda 1.3199  stories_topic 1.1197  tinystories 1.1306  weighted 1.2671
+    ['hello'] -> 'Hi. What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, in a small town, there was a little boy named Tim. Tim loved to play outside in the sun. One day, he saw a big, fluffy cake on the table. He wanted to show his fr'
+step   60000  loss 0.6790  bpc 0.9796 (plain 1.0317)  lr 1.15e-04  |g| 0.37  rate [0.225, 0.216, 0.262, 0.413]  eta 68m  budget 69m
+step   60100  loss 0.7393  bpc 1.0666 (plain 1.1182)  lr 1.15e-04  |g| 0.42  rate [0.225, 0.217, 0.265, 0.411]  eta 68m  budget 69m
+step   60200  loss 0.7123  bpc 1.0277 (plain 1.0830)  lr 1.14e-04  |g| 0.41  rate [0.225, 0.216, 0.264, 0.408]  eta 68m  budget 69m
+step   60300  loss 0.7051  bpc 1.0172 (plain 1.0648)  lr 1.13e-04  |g| 0.39  rate [0.225, 0.217, 0.263, 0.410]  eta 68m  budget 68m
+step   60400  loss 0.7485  bpc 1.0798 (plain 1.1156)  lr 1.13e-04  |g| 0.44  rate [0.225, 0.216, 0.265, 0.411]  eta 67m  budget 68m
+step   60500  loss 0.6977  bpc 1.0066 (plain 1.0490)  lr 1.12e-04  |g| 0.44  rate [0.225, 0.216, 0.265, 0.411]  eta 67m  budget 68m
+step   60600  loss 0.7174  bpc 1.0350 (plain 1.0708)  lr 1.11e-04  |g| 0.44  rate [0.225, 0.217, 0.264, 0.413]  eta 67m  budget 67m
+step   60700  loss 0.7322  bpc 1.0563 (plain 1.1091)  lr 1.11e-04  |g| 0.46  rate [0.225, 0.216, 0.265, 0.411]  eta 66m  budget 67m
+step   60800  loss 0.7008  bpc 1.0110 (plain 1.0698)  lr 1.10e-04  |g| 0.38  rate [0.225, 0.217, 0.264, 0.411]  eta 66m  budget 67m
+step   60900  loss 0.7133  bpc 1.0291 (plain 1.0914)  lr 1.09e-04  |g| 0.41  rate [0.225, 0.216, 0.263, 0.413]  eta 66m  budget 67m
+step   61000  loss 0.6434  bpc 0.9282 (plain 0.9974)  lr 1.09e-04  |g| 0.43  rate [0.224, 0.217, 0.262, 0.410]  eta 65m  budget 66m
+step   61100  loss 0.6977  bpc 1.0066 (plain 1.0707)  lr 1.08e-04  |g| 0.45  rate [0.225, 0.217, 0.264, 0.413]  eta 65m  budget 66m
+step   61200  loss 0.6918  bpc 0.9981 (plain 1.0596)  lr 1.07e-04  |g| 0.41  rate [0.224, 0.216, 0.265, 0.414]  eta 65m  budget 66m
+step   61300  loss 0.7302  bpc 1.0535 (plain 1.0991)  lr 1.06e-04  |g| 0.44  rate [0.225, 0.217, 0.265, 0.414]  eta 65m  budget 65m
+step   61400  loss 0.7097  bpc 1.0239 (plain 1.0629)  lr 1.06e-04  |g| 0.40  rate [0.225, 0.217, 0.264, 0.412]  eta 64m  budget 65m
+step   61500  loss 0.6907  bpc 0.9964 (plain 1.0388)  lr 1.05e-04  |g| 0.42  rate [0.225, 0.217, 0.264, 0.414]  eta 64m  budget 65m
+step   61600  loss 0.6975  bpc 1.0062 (plain 1.0556)  lr 1.04e-04  |g| 0.43  rate [0.225, 0.217, 0.266, 0.412]  eta 64m  budget 65m
+step   61700  loss 0.6670  bpc 0.9623 (plain 1.0325)  lr 1.04e-04  |g| 0.39  rate [0.225, 0.216, 0.263, 0.411]  eta 63m  budget 64m
+step   61800  loss 0.7045  bpc 1.0163 (plain 1.0624)  lr 1.03e-04  |g| 0.41  rate [0.225, 0.216, 0.265, 0.414]  eta 63m  budget 64m
+step   61900  loss 0.6910  bpc 0.9969 (plain 1.0593)  lr 1.02e-04  |g| 0.41  rate [0.225, 0.218, 0.263, 0.411]  eta 63m  budget 64m
+  eval step   62000  alpaca 1.7873  dolly 2.0537  oasst1 1.9567  persona 0.2665  soda 1.3210  stories_topic 1.1207  tinystories 1.1282  weighted 1.2658
+    ['hello'] -> 'Hey there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little dog named Max. Max loved to play outside with his best friend, a little girl named Max. They would run, jump, and laugh and have fun all day lo'
+step   62000  loss 0.7121  bpc 1.0273 (plain 1.0714)  lr 1.02e-04  |g| 0.44  rate [0.225, 0.217, 0.265, 0.411]  eta 63m  budget 63m
+step   62100  loss 0.6792  bpc 0.9799 (plain 1.0564)  lr 1.01e-04  |g| 0.44  rate [0.225, 0.216, 0.263, 0.409]  eta 62m  budget 63m
+step   62200  loss 0.7036  bpc 1.0151 (plain 1.0785)  lr 1.01e-04  |g| 0.41  rate [0.225, 0.217, 0.266, 0.415]  eta 62m  budget 63m
+step   62300  loss 0.6881  bpc 0.9927 (plain 1.0556)  lr 9.99e-05  |g| 0.40  rate [0.225, 0.216, 0.266, 0.412]  eta 62m  budget 63m
+step   62400  loss 0.7577  bpc 1.0931 (plain 1.1334)  lr 9.92e-05  |g| 0.48  rate [0.225, 0.217, 0.267, 0.411]  eta 62m  budget 62m
+step   62500  loss 0.6986  bpc 1.0078 (plain 1.0602)  lr 9.86e-05  |g| 0.40  rate [0.225, 0.216, 0.265, 0.411]  eta 61m  budget 62m
+step   62600  loss 0.7534  bpc 1.0870 (plain 1.1259)  lr 9.79e-05  |g| 0.40  rate [0.225, 0.217, 0.266, 0.412]  eta 61m  budget 62m
+step   62700  loss 0.7554  bpc 1.0898 (plain 1.1200)  lr 9.73e-05  |g| 0.39  rate [0.225, 0.217, 0.267, 0.412]  eta 61m  budget 61m
+step   62800  loss 0.6663  bpc 0.9612 (plain 1.0284)  lr 9.66e-05  |g| 0.39  rate [0.224, 0.217, 0.264, 0.410]  eta 60m  budget 61m
+step   62900  loss 0.6940  bpc 1.0012 (plain 1.0531)  lr 9.60e-05  |g| 0.39  rate [0.225, 0.217, 0.266, 0.415]  eta 60m  budget 61m
+step   63000  loss 0.6692  bpc 0.9655 (plain 1.0144)  lr 9.54e-05  |g| 0.45  rate [0.225, 0.216, 0.265, 0.411]  eta 60m  budget 61m
+step   63100  loss 0.6994  bpc 1.0090 (plain 1.0777)  lr 9.47e-05  |g| 0.41  rate [0.225, 0.217, 0.266, 0.413]  eta 59m  budget 60m
+step   63200  loss 0.6852  bpc 0.9886 (plain 1.0191)  lr 9.41e-05  |g| 0.43  rate [0.225, 0.217, 0.263, 0.412]  eta 59m  budget 60m
+step   63300  loss 0.7456  bpc 1.0756 (plain 1.1034)  lr 9.35e-05  |g| 0.41  rate [0.225, 0.218, 0.264, 0.414]  eta 59m  budget 60m
+step   63400  loss 0.7480  bpc 1.0791 (plain 1.1205)  lr 9.28e-05  |g| 0.48  rate [0.225, 0.217, 0.265, 0.413]  eta 59m  budget 60m
+step   63500  loss 0.7527  bpc 1.0859 (plain 1.1275)  lr 9.22e-05  |g| 0.37  rate [0.225, 0.218, 0.267, 0.414]  eta 58m  budget 59m
+step   63600  loss 0.7031  bpc 1.0144 (plain 1.0623)  lr 9.16e-05  |g| 0.38  rate [0.225, 0.216, 0.266, 0.414]  eta 58m  budget 59m
+step   63700  loss 0.7137  bpc 1.0297 (plain 1.0645)  lr 9.10e-05  |g| 0.42  rate [0.225, 0.217, 0.264, 0.413]  eta 58m  budget 59m
+step   63800  loss 0.6832  bpc 0.9857 (plain 1.0325)  lr 9.04e-05  |g| 0.43  rate [0.225, 0.217, 0.264, 0.410]  eta 57m  budget 58m
+step   63900  loss 0.6657  bpc 0.9604 (plain 1.0354)  lr 8.97e-05  |g| 0.44  rate [0.225, 0.216, 0.264, 0.413]  eta 57m  budget 58m
+  eval step   64000  alpaca 1.7798  dolly 2.0364  oasst1 1.9613  persona 0.2691  soda 1.3109  stories_topic 1.1170  tinystories 1.1245  weighted 1.2601
+    ['hello'] -> 'Hi. What would you like to know?'
+    ['tell me a story about a dog'] -> 'One day, a little dog named Spot wanted to find some food for his friend, Sam. Sam said, "Let\'s play a game!" Tom and they were going to the park to play outside with the fish and'
+step   64000  loss 0.7585  bpc 1.0943 (plain 1.1248)  lr 8.91e-05  |g| 0.43  rate [0.225, 0.218, 0.267, 0.414]  eta 57m  budget 58m
+step   64100  loss 0.7186  bpc 1.0367 (plain 1.0806)  lr 8.85e-05  |g| 0.39  rate [0.225, 0.217, 0.267, 0.414]  eta 57m  budget 58m
+step   64200  loss 0.7262  bpc 1.0477 (plain 1.0911)  lr 8.79e-05  |g| 0.46  rate [0.225, 0.217, 0.266, 0.412]  eta 56m  budget 57m
+step   64300  loss 0.6328  bpc 0.9129 (plain 0.9669)  lr 8.73e-05  |g| 0.40  rate [0.225, 0.216, 0.263, 0.411]  eta 56m  budget 57m
+step   64400  loss 0.6438  bpc 0.9287 (plain 0.9989)  lr 8.67e-05  |g| 0.38  rate [0.225, 0.218, 0.264, 0.411]  eta 56m  budget 57m
+step   64500  loss 0.7083  bpc 1.0218 (plain 1.0773)  lr 8.61e-05  |g| 0.42  rate [0.225, 0.217, 0.265, 0.411]  eta 56m  budget 56m
+step   64600  loss 0.7084  bpc 1.0220 (plain 1.0548)  lr 8.55e-05  |g| 0.45  rate [0.225, 0.218, 0.265, 0.413]  eta 55m  budget 56m
+step   64700  loss 0.7356  bpc 1.0613 (plain 1.1004)  lr 8.49e-05  |g| 0.47  rate [0.226, 0.218, 0.266, 0.414]  eta 55m  budget 56m
+step   64800  loss 0.7194  bpc 1.0379 (plain 1.0817)  lr 8.43e-05  |g| 0.42  rate [0.225, 0.218, 0.266, 0.414]  eta 55m  budget 56m
+step   64900  loss 0.6590  bpc 0.9507 (plain 1.0142)  lr 8.37e-05  |g| 0.42  rate [0.225, 0.218, 0.265, 0.414]  eta 54m  budget 55m
+step   65000  loss 0.6656  bpc 0.9603 (plain 1.0027)  lr 8.31e-05  |g| 0.38  rate [0.225, 0.217, 0.264, 0.412]  eta 54m  budget 55m
+step   65100  loss 0.6494  bpc 0.9369 (plain 1.0123)  lr 8.26e-05  |g| 0.38  rate [0.225, 0.217, 0.264, 0.409]  eta 54m  budget 55m
+step   65200  loss 0.7368  bpc 1.0630 (plain 1.1018)  lr 8.20e-05  |g| 0.38  rate [0.225, 0.218, 0.266, 0.414]  eta 53m  budget 54m
+step   65300  loss 0.6991  bpc 1.0085 (plain 1.0505)  lr 8.14e-05  |g| 0.41  rate [0.225, 0.217, 0.265, 0.413]  eta 53m  budget 54m
+step   65400  loss 0.7359  bpc 1.0616 (plain 1.1133)  lr 8.08e-05  |g| 0.42  rate [0.225, 0.217, 0.266, 0.413]  eta 53m  budget 54m
+step   65500  loss 0.7044  bpc 1.0162 (plain 1.0587)  lr 8.02e-05  |g| 0.43  rate [0.225, 0.218, 0.265, 0.413]  eta 53m  budget 54m
+step   65600  loss 0.6449  bpc 0.9304 (plain 1.0048)  lr 7.97e-05  |g| 0.40  rate [0.225, 0.217, 0.266, 0.412]  eta 52m  budget 53m
+step   65700  loss 0.7509  bpc 1.0833 (plain 1.1328)  lr 7.91e-05  |g| 0.46  rate [0.225, 0.217, 0.264, 0.410]  eta 52m  budget 53m
+step   65800  loss 0.6731  bpc 0.9711 (plain 1.0432)  lr 7.85e-05  |g| 0.45  rate [0.225, 0.218, 0.266, 0.414]  eta 52m  budget 53m
+step   65900  loss 0.7816  bpc 1.1276 (plain 1.1511)  lr 7.80e-05  |g| 0.44  rate [0.225, 0.219, 0.267, 0.413]  eta 51m  budget 53m
+  eval step   66000  alpaca 1.7800  dolly 2.0218  oasst1 1.9382  persona 0.2709  soda 1.3098  stories_topic 1.1123  tinystories 1.1226  weighted 1.2567
+    ['hello'] -> 'Hey there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'One day, a little boy named Tim found a big box. The box had a toy picture on it. Tim liked to race with the ball. He thought it was too big to play with. He drove and the grass we'
+step   66000  loss 0.7709  bpc 1.1121 (plain 1.1641)  lr 7.74e-05  |g| 0.40  rate [0.226, 0.218, 0.267, 0.414]  eta 51m  budget 52m
+step   66100  loss 0.6448  bpc 0.9303 (plain 0.9884)  lr 7.69e-05  |g| 0.43  rate [0.225, 0.218, 0.262, 0.411]  eta 51m  budget 52m
+step   66200  loss 0.6949  bpc 1.0026 (plain 1.0568)  lr 7.63e-05  |g| 0.44  rate [0.225, 0.218, 0.266, 0.411]  eta 51m  budget 52m
+step   66300  loss 0.7027  bpc 1.0139 (plain 1.0493)  lr 7.57e-05  |g| 0.42  rate [0.225, 0.217, 0.265, 0.409]  eta 50m  budget 51m
+step   66400  loss 0.7025  bpc 1.0135 (plain 1.0547)  lr 7.52e-05  |g| 0.42  rate [0.225, 0.218, 0.265, 0.408]  eta 50m  budget 51m
+step   66500  loss 0.7465  bpc 1.0769 (plain 1.1221)  lr 7.46e-05  |g| 0.44  rate [0.225, 0.219, 0.268, 0.412]  eta 50m  budget 51m
+step   66600  loss 0.7400  bpc 1.0676 (plain 1.0941)  lr 7.41e-05  |g| 0.42  rate [0.225, 0.218, 0.264, 0.414]  eta 50m  budget 50m
+step   66700  loss 0.7099  bpc 1.0242 (plain 1.0625)  lr 7.36e-05  |g| 0.40  rate [0.225, 0.218, 0.266, 0.410]  eta 49m  budget 50m
+step   66800  loss 0.7027  bpc 1.0137 (plain 1.0657)  lr 7.30e-05  |g| 0.44  rate [0.225, 0.217, 0.265, 0.411]  eta 49m  budget 50m
+step   66900  loss 0.6235  bpc 0.8995 (plain 0.9557)  lr 7.25e-05  |g| 0.39  rate [0.225, 0.217, 0.263, 0.410]  eta 49m  budget 50m
+step   67000  loss 0.6563  bpc 0.9468 (plain 1.0201)  lr 7.19e-05  |g| 0.40  rate [0.225, 0.217, 0.265, 0.412]  eta 48m  budget 49m
+step   67100  loss 0.6401  bpc 0.9235 (plain 0.9792)  lr 7.14e-05  |g| 0.38  rate [0.225, 0.218, 0.265, 0.410]  eta 48m  budget 49m
+step   67200  loss 0.6949  bpc 1.0025 (plain 1.0399)  lr 7.09e-05  |g| 0.40  rate [0.225, 0.217, 0.264, 0.413]  eta 48m  budget 49m
+step   67300  loss 0.6988  bpc 1.0082 (plain 1.0655)  lr 7.04e-05  |g| 0.41  rate [0.225, 0.218, 0.265, 0.415]  eta 48m  budget 49m
+step   67400  loss 0.6876  bpc 0.9921 (plain 1.0416)  lr 6.98e-05  |g| 0.37  rate [0.225, 0.218, 0.265, 0.411]  eta 47m  budget 48m
+step   67500  loss 0.6968  bpc 1.0053 (plain 1.0709)  lr 6.93e-05  |g| 0.44  rate [0.226, 0.218, 0.266, 0.411]  eta 47m  budget 48m
+step   67600  loss 0.6875  bpc 0.9919 (plain 1.0593)  lr 6.88e-05  |g| 0.42  rate [0.225, 0.218, 0.266, 0.410]  eta 47m  budget 48m
+step   67700  loss 0.7236  bpc 1.0439 (plain 1.0744)  lr 6.83e-05  |g| 0.34  rate [0.226, 0.218, 0.267, 0.412]  eta 46m  budget 47m
+step   67800  loss 0.7165  bpc 1.0336 (plain 1.0791)  lr 6.78e-05  |g| 0.38  rate [0.226, 0.219, 0.265, 0.413]  eta 46m  budget 47m
+step   67900  loss 0.6598  bpc 0.9520 (plain 1.0049)  lr 6.73e-05  |g| 0.37  rate [0.225, 0.218, 0.265, 0.409]  eta 46m  budget 47m
+  eval step   68000  alpaca 1.7775  dolly 2.0302  oasst1 1.9475  persona 0.2757  soda 1.3078  stories_topic 1.1097  tinystories 1.1187  weighted 1.2556
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'One day, a little girl named Sue found a cool water. She wanted to make it home, but the doctor was so happy. She saw a big toy that sand could do it. The dog was very boring. She'
+step   68000  loss 0.7084  bpc 1.0220 (plain 1.0665)  lr 6.67e-05  |g| 0.43  rate [0.226, 0.217, 0.266, 0.410]  eta 46m  budget 47m
+step   68100  loss 0.6777  bpc 0.9778 (plain 1.0337)  lr 6.62e-05  |g| 0.41  rate [0.225, 0.218, 0.267, 0.412]  eta 45m  budget 46m
+step   68200  loss 0.6736  bpc 0.9718 (plain 1.0146)  lr 6.57e-05  |g| 0.44  rate [0.225, 0.217, 0.263, 0.409]  eta 45m  budget 46m
+step   68300  loss 0.6746  bpc 0.9732 (plain 1.0212)  lr 6.52e-05  |g| 0.38  rate [0.225, 0.218, 0.265, 0.412]  eta 45m  budget 46m
+step   68400  loss 0.6920  bpc 0.9983 (plain 1.0440)  lr 6.47e-05  |g| 0.43  rate [0.225, 0.217, 0.266, 0.411]  eta 44m  budget 45m
+step   68500  loss 0.6651  bpc 0.9596 (plain 1.0328)  lr 6.43e-05  |g| 0.38  rate [0.225, 0.218, 0.265, 0.411]  eta 44m  budget 45m
+step   68600  loss 0.6940  bpc 1.0013 (plain 1.0397)  lr 6.38e-05  |g| 0.41  rate [0.226, 0.217, 0.266, 0.411]  eta 44m  budget 45m
+step   68700  loss 0.6408  bpc 0.9245 (plain 1.0031)  lr 6.33e-05  |g| 0.36  rate [0.225, 0.218, 0.265, 0.408]  eta 44m  budget 45m
+step   68800  loss 0.6509  bpc 0.9391 (plain 0.9948)  lr 6.28e-05  |g| 0.39  rate [0.226, 0.218, 0.267, 0.410]  eta 43m  budget 44m
+step   68900  loss 0.6899  bpc 0.9953 (plain 1.0353)  lr 6.23e-05  |g| 0.45  rate [0.226, 0.218, 0.266, 0.410]  eta 43m  budget 44m
+step   69000  loss 0.6636  bpc 0.9574 (plain 1.0185)  lr 6.18e-05  |g| 0.40  rate [0.225, 0.218, 0.265, 0.412]  eta 43m  budget 44m
+step   69100  loss 0.7030  bpc 1.0142 (plain 1.0463)  lr 6.14e-05  |g| 0.43  rate [0.225, 0.218, 0.265, 0.411]  eta 42m  budget 43m
+step   69200  loss 0.7246  bpc 1.0454 (plain 1.1039)  lr 6.09e-05  |g| 0.42  rate [0.225, 0.217, 0.268, 0.413]  eta 42m  budget 43m
+step   69300  loss 0.6726  bpc 0.9703 (plain 1.0188)  lr 6.04e-05  |g| 0.40  rate [0.225, 0.218, 0.266, 0.412]  eta 42m  budget 43m
+step   69400  loss 0.7423  bpc 1.0710 (plain 1.1129)  lr 5.99e-05  |g| 0.43  rate [0.226, 0.219, 0.267, 0.409]  eta 42m  budget 43m
+step   69500  loss 0.6587  bpc 0.9503 (plain 1.0090)  lr 5.95e-05  |g| 0.39  rate [0.226, 0.219, 0.266, 0.411]  eta 41m  budget 42m
+step   69600  loss 0.6722  bpc 0.9697 (plain 1.0261)  lr 5.90e-05  |g| 0.39  rate [0.225, 0.219, 0.265, 0.410]  eta 41m  budget 42m
+step   69700  loss 0.7045  bpc 1.0164 (plain 1.0648)  lr 5.86e-05  |g| 0.45  rate [0.225, 0.217, 0.268, 0.413]  eta 41m  budget 42m
+step   69800  loss 0.6995  bpc 1.0092 (plain 1.0712)  lr 5.81e-05  |g| 0.39  rate [0.225, 0.219, 0.268, 0.412]  eta 40m  budget 41m
+step   69900  loss 0.6589  bpc 0.9506 (plain 1.0240)  lr 5.76e-05  |g| 0.41  rate [0.225, 0.218, 0.264, 0.412]  eta 40m  budget 41m
+  eval step   70000  alpaca 1.7809  dolly 2.0228  oasst1 1.9403  persona 0.2636  soda 1.3008  stories_topic 1.1068  tinystories 1.1161  weighted 1.2517
+    ['hello'] -> 'Hi. What would you like to know?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. He lived in a small house with a little boy named Tim. Tim was a very obedient boy. He loved to play with his toys and make them'
+step   70000  loss 0.6989  bpc 1.0084 (plain 1.0745)  lr 5.72e-05  |g| 0.40  rate [0.226, 0.218, 0.265, 0.412]  eta 40m  budget 41m
+step   70100  loss 0.6404  bpc 0.9239 (plain 1.0051)  lr 5.67e-05  |g| 0.40  rate [0.226, 0.218, 0.265, 0.410]  eta 40m  budget 41m
+step   70200  loss 0.7196  bpc 1.0381 (plain 1.1005)  lr 5.63e-05  |g| 0.45  rate [0.226, 0.217, 0.268, 0.413]  eta 39m  budget 40m
+step   70300  loss 0.7037  bpc 1.0152 (plain 1.0745)  lr 5.59e-05  |g| 0.37  rate [0.225, 0.218, 0.268, 0.411]  eta 39m  budget 40m
+step   70400  loss 0.7505  bpc 1.0827 (plain 1.1209)  lr 5.54e-05  |g| 0.42  rate [0.225, 0.219, 0.267, 0.412]  eta 39m  budget 40m
+step   70500  loss 0.6697  bpc 0.9662 (plain 1.0131)  lr 5.50e-05  |g| 0.37  rate [0.226, 0.218, 0.265, 0.411]  eta 38m  budget 39m
+step   70600  loss 0.6655  bpc 0.9602 (plain 1.0253)  lr 5.45e-05  |g| 0.38  rate [0.226, 0.219, 0.266, 0.409]  eta 38m  budget 39m
+step   70700  loss 0.6828  bpc 0.9851 (plain 1.0356)  lr 5.41e-05  |g| 0.37  rate [0.226, 0.219, 0.266, 0.411]  eta 38m  budget 39m
+step   70800  loss 0.6917  bpc 0.9979 (plain 1.0289)  lr 5.37e-05  |g| 0.39  rate [0.226, 0.219, 0.266, 0.410]  eta 38m  budget 39m
+step   70900  loss 0.6716  bpc 0.9689 (plain 1.0205)  lr 5.33e-05  |g| 0.41  rate [0.225, 0.219, 0.265, 0.409]  eta 37m  budget 38m
+step   71000  loss 0.6702  bpc 0.9669 (plain 1.0232)  lr 5.28e-05  |g| 0.40  rate [0.226, 0.219, 0.265, 0.412]  eta 37m  budget 38m
+step   71100  loss 0.7081  bpc 1.0216 (plain 1.0642)  lr 5.24e-05  |g| 0.42  rate [0.226, 0.218, 0.264, 0.410]  eta 37m  budget 38m
+step   71200  loss 0.7402  bpc 1.0679 (plain 1.1251)  lr 5.20e-05  |g| 0.48  rate [0.225, 0.219, 0.268, 0.412]  eta 36m  budget 38m
+step   71300  loss 0.6921  bpc 0.9985 (plain 1.0597)  lr 5.16e-05  |g| 0.39  rate [0.225, 0.218, 0.267, 0.411]  eta 36m  budget 37m
+step   71400  loss 0.6891  bpc 0.9942 (plain 1.0550)  lr 5.12e-05  |g| 0.40  rate [0.226, 0.219, 0.266, 0.410]  eta 36m  budget 37m
+step   71500  loss 0.6807  bpc 0.9821 (plain 1.0458)  lr 5.08e-05  |g| 0.45  rate [0.226, 0.219, 0.267, 0.413]  eta 36m  budget 37m
+step   71600  loss 0.6909  bpc 0.9967 (plain 1.0685)  lr 5.04e-05  |g| 0.42  rate [0.226, 0.219, 0.266, 0.414]  eta 35m  budget 36m
+step   71700  loss 0.6965  bpc 1.0049 (plain 1.0655)  lr 5.00e-05  |g| 0.49  rate [0.226, 0.219, 0.265, 0.411]  eta 35m  budget 36m
+step   71800  loss 0.7035  bpc 1.0149 (plain 1.0600)  lr 4.96e-05  |g| 0.41  rate [0.226, 0.218, 0.266, 0.413]  eta 35m  budget 36m
+step   71900  loss 0.6569  bpc 0.9477 (plain 1.0040)  lr 4.92e-05  |g| 0.41  rate [0.226, 0.218, 0.264, 0.411]  eta 34m  budget 36m
+  eval step   72000  alpaca 1.7640  dolly 2.0363  oasst1 1.9471  persona 0.2691  soda 1.2984  stories_topic 1.1048  tinystories 1.1148  weighted 1.2492
+    ['hello'] -> 'Hello! How can I help you today?'
+    ['tell me a story about a dog'] -> 'One day, a boy named Tim went to the park. He saw a big bug on the ground. Tim was sad and did not know what was inside. He thought it was a good cat in the box.\nTim asked his mom,'
+step   72000  loss 0.7013  bpc 1.0118 (plain 1.0682)  lr 4.88e-05  |g| 0.40  rate [0.226, 0.218, 0.265, 0.412]  eta 34m  budget 35m
+step   72100  loss 0.6640  bpc 0.9579 (plain 1.0018)  lr 4.84e-05  |g| 0.36  rate [0.226, 0.219, 0.267, 0.413]  eta 34m  budget 35m
+step   72200  loss 0.7154  bpc 1.0321 (plain 1.0824)  lr 4.80e-05  |g| 0.44  rate [0.226, 0.219, 0.266, 0.411]  eta 34m  budget 35m
+step   72300  loss 0.7175  bpc 1.0351 (plain 1.0773)  lr 4.76e-05  |g| 0.42  rate [0.226, 0.219, 0.267, 0.412]  eta 33m  budget 34m
+step   72400  loss 0.6399  bpc 0.9232 (plain 0.9896)  lr 4.73e-05  |g| 0.41  rate [0.226, 0.218, 0.265, 0.410]  eta 33m  budget 34m
+step   72500  loss 0.7107  bpc 1.0254 (plain 1.0701)  lr 4.69e-05  |g| 0.40  rate [0.226, 0.219, 0.266, 0.412]  eta 33m  budget 34m
+step   72600  loss 0.6312  bpc 0.9106 (plain 0.9723)  lr 4.65e-05  |g| 0.41  rate [0.226, 0.219, 0.267, 0.413]  eta 32m  budget 34m
+step   72700  loss 0.6764  bpc 0.9759 (plain 1.0303)  lr 4.61e-05  |g| 0.39  rate [0.226, 0.219, 0.267, 0.412]  eta 32m  budget 33m
+step   72800  loss 0.6189  bpc 0.8928 (plain 0.9573)  lr 4.58e-05  |g| 0.36  rate [0.225, 0.219, 0.265, 0.411]  eta 32m  budget 33m
+step   72900  loss 0.6908  bpc 0.9966 (plain 1.0555)  lr 4.54e-05  |g| 0.37  rate [0.226, 0.219, 0.266, 0.412]  eta 32m  budget 33m
+step   73000  loss 0.6523  bpc 0.9410 (plain 0.9919)  lr 4.51e-05  |g| 0.36  rate [0.226, 0.218, 0.266, 0.412]  eta 31m  budget 32m
+step   73100  loss 0.6931  bpc 1.0000 (plain 1.0689)  lr 4.47e-05  |g| 0.39  rate [0.226, 0.219, 0.267, 0.410]  eta 31m  budget 32m
+step   73200  loss 0.6734  bpc 0.9715 (plain 1.0345)  lr 4.43e-05  |g| 0.41  rate [0.226, 0.218, 0.266, 0.411]  eta 31m  budget 32m
+step   73300  loss 0.7386  bpc 1.0656 (plain 1.0989)  lr 4.40e-05  |g| 0.41  rate [0.226, 0.219, 0.268, 0.411]  eta 30m  budget 32m
+step   73400  loss 0.6927  bpc 0.9993 (plain 1.0411)  lr 4.36e-05  |g| 0.41  rate [0.226, 0.219, 0.267, 0.412]  eta 30m  budget 31m
+step   73500  loss 0.7453  bpc 1.0753 (plain 1.1105)  lr 4.33e-05  |g| 0.45  rate [0.226, 0.219, 0.268, 0.409]  eta 30m  budget 31m
+step   73600  loss 0.7184  bpc 1.0364 (plain 1.0933)  lr 4.30e-05  |g| 0.40  rate [0.226, 0.219, 0.268, 0.413]  eta 30m  budget 31m
+step   73700  loss 0.6798  bpc 0.9807 (plain 1.0386)  lr 4.26e-05  |g| 0.36  rate [0.226, 0.218, 0.266, 0.412]  eta 29m  budget 30m
+step   73800  loss 0.6867  bpc 0.9906 (plain 1.0552)  lr 4.23e-05  |g| 0.40  rate [0.226, 0.219, 0.267, 0.415]  eta 29m  budget 30m
+step   73900  loss 0.6562  bpc 0.9467 (plain 0.9900)  lr 4.19e-05  |g| 0.38  rate [0.226, 0.219, 0.265, 0.409]  eta 29m  budget 30m
+  eval step   74000  alpaca 1.7670  dolly 2.0436  oasst1 1.9421  persona 0.2743  soda 1.2970  stories_topic 1.1017  tinystories 1.1116  weighted 1.2486
+    ['hello'] -> "Hello! I'm listening."
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a polite named Tom. Tom was very important to all the other animals. One day, he saw a little girl named Sue. Sue was playing with a big red ball. Sue a'
+step   74000  loss 0.6693  bpc 0.9656 (plain 1.0203)  lr 4.16e-05  |g| 0.44  rate [0.226, 0.218, 0.266, 0.411]  eta 28m  budget 30m
+step   74100  loss 0.6870  bpc 0.9912 (plain 1.0591)  lr 4.13e-05  |g| 0.39  rate [0.226, 0.219, 0.268, 0.414]  eta 28m  budget 29m
+step   74200  loss 0.6978  bpc 1.0067 (plain 1.0837)  lr 4.10e-05  |g| 0.40  rate [0.226, 0.219, 0.267, 0.411]  eta 28m  budget 29m
+step   74300  loss 0.6843  bpc 0.9873 (plain 1.0738)  lr 4.06e-05  |g| 0.39  rate [0.226, 0.218, 0.267, 0.411]  eta 28m  budget 29m
+step   74400  loss 0.6689  bpc 0.9651 (plain 1.0130)  lr 4.03e-05  |g| 0.38  rate [0.226, 0.221, 0.265, 0.413]  eta 27m  budget 28m
+step   74500  loss 0.6589  bpc 0.9506 (plain 1.0190)  lr 4.00e-05  |g| 0.42  rate [0.226, 0.218, 0.266, 0.411]  eta 27m  budget 28m
+step   74600  loss 0.6813  bpc 0.9829 (plain 1.0413)  lr 3.97e-05  |g| 0.37  rate [0.226, 0.220, 0.266, 0.411]  eta 27m  budget 28m
+step   74700  loss 0.6786  bpc 0.9790 (plain 1.0064)  lr 3.94e-05  |g| 0.39  rate [0.226, 0.219, 0.267, 0.411]  eta 26m  budget 28m
+step   74800  loss 0.6788  bpc 0.9793 (plain 1.0368)  lr 3.91e-05  |g| 0.42  rate [0.226, 0.219, 0.267, 0.413]  eta 26m  budget 27m
+step   74900  loss 0.6810  bpc 0.9825 (plain 1.0375)  lr 3.88e-05  |g| 0.41  rate [0.226, 0.220, 0.266, 0.409]  eta 26m  budget 27m
+step   75000  loss 0.6939  bpc 1.0011 (plain 1.0510)  lr 3.85e-05  |g| 0.40  rate [0.226, 0.219, 0.268, 0.412]  eta 26m  budget 27m
+step   75100  loss 0.6710  bpc 0.9681 (plain 1.0031)  lr 3.82e-05  |g| 0.37  rate [0.226, 0.219, 0.267, 0.409]  eta 25m  budget 27m
+step   75200  loss 0.7020  bpc 1.0127 (plain 1.0697)  lr 3.79e-05  |g| 0.37  rate [0.226, 0.219, 0.269, 0.414]  eta 25m  budget 26m
+step   75300  loss 0.6628  bpc 0.9563 (plain 0.9938)  lr 3.76e-05  |g| 0.39  rate [0.226, 0.220, 0.267, 0.412]  eta 25m  budget 26m
+step   75400  loss 0.6317  bpc 0.9113 (plain 0.9787)  lr 3.73e-05  |g| 0.41  rate [0.226, 0.218, 0.265, 0.412]  eta 24m  budget 26m
+step   75500  loss 0.6859  bpc 0.9896 (plain 1.0431)  lr 3.70e-05  |g| 0.38  rate [0.226, 0.219, 0.267, 0.412]  eta 24m  budget 25m
+step   75600  loss 0.7160  bpc 1.0329 (plain 1.0734)  lr 3.68e-05  |g| 0.42  rate [0.226, 0.219, 0.269, 0.413]  eta 24m  budget 25m
+step   75700  loss 0.7498  bpc 1.0818 (plain 1.1128)  lr 3.65e-05  |g| 0.41  rate [0.226, 0.219, 0.270, 0.413]  eta 24m  budget 25m
+step   75800  loss 0.6833  bpc 0.9858 (plain 1.0510)  lr 3.62e-05  |g| 0.43  rate [0.226, 0.218, 0.267, 0.410]  eta 23m  budget 25m
+step   75900  loss 0.6215  bpc 0.8966 (plain 0.9618)  lr 3.59e-05  |g| 0.40  rate [0.226, 0.219, 0.267, 0.411]  eta 23m  budget 24m
+  eval step   76000  alpaca 1.7700  dolly 2.0187  oasst1 1.9063  persona 0.2688  soda 1.2914  stories_topic 1.1034  tinystories 1.1124  weighted 1.2460
+    ['hello'] -> 'Hey there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'One day, a little boy named Tim went to the park with his mom. They saw a big, round barbell. The ball had a big ball on the water. Tim wanted to play with the ball in the park.\nAs'
+step   76000  loss 0.6698  bpc 0.9663 (plain 1.0293)  lr 3.57e-05  |g| 0.38  rate [0.226, 0.219, 0.267, 0.411]  eta 23m  budget 24m
+step   76100  loss 0.7635  bpc 1.1015 (plain 1.1469)  lr 3.54e-05  |g| 0.39  rate [0.226, 0.219, 0.270, 0.412]  eta 22m  budget 24m
+step   76200  loss 0.6522  bpc 0.9409 (plain 1.0090)  lr 3.52e-05  |g| 0.37  rate [0.227, 0.219, 0.266, 0.410]  eta 22m  budget 23m
+step   76300  loss 0.6950  bpc 1.0027 (plain 1.0661)  lr 3.49e-05  |g| 0.40  rate [0.226, 0.219, 0.267, 0.412]  eta 22m  budget 23m
+step   76400  loss 0.7115  bpc 1.0265 (plain 1.0781)  lr 3.46e-05  |g| 0.42  rate [0.226, 0.220, 0.268, 0.412]  eta 22m  budget 23m
+step   76500  loss 0.7414  bpc 1.0696 (plain 1.1070)  lr 3.44e-05  |g| 0.41  rate [0.226, 0.220, 0.268, 0.411]  eta 21m  budget 23m
+step   76600  loss 0.7414  bpc 1.0696 (plain 1.1141)  lr 3.41e-05  |g| 0.40  rate [0.226, 0.219, 0.269, 0.413]  eta 21m  budget 22m
+step   76700  loss 0.6847  bpc 0.9878 (plain 1.0332)  lr 3.39e-05  |g| 0.42  rate [0.226, 0.218, 0.268, 0.412]  eta 21m  budget 22m
+step   76800  loss 0.6646  bpc 0.9588 (plain 1.0108)  lr 3.37e-05  |g| 0.35  rate [0.226, 0.219, 0.267, 0.412]  eta 20m  budget 22m
+step   76900  loss 0.6598  bpc 0.9519 (plain 1.0026)  lr 3.34e-05  |g| 0.40  rate [0.226, 0.218, 0.267, 0.413]  eta 20m  budget 21m
+step   77000  loss 0.7108  bpc 1.0255 (plain 1.0783)  lr 3.32e-05  |g| 0.42  rate [0.226, 0.220, 0.270, 0.412]  eta 20m  budget 21m
+step   77100  loss 0.7119  bpc 1.0271 (plain 1.0641)  lr 3.30e-05  |g| 0.37  rate [0.226, 0.219, 0.268, 0.411]  eta 20m  budget 21m
+step   77200  loss 0.6720  bpc 0.9694 (plain 1.0142)  lr 3.27e-05  |g| 0.35  rate [0.226, 0.219, 0.268, 0.413]  eta 19m  budget 21m
+step   77300  loss 0.6292  bpc 0.9077 (plain 0.9428)  lr 3.25e-05  |g| 0.39  rate [0.227, 0.219, 0.264, 0.409]  eta 19m  budget 20m
+step   77400  loss 0.7078  bpc 1.0211 (plain 1.0673)  lr 3.23e-05  |g| 0.40  rate [0.226, 0.220, 0.268, 0.413]  eta 19m  budget 20m
+step   77500  loss 0.7149  bpc 1.0314 (plain 1.0836)  lr 3.21e-05  |g| 0.40  rate [0.226, 0.219, 0.268, 0.414]  eta 18m  budget 20m
+step   77600  loss 0.6561  bpc 0.9466 (plain 1.0054)  lr 3.19e-05  |g| 0.40  rate [0.226, 0.219, 0.267, 0.413]  eta 18m  budget 19m
+step   77700  loss 0.5800  bpc 0.8368 (plain 0.9044)  lr 3.16e-05  |g| 0.37  rate [0.227, 0.219, 0.265, 0.409]  eta 18m  budget 19m
+step   77800  loss 0.7214  bpc 1.0407 (plain 1.0879)  lr 3.14e-05  |g| 0.38  rate [0.226, 0.219, 0.269, 0.412]  eta 18m  budget 19m
+step   77900  loss 0.6901  bpc 0.9956 (plain 1.0477)  lr 3.12e-05  |g| 0.41  rate [0.226, 0.219, 0.268, 0.413]  eta 17m  budget 19m
+  eval step   78000  alpaca 1.7648  dolly 2.0182  oasst1 1.9281  persona 0.2640  soda 1.2918  stories_topic 1.1008  tinystories 1.1093  weighted 1.2440
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, in a small house, there lived a little girl named Mia. Mia loved to play outside with her doll. One day, while playing, she saw a tiny dirty doll. She wanted to p'
+step   78000  loss 0.6691  bpc 0.9653 (plain 1.0177)  lr 3.10e-05  |g| 0.43  rate [0.226, 0.220, 0.267, 0.411]  eta 17m  budget 18m
+step   78100  loss 0.6527  bpc 0.9417 (plain 1.0118)  lr 3.08e-05  |g| 0.35  rate [0.226, 0.219, 0.268, 0.411]  eta 17m  budget 18m
+step   78200  loss 0.6633  bpc 0.9570 (plain 1.0006)  lr 3.06e-05  |g| 0.35  rate [0.226, 0.219, 0.266, 0.411]  eta 16m  budget 18m
+step   78300  loss 0.6752  bpc 0.9741 (plain 1.0301)  lr 3.04e-05  |g| 0.41  rate [0.226, 0.219, 0.268, 0.412]  eta 16m  budget 17m
+step   78400  loss 0.6872  bpc 0.9915 (plain 1.0491)  lr 3.03e-05  |g| 0.39  rate [0.227, 0.220, 0.267, 0.413]  eta 16m  budget 17m
+step   78500  loss 0.7021  bpc 1.0130 (plain 1.0630)  lr 3.01e-05  |g| 0.39  rate [0.226, 0.219, 0.267, 0.411]  eta 16m  budget 17m
+step   78600  loss 0.6619  bpc 0.9550 (plain 1.0165)  lr 2.99e-05  |g| 0.39  rate [0.226, 0.219, 0.268, 0.415]  eta 15m  budget 17m
+step   78700  loss 0.6525  bpc 0.9414 (plain 0.9711)  lr 2.97e-05  |g| 0.34  rate [0.227, 0.219, 0.266, 0.410]  eta 15m  budget 16m
+step   78800  loss 0.7265  bpc 1.0481 (plain 1.0881)  lr 2.95e-05  |g| 0.42  rate [0.226, 0.219, 0.268, 0.411]  eta 15m  budget 16m
+step   78900  loss 0.6642  bpc 0.9583 (plain 1.0143)  lr 2.94e-05  |g| 0.40  rate [0.227, 0.220, 0.267, 0.411]  eta 14m  budget 16m
+step   79000  loss 0.7163  bpc 1.0334 (plain 1.0888)  lr 2.92e-05  |g| 0.42  rate [0.227, 0.220, 0.269, 0.412]  eta 14m  budget 16m
+step   79100  loss 0.6653  bpc 0.9598 (plain 1.0269)  lr 2.90e-05  |g| 0.39  rate [0.226, 0.219, 0.268, 0.412]  eta 14m  budget 15m
+step   79200  loss 0.6999  bpc 1.0097 (plain 1.0751)  lr 2.89e-05  |g| 0.41  rate [0.227, 0.219, 0.267, 0.411]  eta 14m  budget 15m
+step   79300  loss 0.6481  bpc 0.9350 (plain 0.9853)  lr 2.87e-05  |g| 0.40  rate [0.227, 0.219, 0.266, 0.412]  eta 13m  budget 15m
+step   79400  loss 0.7130  bpc 1.0287 (plain 1.0821)  lr 2.85e-05  |g| 0.39  rate [0.227, 0.218, 0.267, 0.411]  eta 13m  budget 14m
+step   79500  loss 0.6553  bpc 0.9454 (plain 1.0013)  lr 2.84e-05  |g| 0.37  rate [0.227, 0.219, 0.266, 0.411]  eta 13m  budget 14m
+step   79600  loss 0.6626  bpc 0.9560 (plain 1.0074)  lr 2.82e-05  |g| 0.36  rate [0.226, 0.219, 0.266, 0.410]  eta 12m  budget 14m
+step   79700  loss 0.6922  bpc 0.9986 (plain 1.0684)  lr 2.81e-05  |g| 0.43  rate [0.226, 0.219, 0.269, 0.414]  eta 12m  budget 14m
+step   79800  loss 0.7213  bpc 1.0407 (plain 1.1029)  lr 2.80e-05  |g| 0.40  rate [0.226, 0.220, 0.269, 0.413]  eta 12m  budget 13m
+step   79900  loss 0.7371  bpc 1.0635 (plain 1.1220)  lr 2.78e-05  |g| 0.44  rate [0.227, 0.220, 0.268, 0.412]  eta 12m  budget 13m
+  eval step   80000  alpaca 1.7556  dolly 2.0273  oasst1 1.9394  persona 0.2666  soda 1.2909  stories_topic 1.0979  tinystories 1.1080  weighted 1.2421
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little dog named Max. Max was very good at finding things. He liked to bring his bag and have fun with his friends.\nOne day, Max saw a big cat named L'
+step   80000  loss 0.6845  bpc 0.9876 (plain 1.0593)  lr 2.77e-05  |g| 0.36  rate [0.227, 0.219, 0.268, 0.411]  eta 11m  budget 13m
+step   80100  loss 0.6870  bpc 0.9911 (plain 1.0642)  lr 2.76e-05  |g| 0.40  rate [0.227, 0.220, 0.267, 0.411]  eta 11m  budget 12m
+step   80200  loss 0.6709  bpc 0.9679 (plain 1.0269)  lr 2.74e-05  |g| 0.38  rate [0.227, 0.219, 0.267, 0.412]  eta 11m  budget 12m
+step   80300  loss 0.6616  bpc 0.9545 (plain 1.0384)  lr 2.73e-05  |g| 0.39  rate [0.226, 0.219, 0.267, 0.411]  eta 11m  budget 12m
+step   80400  loss 0.6410  bpc 0.9248 (plain 0.9995)  lr 2.72e-05  |g| 0.36  rate [0.226, 0.219, 0.267, 0.411]  eta 10m  budget 12m
+step   80500  loss 0.6703  bpc 0.9671 (plain 1.0074)  lr 2.71e-05  |g| 0.38  rate [0.226, 0.219, 0.267, 0.413]  eta 10m  budget 11m
+step   80600  loss 0.6596  bpc 0.9515 (plain 0.9878)  lr 2.69e-05  |g| 0.37  rate [0.227, 0.219, 0.268, 0.409]  eta 10m  budget 11m
+step   80700  loss 0.6859  bpc 0.9896 (plain 1.0400)  lr 2.68e-05  |g| 0.38  rate [0.226, 0.219, 0.268, 0.411]  eta 9m  budget 11m
+step   80800  loss 0.6721  bpc 0.9696 (plain 1.0194)  lr 2.67e-05  |g| 0.37  rate [0.227, 0.219, 0.267, 0.411]  eta 9m  budget 10m
+step   80900  loss 0.6654  bpc 0.9600 (plain 1.0110)  lr 2.66e-05  |g| 0.38  rate [0.227, 0.219, 0.266, 0.409]  eta 9m  budget 10m
+step   81000  loss 0.6642  bpc 0.9582 (plain 1.0352)  lr 2.65e-05  |g| 0.39  rate [0.226, 0.219, 0.269, 0.411]  eta 9m  budget 10m
+step   81100  loss 0.7273  bpc 1.0492 (plain 1.0809)  lr 2.64e-05  |g| 0.38  rate [0.227, 0.220, 0.268, 0.414]  eta 8m  budget 10m
+step   81200  loss 0.7020  bpc 1.0127 (plain 1.0727)  lr 2.63e-05  |g| 0.41  rate [0.226, 0.220, 0.269, 0.412]  eta 8m  budget 9m
+step   81300  loss 0.7049  bpc 1.0170 (plain 1.0783)  lr 2.62e-05  |g| 0.38  rate [0.227, 0.220, 0.270, 0.413]  eta 8m  budget 9m
+step   81400  loss 0.6926  bpc 0.9992 (plain 1.0573)  lr 2.61e-05  |g| 0.40  rate [0.226, 0.219, 0.268, 0.414]  eta 7m  budget 9m
+step   81500  loss 0.6569  bpc 0.9477 (plain 1.0118)  lr 2.60e-05  |g| 0.38  rate [0.226, 0.219, 0.267, 0.408]  eta 7m  budget 8m
+step   81600  loss 0.6881  bpc 0.9927 (plain 1.0344)  lr 2.60e-05  |g| 0.38  rate [0.226, 0.219, 0.267, 0.411]  eta 7m  budget 8m
+step   81700  loss 0.6914  bpc 0.9975 (plain 1.0480)  lr 2.59e-05  |g| 0.36  rate [0.226, 0.219, 0.269, 0.413]  eta 7m  budget 8m
+step   81800  loss 0.6688  bpc 0.9649 (plain 1.0351)  lr 2.58e-05  |g| 0.42  rate [0.226, 0.219, 0.268, 0.411]  eta 6m  budget 8m
+step   81900  loss 0.7025  bpc 1.0135 (plain 1.0613)  lr 2.57e-05  |g| 0.41  rate [0.227, 0.220, 0.267, 0.413]  eta 6m  budget 7m
+  eval step   82000  alpaca 1.7546  dolly 2.0146  oasst1 1.9320  persona 0.2587  soda 1.2923  stories_topic 1.0990  tinystories 1.1092  weighted 1.2413
+    ['hello'] -> 'Hi. What would you like to know?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a cat named Tom. Tom had a long tape that he loved to wear. Every day, he would take his toys in the water and make them play. The tallest cat was sad a'
+step   82000  loss 0.7132  bpc 1.0289 (plain 1.0748)  lr 2.57e-05  |g| 0.46  rate [0.227, 0.219, 0.268, 0.412]  eta 6m  budget 7m
+step   82100  loss 0.7022  bpc 1.0130 (plain 1.0583)  lr 2.56e-05  |g| 0.41  rate [0.227, 0.219, 0.267, 0.410]  eta 5m  budget 7m
+step   82200  loss 0.6744  bpc 0.9729 (plain 1.0283)  lr 2.55e-05  |g| 0.38  rate [0.227, 0.220, 0.267, 0.413]  eta 5m  budget 6m
+step   82300  loss 0.6719  bpc 0.9693 (plain 1.0125)  lr 2.55e-05  |g| 0.39  rate [0.226, 0.219, 0.266, 0.409]  eta 5m  budget 6m
+step   82400  loss 0.7022  bpc 1.0130 (plain 1.0643)  lr 2.54e-05  |g| 0.38  rate [0.226, 0.219, 0.269, 0.411]  eta 5m  budget 6m
+step   82500  loss 0.7343  bpc 1.0593 (plain 1.0996)  lr 2.54e-05  |g| 0.43  rate [0.227, 0.220, 0.270, 0.411]  eta 4m  budget 6m
+step   82600  loss 0.6794  bpc 0.9801 (plain 1.0197)  lr 2.53e-05  |g| 0.37  rate [0.227, 0.220, 0.266, 0.412]  eta 4m  budget 5m
+step   82700  loss 0.6448  bpc 0.9302 (plain 1.0030)  lr 2.53e-05  |g| 0.37  rate [0.226, 0.220, 0.268, 0.412]  eta 4m  budget 5m
+step   82800  loss 0.6784  bpc 0.9787 (plain 1.0619)  lr 2.52e-05  |g| 0.39  rate [0.227, 0.220, 0.268, 0.412]  eta 3m  budget 5m
+step   82900  loss 0.6812  bpc 0.9828 (plain 1.0425)  lr 2.52e-05  |g| 0.46  rate [0.227, 0.220, 0.267, 0.413]  eta 3m  budget 5m
+step   83000  loss 0.6640  bpc 0.9579 (plain 1.0086)  lr 2.52e-05  |g| 0.37  rate [0.227, 0.220, 0.268, 0.412]  eta 3m  budget 4m
+step   83100  loss 0.7094  bpc 1.0235 (plain 1.0770)  lr 2.51e-05  |g| 0.37  rate [0.227, 0.220, 0.270, 0.413]  eta 3m  budget 4m
+step   83200  loss 0.6584  bpc 0.9499 (plain 0.9957)  lr 2.51e-05  |g| 0.37  rate [0.227, 0.220, 0.266, 0.412]  eta 2m  budget 4m
+step   83300  loss 0.6962  bpc 1.0045 (plain 1.0617)  lr 2.51e-05  |g| 0.38  rate [0.227, 0.220, 0.267, 0.412]  eta 2m  budget 3m
+step   83400  loss 0.7294  bpc 1.0524 (plain 1.0849)  lr 2.51e-05  |g| 0.40  rate [0.227, 0.219, 0.269, 0.412]  eta 2m  budget 3m
+step   83500  loss 0.6347  bpc 0.9157 (plain 0.9539)  lr 2.50e-05  |g| 0.37  rate [0.227, 0.220, 0.266, 0.413]  eta 1m  budget 3m
+step   83600  loss 0.6791  bpc 0.9797 (plain 1.0309)  lr 2.50e-05  |g| 0.38  rate [0.227, 0.220, 0.268, 0.412]  eta 1m  budget 3m
+step   83700  loss 0.6971  bpc 1.0058 (plain 1.0458)  lr 2.50e-05  |g| 0.38  rate [0.227, 0.220, 0.269, 0.413]  eta 1m  budget 2m
+step   83800  loss 0.6973  bpc 1.0059 (plain 1.0272)  lr 2.50e-05  |g| 0.39  rate [0.227, 0.219, 0.269, 0.413]  eta 1m  budget 2m
+step   83900  loss 0.7482  bpc 1.0795 (plain 1.1429)  lr 2.50e-05  |g| 0.38  rate [0.227, 0.220, 0.269, 0.412]  eta 0m  budget 2m
+  eval step   84000  alpaca 1.7617  dolly 2.0039  oasst1 1.9253  persona 0.2649  soda 1.2888  stories_topic 1.0962  tinystories 1.1059  weighted 1.2399
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She liked to deliver things. One day, she found a big toy block. It was very hot outside. Lily thought, she wanted to make it'
+  eval step   84000  alpaca 1.7617  dolly 2.0039  oasst1 1.9253  persona 0.2649  soda 1.2888  stories_topic 1.0962  tinystories 1.1059  weighted 1.2399
