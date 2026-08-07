@@ -34,8 +34,25 @@ not exact, because `fallback` is computed on the same draws as `topic`+`list`
 (the union of `topic`/`list`/`fact`, per `_SUBSTANTIVE`), so a hit and a
 fallback flag on the same draw are not independent events. This is the same
 approximation an informal check made in the prior (uncommitted, unexported)
-session; it is formalised here, not improved on, and the caveat is the point of
-writing it down. Two-sample z = (rate₂ − rate₁) / sqrt(se₁² + se₂²); |z| < 1.96
+session; it is formalised here, not improved on, and the caveat is the point
+of writing it down.
+
+**A second, one-directional caveat, present everywhere in this document that
+`social` reads 20/20 or 0/20 (which is every table in §1, §2 and §4):** the
+component `se` used in the propagated headline SE is a Wald
+`sqrt(p(1-p)/n)`, which is exactly `0` at `p = 0` or `p = 1` — the same
+degeneracy `docs/chat/CONVENTIONS.md`'s own case for Wilson over Wald exists
+to avoid, re-introduced here because the headline's propagation formula needs
+a single `se` number per component, not a full interval. A `social` term of
+`0` makes the propagated headline SE an **underestimate**, never an
+overestimate — so it does not manufacture a resolved verdict anywhere in this
+document; it can only have made an unresolved call look slightly more
+confident than it should. Every verdict in §1, §2 and §4 was already
+`unresolved` under the understated SE, so correcting it would only widen
+margins that were already wide enough to not matter — but it is a real
+direction of bias and is recorded here rather than left implicit.
+
+Two-sample z = (rate₂ − rate₁) / sqrt(se₁² + se₂²); |z| < 1.96
 is `unresolved`, matching `resolves_against`'s own boundary.
 
 **Result**, on the committed `experiments/chat/_quality/chat-v3d-aligned.json`
