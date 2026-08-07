@@ -150,13 +150,24 @@ the model) is now confirmed on the exact case it was written to fix, not just
 argued in the abstract. Written to
 `experiments/chat/_quality/story_dodge_resample_v5a.json`.
 
-**The three context arms** (`chat-v3d-aligned`, `chat-v4a-short`,
-`chat-v4b-balance`, 101 seeds each, ≈1,212 draws, not tested against a
-threshold — reported alongside for reference) are resampled separately; see
-below once that run completes.
+**The three context arms** (101 seeds each, 1,212 draws, not tested against a
+threshold — reported for reference, not as a P1-style verdict):
 
-*(context-arm numbers appended here once
-`experiments/chat/_resample/resample-context-101/stdout.log` finishes.)*
+| arm | `story_dodge` | 95% CI | opener-only | vs. 0.125 (reference only) |
+| --- | ---: | --- | ---: | :-- |
+| `chat-v3d-aligned` (shipped) | 0.0611 (74/1212) | [0.0489, 0.0760] | 0.0470 | below |
+| `chat-v4b-balance` | 0.1304 (158/1212) | [0.1126, 0.1505] | 0.1139 | unresolved |
+| `chat-v4a-short` | 0.1733 (210/1212) | [0.1530, 0.1956] | 0.1502 | above |
+
+At this resolution the three arms now separate cleanly from each other
+(`chat-v3d-aligned`'s upper bound, 0.0760, sits below `chat-v4b-balance`'s
+lower bound, 0.1126, which sits below `chat-v4a-short`'s), even though
+`chat-v4b-balance` itself still straddles the *specific* 0.125 threshold —
+this is a real, informative interval landing near a boundary, not a
+resolution failure like the original 48-draw measurement, since 1,212 draws
+puts the lattice at 0.00083. `chat-v3d-aligned` remains the best of the four
+arms measured on `story_dodge` at every sample size this project has used.
+Written to `experiments/chat/_quality/story_dodge_resample_context.json`.
 
 ## 4. The instruction-weight ladder: `chat-v6-inst-a`, `chat-v6-inst-b`
 
