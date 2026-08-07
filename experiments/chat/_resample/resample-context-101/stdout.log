@@ -1,0 +1,32 @@
+
+=== launch 2026-08-07T05:11:01 === C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe -u C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\story_dodge_resample.py --seeds 101 --arms chat-v3d-aligned chat-v4a-short chat-v4b-balance --out experiments/chat/_quality/story_dodge_resample_context.json
+# story_dodge resample: 1212 draws per arm (was 48), lattice 0.00083
+
+## chat-v3d-aligned  (step 14000)
+   12 probes x 101 seeds x 16 candidates = 1212 draws of story_dodge
+   superset check: 48 committed draws reproduced identical
+   story_dodge  0.0611  = 74/1212  95% CI [0.0489, 0.0760]  lattice 0.00083
+   opener only  0.0470  = 57/1212  95% CI [0.0365, 0.0604]
+   vs P1's 0.125: below   (21.3 min)
+
+## chat-v4a-short  (step 14000)
+   12 probes x 101 seeds x 16 candidates = 1212 draws of story_dodge
+   superset check: 48 committed draws reproduced identical
+   story_dodge  0.1733  = 210/1212  95% CI [0.1530, 0.1956]  lattice 0.00083
+   opener only  0.1502  = 182/1212  95% CI [0.1312, 0.1714]
+   vs P1's 0.125: above   (21.2 min)
+
+## chat-v4b-balance  (step 14000)
+   12 probes x 101 seeds x 16 candidates = 1212 draws of story_dodge
+   superset check: 48 committed draws reproduced identical
+   story_dodge  0.1304  = 158/1212  95% CI [0.1126, 0.1505]  lattice 0.00083
+   opener only  0.1139  = 138/1212  95% CI [0.0972, 0.1330]
+   vs P1's 0.125: unresolved   (20.8 min)
+
+## summary, at the pinned n=1 lambda=0 row
+  arm                     story_dodge             95% CI    opener   vs 0.125
+  chat-v3d-aligned        0.0611   74/1212 [0.0489, 0.0760]    0.0470      below
+  chat-v4a-short          0.1733  210/1212 [0.1530, 0.1956]    0.1502      above
+  chat-v4b-balance        0.1304  158/1212 [0.1126, 0.1505]    0.1139 unresolved
+
+wrote experiments\chat\_quality\story_dodge_resample_context.json

@@ -1,0 +1,131 @@
+{
+ "seeds": 101,
+ "n_candidates": 16,
+ "draws_per_arm": 1212,
+ "lattice": 0.000825,
+ "p1_threshold": 0.125,
+ "p1_upper_band": 0.146,
+ "reading_row": {
+  "n": 1,
+  "lambda": 0.0
+ },
+ "sampling": {
+  "temperature": 0.85,
+  "top_p": 0.92,
+  "min_p": 0.02,
+  "max_new": 300
+ },
+ "arms": [
+  {
+   "arm": "chat-v3d-aligned",
+   "step": 14000,
+   "seeds": 101,
+   "n_candidates": 16,
+   "row": {
+    "n": 1,
+    "lambda": 0.0
+   },
+   "story_dodge": {
+    "k": 74,
+    "n": 1212,
+    "rate": 0.0611,
+    "se": 0.0069,
+    "ci_low": 0.0489,
+    "ci_high": 0.076,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "story_dodge_opener": {
+    "k": 57,
+    "n": 1212,
+    "rate": 0.047,
+    "se": 0.0061,
+    "ci_low": 0.0365,
+    "ci_high": 0.0604,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "p1_verdict": "below",
+   "superset_check": {
+    "file": "experiments\\chat\\_quality\\chat-v3d-aligned.json",
+    "checked": 48,
+    "status": "identical"
+   },
+   "seconds": 1278.7
+  },
+  {
+   "arm": "chat-v4a-short",
+   "step": 14000,
+   "seeds": 101,
+   "n_candidates": 16,
+   "row": {
+    "n": 1,
+    "lambda": 0.0
+   },
+   "story_dodge": {
+    "k": 210,
+    "n": 1212,
+    "rate": 0.1733,
+    "se": 0.0109,
+    "ci_low": 0.153,
+    "ci_high": 0.1956,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "story_dodge_opener": {
+    "k": 182,
+    "n": 1212,
+    "rate": 0.1502,
+    "se": 0.0103,
+    "ci_low": 0.1312,
+    "ci_high": 0.1714,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "p1_verdict": "above",
+   "superset_check": {
+    "file": "experiments\\chat\\_quality\\chat-v4a-short.json",
+    "checked": 48,
+    "status": "identical"
+   },
+   "seconds": 1274.0
+  },
+  {
+   "arm": "chat-v4b-balance",
+   "step": 14000,
+   "seeds": 101,
+   "n_candidates": 16,
+   "row": {
+    "n": 1,
+    "lambda": 0.0
+   },
+   "story_dodge": {
+    "k": 158,
+    "n": 1212,
+    "rate": 0.1304,
+    "se": 0.0097,
+    "ci_low": 0.1126,
+    "ci_high": 0.1505,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "story_dodge_opener": {
+    "k": 138,
+    "n": 1212,
+    "rate": 0.1139,
+    "se": 0.0091,
+    "ci_low": 0.0972,
+    "ci_high": 0.133,
+    "lattice": 0.00083,
+    "z": 1.959963984540054
+   },
+   "p1_verdict": "unresolved",
+   "superset_check": {
+    "file": "experiments\\chat\\_quality\\chat-v4b-balance.json",
+    "checked": 48,
+    "status": "identical"
+   },
+   "seconds": 1245.8
+  }
+ ]
+}
