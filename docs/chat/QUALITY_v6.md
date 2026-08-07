@@ -69,3 +69,38 @@ boundary case specifically (`chat-v5a-short300` vs. its own pre-registered
 threshold, not vs. another arm) — that is Phase 4's resample, run at 301 seeds
 because 20-and 48-draw samples are visibly too small to resolve differences
 this size, as this section's own numbers now show directly.
+
+---
+
+## 2. The from-scratch run: `chat-v6-scratch`
+
+*(filled in once the run completes or is stopped by its budget — §2 below is a
+placeholder committed now so the section order is fixed in advance.)*
+
+## 3. P1: does `story_dodge` actually clear 0.125?
+
+*(filled in after the 301-seed resample, `scripts/chat/story_dodge_resample.py`,
+completes — see `docs/chat/CONVENTIONS.md` §5 for what was pre-committed.)*
+
+## 4. The instruction-weight ladder: `chat-v6-inst-a`, `chat-v6-inst-b`
+
+*(filled in after both arms train and score — predictions in
+`PREDICTION_v6.md` §4.)*
+
+## 5. Prediction scorecard
+
+*(P0, P1a, P1b scored exactly as `PREDICTION_v6.md` states them — CORRECT /
+FAILED / UNRESOLVED, no post-hoc rewording, per `docs/chat/CONVENTIONS.md` §4
+rule 5: a near-miss is still a miss.)*
+
+## 6. What ships
+
+*(the `SHIPPED` decision, restated with the rule that produced it.)*
+
+## 7. What this round leaves open
+
+*(named explicitly, not silently dropped: `bot_loss_weight`/`align_frac`
+isolation; the two `story_dodge` suspects — ending-less truncation and the
+"short"/"little" phrasing bias; `spread_slow_poles` A/B, still flagged
+research-side-only; cross-turn factual memory, architecturally out of reach at
+this model size.)*
