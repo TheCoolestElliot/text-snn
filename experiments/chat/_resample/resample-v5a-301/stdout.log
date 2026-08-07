@@ -1,0 +1,16 @@
+
+=== launch 2026-08-07T04:05:05 === C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe -u C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\story_dodge_resample.py --seeds 301 --arms chat-v5a-short300 --out experiments/chat/_quality/story_dodge_resample_v5a.json
+# story_dodge resample: 3612 draws per arm (was 48), lattice 0.00028
+
+## chat-v5a-short300  (step 14000)
+   12 probes x 301 seeds x 16 candidates = 3612 draws of story_dodge
+   superset check: 48 committed draws reproduced identical
+   story_dodge  0.1035  = 374/3612  95% CI [0.0940, 0.1139]  lattice 0.00028
+   opener only  0.0756  = 273/3612  95% CI [0.0674, 0.0847]
+   vs P1's 0.125: below   (65.5 min)
+
+## summary, at the pinned n=1 lambda=0 row
+  arm                     story_dodge             95% CI    opener   vs 0.125
+  chat-v5a-short300       0.1035  374/3612 [0.0940, 0.1139]    0.0756      below
+
+wrote experiments\chat\_quality\story_dodge_resample_v5a.json

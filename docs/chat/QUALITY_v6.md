@@ -124,10 +124,39 @@ pre-registered rule, this is not a comparison that needed the unresolved-margin
 clause invoked; the point estimate itself did not clear the bar. Committed as
 a plain negative result, matching two of this project's last three rounds.
 
-## 3. P1: does `story_dodge` actually clear 0.125?
+## 3. P1: does `story_dodge` actually clear 0.125? — RESOLVED, below
 
-*(filled in after the 301-seed resample, `scripts/chat/story_dodge_resample.py`,
-completes — see `docs/chat/CONVENTIONS.md` §5 for what was pre-committed.)*
+`docs/chat/PREDICTION_v5.md` P1 asked whether `chat-v5a-short300`'s
+`story_dodge` comes in below 0.125. At the committed 48 draws it measured
+**exactly** 0.1250 — a lattice point the metric could not miss narrowly — and
+`QUALITY_v5.md` §4.4 could only report UNRESOLVED. `docs/chat/CONVENTIONS.md`
+§5 pre-committed the fix before this round's numbers existed: resample at 301
+seeds (odd, so the denominator 3,612 is off the lattice), same checkpoint,
+same frozen battery, same pinned `n=1, λ=0` row, no retraining.
+
+**Superset check passed**: all 48 committed draws reproduced character for
+character, so this is confirmably a superset of `QUALITY_v5.md`'s measurement,
+not a second, differently-seeded one that happens to be nearby.
+
+**Result:** `story_dodge` = **0.1035** (374/3612), **95 % CI [0.0940, 0.1139]**
+— the entire interval sits below 0.125. `resolves_against(374, 3612, 0.125)`
+→ **`below`**. Opener-only branch (length-independent):
+0.0756 (273/3612), 95 % CI [0.0674, 0.0847].
+
+**P1: RESOLVED, below — CORRECT**, after two rounds unresolved. Took 65.5
+minutes on the GPU, no retraining. `docs/chat/CONVENTIONS.md`'s own thesis
+(the 2026-08-06 unresolved verdict was a resolution failure, not a fact about
+the model) is now confirmed on the exact case it was written to fix, not just
+argued in the abstract. Written to
+`experiments/chat/_quality/story_dodge_resample_v5a.json`.
+
+**The three context arms** (`chat-v3d-aligned`, `chat-v4a-short`,
+`chat-v4b-balance`, 101 seeds each, ≈1,212 draws, not tested against a
+threshold — reported alongside for reference) are resampled separately; see
+below once that run completes.
+
+*(context-arm numbers appended here once
+`experiments/chat/_resample/resample-context-101/stdout.log` finishes.)*
 
 ## 4. The instruction-weight ladder: `chat-v6-inst-a`, `chat-v6-inst-b`
 

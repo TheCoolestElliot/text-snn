@@ -1,0 +1,22 @@
+{
+  "pid": 16020,
+  "command": [
+    "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+    "-u",
+    "C:\\Elliot's Stuff\\SNN\\Text SNN\\scripts\\chat\\story_dodge_resample.py",
+    "--seeds",
+    "301",
+    "--arms",
+    "chat-v5a-short300",
+    "--out",
+    "experiments/chat/_quality/story_dodge_resample_v5a.json"
+  ],
+  "cwd": "C:\\Elliot's Stuff\\SNN\\Text SNN",
+  "run_name": "resample-v5a-301",
+  "run_name_generated": false,
+  "out_dir": "experiments/chat/_resample",
+  "log": "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\_resample\\resample-v5a-301\\stdout.log",
+  "started": "2026-08-07T04:05:05-04:00",
+  "started_unix": 1786089905.4935727,
+  "detached": true
+}
