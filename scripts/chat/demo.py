@@ -77,7 +77,10 @@ def main(argv: list[str] | None = None) -> int:
                    help="draw N replies per turn and keep the most on-topic; "
                         "1 (the default here) is the plain sampler, so an old "
                         "transcript stays comparable with a new one")
-    p.add_argument("--rerank-lambda", type=float, default=1.0)
+    p.add_argument("--rerank-lambda", type=float, default=0.6,
+                   help="MMI penalty against the null-prompt reply; 0.6 is the "
+                        "measured, shipped value (QUALITY.md §5) -- 1.0 clears "
+                        "the fluency floor and produces word-salad-like text")
     p.add_argument("--out", default=None, help="also write the transcript here")
     args = p.parse_args(argv)
 
