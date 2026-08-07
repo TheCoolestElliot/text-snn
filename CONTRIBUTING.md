@@ -47,6 +47,16 @@ decision threshold. Append results. **Never rewrite the hypothesis.**
 * **Negative results and falsified predictions stay, prominently.**
 * **Report a near-miss as a miss.** `EXP_008`'s W3 failed at 49.7 % against a
   50 % bar. The near-ness is worth discussing; the verdict is not negotiable.
+* **A rate compared against a threshold carries an interval, and its
+  denominator.** Write `0.1250 (6/48), 95 % CI [0.059, 0.247]`, not `0.125`. The
+  denominator states the metric's *resolution* and the interval states whether
+  the comparison was decided at all — `PREDICTION_v5.md`'s P1 was placed at
+  exactly 6/48, a lattice point the measurement could hit but not miss, and its
+  interval was four times wider than every gap the metric was being used to
+  rank. **Never place a threshold on a value the metric can land on exactly.**
+  `docs/chat/CONVENTIONS.md` is the standing rule and
+  `snnchat.quality.rate_ci` / `resolves_against` are the implementation;
+  `unresolved` is a verdict, not a failure to report one.
 * **A bar is reported as it fired.** If a pre-registered rule returns an unhelpful
   verdict, report the verdict and *refer* the corrected rule to the next phase.
   Do not repair it retroactively.

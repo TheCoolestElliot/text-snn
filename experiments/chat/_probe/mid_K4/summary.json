@@ -1,0 +1,45 @@
+{
+  "run_name": "_probe/mid_K4",
+  "steps": 1663,
+  "params": 4417637,
+  "wall_clock_s": 306.17,
+  "peak_vram_gib": 3.924,
+  "val": {
+    "soda": 1.6473732481538932,
+    "tinystories": 1.556820891226812,
+    "weighted": 1.6047603743058552
+  },
+  "description": {
+    "params": 4417637,
+    "d_model": 1024,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}

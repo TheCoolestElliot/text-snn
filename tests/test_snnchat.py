@@ -1270,3 +1270,137 @@ def test_the_ladder_rejects_a_length_it_cannot_apply(tiny_model):
     with pytest.raises(ValueError):
         sample_candidates(tiny_model, logits, state, SamplingParams(max_new=4), 4,
                           temperatures=[0.8, 0.9])
+
+
+# --------------------------------------------------------------------------
+# reporting a rate against a threshold  (docs/chat/CONVENTIONS.md)
+# --------------------------------------------------------------------------
+
+
+def test_wilson_brackets_the_point_estimate_and_stays_in_the_unit_interval():
+    from snnchat.quality import wilson_interval
+
+    for k, n in [(0, 48), (1, 48), (6, 48), (47, 48), (48, 48), (151, 1212)]:
+        lo, hi = wilson_interval(k, n)
+        assert 0.0 <= lo <= k / n <= hi <= 1.0, (k, n, lo, hi)
+
+
+def test_wilson_does_not_collapse_at_the_boundaries():
+    """The normal approximation gives a zero-width interval at k=0, which is the
+    specific failure this interval was chosen to avoid."""
+    from snnchat.quality import wilson_interval
+
+    lo, hi = wilson_interval(0, 48)
+    assert lo == 0.0 and hi > 0.05
+    lo, hi = wilson_interval(48, 48)
+    assert hi == 1.0 and lo < 0.95
+
+
+def test_the_interval_narrows_as_the_denominator_grows():
+    from snnchat.quality import wilson_interval
+
+    widths = []
+    for mult in (1, 5, 25):
+        lo, hi = wilson_interval(6 * mult, 48 * mult)
+        widths.append(hi - lo)
+    assert widths == sorted(widths, reverse=True)
+    assert widths[-1] < widths[0] / 4
+
+
+def test_no_draws_is_no_information_rather_than_a_point_estimate():
+    from snnchat.quality import wilson_interval
+
+    assert wilson_interval(0, 0) == (0.0, 1.0)
+
+
+def test_rate_ci_reports_the_lattice_the_metric_actually_lives_on():
+    """The denominator and its spacing are the part `PREDICTION_v5.md` P1 needed
+    and did not have: 0.125 is exactly 6/48, so at 48 draws the threshold could
+    be hit but not missed."""
+    from snnchat.quality import rate_ci
+
+    r = rate_ci(6, 48)
+    assert (r["k"], r["n"], r["rate"]) == (6, 48, 0.125)
+    assert r["lattice"] == pytest.approx(1 / 48, abs=1e-5)
+    assert r["rate"] == pytest.approx(6 * r["lattice"], abs=1e-4)
+    # and the interval it was being read without
+    assert r["ci_low"] < 0.083 and r["ci_high"] > 0.167
+
+
+def test_unresolved_is_a_verdict_and_a_point_estimate_alone_cannot_reach_it():
+    from snnchat.quality import resolves_against
+
+    # the v5 measurement, at the sample size it was actually taken at
+    assert resolves_against(6, 48, 0.125) == "unresolved"
+    # the same RATE at 25x the draws still straddles it -- the threshold sits
+    # too close to the estimate for this metric to decide, at any n it can afford
+    assert resolves_against(150, 1200, 0.125) == "unresolved"
+    # a rate far enough away resolves at the small sample
+    assert resolves_against(1, 48, 0.125) == "below"
+    assert resolves_against(24, 48, 0.125) == "above"
+
+
+def test_an_even_seed_count_leaves_the_threshold_on_the_lattice():
+    """The rule `docs/chat/CONVENTIONS.md` §5 turns on: `story_dodge`'s
+    denominator is 12*seeds, which is divisible by 8 -- and so hits 0.125
+    exactly -- if and only if the seed count is even. However large it is."""
+    for seeds in (4, 8, 100, 500):
+        assert (12 * seeds) % 8 == 0, seeds
+        assert (0.125 * 12 * seeds).is_integer()
+    for seeds in (101, 301, 401):
+        assert (12 * seeds) % 8 != 0, seeds
+        assert not (0.125 * 12 * seeds).is_integer()
+
+
+def test_the_opener_branch_is_the_length_independent_half_of_is_story():
+    from snnchat.quality import _is_story, _is_story_opener
+
+    opener = "Once upon a time there was a cat."
+    assert _is_story_opener(opener) and _is_story(opener)
+
+    named = "The answer is a boy named Tim who liked to play. " + "x " * 30
+    assert len(named) > 80
+    assert _is_story(named) and not _is_story_opener(named)
+
+    # the branch that fires on length: the SAME text under 80 characters does not
+    short_named = "a boy named Tim"
+    assert not _is_story(short_named) and not _is_story_opener(short_named)
+
+
+def test_probe_index_is_what_makes_a_probe_subset_the_same_experiment(tiny_model):
+    """`collect` seeds a probe by its POSITION, so drawing 12 of 37 probes is a
+    different experiment unless the index is pinned. This is the property
+    `story_dodge_resample.py`'s superset gate rests on."""
+    from snnchat.quality import PROBES, collect
+
+    idx = tuple(i for i, p in enumerate(PROBES) if p.kind in ("list", "fact"))[:2]
+    sub = tuple(PROBES[i] for i in idx)
+    params = SamplingParams(max_new=16)
+
+    full = collect(tiny_model, probes=PROBES[:max(idx) + 1], seeds=(0,), n=2,
+                   params=params, progress=False)
+    pinned = collect(tiny_model, probes=sub, seeds=(0,), n=2, params=params,
+                     progress=False, probe_index=idx)
+    naive = collect(tiny_model, probes=sub, seeds=(0,), n=2, params=params,
+                    progress=False)
+
+    want = {d["prompt"]: d["texts"] for d in full["draws"]}
+    assert all(d["texts"] == want[d["prompt"]] for d in pinned["draws"])
+    # and the unpinned subset is NOT the same draw -- if this ever passes, the
+    # gate in story_dodge_resample.py has stopped constraining anything
+    assert any(d["texts"] != want[d["prompt"]] for d in naive["draws"])
+
+
+def test_probe_index_defaults_to_the_original_behaviour(tiny_model):
+    from snnchat.quality import PROBES, collect
+
+    params = SamplingParams(max_new=16)
+    a = collect(tiny_model, probes=PROBES[:3], seeds=(0,), n=2, params=params,
+                progress=False)
+    b = collect(tiny_model, probes=PROBES[:3], seeds=(0,), n=2, params=params,
+                progress=False, probe_index=(0, 1, 2))
+    assert [d["texts"] for d in a["draws"]] == [d["texts"] for d in b["draws"]]
+
+    with pytest.raises(ValueError):
+        collect(tiny_model, probes=PROBES[:3], seeds=(0,), n=2, params=params,
+                progress=False, probe_index=(0, 1))

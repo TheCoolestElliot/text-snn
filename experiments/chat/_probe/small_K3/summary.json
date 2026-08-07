@@ -1,0 +1,39 @@
+{
+  "run_name": "_probe/small_K3",
+  "steps": 2140,
+  "params": 1933925,
+  "wall_clock_s": 304.19,
+  "peak_vram_gib": 3.762,
+  "val": {
+    "soda": 1.6283949600967014,
+    "tinystories": 1.5273003968331607,
+    "weighted": 1.5808210479726823
+  },
+  "description": {
+    "params": 1933925,
+    "d_model": 768,
+    "n_layers": 3,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}
