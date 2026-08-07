@@ -223,22 +223,100 @@ arm, and belongs in §7 as a concrete next step: the standard 4-seed
 in general, the same way it was for `story_dodge` before `PREDICTION_v5.md`'s
 P1 forced the issue.
 
-*(`chat-v6-inst-b` appended once it trains and scores.)*
+**`chat-v6-inst-b` result** (same shape, story weight still pinned at 0.40,
+instruction pushed further to 0.45):
+
+| arm | instruction | `topic` | `list` | `list_strict` | `social` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `chat-v6-inst-a` | 0.36 | 0.0938 (6/64) | 0.2167 | 0.0500 | 1.0000 (20/20) |
+| `chat-v6-inst-b` | **0.45** | 0.0938 (6/64) | **0.1000** | **0.0167** | **0.9000 (18/20)** |
+
+**P1b answer: plateau/reverse, not a continued rise.** `topic` sat exactly flat
+(6/64 both arms); `list_strict` fell back from 0.050 to 0.017, below even
+`chat-v4a-short`'s 0.033; `social` dropped to 0.900, matching `chat-v4b-balance`'s
+cost exactly. None of the `chat-v6-inst-a` vs. `chat-v6-inst-b` differences
+resolve either (`|z| < 1.5` on `topic`/`list`/`social`), but the *direction* —
+every one of them moved the wrong way at once, at the same story weight, from
+one clean step up the instruction axis — is consistent with a real cost rather
+than noise landing badly, and mirrors this project's other closed lever
+(window-coverage dose, `snn-chat-window-dose-ceiling`): pushing an axis 25%
+further (0.36→0.45, a smaller step than dose's 3.4×) was enough to reverse the
+gain it was chasing. **Instruction weight around 0.36, on a corpus that also
+holds story weight at 0.40, is now this project's best-supported point on this
+axis** — not because 0.45 is disproven (the reversal is itself unresolved),
+but because it is the only point with anything pointing toward it rather than
+away. `chat-v6-inst-b`'s reply quality also degraded qualitatively: its
+`hello` demo reply ("Hello there, what can I add it for a natural language?")
+reads less coherent than `chat-v6-inst-a`'s ("Hi there. What can I do for you?"),
+consistent with the `social` drop. Prompt dependence (no sampler): 0.0670,
+between `chat-v3d-aligned`'s 0.0620 and `chat-v6-scratch`'s 0.0729.
 
 ## 5. Prediction scorecard
 
-*(P0, P1a, P1b scored exactly as `PREDICTION_v6.md` states them — CORRECT /
-FAILED / UNRESOLVED, no post-hoc rewording, per `docs/chat/CONVENTIONS.md` §4
-rule 5: a near-miss is still a miss.)*
+| # | statement | verdict |
+| --- | --- | --- |
+| P0 | fresh-init `chat-v6-scratch` beats `chat-v3d-aligned`'s headline (>0.2969) with a resolved margin | **FAILS** — 0.2679, below the threshold outright (§2) |
+| P1 | `chat-v5a-short300`'s `story_dodge` comes in below 0.125 | **CORRECT, RESOLVED** — 0.1035 (374/3612), 95% CI [0.0940, 0.1139], entirely below (§3) |
+| P1a | attribution rule for `chat-v6-inst-a`'s `list_strict` gain (nearer `v4a`'s topic or `v4b`'s) | **DEFECT — not applicable as written.** Reference values (0.0723/0.0645) do not match the committed data (both 0.0469); reported on the plain data instead (§4) |
+| P1b | does `list_strict` keep rising (0.23→0.36→0.45) or plateau/reverse | **ANSWERED: reverses.** Both pre-registered outcomes counted as a result; this is the one that happened (§4) |
+
+**Scorecard: 1 resolved-correct (P1), 1 clean fail (P0), 1 pre-registration
+defect caught before scoring (P1a), 1 answered-as-designed (P1b).** No
+prediction was silently reworded after its number existed; P1a's defect is
+reported as a defect, not quietly patched.
 
 ## 6. What ships
 
-*(the `SHIPPED` decision, restated with the rule that produced it.)*
+**`SHIPPED` is unchanged: `chat-v3d-aligned/ckpt_best.pt`.** Every new arm
+this round was checked against the incumbent's headline (0.2969) with the same
+propagated-SE method:
+
+| arm | headline | vs. incumbent | verdict |
+| --- | ---: | ---: | :-- |
+| `chat-v6-scratch` | 0.2679 | z = −0.738 | unresolved, and below threshold regardless (§2) |
+| `chat-v6-inst-a` | 0.3101 | z = +0.294 | unresolved — highest point estimate of the round, not a resolved win |
+| `chat-v6-inst-b` | 0.2533 | z = −1.035 | unresolved |
+
+None of the ladder arms had a formal pre-registered ship threshold the way
+`chat-v6-scratch` did (§4 was framed as attribution, not a ship candidate) —
+this table applies the standing rule (§0: an unresolved comparison does not
+displace an incumbent) uniformly anyway, rather than letting an arm's numeric
+rank stand in for a decision it was never tested against. `chat-v6-inst-a`'s
+0.3101 is the best point estimate any arm has ever scored at `n=1, λ=0` in
+this project's history — worth a follow-up round with a resample behind it,
+not a promotion on the strength of a single unresolved measurement.
 
 ## 7. What this round leaves open
 
-*(named explicitly, not silently dropped: `bot_loss_weight`/`align_frac`
-isolation; the two `story_dodge` suspects — ending-less truncation and the
-"short"/"little" phrasing bias; `spread_slow_poles` A/B, still flagged
-research-side-only; cross-turn factual memory, architecturally out of reach at
-this model size.)*
+- **The standard 4-seed `quality.py` battery is underpowered for
+  `topic`/`list`/headline comparisons, not just for `story_dodge`.** Every
+  such comparison in this document — §1, §2, and §4 — came back `unresolved`;
+  the one comparison that *did* resolve is the one this round spent a
+  301-seed resample on. A generic resample tool for `topic`/`list` (parallel
+  to `story_dodge_resample.py`, currently hard-coded to the `list`+`fact`
+  kinds) does not exist yet and would be the highest-leverage infrastructure
+  investment for a future round, ahead of any specific new arm.
+- **`chat-v6-inst-a`'s ~0.36 instruction weight is this project's
+  best-supported point on that axis**, not proven superior to the incumbent,
+  but the only new arm this round with more evidence pointing toward it than
+  away. A resampled, properly-powered head-to-head against `chat-v3d-aligned`
+  is the natural next step.
+- **`bot_loss_weight`/`align_frac` isolation** — still always varied together
+  since `chat-v3b`, never attempted this round (named in `PREDICTION_v6.md`
+  §4 as out of scope, priced above a plain 40-minute arm).
+- **The two named `story_dodge` suspects** — ending-less truncation, and the
+  "short"/"little" phrasing bias — still untested. Now that `story_dodge` can
+  actually be measured with a resample, these are cheaper to chase than they
+  were: the resample tooling exists and works.
+- **`spread_slow_poles` A/B** (log-uniform vs. committed uniform `beta_s`
+  init, matched seeds) remains flagged research-side-only, per `README.md`'s
+  own boundary — not acted on from the chat side this round either.
+- **Cross-turn factual memory / recall** — architecturally out of reach at
+  4.4M parameters and a ~47-character neuron horizon. Nothing tried in five
+  rounds has moved it and nothing at this scale will.
+- **A stretch arm was deliberately not attempted this round.** The originally
+  planned candidate (a lowered `RAW_FRACTION` for `story_dodge` via
+  `snnchat.shortform`) was never pre-registered with its own resample budgeted,
+  and improvising an unregistered experiment in the session's closing hours
+  would trade this project's core discipline for one more data point. Named
+  here as a next-round candidate instead.
