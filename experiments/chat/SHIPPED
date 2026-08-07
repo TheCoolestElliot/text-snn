@@ -7,3 +7,14 @@ chat-v3d-aligned/ckpt_best.pt   # 2026-08-06 responsiveness round; see docs/chat
 # closing the length confound QUALITY_v4.md §4.2 left open. It beats this
 # checkpoint on topic propensity (0.0957 vs 0.0908, inside the bar) and loses the
 # pre-registered headline 0.2779 vs 0.2969 on `list`. See docs/chat/QUALITY_v5.md.
+# Still the ship after session 6 (2026-08-07): chat-v6-scratch, a fresh-init
+# 84,000-step run on this checkpoint's exact recipe (no --init-from), landed at
+# headline 0.2679 -- below 0.2969, not just unresolved against it -- so the
+# stale-pretraining hypothesis QUALITY.md §6 raised is not supported. Its
+# no-sampler prompt-dependence WAS higher (0.0729 vs 0.0620), which does not
+# move this decision but is worth a future round's attention. Also, a Wilson/SE
+# re-read of THIS checkpoint vs chat-v5a-short300 above found that gap
+# unresolved (z=-0.479, not the clean win the bare fractions implied) -- see
+# docs/chat/QUALITY_v6.md §1. This checkpoint remains shipped because an
+# unresolved comparison does not displace an incumbent, not because either
+# round newly confirmed it superior.

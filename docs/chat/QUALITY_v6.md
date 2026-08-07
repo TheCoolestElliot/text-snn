@@ -72,10 +72,57 @@ this size, as this section's own numbers now show directly.
 
 ---
 
-## 2. The from-scratch run: `chat-v6-scratch`
+## 2. The from-scratch run: `chat-v6-scratch` — P0 FAILS
 
-*(filled in once the run completes or is stopped by its budget — §2 below is a
-placeholder committed now so the section order is fixed in advance.)*
+**`chat-v6-scratch` completed its full 84,000-step cosine schedule** (it did
+not need its `--budget-minutes 240` ceiling — `wall_clock_s = 14322.3`,
+≈3.98 h, just under budget), fresh-init, on `chat-v3d-aligned`'s exact recipe
+(`PREDICTION_v6.md` §0/§2): 4,417,637 params (unchanged architecture), peak
+VRAM 3.831 GiB, weighted held-out val bpc 1.2399 under its own training
+mixture (not comparable to `chat-v2-anneal`'s 1.1795 — different mixture, per
+`snn-chat-subsystem`'s standing rule).
+
+**Result at the pinned `n=1, λ=0` row**, same method as §1:
+
+| component | `chat-v3d-aligned` (shipped) | `chat-v6-scratch` (fresh-init) | diff | SE | z | verdict |
+| --- | ---: | ---: | ---: | ---: | ---: | :-- |
+| `topic` | 0.0938 (6/64) | 0.1094 (7/64) | +0.0156 | 0.0533 | 0.292 | unresolved |
+| `list` | 0.1667 (n=20), se 0.0820 | 0.0500 (n=20), se 0.0500 | −0.1167 | 0.0960 | −1.215 | unresolved |
+| `social` | 1.0000 (20/20) | 1.0000 (20/20) | 0.0000 | — | — | tied at ceiling |
+| `fallback` | 0.0000 (0/112) | 0.0089 (1/112) | +0.0089 | 0.0089 | 1.000 | unresolved |
+| **headline** | **0.2969** | **0.2679** | **−0.0290** | **0.0393** | **−0.738** | **unresolved** |
+
+**Verdict on P0: FAILS**, cleanly, on the pre-registered threshold —
+`PREDICTION_v6.md` §3 required headline > 0.2969 *and* a resolved margin;
+`chat-v6-scratch`'s point estimate (0.2679) does not clear 0.2969 at all, so
+this is a miss on the first, simpler condition, not one that needed the
+significance machinery to decide (`docs/chat/CONVENTIONS.md` §4 rule 5: a
+near-miss is still a miss, and this is not even a near-miss on the point
+estimate — though the *margin* against the incumbent is itself statistically
+unresolved, so "worse" is not established either, only "not better"). **The
+hypothesis that stale pre-training was suppressing quality is not supported by
+this experiment.** A fresh 84,000-step run on the identical corpus, mixture,
+and alignment settings a 14,000-step anneal was already using lands at a
+headline statistically indistinguishable from the anneal's, and if anything
+lower on point estimate, mainly on `list` (0.050 vs 0.167 — but both are 1 or
+3 hits out of 20 draws, and neither number resolves against the other).
+
+**One measurement moved in the encouraging direction, and it is not in the
+headline.** Prompt dependence (`prompt_dependence`, no sampler, no lexicon —
+the "number to believe" per `scripts/chat/quality.py`'s own docstring) is
+**0.0729 for `chat-v6-scratch` against 0.0620 for `chat-v3d-aligned`** — higher,
+in the direction that matters, on a metric immune to decoder tuning. This is
+one arm, not a trend, and it does not move the ship decision (P0's threshold
+was fixed on the sampler-based headline, not on this number), but it is worth
+naming: the fresh-init run's replies depend somewhat *more* on their own
+prompt than the anneal's do, even though the sampler-scored battery does not
+show it. `closed_rate` (0.480 vs 0.493) and `story_dodge` (0.0833, identical
+to four decimal places on both arms) show no difference at all.
+
+**Decision: `SHIPPED` is unchanged — stays `chat-v3d-aligned`.** Per the
+pre-registered rule, this is not a comparison that needed the unresolved-margin
+clause invoked; the point estimate itself did not clear the bar. Committed as
+a plain negative result, matching two of this project's last three rounds.
 
 ## 3. P1: does `story_dodge` actually clear 0.125?
 

@@ -1,0 +1,50 @@
+{
+  "run_name": "chat-v6-scratch",
+  "steps": 84000,
+  "params": 4417637,
+  "wall_clock_s": 14322.32,
+  "peak_vram_gib": 3.831,
+  "val": {
+    "alpaca": 1.7617068638529432,
+    "dolly": 2.003875195021645,
+    "oasst1": 1.9252787261063262,
+    "persona": 0.26487776119269807,
+    "soda": 1.2887885090236122,
+    "stories_topic": 1.0961958614406342,
+    "tinystories": 1.105863298616139,
+    "weighted": 1.2399480799532112
+  },
+  "description": {
+    "params": 4417637,
+    "d_model": 1024,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}
