@@ -98,3 +98,75 @@ about the decoder, and it cannot resolve the ship decision (mirrors
 *(written during Phase 2, while `chat-v6-scratch` trains — appended below,
 not backdated into §1–§3, which were committed before `chat-v6-scratch`
 launched)*
+
+`QUALITY_v5.md`'s own closing recommendation (echoed independently across two
+sessions) was: **"instruction following, not topicality, is what the next
+round should be aimed at."** The only evidence for it is two points —
+`chat-v4a-short` (`list_strict` 0.033) and `chat-v4b-balance` (`list_strict`
+0.083) — and they are not two points on an instruction-weight curve. Read
+directly from the committed `config.json` files (not from a prose recap):
+
+| arm | `stories_short` | `alpaca` | `dolly` | `oasst1` | instruction (alpaca+dolly+oasst1) | `soda` | `tinystories` | `persona` |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `chat-v4a-short` | 0.40 | 0.15 | 0.06 | 0.02 | **0.23** | 0.20 | 0.09 | 0.08 |
+| `chat-v4b-balance` | 0.26 | 0.26 | 0.08 | 0.02 | **0.36** | 0.21 | 0.08 | 0.09 |
+
+`v4b` cut story weight by a third (0.40 → 0.26) **at the same time** it raised
+instruction weight (0.23 → 0.36). `list_strict`'s gain cannot be attributed to
+either alone from these two arms — this is exactly the trap `QUALITY_v5.md`'s
+own precedent (story weight was eliminated as `story_dodge`'s cause by an
+arm that changed *only* story weight) warns against skipping.
+
+### Arm `chat-v6-inst-a` — de-confound `chat-v4b-balance` (must-do)
+
+Holds `stories_short` at `v4a`'s 0.40 and `tinystories`/`persona` at `v4a`'s
+values, raises instruction sources to `v4b`'s **exact absolute weights**
+(`alpaca=0.26, dolly=0.08, oasst1=0.02`), and lets `soda` alone absorb the
+difference (0.20 → 0.07) since it is dialogue register, not implicated in
+either the story-weight or instruction-weight hypothesis:
+
+```
+--mix stories_short=0.40 soda=0.07 alpaca=0.26 tinystories=0.09 persona=0.08 dolly=0.08 oasst1=0.02
+```
+
+(sums to 1.00 — to be re-verified by `train.py --dry-run` immediately before
+launch, per the standing rule.) Otherwise identical to `chat-v4a-short`'s
+recipe: `--init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --no-resume
+--max-steps 14000 --batch-size 160 --seq-len 256 --lr 5e-4
+--bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024
+--budget-minutes 46`.
+
+**Prediction P1a:** if `list_strict` moves toward `v4b`'s 0.083 while topic
+propensity stays nearer `v4a`'s 0.0723 than `v4b`'s 0.0645, credit shifts from
+"the story cut" to "instruction weight" as `list_strict`'s driver — the
+opposite pattern (topic moves, `list_strict` doesn't) would instead implicate
+the story cut, and a null on both would mean neither isolated knob reproduces
+`v4b`'s effect, i.e. the effect was the *combination*, not the sum of parts.
+All three outcomes are reportable; none is a failure to plan around.
+
+### Arm `chat-v6-inst-b` — a third point on the now-isolated curve (should-do)
+
+Same shape, `stories_short` still pinned at 0.40, instruction pushed further:
+
+```
+--mix stories_short=0.40 soda=0.03 alpaca=0.32 tinystories=0.07 persona=0.05 dolly=0.10 oasst1=0.03
+```
+
+(instruction = 0.45; sums to 1.00, re-verify by dry-run before launch.)
+
+**Prediction P1b:** does `list_strict` continue rising roughly monotonically
+across 0.23 → 0.36 → 0.45 (a real curve, the first this project has had on
+this axis), or plateau/reverse — mirroring how the window-coverage dose lever
+(`QUALITY_v4.md`, `snn-chat-window-dose-ceiling`) was closed after a 3.4×
+step moved topicality backwards? Either outcome closes the question either as
+"push further" or "this lever is also exhausted"; a plateau is not a null
+result for this arm, it is the answer.
+
+### Deliberately not attempted this session
+
+`bot_loss_weight`/`align_frac` isolation (always varied together since `v3b`)
+and the two named `story_dodge` suspects (ending-less truncation;
+"short"/"little" phrasing bias) each need their own resample to avoid
+inheriting the 48-draw unresolvability problem `CONVENTIONS.md` exists to fix
+— pricing them above a plain 40-minute arm. Named here as next-round
+candidates rather than silently dropped from this round's scope.
