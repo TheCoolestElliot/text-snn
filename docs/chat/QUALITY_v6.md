@@ -1,10 +1,14 @@
 # Chat quality, round 6 — a from-scratch run, the instruction-weight ladder, and closing out P1
 
-**Date:** 2026-08-06
+**Date:** 2026-08-06 – 2026-08-07 (session ran overnight)
 **Author:** Elliot Asher Caudill
-**Status:** IN PROGRESS. This file is written incrementally as each part of the
-round completes; sections below are appended, not edited once landed, mirroring
-`QUALITY_v5.md`'s own treatment of `QUALITY_v4.md`.
+**Status: CLOSED** 2026-08-07. **P1 resolved and correct; P0 fails cleanly;
+P1a is a caught pre-registration defect; P1b answered as designed; the §5
+seed-variance measurement resolved when it was pre-registered as not needing
+to (§8) — the round's most consequential finding.** `SHIPPED` is unchanged:
+`chat-v3d-aligned/ckpt_best.pt`. This file was written incrementally as each
+part of the round completed; sections were appended, not edited once landed,
+mirroring `QUALITY_v5.md`'s own treatment of `QUALITY_v4.md`.
 **Predicts:** `docs/chat/PREDICTION_v6.md` (written before `chat-v6-scratch`
 launches).
 **Does not modify:** `QUALITY.md`, `QUALITY_v4.md`, `QUALITY_v5.md`, or
@@ -276,11 +280,14 @@ between `chat-v3d-aligned`'s 0.0620 and `chat-v6-scratch`'s 0.0729.
 | P1 | `chat-v5a-short300`'s `story_dodge` comes in below 0.125 | **CORRECT, RESOLVED** — 0.1035 (374/3612), 95% CI [0.0940, 0.1139], entirely below (§3) |
 | P1a | attribution rule for `chat-v6-inst-a`'s `list_strict` gain (nearer `v4a`'s topic or `v4b`'s) | **DEFECT — not applicable as written.** Reference values (0.0723/0.0645) do not match the committed data (both 0.0469); reported on the plain data instead (§4) |
 | P1b | does `list_strict` keep rising (0.23→0.36→0.45) or plateau/reverse | **ANSWERED: reverses.** Both pre-registered outcomes counted as a result; this is the one that happened (§4) |
+| §5 (unnumbered — explicitly not a threshold test) | measure training-seed variance via `chat-v6-inst-a-s1` (identical recipe, `--seed 1`) | **MEASURED: 0.099 headline swing, RESOLVED (z=−2.406)** despite every individual component being unresolved (§8) |
 
 **Scorecard: 1 resolved-correct (P1), 1 clean fail (P0), 1 pre-registration
-defect caught before scoring (P1a), 1 answered-as-designed (P1b).** No
-prediction was silently reworded after its number existed; P1a's defect is
-reported as a defect, not quietly patched.
+defect caught before scoring (P1a), 1 answered-as-designed (P1b), 1
+variance measurement that came back resolved when it was explicitly
+pre-registered as not needing to (§8).** No prediction was silently reworded
+after its number existed; P1a's defect is reported as a defect, not quietly
+patched.
 
 ## 6. What ships
 
@@ -337,3 +344,76 @@ not a promotion on the strength of a single unresolved measurement.
   and improvising an unregistered experiment in the session's closing hours
   would trade this project's core discipline for one more data point. Named
   here as a next-round candidate instead.
+
+## 8. Training-seed variance: the headline moves 0.099, and RESOLVES
+
+Pre-registered in `PREDICTION_v6.md` §5, after remaining budget made building
+an underpowered resample tool the wrong move (§7, advisor-checked power
+calculation). Not a ship test — `chat-v6-inst-a-s1` is `chat-v6-inst-a`'s
+identical recipe at `--seed 1` instead of `0`; both initialise from the same
+`chat-v2-anneal` checkpoint, so only training batch order differs.
+
+| component | `chat-v6-inst-a` (seed 0) | `chat-v6-inst-a-s1` (seed 1) | diff | SE | z | verdict |
+| --- | ---: | ---: | ---: | ---: | ---: | :-- |
+| `topic` | 0.0938 (6/64) | 0.0625 (4/64) | −0.0313 | 0.0474 | −0.661 | unresolved |
+| `list` | 0.2167 (n=20) | 0.0500 (n=20) | −0.1667 | 0.0984 | −1.694 | unresolved |
+| `social` | 1.0000 (20/20) | 0.8500 (17/20) | −0.1500 | 0.0798 | −1.880 | unresolved |
+| `fallback` | 0.0089 (1/112) | 0.0268 (3/112) | +0.0179 | 0.0177 | 1.011 | unresolved |
+| **headline** | **0.3101** | **0.2109** | **−0.0992** | **0.0412** | **−2.406** | **RESOLVED — seed 1 lower** |
+
+**Every individual component is unresolved. The headline is not.** All four
+components moved the same direction at once (topic down, list down, social
+down, fallback up — every one costs the headline), and the headline pools
+that correlated shift into a signal none of its parts carries alone. This is
+the mechanism, not a contradiction: §1's independence caveat means the
+propagated SE is an *approximation* of the headline's true variance, not a
+recomputation of a quantity already measured directly — and the headline
+*is* measured directly here, from the same 37-probe draw, the same way every
+other headline in this document was.
+
+**The magnitude is the finding.** A **0.099** swing from changing nothing but
+which batches 14,000 steps of fine-tuning happened to see is larger than
+every arm-vs-arm difference this round measured (§1: 0.019, unresolved; §2:
+0.029, unresolved; §4: 0.013 to 0.044, all unresolved) — **and this is the one
+that resolves.** Two conclusions, both load-bearing for how to read this
+project's history:
+
+1. **`chat-v6-inst-a`'s 0.3101 does not, on its own, support ranking it above
+   `chat-v3d-aligned`'s 0.2969** (§6) — not only because that specific
+   comparison was already unresolved, but because a same-recipe reroll alone
+   can move the headline by more than that gap.
+2. **Every arm comparison in `QUALITY.md` through this document — five
+   rounds, dozens of pairwise reads — was made at `n = 1` training seed per
+   arm**, exactly the limitation `docs/chat/CONVENTIONS.md` §3 states in the
+   abstract ("training-seed variability is not in it at all... two arms
+   trained from different seeds could differ by more than these intervals
+   suggest"). This measurement turns that abstract statement into a concrete
+   number for the first time: **the training-seed contribution to headline
+   variance is large enough, on its own, to resolve against a same-recipe
+   reroll** — meaning a resolved-looking arm-vs-arm gap smaller than ~0.10
+   cannot yet be attributed to the recipe change with confidence, since a
+   same-recipe seed change alone can produce a gap that size. No comparison
+   in this project's history has been re-run at a second seed before this.
+
+**One data point, not a distribution — say that plainly.** `n = 2` seeds
+establishes that seed variance is *nonzero and large*, not what its
+distribution is, whether 0.099 is typical or an outlier, or whether it holds
+at other recipes. Do not treat 0.099 as "the" seed-noise floor for this
+package; treat it as a lower bound on how large that floor can be, established
+once.
+
+**A genuine bonus, not scored**: `chat-v6-inst-a-s1` hit the same
+gradient-norm divergence shape `BUILD_NOTES.md` §9 already flagged (loss
+`nan` at step 4859, six seeds and two arms after the first sighting),
+recovered automatically via the trainer's rollback+seed-bump+halved-LR
+mechanism (`log.jsonl`), and finished its full 14,000 steps regardless. A
+second occurrence on the *same* recipe as a run that did not diverge
+(`chat-v6-inst-a`, seed 0, clean) is a small additional data point that the
+divergence is seed-triggered, consistent with `EXP_009`'s general shape
+(research side) — not chased further here, outside this round's scope.
+
+This changes the round's headline framing, not its `SHIPPED` decision:
+`chat-v3d-aligned` was already the incumbent on an unresolved-does-not-displace
+basis (§6); it still is. What changes is the confidence attached to *every*
+number in this document and its five predecessors — now stated once, plainly,
+rather than left as CONVENTIONS.md's abstract caveat.
