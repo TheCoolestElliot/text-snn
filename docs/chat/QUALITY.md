@@ -385,7 +385,20 @@ per-probe table says what that means:
 | a story about a **dragon / robot / pirate / kite / train / moon / spider / teacher / bicycle** | 0.00 | 0.00 |
 
 Nine of sixteen topics still land at zero for every arm. **The model is more
-likely to be about what you asked; it is still usually not.** The mechanism has
+likely to be about what you asked; it is still usually not.**
+
+> **Correction, 2026-08-08 — appended, not applied, because this is a closed
+> round record.** "Nine" could not be reproduced from any committed arm at any
+> reading row. Recomputing from `experiments/chat/_quality/*.json` at the pinned
+> `n = 1, λ = 0` row: **thirteen** of sixteen score zero for `chat-v2-anneal` and
+> **thirteen** for `chat-v3d-aligned`, and the set that is zero in *both* — which
+> is what "for every arm" would mean — is **eleven**, not nine. Across all
+> twenty-one arms the project has scored, the per-arm count ranges 11–15 and
+> **none is nine**. So this is not, as `TOPIC_DOSE_NOTE.md` §2 supposed, a figure
+> read off an earlier arm's table; it matches no arm. The sentence is left as
+> written because a round record reports what it reported. The two arms' claims
+> above and the conclusion drawn from them are unaffected — the direction and the
+> magnitude of the topic gain are measured elsewhere in this file and stand. The mechanism has
 been identified, the fix has been shown to work in the direction predicted and to
 scale with the dose, and the dose available in a 40-minute anneal is not enough
 to finish the job. Section 6 says what would be.
@@ -482,7 +495,9 @@ makes it correct.
   or decoding changes it.
 * **It does not make the model reliably on topic.** 0.052 to 0.091 is a 75 %
   relative gain and an 91-in-1000 absolute one. Nine of sixteen test topics still
-  land at zero for every arm.
+  land at zero for every arm. *(Corrected 2026-08-08: thirteen per arm, eleven in
+  the intersection, and no arm in the project's history scores nine — see the
+  appended note in §5 above.)*
 * **It cost instruction following.** `chat-v3a-data` reaches the best strict
   `list` score of the round (0.050–0.067); the shipped arm scores **0.000**. A
   mixture that is 40 % stories makes a model that tells stories, and "name three

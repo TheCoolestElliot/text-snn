@@ -20,17 +20,19 @@ mechanisms actually close it?**
 |---|---|
 | Phases 1–3 | complete |
 | Phase 4 | **open** — running record in [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md) |
-| Arms adopted | **1** — the two-compartment neuron |
-| Arms recommended but *not* taken | 2 — the learned per-channel threshold, and the composition |
-| Open decisions | **6 of 8**, all the author's (§8 of the Phase-4 report) |
-| Budget | ~4.6 of ~30 GPU-hours spent |
+| Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
+| Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
+| Open decisions | **5 of 9**, all the author's (§8 of the Phase-4 report) |
+| Budget | ~6.5 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
 
-* **Nothing here is a recommendation to adopt anything.** Three arms have beaten
-  the baseline; one has been adopted. The other two are open decisions and the
-  reports say so in every place they appear.
+* **Nothing here is a recommendation to adopt anything you have not been shown
+  the caveats for.** Three arms have beaten the baseline; two are adopted. The
+  third — the composition — is provisional and the reports say so in every place
+  it appears. The threshold arm's own headline still carries the `W1 fails`
+  caveat until decision #6 is ruled.
 * **The composition result is provisional at n = 2** of a pre-registered 3. One
   seed diverged, and it was **not** replaced — replacing it would have removed a
   failure from the record.

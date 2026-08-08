@@ -84,7 +84,13 @@ from a regex that finds capitalised mid-sentence words — which in TinyStories 
 on "a story about a rabbit", a form it had never once seen. Fixing the corpus and
 the window placement raised the rate at which it mentions your topic by **75 %
 relative** (0.052 → 0.091 over ~1,000 drawn replies). That is a real improvement
-and it is still a small number: nine of sixteen test topics land at zero.
+and it is still a small number: **thirteen of sixteen** test topics score zero
+for the shipped model (4 draws each, `n = 1, λ = 0`, recomputed 2026-08-08 from
+`experiments/chat/_quality/chat-v3d-aligned.json` — this line said "nine" for two
+days and no committed arm supports that figure; see `TOPIC_DOSE_NOTE.md` §2).
+Read thirteen as an upper bound rather than a count of true zeroes: Wilson's
+interval on 0 hits in 4 draws is [0, 0.49], so a rare topic and an impossible one
+are not distinguishable at this resolution.
 
 Told "my name is Elliot" and then asked for the name, it still cannot. Nothing
 here changed that and nothing at this scale will.

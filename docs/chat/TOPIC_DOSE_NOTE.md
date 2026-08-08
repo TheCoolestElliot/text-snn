@@ -102,7 +102,20 @@ this checkpoint exactly — this is a re-read of already-committed numbers,
 not a new draw.)
 
 **13 of 16 are literally 0/4, not the "nine" `README.md` has stood on** —
-that prose figure was reading an earlier, different arm's table. **This
+that prose figure was reading an earlier, different arm's table.
+
+> **Correction, 2026-08-08: that explanation is wrong, and it was a guess.**
+> Every arm with committed draws was re-counted at the `n = 1, λ = 0` row. The
+> per-arm zero count ranges **11 to 15 across all twenty-one arms** and **none is
+> nine**, so "nine" was not read off any arm's table. Nor is it the cross-arm
+> intersection for the round `QUALITY.md` documents: the topics scoring zero in
+> *both* `chat-v2-anneal` and `chat-v3d-aligned` number **eleven**. The figure
+> appears to have been written from recollection rather than from the JSON —
+> which is the failure mode `PREDICTION_v6.md` §5 already named after this
+> project's remembered numbers were wrong twice and the committed data was right
+> both times. This note reproduced that failure in the same breath as reporting
+> it, which is the reason to record the correction here rather than quietly
+> deleting the sentence. **This
 table is NOT a clean confirmation of the dose hypothesis and it would be
 dishonest to present it as one.** `boat`, the second-highest-dose probe,
 is the best-scoring word-topic probe (0.50) — consistent. But `cake`, the
