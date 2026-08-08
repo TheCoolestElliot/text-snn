@@ -49,7 +49,10 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
+from snn.data import _mix64
 from snn.neuron import lif_scan
+from snn.noise import (NOISE_STREAM_SALT, add_background_noise,
+                       fill_background_noise, noise_scale)
 from snn.prescan import threshold_gain, token_shift
 from snn.surrogate import atan_value
 from snn.twocomp import twocomp_scan
@@ -64,6 +67,7 @@ __all__ = [
     "TokenShiftCharLM",
     "LearnedThresholdCharLM",
     "TwoCompThresholdCharLM",
+    "NoisyCharLM",
     "GRUCharLM",
     "build_model",
     "count_params",
@@ -744,6 +748,134 @@ class LearnedThresholdCharLM(_CharLMStack):
 
 
 # ---------------------------------------------------------------------------
+# Arm 8: injected background spike noise, training only (EXP_013)
+# ---------------------------------------------------------------------------
+
+
+class NoisyCharLM(_CharLMStack):
+    """The Phase-2 baseline with zero-mean background spike noise on its current.
+
+    Pre-registered in `experiments/logs/EXP_013_noise_injection.md`. The transform
+    and the reason it is centred live in `snn.noise`; this class is only the
+    wiring, exactly as `TokenShiftCharLM` is only the wiring for `snn.prescan`.
+
+    **This arm's function class is identical to the Phase-2 baseline's, and its
+    inference-time model is the Phase-2 baseline exactly.** It adds no parameter,
+    no state variable and no kernel; under `model.eval()` the noise term is not
+    computed at all, so there is nothing to fold away and no reparameterisation
+    residual of the kind `EXP_012` measured. It changes only the trajectory
+    training takes, which is what `04_phase4_interim.md` §7 item 5 asks for.
+
+    All five invariants hold and none is in question: this is the committed
+    neuron driven by a perturbed current.
+
+    THE BUFFERS, AND WHY THE MODEL OWNS THEM
+    ----------------------------------------
+    The noise must be a pure function of `(seed, step)` so that R6 (resumable
+    checkpoints) stays testable, and it must not be drawn inside the captured
+    CUDA graph. So it is drawn into static buffers outside the captured region --
+    the same pattern `snn.train`'s `static_x`/`static_y` use, and for the same
+    reason. `allocate_noise` is called once before capture and `refill_noise`
+    once per step before the graph is replayed; `Trainer` is the only caller of
+    either.
+
+    A model in training mode with `noise_amp > 0` and no filled buffer RAISES
+    rather than quietly training the baseline. A silently-unnoised noise arm
+    would look exactly like a null result, and this project has already had one
+    run that trained against a mutated kernel with nothing in its logs to say so
+    (`03_phase3_candidates.md` §8).
+    """
+
+    def __init__(self, *args, noise_amp: float = 0.0, noise_p: float = 0.1,
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.noise_amp = float(noise_amp)
+        self.noise_p = float(noise_p)
+        # Validated here as well as in Config, because tests and screens build
+        # this class directly.
+        noise_scale(self.noise_amp, self.noise_p)
+        self._noise: list[Tensor] = []
+        self._noise_step: int | None = None
+
+    @property
+    def noise_active(self) -> bool:
+        """True when this forward pass will perturb anything.
+
+        A property rather than an inline `and` so the trainer, the tests and the
+        results script agree on what "the noise is on" means. `self.training` is
+        the training-only gate: `snn.evaluate.evaluate` sets `eval()` and restores
+        the previous mode, so every committed evaluation path is already covered
+        by it without knowing this arm exists.
+        """
+        return self.noise_amp != 0.0 and self.training
+
+    def allocate_noise(self, batch_size: int, seq_len: int) -> None:
+        """Allocate the per-layer static buffers. Must precede graph capture.
+
+        Allocated once and only ever written through in-place ops, because the
+        graph bakes in their addresses. A no-op at `noise_amp = 0`, so the
+        nesting costs no memory as well as no kernels.
+        """
+        if self.noise_amp == 0.0:
+            return
+        device = self.embed.weight.device
+        self._noise = [
+            torch.zeros(batch_size, seq_len, self.d_model,
+                        device=device, dtype=torch.float32)
+            for _ in range(self.n_layers)
+        ]
+        self._noise_step = None
+
+    @torch.no_grad()
+    def refill_noise(self, seed: int, step: int) -> None:
+        """Redraw every layer's noise for `step`. Call OUTSIDE the captured region.
+
+        A pure function of `(seed, step)`: the generator is seeded per call from
+        `_mix64(seed ^ NOISE_STREAM_SALT, step)` rather than advanced from a
+        stateful stream, so a run resumed at step k injects exactly the noise an
+        uninterrupted run injected at step k. That is `snn.data` §3's argument,
+        applied to the one other stochastic thing in the training step.
+
+        The salt is what keeps the noise independent of which windows the batch
+        drew; without it both would be `_mix64(seed, step)` and the arm would be
+        confounded with the data order in a way no metric would reveal.
+        """
+        if self.noise_amp == 0.0:
+            return
+        if not self._noise:
+            raise RuntimeError(
+                "refill_noise called before allocate_noise. The buffers must "
+                "exist before CUDA-graph capture bakes in their addresses."
+            )
+        gen = torch.Generator(device=self._noise[0].device)
+        gen.manual_seed(_mix64(int(seed) ^ NOISE_STREAM_SALT, int(step)))
+        for buf in self._noise:
+            fill_background_noise(buf, self.noise_amp, self.noise_p, gen)
+        self._noise_step = int(step)
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        if self.noise_active:
+            if not self._noise:
+                raise RuntimeError(
+                    f"{type(self).__name__} is in training mode with "
+                    f"noise_amp={self.noise_amp} but no noise buffer has been "
+                    "allocated. Training would silently proceed as the Phase-2 "
+                    "baseline and the run would be indistinguishable from a "
+                    "null. Call allocate_noise() then refill_noise()."
+                )
+            cur = add_background_noise(cur, self._noise[layer])
+        return lif_scan(
+            cur,
+            v0,
+            self.beta,
+            self.threshold,
+            self.surrogate_alpha,
+            self.reset,
+            self.fused,
+        )
+
+
+# ---------------------------------------------------------------------------
 # Arm 7: the composition of arms 4 and 6 (EXP_011)
 # ---------------------------------------------------------------------------
 
@@ -1012,7 +1144,7 @@ def build_model(cfg: "Config") -> nn.Module:
 
     arch = cfg.arch
     if arch in ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
-                "threshold"):
+                "threshold", "noise"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -1061,6 +1193,9 @@ def build_model(cfg: "Config") -> nn.Module:
             model = TokenShiftCharLM(mu_init=cfg.mu_init, **common)
         elif arch == "threshold":
             model = LearnedThresholdCharLM(thr_log_init=cfg.thr_log_init, **common)
+        elif arch == "noise":
+            model = NoisyCharLM(noise_amp=cfg.noise_amp, noise_p=cfg.noise_p,
+                                **common)
         else:
             cls = SpikingCharLM if arch == "snn" else AnalogueCharLM
             model = cls(**common)
@@ -1078,7 +1213,7 @@ def build_model(cfg: "Config") -> nn.Module:
     else:
         raise ValueError(
             "arch must be 'snn', 'analogue', 'twocomp', 'twocomp_threshold', "
-            f"'tokenshift', 'threshold' or 'gru', got {arch!r}"
+            f"'tokenshift', 'threshold', 'noise' or 'gru', got {arch!r}"
         )
 
     return model.to(cfg.device)

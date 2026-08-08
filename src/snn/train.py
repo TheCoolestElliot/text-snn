@@ -175,6 +175,13 @@ class Trainer:
         # no spikes would be a category error waiting to be quoted.
         self.static_metrics[_M_RATE0:].fill_(_RATE_UNSET)
 
+        # EXP_013: the noise arm's per-layer buffers are static for the same
+        # reason static_x is, and must exist BEFORE _capture() bakes in their
+        # addresses.  A no-op for every other arm.
+        allocate = getattr(self.model, "allocate_noise", None)
+        if allocate is not None:
+            allocate(cfg.batch_size, cfg.seq_len)
+
         # Hoisted out of _step_body so the captured region contains no Python
         # conditional at all (see the module docstring, trap 3).
         self._vocab = int(cfg.vocab_size)
@@ -371,6 +378,14 @@ class Trainer:
         x, y = self.sampler.batch(step)
         self.static_x.copy_(x, non_blocking=non_blocking)
         self.static_y.copy_(y, non_blocking=non_blocking)
+        # EXP_013's noise is staged exactly where the batch is, and for the same
+        # reason: this is the one place outside the captured region that every
+        # path -- warm-up, capture and replay -- funnels through, so putting the
+        # redraw anywhere else would silently leave the warm-up steps unnoised.
+        # A no-op for every arm but `noise`, and for `noise` at amplitude 0.
+        refill = getattr(self.model, "refill_noise", None)
+        if refill is not None:
+            refill(self.cfg.seed, step)
         return x, y  # returned so callers can keep pinned buffers alive
 
     def step(self) -> dict:
