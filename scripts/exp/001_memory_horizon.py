@@ -138,6 +138,30 @@ ARMS: dict[str, str] = {
     "compose_s0": "compose",
     "compose_s1": "compose",
     "compose_s2": "compose",
+    # EXP_013's noise-injection ladder. A registry entry and nothing else, for
+    # the fifth time and for the same reason -- statistic, k-sweep and F1
+    # tolerance untouched, explicit `--out` so no committed artifact is
+    # overwritten.
+    #
+    # THE THREE AMPLITUDES ARE THREE ARM NAMES, NOT ONE. `by_arm` aggregates on
+    # this value, and EXP_013 §2.4's ladder is a dose-response: pooling
+    # amp=0.1 with amp=1.6 would produce a mean horizon describing no
+    # configuration that was trained. This is the same failure the `compose`
+    # block above warns about, one step worse, because here the runs really are
+    # different arms rather than seeds of one.
+    #
+    # The noise is training-only (§1.1), so at probe time every one of these is
+    # the Phase-2 architecture with perturbation-trained weights -- which is
+    # exactly what makes the horizon comparable with `snn_beta0.5` above.
+    "noise_a0p1_s0": "noise_a0p1",
+    "noise_a0p1_s1": "noise_a0p1",
+    "noise_a0p1_s2": "noise_a0p1",
+    "noise_a0p4_s0": "noise_a0p4",
+    "noise_a0p4_s1": "noise_a0p4",
+    "noise_a0p4_s2": "noise_a0p4",
+    "noise_a1p6_s0": "noise_a1p6",
+    "noise_a1p6_s1": "noise_a1p6",
+    "noise_a1p6_s2": "noise_a1p6",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
