@@ -395,5 +395,236 @@ the discrepancy is the point.
 
 ## 9. Results
 
+**CLOSED 2026-08-08. Every prediction held, and the gate that was expected to
+pass is the one that failed.** ~1.03 GPU-hours of training (378.6 + 1,112.4 +
+2,191.4 s) plus three evaluations, one horizon sweep over eight checkpoints and
+one gap sweep over four.
+
+### 9.1 The scoreboard
+
+| rung | params | test bpc fresh | test bpc carried | wall-clock | peak VRAM | firing rate (test, carried) |
+|---|---:|---:|---:|---:|---:|---|
+| `scale_d512_s0` | 735,437 | 2.27387 | 2.25747 | 378.6 s | 0.6089 GiB | 0.339 / 0.320 |
+| `scale_d1020_s0` | 2,501,245 | 2.08760 | **2.06947** | 1,112.4 s | 1.1418 GiB | 0.293 / 0.267 |
+| `scale_d1481_s0` | 4,997,099 | 2.02007 | **2.00073** | 2,191.4 s | 1.6434 GiB | 0.209 / 0.185 |
+
+Committed references, all on the **old** tree and all at 735,437 parameters
+except where noted: Phase-2 baseline **2.25311** (n=5), the adopted
+two-compartment arm **2.11869** (n=7), the composed arm **2.08326** (n=2,
+738,509 params), the GRU anchor **1.76741** (n=3).
+
+### 9.2 S1 — HELD, at 54.75 transferred σ
+
+`bpc_carried(d=1481) = 2.00073` against the anchor 2.25311: **−0.25238 bpc**,
+against a bar of −0.0461. The margin is 5.5× the bar and **54.75×** the
+transferred σ, so the σ-transfer risk §3.0 sized the bar against is not close to
+load-bearing — even a 3.94× inflation leaves this at 13.9 σ.
+
+**Against `scale_d512_s0` instead** — the anchor §7's G1-failure branch
+pre-registered — it is **−0.25674**. The verdict does not depend on which anchor
+is used, which is worth stating because G1 did fail.
+
+### 9.3 S2 — HELD, and returns are diminishing per octave
+
+| step | Δ bpc carried | octaves | Δ per octave | resolves at 2σ |
+|---|---:|---:|---:|---|
+| d=512 → d=1020 | **−0.18800** | 1.766 | −0.1064 | yes |
+| d=1020 → d=1481 | **−0.06874** | 0.998 | −0.0689 | yes |
+
+Both steps resolve by more than an order of magnitude over the 0.00922 gate, so
+neither is scored as tied. **Per octave the second step buys 65 % of the first**
+— diminishing, but still enormous against anything else this project has
+measured. No functional form is fitted and none may be quoted (§5 item 5).
+
+### 9.4 S3 — HELD, and this is the ceiling the pilot existed to find
+
+| rung | gap (fresh) | Δgap vs baseline | Δtest (fresh) | Δtest ≤ 0 | verdict |
+|---|---:|---:|---:|---|---|
+| d=512 | +0.00592 | −0.00002 | +0.00418 | no | below what this instrument resolves |
+| d=1020 | +0.03524 | +0.02930 | −0.18209 | **yes** | **counts** |
+| d=1481 | +0.05509 | +0.04915 | −0.24962 | **yes** | **counts** |
+
+**The guard did real work and the bar passed it honestly.** `EXP_013`'s N1 fired
+on models whose test bpc was 14.8 and 190 se *worse*; here the gap grows while
+the test leg improves by 0.18 and 0.25 bpc. That is memorisation appearing
+alongside a real gain, not damage — the distinction the `Δtest ≤ 0` condition
+exists to draw, drawn for the first time.
+
+**So the underfitting regime ends between 2.5M and 5M parameters**, i.e. between
+36 and 18 characters per parameter. `EXP_013` §2.2's "the model does not
+overfit" is confirmed as a statement about **735K parameters** and is now bounded
+above.
+
+**An independent confirmation worth more than the bar it serves:** the d=512
+leg's fresh gap is **+0.00592**, against `EXP_013` §2.2's **+0.00594** measured
+on five different runs, on a different tree, at a different time. Two
+measurements agreeing to 2e-05 on a quantity whose 2σ bar is 0.00536 is the
+strongest check in this experiment, and it was not designed as one.
+
+### 9.5 S4 — HELD. Width buys per-step capacity, and essentially no reach
+
+| rung | horizon | total Δ | zero-context | within-reach | beyond-horizon | near share |
+|---|---:|---:|---:|---:|---:|---:|
+| d=512 | 7 | −0.00421 | +0.00712 | −0.01154 | +0.00021 | not scored (below 10σ) |
+| d=1020 | **8** | +0.18212 | +0.09679 | +0.08212 | +0.00321 | **98.2 %** |
+| d=1481 | **8** | +0.24961 | +0.10926 | +0.12538 | +0.01497 | **94.0 %** |
+
+The horizon moves 7 → 8 → 8, **inside the pre-registered ceiling**, where 6, 7
+and 8 all count as "did not move". It sits *at* the ceiling at both wide rungs
+and that is reported rather than smoothed: this is a marker, not a demonstration
+that width buys one character of reach, because at n = 1 the horizon has no error
+bar (§3, S4's guard (a)).
+
+**94–98 % of the gain is at or inside the baseline's own reach, and 6 % or less
+lies beyond it.** `03_phase3_candidates.md` §5 *assumed* width was per-step
+capacity when it assigned the zero-context and within-reach components to "the
+readout, normalisation, width, scale". This is the first measurement of that
+assumption, and it holds.
+
+**Note what this does to §7.1's premise.** The within-reach component — 51.8 % of
+the remaining gap, the thing §7 item 2 called "still barely attacked" — moves by
+**+0.12538** here. The best any architectural arm managed against the baseline
+was the threshold arm's +0.0288.
+
+### 9.6 D1 — the recipe trains these widths, with one blind spot named
+
+No non-finite loss anywhere. Firing rates stay in band and in fact **fall
+monotonically with width** — 0.339/0.320 → 0.293/0.267 → 0.209/0.185 — so the
+network gets sparser as it gets wider, which is an energy-relevant observation
+nothing in this project had measured and which no bar here anticipated.
+
+**The clip: 0 of 81 logged steps over 1.0 at every rung, including both wide
+ones.** So §4's clean cell is the one that fires.
+
+**But 0/81 is "not at the logged steps", not "never", and the difference
+matters here.** §2.1's calibration logged every **25** steps over the first 400
+and saw the clip bind **1–4 times** at exactly these widths. These runs log every
+**250**, so they cannot see that early transient at all. The honest statement is
+that the clip does not bind at width **in steady state**, and that whether it
+binds during warm-up is unresolved by this measurement while being *positively
+indicated* by the calibration. The interpretation guard in §4 is therefore
+satisfied on a measurement with a known hole in it, and S1's margin — 54.75 σ —
+is far too large for the transient to be a competing explanation.
+
+### 9.7 G1 — FAILED. Today's tree does not reproduce the committed baseline
+
+| protocol | committed `snn_beta0.5_s0` | retrain `scale_d512_s0` | delta |
+|---|---:|---:|---:|
+| fresh | 2.2718995629892054 | 2.273872258304913 | **+1.973e-03** |
+| carried | 2.2554769668134713 | 2.257471102255831 | **+1.994e-03** |
+
+**Established:** the forward is bit-identical (step 0's loss matches exactly);
+`environment.json` is identical field-for-field — same torch, driver, CPU and
+`CUBLAS_WORKSPACE_CONFIG`; `config.json` differs only in `run_name` (K1 passed);
+step 0's *logged* grad-norm differs by ~1.5e-08, about one ulp; the trajectories
+are materially apart by step 250.
+
+**Not established, and not claimed: the mechanism.** The obvious account — the
+clip fires at some unlogged step and the fp32/fp64 coefficients differ — **failed
+its reproduction**: on CPU, `_clip_grad_norm_fp64` and stock `clip_grad_norm_`
+return **bitwise-identical** gradients both below `max_norm` and when the clip
+fires. The delta sits at §6.5's ~2e-3 reparameterisation noise floor, which is
+suggestive and is not evidence of a cause.
+
+**The decisive untried test**, referred rather than run here: retrain
+`scale_d512_s0` a second time and check bitwise self-reproduction. Reproduces
+itself → the tree is deterministic and a code change is responsible; does not →
+training is not bit-reproducible across processes and this gate's premise was
+wrong. `EXP_013` §9.8's bit-identical retrain was on the *same* tree at the same
+time and does not settle it.
+
+**What it does not invalidate:** every committed arm was trained on the old tree,
+so the arms remain mutually comparable and the adopted effects (0.03–0.06 bpc)
+are 15–30× this delta. **What it removes** is "reproduce a committed number
+bitwise" as an available gate, and it means any *new* run must be compared
+against a newly trained baseline. This experiment did exactly that (§9.2 reports
+both anchors).
+
+### 9.8 Gates
+
+| gate | state |
+|---|---|
+| **K1** | 3/3. Every rung differs from `snn_beta0.5_s0` in `d_model` and `run_name` only — `seed` deliberately not in the may-differ set |
+| **G3** | 3/3 exact: 735,437 / 2,501,245 / 4,997,099, equal to `spiking_param_count` and to §2.2 |
+| **G4** | peak 1.6434 GiB at the widest rung against a 3.0 alarm and a 7.96 card |
+| **G2** | capture succeeded at every width; no `cuda_graph=False` fallback used |
+| **K2** | no mutation-campaign lockfile before any of the six child processes |
+| **K3** | realised/projected 0.949 / 0.946 / 0.925 — the 400-step calibration over-predicts by 5–8 %, consistently, which is the in-training evaluations it excludes |
+| **F1** | `f1_failures` **empty**; every horizon probe's `k = L` leg reproduced its own run's committed bpc |
+| **pre-registration hash** | unchanged across the ladder (`prereg_unchanged: true`) |
+| **G1** | **FAILED** — §9.7 |
+
+### 9.9 Predictions, resolved as written
+
+| | statement | verdict |
+|---|---|---|
+| S1 | capacity buys ≥10σ | **HELD** at 54.75σ |
+| S2 | monotone, scored at ≥2σ | **HELD**, both pairs resolve |
+| S3 | gap rises, only where Δtest ≤ 0 | **HELD** at both wide rungs; d=512 below resolution |
+| S4 | gain is near-context; horizon ≤ 8 | **HELD**, 94–98 % near, horizon 8 |
+| D1 | diagnostic | recipe trains these widths; clip blind spot named |
+| G1 | tree reproduces the baseline | **FAILED** |
+
+### 9.10 What this does not answer, and what it must not be read as
+
+* **Nothing is adopted and nothing is ranked.** n = 1 per rung; §6.2 needs three
+  seeds. `adopts_nothing` and `ranks_nothing` are structural fields in the
+  artifact.
+* **The comparison against the architectural arms is not parameter-matched.**
+  `d=1481` beats the adopted two-compartment arm by 0.118 bpc and the composed
+  arm by 0.083 — **at 6.8× the parameters**. It does not show width is a better
+  *mechanism* than either; it shows the project has been spending its GPU-hours
+  on a 0.03–0.17 bpc axis while an unmeasured 0.25 bpc axis sat beside it, which
+  is §7 item 6's referral vindicated rather than any arm refuted.
+* **It does not say what size Phase 5 should run** (§1.1) — wrong neuron, and
+  `EXP_005`/`EXP_012` are two demonstrations that statistics do not transfer
+  between these two neurons.
+* **σ at the new widths is still unmeasured**, and S3 now gives a reason to
+  expect it to differ: a model that has begun to overfit has a different noise
+  structure from one that has not.
+* Whether the gap keeps opening past 5M, where the optimum sits, and whether any
+  of this survives on `twocomp` are all open.
+
+### 9.11 The pre-registration guarantee, checkable after the fact
+
+This file was committed before the first run (`d59f98e`), so git history is the
+primary evidence. The hash chain is kept as well, because a commit proves
+ordering only if nobody amends it.
+
+`exp_014_run_manifest.json` stamps
+`7703641f57a098b7d18c9ae9be4e4fce818dd649a2e2b907e17350918469f22b` both before
+the first run and after the last. To reproduce it from this file as it now
+stands: take everything up to and including the first byte of `## 9. Results`'s
+line, and append the two-line stub this section replaced —
+
+```
+## 9. Results
+
 *(Empty at pre-registration. Appended after the runs; predictions are resolved as
 written, including the ones that fail.)*
+```
+
+— and the SHA-256 of the result is that value, **verified 2026-08-08**. §0–§8 are
+byte-identical to what was hashed before the first training run: no hypothesis,
+no bar and no decision cell moved after the numbers arrived. The prefix through
+the end of §8 hashes to
+`e9e148d5fb85c3eb67c384a618834b4ef962fd8933e2da55310aa90d01d21a78`, which is the
+value a future revision of this section should be checked against instead.
+
+## 10. Referred to Elliot, and not decided here
+
+1. **G1's failure and its chase** (§9.7). The mechanism is unidentified and the
+   decisive test is one 400-second run. Whether the project re-baselines, and
+   whether decision #7's fix should still be described as numerically inert,
+   are both Elliot's.
+2. **Whether the top rung is reseeded to n = 3** before any number from it is
+   quoted as a result. At ~2,191 s per seed that is ~1.2 GPU-hours.
+3. **Whether §7.1's ranking survives this.** Every remaining architectural
+   candidate is ranked against gains of 0.03–0.17 bpc; width bought 0.25 at a
+   cost the report priced at 0.35 GPU-h and which is really ~1.1.
+4. **Whether the `twocomp` ladder is now worth its ~1.2–1.8 GPU-hours**, since
+   the sizing answer Phase 5 actually needs is on that neuron and this pilot
+   cannot supply it.
+5. **§7.1's GPU-h column generally** — one item was measured and came in at
+   3.1× its estimate, and every other row descends from the same withdrawn cost
+   model (§2.1).
