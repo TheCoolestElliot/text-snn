@@ -214,10 +214,14 @@ class Trainer:
 
         * ``set_to_none=False`` -- gradients must keep stable addresses, so
           they are zeroed rather than freed.
-        * ``clip_grad_norm_`` is the modern branchless implementation: it
-          computes ``clamp(max_norm / (total_norm + 1e-6), max=1.0)`` on device
-          and always multiplies.  ``error_if_nonfinite=False`` is passed
-          explicitly because the True path calls ``bool()`` on a tensor.
+        * ``_clip_grad_norm_fp64`` is a branchless, capture-safe replacement
+          for ``clip_grad_norm_`` (decision #7, rev 6): it computes
+          ``clamp(max_norm / (total_norm + 1e-6), max=1.0)`` on device and
+          always multiplies, exactly as the stock implementation does, but
+          accumulates the sum of squares in fp64 so a legitimately large
+          (but finite) gradient cannot overflow the norm to ``inf`` and get
+          silently zeroed instead of clipped -- see the function's own
+          docstring and ``EXP_009`` Sec 9.4.
         * No ``.item()``, no ``print``, no Python ``if``.  Metrics leave via
           ``copy_`` into a static tensor and are read outside the region.
         """
@@ -227,10 +231,7 @@ class Trainer:
             logits.reshape(-1, self._vocab).float(), self.static_y.reshape(-1)
         )
         loss.backward()
-        gnorm = torch.nn.utils.clip_grad_norm_(
-            self.params, self._max_norm, norm_type=2.0,
-            error_if_nonfinite=False, foreach=True,
-        )
+        gnorm = _clip_grad_norm_fp64(self.params, self._max_norm)
         self.opt.step()
         self.static_metrics[_M_LOSS].copy_(loss.detach())
         self.static_metrics[_M_GNORM].copy_(gnorm.detach())
@@ -654,6 +655,55 @@ class Trainer:
 # ----------------------------------------------------------------------
 # module helpers
 # ----------------------------------------------------------------------
+
+def _clip_grad_norm_fp64(parameters: list[torch.Tensor], max_norm: float) -> torch.Tensor:
+    """L2 grad-clip, matching ``torch.nn.utils.clip_grad_norm_(..., foreach=True)``
+    except the sum of squares accumulates in fp64.  Decision #7 (rev 6 of
+    ``04_phase4_interim.md``): applies the first of the two one-line fixes
+    ``EXP_009`` Sec 9.4 named and referred, choosing it over the
+    abort-on-non-finite alternative because it repairs the clip's own blind
+    spot rather than working around it.
+
+    The bug this replaces: the stock foreach implementation squares each
+    gradient *in its own dtype* before summing.  ``EXP_009`` Sec 9.4 hit a
+    single gradient of 5.46e31 -- finite, unremarkable on its own -- which
+    squares to 2.98e63, overflowing fp32's ~3.4e38 range by 25 orders of
+    magnitude before the sum across parameters even runs.  The observed norm
+    is therefore ``inf``, the branchless
+    ``clamp(max_norm / (total_norm + 1e-6), max=1.0)`` evaluates to exactly
+    0, and the update is *zeroed* rather than rescaled -- silently, and
+    permanently from that step on, since a zeroed update cannot repair the
+    gradient that caused it.
+
+    The fix upcasts each gradient to fp64 *before* squaring (matching the
+    exact computation ``009_chase_divergence.py`` used to diagnose the bug:
+    ``vector_norm(g.double())`` per tensor).  2.98e63 is five orders of
+    magnitude inside fp64's ~1.8e308 range, so the clip observes a large but
+    finite norm and rescales the update instead of erasing it. It does not
+    change behaviour for any gradient that was already representable in
+    fp32 -- the fp64 sum-of-squares and its fp32 downcast agree with the old
+    computation to within ordinary rounding wherever the old computation was
+    already finite.
+
+    Capture-safety: every op here is a device kernel on a fixed-size input
+    (no ``.item()``, no data-dependent branch).  ``p.grad is not None`` is a
+    structural check, not a value-dependent one -- every parameter in
+    ``self.params`` already has a non-None ``.grad`` by the time this first
+    runs (``_step_body``'s own ``zero_grad(set_to_none=False)`` keeps
+    gradient tensors permanently allocated once a backward pass has touched
+    them, and warm-up runs three such passes before capture), so the branch
+    resolves to the same outcome on every call, including the one call made
+    during capture -- the same precedent the stock ``clip_grad_norm_`` this
+    replaces already relied on internally.
+    """
+    grads = [p.grad for p in parameters if p.grad is not None]
+    total_norm = torch.linalg.vector_norm(
+        torch.stack([torch.linalg.vector_norm(g.double()) for g in grads])
+    )
+    clip_coef = (max_norm / (total_norm + 1e-6)).clamp(max=1.0).to(torch.float32)
+    torch._foreach_mul_(grads, clip_coef)
+    return total_norm.to(torch.float32)
+
 
 def _default_run_name(cfg: Config) -> str:
     """Deterministic, so re-launching the same experiment resumes it instead of
