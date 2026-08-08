@@ -1,0 +1,146 @@
+{
+ "experiment": "EXP_014_parameter_scaling",
+ "prereg": "experiments/logs/EXP_014_parameter_scaling.md",
+ "prereg_sha256_before_first_run": "7703641f57a098b7d18c9ae9be4e4fce818dd649a2e2b907e17350918469f22b",
+ "reference_run": "snn_beta0.5_s0",
+ "may_differ": [
+  "d_model",
+  "run_name"
+ ],
+ "seed": 0,
+ "widths": [
+  512,
+  1020,
+  1481
+ ],
+ "vram_alarm_gib": 3.0,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "rungs": [
+  {
+   "d_model": 512,
+   "run": "scale_d512_s0",
+   "train_wall_clock_s": 383.4,
+   "eval_wall_clock_s": 9.3,
+   "k1": {
+    "run": "scale_d512_s0",
+    "arch": "snn",
+    "d_model": 512,
+    "seed": 0,
+    "differs_in": [
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "mu_init",
+     "noise_amp",
+     "noise_p",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "params": 735437,
+   "params_expected": 735437,
+   "peak_vram_gib": 0.6089,
+   "wall_clock_s": 378.63,
+   "k3": {
+    "projected_20k_s_from_calibration": 398.9,
+    "realised_train_wall_clock_s": 378.63,
+    "ratio_realised_over_projected": 0.9492,
+    "note": "the projection is a 400-step per-step rate scaled by the committed 398.88 s; it excludes capture cost and the eight in-training evaluations, so a ratio above 1 is expected and its size is the measurement"
+   }
+  },
+  {
+   "d_model": 1020,
+   "run": "scale_d1020_s0",
+   "train_wall_clock_s": 1117.2,
+   "eval_wall_clock_s": 12.2,
+   "k1": {
+    "run": "scale_d1020_s0",
+    "arch": "snn",
+    "d_model": 1020,
+    "seed": 0,
+    "differs_in": [
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "mu_init",
+     "noise_amp",
+     "noise_p",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "params": 2501245,
+   "params_expected": 2501245,
+   "peak_vram_gib": 1.1418,
+   "wall_clock_s": 1112.39,
+   "k3": {
+    "projected_20k_s_from_calibration": 1175.8,
+    "realised_train_wall_clock_s": 1112.39,
+    "ratio_realised_over_projected": 0.9461,
+    "note": "the projection is a 400-step per-step rate scaled by the committed 398.88 s; it excludes capture cost and the eight in-training evaluations, so a ratio above 1 is expected and its size is the measurement"
+   }
+  },
+  {
+   "d_model": 1481,
+   "run": "scale_d1481_s0",
+   "train_wall_clock_s": 2196.5,
+   "eval_wall_clock_s": 18.7,
+   "k1": {
+    "run": "scale_d1481_s0",
+    "arch": "snn",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "mu_init",
+     "noise_amp",
+     "noise_p",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "params": 4997099,
+   "params_expected": 4997099,
+   "peak_vram_gib": 1.6434,
+   "wall_clock_s": 2191.44,
+   "k3": {
+    "projected_20k_s_from_calibration": 2368.3,
+    "realised_train_wall_clock_s": 2191.44,
+    "ratio_realised_over_projected": 0.9253,
+    "note": "the projection is a 400-step per-step rate scaled by the committed 398.88 s; it excludes capture cost and the eight in-training evaluations, so a ratio above 1 is expected and its size is the measurement"
+   }
+  }
+ ],
+ "g1": {
+  "gate": "G1",
+  "reference": "snn_beta0.5_s0",
+  "retrain": "scale_d512_s0",
+  "compares": "seed 0 against seed 0, not against the 5-seed mean",
+  "fresh": {
+   "retrain": 2.273872258304913,
+   "committed": 2.2718995629892054,
+   "bitwise_equal": false,
+   "delta": 0.00197269531570754
+  },
+  "carried": {
+   "retrain": 2.257471102255831,
+   "committed": 2.2554769668134713,
+   "bitwise_equal": false,
+   "delta": 0.0019941354423598234
+  },
+  "passes": false
+ },
+ "prereg_sha256_after_last_run": "7703641f57a098b7d18c9ae9be4e4fce818dd649a2e2b907e17350918469f22b",
+ "prereg_unchanged": true
+}
