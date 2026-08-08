@@ -1,0 +1,16 @@
+{
+  "pid": 20004,
+  "command": [
+    "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+    "-u",
+    "C:\\Elliot's Stuff\\SNN\\Text SNN\\scripts\\chat\\session7_driver.py"
+  ],
+  "cwd": "C:\\Elliot's Stuff\\SNN\\Text SNN",
+  "run_name": "session7-driver",
+  "run_name_generated": false,
+  "out_dir": "experiments/chat",
+  "log": "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\session7-driver\\stdout.log",
+  "started": "2026-08-07T10:11:13-04:00",
+  "started_unix": 1786111873.2988074,
+  "detached": true
+}

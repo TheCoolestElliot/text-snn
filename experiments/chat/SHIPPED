@@ -18,3 +18,10 @@ chat-v3d-aligned/ckpt_best.pt   # 2026-08-06 responsiveness round; see docs/chat
 # docs/chat/QUALITY_v6.md §1. This checkpoint remains shipped because an
 # unresolved comparison does not displace an incumbent, not because either
 # round newly confirmed it superior.
+# Still the ship after session 7 (2026-08-07): raised this checkpoint's
+# recipe and chat-v6-inst-a's recipe to n=4 training seeds each (fixed in
+# advance) and compared with a Welch t-test instead of session 6's single-pair
+# read. Pooled headline 0.2940 (this recipe) vs 0.2694 (chat-v6-inst-a's),
+# p=0.334 -- unresolved, on every component too. Unchanged because an
+# unresolved margin does not displace an incumbent, same rule as every prior
+# round. See docs/chat/QUALITY_v7.md.

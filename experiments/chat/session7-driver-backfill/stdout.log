@@ -1,0 +1,17 @@
+
+=== launch 2026-08-07T12:59:29 === C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe -u C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\session7_driver.py
+[2026-08-07 12:59:29] SESSION7_START 5 runs planned
+[2026-08-07 12:59:29] TRAIN_START chat-v3d-aligned-s1 seed=1
+[2026-08-07 12:59:29]   cmd: C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe -u scripts/chat/train.py --run-name chat-v3d-aligned-s1 --seed 1 --out-dir experiments/chat --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --no-resume --max-steps 14000 --batch-size 160 --seq-len 256 --lr 5e-4 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --budget-minutes 75 --warmup-steps 200 --mix stories_topic=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02
+[2026-08-07 13:39:08] TRAIN_DONE chat-v3d-aligned-s1
+[2026-08-07 13:39:08] EVAL_START chat-v3d-aligned-s1
+[2026-08-07 13:41:26] EVAL_DONE chat-v3d-aligned-s1
+[2026-08-07 13:41:26] SKIP chat-v3d-aligned-s2 (summary.json already shows 14000 steps)
+[2026-08-07 13:41:26] SKIP_EVAL chat-v3d-aligned-s2 (quality json already exists)
+[2026-08-07 13:41:26] SKIP chat-v3d-aligned-s3 (summary.json already shows 14000 steps)
+[2026-08-07 13:41:26] SKIP_EVAL chat-v3d-aligned-s3 (quality json already exists)
+[2026-08-07 13:41:26] SKIP chat-v6-inst-a-s2 (summary.json already shows 14000 steps)
+[2026-08-07 13:41:26] SKIP_EVAL chat-v6-inst-a-s2 (quality json already exists)
+[2026-08-07 13:41:26] SKIP chat-v6-inst-a-s3 (summary.json already shows 14000 steps)
+[2026-08-07 13:41:26] SKIP_EVAL chat-v6-inst-a-s3 (quality json already exists)
+[2026-08-07 13:41:26] SESSION7_ALL_DONE 5/5 runs trained and scored
