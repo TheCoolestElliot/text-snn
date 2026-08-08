@@ -50,7 +50,7 @@ import torch  # noqa: E402
 
 CORPUS_CHOICES = ("enwik8", "text8")
 ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
-                "threshold", "gru")
+                "threshold", "noise", "gru")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -113,6 +113,17 @@ class Config:
     # only" any more.
     thr_log_init: float = 0.0       # threshold/twocomp_threshold: 0.0 nests the parent
 
+    # --- injected background spike noise (arch="noise"; EXP_013) ----------
+    # Ignored by every other arm. `noise_amp` is the standard deviation of the
+    # injected current in threshold units -- the Bernoulli process is centred and
+    # normalised so that it is, which is EXP_013 §1.2's whole design. 0.0 is the
+    # value at which the arm IS the Phase-2 baseline, bitwise and by code path,
+    # for the same reason `mu_init` and `thr_log_init` default to their nesting
+    # values: a run that forgets to set it trains the baseline rather than
+    # something undocumented.
+    noise_amp: float = 0.0          # noise only: injected current sd; 0.0 nests Phase 2
+    noise_p: float = 0.1            # noise only: Bernoulli event rate; held fixed by EXP_013
+
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
     weight_decay: float = 0.1
@@ -152,6 +163,13 @@ class Config:
                 raise ValueError(f"Config.{name} must be >= 1, got {getattr(self, name)!r}")
         if self.vocab_size < 0:
             raise ValueError("Config.vocab_size must be >= 0 (0 means 'unset')")
+        # Caught here rather than inside the training step: `noise_scale` divides
+        # by sqrt(p*(1-p)), and p at 0 or 1 would produce an inf amplitude three
+        # hours into a run instead of at construction.
+        if not 0.0 < self.noise_p < 1.0:
+            raise ValueError(f"Config.noise_p must be in (0, 1), got {self.noise_p!r}")
+        if self.noise_amp < 0.0:
+            raise ValueError(f"Config.noise_amp must be >= 0, got {self.noise_amp!r}")
 
     def _check_choice(self, name: str, choices: tuple[str, ...]) -> None:
         value = getattr(self, name)
@@ -297,6 +315,10 @@ _HELP: dict[str, str] = {
     "mu_init": "tokenshift only: 2-tap input mix; 1.0 nests the Phase-2 baseline",
     "thr_log_init": "threshold/twocomp_threshold: log per-channel threshold; "
                     "0.0 nests the arm's own parent",
+    "noise_amp": "noise only: sd of the injected background spike current, in "
+                 "threshold units; 0.0 nests the Phase-2 baseline",
+    "noise_p": "noise only: Bernoulli event rate of the background spike train; "
+               "sets sparsity, not variance",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",
