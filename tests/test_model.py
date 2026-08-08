@@ -139,6 +139,57 @@ def test_spiking_param_count_matches_spec():
     assert 0.73e6 < n < 0.74e6  # "~0.735 M"
 
 
+#: EXP_014 §2.2's ladder. The parameter count is that experiment's x-axis, so a
+#: silent change to it would move every point without moving any prose. These
+#: are the exact-error-minimising integer widths for the 2.5M and 5M targets --
+#: within 0.06 % of nominal, which is EXP_003 §4's own standard for deriving a
+#: width from a parameter target rather than picking a round one.
+EXP014_LADDER = ((512, 735_437), (1020, 2_501_245), (1481, 4_997_099))
+
+
+def test_exp014_ladder_widths_have_the_preregistered_parameter_counts():
+    """The pre-registered x-axis, checked against a built model at each rung.
+
+    `014_run_scaling_ladder.py`'s G3 makes the same assertion against each run's
+    own `summary.json` at run time; this is its offline half, so a width that
+    stopped meaning what EXP_014 §2.2 says it means fails in CI rather than
+    three GPU-hours into a ladder.
+    """
+    for d, expected in EXP014_LADDER:
+        closed_form = spiking_param_count(BASE_VOCAB, d, BASE_K)
+        assert closed_form == expected, (
+            f"d={d}: closed form gives {closed_form:,}, EXP_014 §2.2 "
+            f"pre-registered {expected:,}"
+        )
+        built = count_params(
+            SpikingCharLM(vocab_size=BASE_VOCAB, d_model=d, n_layers=BASE_K))
+        assert built == expected, (
+            f"d={d}: built model has {built:,} parameters, closed form "
+            f"predicted {expected:,}"
+        )
+
+
+def test_exp014_ladder_hits_its_nominal_targets():
+    """The rungs are labelled 0.735M / 2.5M / 5M and must deserve those labels.
+
+    Guards the direction of the ladder too: EXP_014 §2.2 quotes 1.766 then 0.998
+    octaves and says explicitly that no slope may be read as if the steps
+    matched, so the asymmetry is pinned rather than left to drift.
+    """
+    import math
+
+    nominal = (735_437, 2_500_000, 5_000_000)
+    for (d, actual), target in zip(EXP014_LADDER, nominal):
+        rel = abs(actual - target) / target
+        assert rel < 1e-3, f"d={d}: {actual:,} is {rel:.2%} from {target:,}"
+
+    counts = [c for _, c in EXP014_LADDER]
+    octaves = [math.log2(counts[i + 1] / counts[i]) for i in range(len(counts) - 1)]
+    assert round(octaves[0], 3) == 1.766
+    assert round(octaves[1], 3) == 0.998
+    assert octaves[0] > octaves[1], "the ladder's steps are unequal, by design"
+
+
 def test_analogue_param_count_is_identical_not_merely_matched():
     """The control isolates I1+I3, so its parameterisation must be identical."""
     torch.manual_seed(0)

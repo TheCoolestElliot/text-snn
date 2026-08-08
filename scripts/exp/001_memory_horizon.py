@@ -162,6 +162,27 @@ ARMS: dict[str, str] = {
     "noise_a1p6_s0": "noise_a1p6",
     "noise_a1p6_s1": "noise_a1p6",
     "noise_a1p6_s2": "noise_a1p6",
+    # EXP_014's parameter-scaling ladder. A registry entry and nothing else, for
+    # the sixth time and for the same reason -- statistic, k-sweep and F1
+    # tolerance untouched, explicit `--out` so no committed artifact is
+    # overwritten.
+    #
+    # THREE WIDTHS ARE THREE ARM NAMES, for the same reason EXP_013's three
+    # amplitudes are: `by_arm` aggregates on this value, and a mean horizon
+    # pooling a 0.735M-parameter model with a 5M one would describe neither.
+    # Here the pooling would be worse than merely uninformative -- whether the
+    # horizon moves WITH width is EXP_014's S4, so averaging across widths would
+    # destroy the exact quantity the probe is being run to measure.
+    #
+    # `scale_d512_s0` is a deliberate retrain of the committed baseline's own
+    # configuration and is gate G1, not a duplicate: every committed baseline
+    # predates decision #7's replacement of `clip_grad_norm_`, so this run is
+    # what establishes that today's tree still produces yesterday's numbers. It
+    # is registered separately from `snn_beta0.5` precisely so the two do not
+    # pool -- if G1 ever fails, the pooled arm would hide it.
+    "scale_d512_s0": "scale_d512",
+    "scale_d1020_s0": "scale_d1020",
+    "scale_d1481_s0": "scale_d1481",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
