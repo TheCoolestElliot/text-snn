@@ -79,10 +79,25 @@ decision threshold. Append results. **Never rewrite the hypothesis.**
 * **σ is not a project constant.** Re-measure it on every structurally new arm.
   It is 0.00461 on the baseline, 0.00313 on the two-state neuron, and it varies
   with a *hyperparameter* that changes no parameter and no function.
+* **A fold-in tolerance is architecture-specific, and is re-derived — or at
+  minimum re-measured — for each new arm, never inherited from a prior arm's
+  check.** `EXP_008`'s W1 borrowed a 1e-3 bound from `F1`, a check built for a
+  different comparison (two evaluations of the *same* weights), and failed by
+  ~1000×; `EXP_012` explained the gap as structural, not accidental — the same
+  identity, through the same fold, costs 2.0e-03 bpc on the baseline neuron and
+  1.4e-05 on the two-compartment one, because the two neurons put wildly
+  different amounts of probability mass at the firing threshold. A single
+  constant is too loose for one arm or too tight for the other by construction.
 * **Never change the baseline to make a diagnostic look better.** Document the
   discrepancy and ship the fix as a ranked candidate.
 * **Never replace a failed seed to restore n.** Report the reduced n and mark the
-  verdict provisional.
+  verdict provisional. **A provisional result is promoted to adopted status only
+  by seeds *added*, never by one swapped in for a failure, up to the
+  pre-registered n** — until then it is cited with an explicit seed-count
+  caveat wherever it appears. `EXP_011`'s composed arm is the standing example:
+  `compose_s0` diverged, was not replaced, and the arm remains n = 2 of a
+  pre-registered 3 until two more seeds are added, not until one is
+  substituted.
 * **Chase a NaN to its origin.** "One seed diverged" is a tolerance widened in
   prose. Replay the failing step on *both* dispatch paths — an identical NaN on
   the eager path exonerates a hand-written backward.
@@ -132,8 +147,8 @@ resuming, so that no artifact ever describes two runs at once.
 
 ```bash
 ruff check .                        # must pass
-pytest -m "not cuda and not data"   # 165 tests, ~7s, no GPU or corpus needed
-pytest                              # 303 tests, ~42s, needs GPU + corpus
+pytest -m "not cuda and not data"   # 257 tests, ~8s, no GPU or corpus needed
+pytest                              # 394 tests, ~47s, needs GPU + corpus
 ```
 
 CI runs the first two. **CI cannot catch a regression in the fused kernels, the

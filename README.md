@@ -125,7 +125,7 @@ because they were children of an interactive shell that went away (risk R6);
 
 ```bash
 pytest                              # everything the machine can run
-pytest -m "not cuda and not data"   # no GPU, no corpus — 165 tests, ~7s
+pytest -m "not cuda and not data"   # no GPU, no corpus — 257 tests, ~8s
 ruff check .                        # lint gate
 ```
 
