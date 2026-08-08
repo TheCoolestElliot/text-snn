@@ -1,0 +1,331 @@
+{
+  "artifact": "exp_013_noise_results",
+  "experiment": "EXP_013_noise_injection",
+  "log": "experiments/logs/EXP_013_noise_injection.md",
+  "bars": {
+    "SIGMA_BPC": 0.00461,
+    "BAR_BPC": 0.00922,
+    "SIGMA_GAP": {
+      "fresh": 0.00268,
+      "carried": 0.00306
+    },
+    "BAR_GAP": {
+      "fresh": 0.00536,
+      "carried": 0.00612
+    },
+    "NOISE_FLOOR": 0.002
+  },
+  "collected": {
+    "baseline": {
+      "fresh": {
+        "n": 5,
+        "gap_mean": 0.005940492910452821,
+        "gap_sd": 0.0026776236864477455,
+        "test_bpc_mean": 2.269692045956405,
+        "test_bpc_sd": 0.0045023972002364255,
+        "train_bpc_mean": 2.2637515530459518,
+        "train_bpc_sd": 0.0025016151530467745,
+        "gaps": [
+          0.008743691881444082,
+          0.004498017278693922,
+          0.006351146182247636,
+          0.002139115119839996,
+          0.007970494090038471
+        ]
+      },
+      "carried": {
+        "n": 5,
+        "gap_mean": -0.001796197441380354,
+        "gap_sd": 0.003063650885664678,
+        "test_bpc_mean": 2.253114842808576,
+        "test_bpc_sd": 0.004610364431390589,
+        "train_bpc_mean": 2.254911040249956,
+        "train_bpc_sd": 0.00259523069683984,
+        "gaps": [
+          0.001630903557878316,
+          -0.0033620367943361096,
+          -0.002440983707640232,
+          -0.0057354482921585515,
+          0.0009265780293548076
+        ]
+      }
+    },
+    "amplitudes": {
+      "0.1": {
+        "n": 3,
+        "runs": [
+          "noise_a0p1_s0",
+          "noise_a0p1_s1",
+          "noise_a0p1_s2"
+        ],
+        "fresh": {
+          "gap_mean": 0.005129583585564331,
+          "gap_sd": 0.0014898479784579328,
+          "test_bpc_mean": 2.2735641442199483,
+          "test_bpc_sd": 0.001559661015208001,
+          "train_bpc_mean": 2.268434560634384,
+          "delta_gap": -0.0008109093248884905,
+          "delta_gap_se": -0.41432213557155934,
+          "delta_gap_resolved": false,
+          "delta_test_bpc": 0.0038720982635434,
+          "delta_test_bpc_se": 1.150127746105913,
+          "gaps": [
+            0.0034698190005104657,
+            0.006351298929997196,
+            0.005567632826185331
+          ],
+          "test_bpcs": [
+            2.2726652738779745,
+            2.275365084686374,
+            2.2726620740954964
+          ]
+        },
+        "carried": {
+          "gap_mean": -0.0036639515836157286,
+          "gap_sd": 0.0018023665597781745,
+          "test_bpc_mean": 2.2573075490177903,
+          "test_bpc_sd": 0.0016734038517929595,
+          "train_bpc_mean": 2.2609715006014057,
+          "delta_gap": -0.0018677541422353746,
+          "delta_gap_se": -0.8357933623987152,
+          "delta_gap_resolved": false,
+          "delta_test_bpc": 0.004192706209214414,
+          "delta_test_bpc_se": 1.245357791637044,
+          "gaps": [
+            -0.005399985948467911,
+            -0.0018018701533435433,
+            -0.0037899986490357307
+          ],
+          "test_bpcs": [
+            2.25643173415706,
+            2.2592370970544975,
+            2.2562538158418133
+          ]
+        },
+        "test_firing_rate_mean": [
+          0.3510652635442583,
+          0.35355131158180403
+        ]
+      },
+      "0.4": {
+        "n": 3,
+        "runs": [
+          "noise_a0p4_s0",
+          "noise_a0p4_s1",
+          "noise_a0p4_s2"
+        ],
+        "fresh": {
+          "gap_mean": -0.0027054964190614448,
+          "gap_sd": 0.0030252074628297283,
+          "test_bpc_mean": 2.319824571700416,
+          "test_bpc_sd": 0.0026938722714645808,
+          "train_bpc_mean": 2.322530068119477,
+          "delta_gap": -0.008645989329514266,
+          "delta_gap_se": -4.417540473623069,
+          "delta_gap_resolved": true,
+          "delta_test_bpc": 0.05013252574401106,
+          "delta_test_bpc_se": 14.890843391921539,
+          "gaps": [
+            0.0006514736758624906,
+            -0.0052206080436176805,
+            -0.003547354889429144
+          ],
+          "test_bpcs": [
+            2.3220592806989377,
+            2.316833316300918,
+            2.3205811181013924
+          ]
+        },
+        "carried": {
+          "gap_mean": -0.0097526401716889,
+          "gap_sd": 0.0032940269264124574,
+          "test_bpc_mean": 2.3028976450755905,
+          "test_bpc_sd": 0.003253896758941048,
+          "train_bpc_mean": 2.3126502852472792,
+          "delta_gap": -0.007956442730308547,
+          "delta_gap_se": -3.5603947392875694,
+          "delta_gap_resolved": true,
+          "delta_test_bpc": 0.04978280226701459,
+          "delta_test_bpc_se": 14.786965172160095,
+          "gaps": [
+            -0.0060444694347445704,
+            -0.01234001656777739,
+            -0.010873434512544744
+          ],
+          "test_bpcs": [
+            2.3055391726230945,
+            2.2992628818896343,
+            2.3038908807140417
+          ]
+        },
+        "test_firing_rate_mean": [
+          0.33895188334741094,
+          0.467320816558704
+        ]
+      },
+      "1.6": {
+        "n": 3,
+        "runs": [
+          "noise_a1p6_s0",
+          "noise_a1p6_s1",
+          "noise_a1p6_s2"
+        ],
+        "fresh": {
+          "gap_mean": -0.02359075650124387,
+          "gap_sd": 0.0031119690508394763,
+          "test_bpc_mean": 2.9109887772150373,
+          "test_bpc_sd": 0.01830018969502238,
+          "train_bpc_mean": 2.934579533716281,
+          "delta_gap": -0.029531249411696693,
+          "delta_gap_se": -15.088555460911794,
+          "delta_gap_resolved": true,
+          "delta_test_bpc": 0.6412967312586324,
+          "delta_test_bpc_se": 190.4841029092632,
+          "gaps": [
+            -0.02085810568109281,
+            -0.026977927277676894,
+            -0.022936236544961908
+          ],
+          "test_bpcs": [
+            2.9312884224162996,
+            2.905922284861494,
+            2.8957556243673186
+          ]
+        },
+        "carried": {
+          "gap_mean": -0.029634854438376806,
+          "gap_sd": 0.002687024552358946,
+          "test_bpc_mean": 2.8928667416407463,
+          "test_bpc_sd": 0.018172011636553614,
+          "train_bpc_mean": 2.9225015960791225,
+          "delta_gap": -0.02783865699699645,
+          "delta_gap_se": -12.457402294039204,
+          "delta_gap_resolved": true,
+          "delta_test_bpc": 0.6397518988321704,
+          "delta_test_bpc_se": 190.0252419724201,
+          "gaps": [
+            -0.027072603726976396,
+            -0.03243131949656153,
+            -0.02940064009159249
+          ],
+          "test_bpcs": [
+            2.9130060714790935,
+            2.887898797231922,
+            2.8776953562112224
+          ]
+        },
+        "test_firing_rate_mean": [
+          0.3614101492260631,
+          0.6582969058501092
+        ]
+      }
+    }
+  },
+  "resolution": {
+    "predictions": {
+      "N1": {
+        "statement": "at least one amplitude has delta_gap <= -2*sigma_gap (fresh)",
+        "bar": -0.00536,
+        "values": {
+          "0.1": -0.0008109093248884905,
+          "0.4": -0.008645989329514266,
+          "1.6": -0.029531249411696693
+        },
+        "held": true,
+        "amplitudes_that_hit": [
+          0.4,
+          1.6
+        ],
+        "predicted_to_fail_in_advance": true,
+        "note": "\u00a72.3 states the ceiling that makes this underpowered: the whole fresh gap is 0.00594 including a region-difficulty term no regulariser can touch, against a bar of 0.00536."
+      },
+      "N2": {
+        "statement": "delta test bpc (carried) is monotone increasing in amplitude AND at the top of the ladder exceeds +2*sigma",
+        "bar": 0.00922,
+        "values": {
+          "0.1": 0.004192706209214414,
+          "0.4": 0.04978280226701459,
+          "1.6": 0.6397518988321704
+        },
+        "monotone": true,
+        "top_of_ladder_delta": 0.6397518988321704,
+        "held": true
+      },
+      "N3": {
+        "statement": "at the bottom of the ladder |delta test bpc| < 2*sigma",
+        "bar": 0.00922,
+        "amplitude": 0.1,
+        "value": 0.004192706209214414,
+        "held": true,
+        "direction": "harm"
+      },
+      "N4": {
+        "statement": "mean firing rate rises monotonically in amplitude, every layer",
+        "values": {
+          "0.1": [
+            0.3510652635442583,
+            0.35355131158180403
+          ],
+          "0.4": [
+            0.33895188334741094,
+            0.467320816558704
+          ],
+          "1.6": [
+            0.3614101492260631,
+            0.6582969058501092
+          ]
+        },
+        "held": false
+      },
+      "N5": {
+        "statement": "delta_gap >= 0 at every amplitude (fresh); fails only on a delta below -noise_floor, per \u00a75 item 7",
+        "noise_floor": 0.002,
+        "values": {
+          "0.1": -0.0008109093248884905,
+          "0.4": -0.008645989329514266,
+          "1.6": -0.029531249411696693
+        },
+        "resolved": {
+          "0.1": false,
+          "0.4": true,
+          "1.6": true
+        },
+        "held": false,
+        "amplitudes_that_fail": [
+          0.4,
+          1.6
+        ]
+      },
+      "N6": {
+        "statement": "the arm's cross-seed sd of test bpc is within a factor of 2 of the baseline's 0.00461",
+        "band": [
+          0.002305,
+          0.00922
+        ],
+        "values": {
+          "0.1": 0.0016734038517929595,
+          "0.4": 0.003253896758941048,
+          "1.6": 0.018172011636553614
+        },
+        "held": false,
+        "power_note": "n=3 estimates a standard deviation to about +/-40 % (EXP_004 \u00a710.7); stated in \u00a75 item 5 before the run."
+      }
+    },
+    "held": [
+      "N1",
+      "N2",
+      "N3"
+    ],
+    "failed": [
+      "N4",
+      "N5",
+      "N6"
+    ],
+    "unresolved": [],
+    "decision_cell": "N1 holds",
+    "verdict": "The arm reduces the generalisation gap. REPORT the effect and REFER adoption to Elliot, with \u00a72.3's ceiling quoted beside it: a reduction of >=90 % of a gap that includes an irreducible region-difficulty term demands an explanation before it is believed.",
+    "adopts_nothing": true,
+    "ranks_nothing": true,
+    "bars_are_transcribed_not_computed": true
+  }
+}
