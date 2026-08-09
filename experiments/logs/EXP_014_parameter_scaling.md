@@ -526,12 +526,7 @@ return **bitwise-identical** gradients both below `max_norm` and when the clip
 fires. The delta sits at §6.5's ~2e-3 reparameterisation noise floor, which is
 suggestive and is not evidence of a cause.
 
-**The decisive untried test**, referred rather than run here: retrain
-`scale_d512_s0` a second time and check bitwise self-reproduction. Reproduces
-itself → the tree is deterministic and a code change is responsible; does not →
-training is not bit-reproducible across processes and this gate's premise was
-wrong. `EXP_013` §9.8's bit-identical retrain was on the *same* tree at the same
-time and does not settle it.
+**The chase was then run rather than referred, and it closed. See §9.12.**
 
 **What it does not invalidate:** every committed arm was trained on the old tree,
 so the arms remain mutually comparable and the adopted effects (0.03–0.06 bpc)
@@ -585,7 +580,64 @@ both anchors).
 * Whether the gap keeps opening past 5M, where the optimum sits, and whether any
   of this survives on `twocomp` are all open.
 
-### 9.11 The pre-registration guarantee, checkable after the fact
+### 9.12 G1 chased to its origin: decision #7's clip, confirmed by substitution
+
+Run the same day, ~15 GPU-minutes. **`CONTRIBUTING.md` §4 says chase a residual
+to its origin and never widen a tolerance around it; this is that chase, and it
+reverses the "mechanism not established" reading §9.7 was written with.**
+
+**Four measurements, in the order they were made:**
+
+1. **Today's tree reproduces itself bitwise.** `scale_d512_s0` retrained under a
+   different `run_name`: all 81 logged steps and both val bpc identical to full
+   precision. So training *is* bit-reproducible across processes, and G1's
+   failure is a code change rather than nondeterminism.
+2. **The clip fires exactly three times in 20,000 steps** — steps **32, 33, 34**,
+   grad norms **1.0329 / 1.1198 / 1.0957**, measured by retraining at
+   `log_every = 1`. Every one falls *between* the 250-step logging cadence, which
+   is why §9.6 reads 0/81 and why §2.1's 25-step calibration saw it.
+3. **The Phase-2 tree reproduces the committed baseline bitwise.** A worktree at
+   `b5f71a9` — the commit that last touched `src/snn/train.py`, `kernels.py`,
+   `neuron.py`, `surrogate.py`, `data.py` and `evaluate.py`, none of which have
+   changed since — retrained `d = 512, seed 0`: **0 of 81 logged steps differ**
+   from `snn_beta0.5_s0`, val bpc identical to full precision. The committed
+   baseline was never irreproducible; the regression is entirely between
+   `b5f71a9` and HEAD.
+4. **Substituting the clip back restores bitwise agreement.** Monkeypatching
+   `snn.train._clip_grad_norm_fp64` to the stock `clip_grad_norm_` and running
+   250 steps on **today's** tree: **no differing loss at any step** against the
+   Phase-2 tree's own 250. With the fp64 clip in place, the first differing loss
+   is step **47** — the identical step at which the two trees diverge.
+
+**Verdict: `_clip_grad_norm_fp64` is the whole cause.** The three clipped steps
+are the only ones on which it can act; there the fp32 and fp64 sums-of-squares
+differ by ~1 ulp, so the clip coefficients differ in their last bits and the
+updates differ. The perturbation stays below the loss's own fp32 resolution for
+thirteen more steps and first becomes visible at step 47, then amplifies over the
+remaining ~19,950 steps to **+1.97e-03 bpc** — which lands on §6.5's ~2e-3
+reparameterisation noise floor, now with a mechanism attached rather than as a
+coincidence.
+
+**A false negative on the way, recorded because it is the more useful half.** The
+substitution test was first run for **40 steps** and returned "no divergence",
+which was read as exonerating the clip. It stopped **seven steps short** of the
+divergence. The probe had been validated as *sensitive* — the two paths' reported
+grad norms differ from step 0 — so it looked trustworthy, and a validated probe
+run for too short a window is exactly the shape of `EXP_007`'s V4: a check that
+clears its bar while telling nobody anything. **The horizon of a null result is
+part of the null result.** The corrected test states its own: 250 steps, with
+the divergence at 47 well inside it.
+
+**What this changes.** Decision #7's fix is **not numerically inert**, and
+`src/snn/train.py`'s docstring and `04_phase4_interim.md` §8 row 7 both say
+something close to that — the fix "does not change behaviour for any gradient
+that was already representable in fp32". That is true of the **gradients** and
+false of the **trajectory**: on any step where the clip actually fires, the
+coefficient differs in its last bits and the run diverges. The fix is still the
+right fix — it repairs a failure mode that silently zeroes updates forever — but
+it is a **tree change that invalidates bitwise comparison against every number
+committed before it**, and it should be described that way. Referred to Elliot
+(§10 item 1), not applied here.
 
 This file was committed before the first run (`d59f98e`), so git history is the
 primary evidence. The hash chain is kept as well, because a commit proves
@@ -613,10 +665,16 @@ value a future revision of this section should be checked against instead.
 
 ## 10. Referred to Elliot, and not decided here
 
-1. **G1's failure and its chase** (§9.7). The mechanism is unidentified and the
-   decisive test is one 400-second run. Whether the project re-baselines, and
-   whether decision #7's fix should still be described as numerically inert,
-   are both Elliot's.
+1. **G1's failure is explained (§9.12) and what to do about it is not.**
+   Decision #7's clip is the cause, confirmed by substitution. Three things are
+   Elliot's: whether §8 row 7 and `train.py`'s docstring are corrected to say the
+   fix changes the trajectory wherever the clip fires rather than being
+   numerically inert; whether the project re-baselines (every committed figure
+   predates the change, and arms trained on either side of it are no longer
+   bitwise comparable); and whether a standing rule is wanted that a change to
+   `src/snn` which alters any committed number must be recorded as such before
+   it is merged. **Nothing here argues for reverting the fix** — it repairs a
+   failure that silently zeroes updates for the rest of a run.
 2. **Whether the top rung is reseeded to n = 3** before any number from it is
    quoted as a result. At ~2,191 s per seed that is ~1.2 GPU-hours.
 3. **Whether §7.1's ranking survives this.** Every remaining architectural
