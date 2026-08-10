@@ -1,0 +1,865 @@
+{
+ "purpose": "price a configuration before anything is pre-registered against it",
+ "calib_steps": 400,
+ "arches": [
+  "snn",
+  "twocomp",
+  "twocomp_threshold",
+  "gru"
+ ],
+ "widths": [
+  1481
+ ],
+ "ratio_base": {
+  "arch": "snn",
+  "d_model": 1481
+ },
+ "wall_clock_denominator": {
+  "run": "scale_d1481_s0",
+  "steps": 20000,
+  "wall_clock_s": 2191.44,
+  "peak_vram_gib": 1.6434
+ },
+ "vram_alarm_gib": 3.0,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "reads_no_bpc_against_any_bar": true,
+ "results": [
+  {
+   "arch": "snn",
+   "d_model": 1481,
+   "params": 4997099,
+   "returncode": 0,
+   "process_wall_clock_s": 61.45,
+   "params_realised": 4997099,
+   "median_steps_per_s_steady": 9.4639,
+   "s_per_step_steady": 0.105665,
+   "peak_vram_gib": 1.6434,
+   "firing_rate_step0": [
+    0.05172095075249672,
+    4.615757916326402e-06
+   ],
+   "firing_rate_final": [
+    0.32537955045700073,
+    0.3657551109790802
+   ],
+   "layer1_escape_step": 25,
+   "layer1_escape_rate_threshold": 0.01,
+   "max_grad_norm": 1.3501633405685425,
+   "n_logged_steps_over_clip": 3,
+   "steps_over_clip": [
+    25,
+    150,
+    175
+   ],
+   "final_train_bpc": 2.5619326792717945,
+   "n_train_records": 17,
+   "series": [
+    {
+     "step": 0,
+     "steps_per_s": 9.9487,
+     "grad_norm": 0.23183803260326385,
+     "firing_rate": [
+      0.05172095075249672,
+      4.615757916326402e-06
+     ],
+     "bpc": 7.674712036140766,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 25,
+     "steps_per_s": 9.5445,
+     "grad_norm": 1.3501633405685425,
+     "firing_rate": [
+      0.29208192229270935,
+      0.3761889636516571
+     ],
+     "bpc": 4.946432577474938,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 50,
+     "steps_per_s": 9.5321,
+     "grad_norm": 0.4579538106918335,
+     "firing_rate": [
+      0.3396642208099365,
+      0.43830692768096924
+     ],
+     "bpc": 3.842068342704024,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 75,
+     "steps_per_s": 9.5213,
+     "grad_norm": 0.5026219487190247,
+     "firing_rate": [
+      0.35762691497802734,
+      0.42923277616500854
+     ],
+     "bpc": 3.368399573107806,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 100,
+     "steps_per_s": 9.5142,
+     "grad_norm": 0.9142221808433533,
+     "firing_rate": [
+      0.35900938510894775,
+      0.41702836751937866
+     ],
+     "bpc": 3.2699013253403564,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 125,
+     "steps_per_s": 9.5078,
+     "grad_norm": 0.7363550662994385,
+     "firing_rate": [
+      0.3526381552219391,
+      0.40815263986587524
+     ],
+     "bpc": 3.120195931209109,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 150,
+     "steps_per_s": 9.5013,
+     "grad_norm": 1.2048383951187134,
+     "firing_rate": [
+      0.34908610582351685,
+      0.39800649881362915
+     ],
+     "bpc": 3.107031003250863,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 175,
+     "steps_per_s": 9.4948,
+     "grad_norm": 1.1927001476287842,
+     "firing_rate": [
+      0.3446844220161438,
+      0.3918933570384979
+     ],
+     "bpc": 2.990882863955967,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 200,
+     "steps_per_s": 9.4888,
+     "grad_norm": 0.8611268997192383,
+     "firing_rate": [
+      0.33793067932128906,
+      0.3886016309261322
+     ],
+     "bpc": 2.892738556483993,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 225,
+     "steps_per_s": 9.4822,
+     "grad_norm": 0.736088752746582,
+     "firing_rate": [
+      0.32772061228752136,
+      0.3804965615272522
+     ],
+     "bpc": 2.9535296080497715,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 250,
+     "steps_per_s": 9.4752,
+     "grad_norm": 0.7028313279151917,
+     "firing_rate": [
+      0.3275777995586395,
+      0.3753260672092438
+     ],
+     "bpc": 2.842572077140566,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 275,
+     "steps_per_s": 9.4699,
+     "grad_norm": 0.576362133026123,
+     "firing_rate": [
+      0.32824811339378357,
+      0.3743484914302826
+     ],
+     "bpc": 2.816019331708555,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 300,
+     "steps_per_s": 9.4639,
+     "grad_norm": 0.43029341101646423,
+     "firing_rate": [
+      0.32202136516571045,
+      0.36590269207954407
+     ],
+     "bpc": 2.738366929069536,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 325,
+     "steps_per_s": 9.4585,
+     "grad_norm": 0.3696642518043518,
+     "firing_rate": [
+      0.321809858083725,
+      0.36525145173072815
+     ],
+     "bpc": 2.718681622869128,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 350,
+     "steps_per_s": 9.4537,
+     "grad_norm": 0.28118565678596497,
+     "firing_rate": [
+      0.3225061595439911,
+      0.3640165627002716
+     ],
+     "bpc": 2.620568960204913,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 375,
+     "steps_per_s": 9.4486,
+     "grad_norm": 0.19251088798046112,
+     "firing_rate": [
+      0.3237285017967224,
+      0.365426629781723
+     ],
+     "bpc": 2.5201178494369163,
+     "peak_vram_gib": 1.6434
+    },
+    {
+     "step": 399,
+     "steps_per_s": 9.4436,
+     "grad_norm": 0.15588310360908508,
+     "firing_rate": [
+      0.32537955045700073,
+      0.3657551109790802
+     ],
+     "bpc": 2.5619326792717945,
+     "peak_vram_gib": 1.6434
+    }
+   ],
+   "s_per_step_vs_base": 1.0,
+   "projected_20k_s": 2191.4,
+   "vram_alarm": false
+  },
+  {
+   "arch": "twocomp",
+   "d_model": 1481,
+   "params": 5003023,
+   "returncode": 0,
+   "process_wall_clock_s": 70.71,
+   "params_realised": 5003023,
+   "median_steps_per_s_steady": 7.8975,
+   "s_per_step_steady": 0.126622,
+   "peak_vram_gib": 2.6138,
+   "firing_rate_step0": [
+    0.09205253422260284,
+    0.0034622512757778168
+   ],
+   "firing_rate_final": [
+    0.26383087038993835,
+    0.3422205150127411
+   ],
+   "layer1_escape_step": 25,
+   "layer1_escape_rate_threshold": 0.01,
+   "max_grad_norm": 1.567402958869934,
+   "n_logged_steps_over_clip": 6,
+   "steps_over_clip": [
+    75,
+    100,
+    125,
+    150,
+    175,
+    200
+   ],
+   "final_train_bpc": 2.53741036101587,
+   "n_train_records": 17,
+   "series": [
+    {
+     "step": 0,
+     "steps_per_s": 8.1231,
+     "grad_norm": 0.5392321348190308,
+     "firing_rate": [
+      0.09205253422260284,
+      0.0034622512757778168
+     ],
+     "bpc": 7.674120415821799,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 25,
+     "steps_per_s": 7.9564,
+     "grad_norm": 0.646579921245575,
+     "firing_rate": [
+      0.4596049189567566,
+      0.4788112938404083
+     ],
+     "bpc": 5.011596459921554,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 50,
+     "steps_per_s": 7.9394,
+     "grad_norm": 0.9254434704780579,
+     "firing_rate": [
+      0.44944360852241516,
+      0.46965956687927246
+     ],
+     "bpc": 4.193016140054672,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 75,
+     "steps_per_s": 7.9314,
+     "grad_norm": 1.100193738937378,
+     "firing_rate": [
+      0.4256606698036194,
+      0.45830050110816956
+     ],
+     "bpc": 3.6742724374938196,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 100,
+     "steps_per_s": 7.925,
+     "grad_norm": 1.1180886030197144,
+     "firing_rate": [
+      0.3883494436740875,
+      0.44510555267333984
+     ],
+     "bpc": 3.481183387786524,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 125,
+     "steps_per_s": 7.9199,
+     "grad_norm": 1.567402958869934,
+     "firing_rate": [
+      0.34908536076545715,
+      0.4266398847103119
+     ],
+     "bpc": 3.3303449719513925,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 150,
+     "steps_per_s": 7.915,
+     "grad_norm": 1.3901469707489014,
+     "firing_rate": [
+      0.3175273835659027,
+      0.41276952624320984
+     ],
+     "bpc": 3.295694595386157,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 175,
+     "steps_per_s": 7.9113,
+     "grad_norm": 1.0667052268981934,
+     "firing_rate": [
+      0.2946597933769226,
+      0.39468497037887573
+     ],
+     "bpc": 3.0982151725676355,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 200,
+     "steps_per_s": 7.908,
+     "grad_norm": 1.1677063703536987,
+     "firing_rate": [
+      0.27609580755233765,
+      0.37568482756614685
+     ],
+     "bpc": 2.994565356476241,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 225,
+     "steps_per_s": 7.9052,
+     "grad_norm": 0.8192181587219238,
+     "firing_rate": [
+      0.2688034176826477,
+      0.36608418822288513
+     ],
+     "bpc": 2.968428121128715,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 250,
+     "steps_per_s": 7.9024,
+     "grad_norm": 0.9355442523956299,
+     "firing_rate": [
+      0.263227641582489,
+      0.3526190221309662
+     ],
+     "bpc": 2.8603273940329914,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 275,
+     "steps_per_s": 7.8999,
+     "grad_norm": 0.499330073595047,
+     "firing_rate": [
+      0.26461169123649597,
+      0.35147419571876526
+     ],
+     "bpc": 2.7976503807178514,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 300,
+     "steps_per_s": 7.8975,
+     "grad_norm": 0.6053216457366943,
+     "firing_rate": [
+      0.25961700081825256,
+      0.34008222818374634
+     ],
+     "bpc": 2.708440915923502,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 325,
+     "steps_per_s": 7.8954,
+     "grad_norm": 0.31506550312042236,
+     "firing_rate": [
+      0.26112160086631775,
+      0.3407543897628784
+     ],
+     "bpc": 2.6783040520475105,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 350,
+     "steps_per_s": 7.8934,
+     "grad_norm": 0.34086015820503235,
+     "firing_rate": [
+      0.26339980959892273,
+      0.339782178401947
+     ],
+     "bpc": 2.5813646550274814,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 375,
+     "steps_per_s": 7.8916,
+     "grad_norm": 0.16401511430740356,
+     "firing_rate": [
+      0.26448968052864075,
+      0.34255895018577576
+     ],
+     "bpc": 2.4888077199167387,
+     "peak_vram_gib": 2.6138
+    },
+    {
+     "step": 399,
+     "steps_per_s": 7.8899,
+     "grad_norm": 0.15234890580177307,
+     "firing_rate": [
+      0.26383087038993835,
+      0.3422205150127411
+     ],
+     "bpc": 2.53741036101587,
+     "peak_vram_gib": 2.6138
+    }
+   ],
+   "s_per_step_vs_base": 1.1983,
+   "projected_20k_s": 2626.0,
+   "vram_alarm": false
+  },
+  {
+   "arch": "twocomp_threshold",
+   "d_model": 1481,
+   "params": 5005985,
+   "returncode": 0,
+   "process_wall_clock_s": 74.44,
+   "params_realised": 5005985,
+   "median_steps_per_s_steady": 7.4365,
+   "s_per_step_steady": 0.134472,
+   "peak_vram_gib": 2.9767,
+   "firing_rate_step0": [
+    0.09205253422260284,
+    0.0034622512757778168
+   ],
+   "firing_rate_final": [
+    0.27346399426460266,
+    0.3442392349243164
+   ],
+   "layer1_escape_step": 25,
+   "layer1_escape_rate_threshold": 0.01,
+   "max_grad_norm": 2.0686094760894775,
+   "n_logged_steps_over_clip": 7,
+   "steps_over_clip": [
+    75,
+    100,
+    125,
+    150,
+    175,
+    225,
+    250
+   ],
+   "final_train_bpc": 2.532580056283737,
+   "n_train_records": 17,
+   "series": [
+    {
+     "step": 0,
+     "steps_per_s": 7.5994,
+     "grad_norm": 0.5393545031547546,
+     "firing_rate": [
+      0.09205253422260284,
+      0.0034622512757778168
+     ],
+     "bpc": 7.674120415821799,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 25,
+     "steps_per_s": 7.4906,
+     "grad_norm": 0.6457642912864685,
+     "firing_rate": [
+      0.45980480313301086,
+      0.47870126366615295
+     ],
+     "bpc": 5.011708592609916,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 50,
+     "steps_per_s": 7.4723,
+     "grad_norm": 0.9213442802429199,
+     "firing_rate": [
+      0.4494282007217407,
+      0.4701389968395233
+     ],
+     "bpc": 4.193694439629675,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 75,
+     "steps_per_s": 7.4627,
+     "grad_norm": 1.5505729913711548,
+     "firing_rate": [
+      0.4274934232234955,
+      0.45519986748695374
+     ],
+     "bpc": 3.659533524314877,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 100,
+     "steps_per_s": 7.4549,
+     "grad_norm": 1.3483020067214966,
+     "firing_rate": [
+      0.39401933550834656,
+      0.4438471794128418
+     ],
+     "bpc": 3.47489776586279,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 125,
+     "steps_per_s": 7.449,
+     "grad_norm": 1.1775689125061035,
+     "firing_rate": [
+      0.3582040071487427,
+      0.433883398771286
+     ],
+     "bpc": 3.303660143843519,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 150,
+     "steps_per_s": 7.4459,
+     "grad_norm": 1.2258899211883545,
+     "firing_rate": [
+      0.32790252566337585,
+      0.4116224944591522
+     ],
+     "bpc": 3.2243228271739968,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 175,
+     "steps_per_s": 7.4431,
+     "grad_norm": 2.0686094760894775,
+     "firing_rate": [
+      0.3096447288990021,
+      0.39554280042648315
+     ],
+     "bpc": 3.1559105364178834,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 200,
+     "steps_per_s": 7.4414,
+     "grad_norm": 0.9638129472732544,
+     "firing_rate": [
+      0.2883737087249756,
+      0.37879568338394165
+     ],
+     "bpc": 2.952843397272829,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 225,
+     "steps_per_s": 7.4397,
+     "grad_norm": 1.2892444133758545,
+     "firing_rate": [
+      0.27781131863594055,
+      0.36104631423950195
+     ],
+     "bpc": 3.023626984819039,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 250,
+     "steps_per_s": 7.4385,
+     "grad_norm": 1.3983911275863647,
+     "firing_rate": [
+      0.27487000823020935,
+      0.3540073335170746
+     ],
+     "bpc": 2.8876705717283677,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 275,
+     "steps_per_s": 7.4374,
+     "grad_norm": 0.5799514651298523,
+     "firing_rate": [
+      0.2730112373828888,
+      0.3513084053993225
+     ],
+     "bpc": 2.799206135777556,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 300,
+     "steps_per_s": 7.4365,
+     "grad_norm": 0.3485570549964905,
+     "firing_rate": [
+      0.27126237750053406,
+      0.34236940741539
+     ],
+     "bpc": 2.7025725239107614,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 325,
+     "steps_per_s": 7.4355,
+     "grad_norm": 0.30542993545532227,
+     "firing_rate": [
+      0.2720505893230438,
+      0.342812180519104
+     ],
+     "bpc": 2.6848925354194138,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 350,
+     "steps_per_s": 7.4348,
+     "grad_norm": 0.3054054379463196,
+     "firing_rate": [
+      0.2729554772377014,
+      0.34225454926490784
+     ],
+     "bpc": 2.5801824462854506,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 375,
+     "steps_per_s": 7.4342,
+     "grad_norm": 0.1868445724248886,
+     "firing_rate": [
+      0.27397438883781433,
+      0.3446449041366577
+     ],
+     "bpc": 2.4857639709617687,
+     "peak_vram_gib": 2.9767
+    },
+    {
+     "step": 399,
+     "steps_per_s": 7.4339,
+     "grad_norm": 0.15973515808582306,
+     "firing_rate": [
+      0.27346399426460266,
+      0.3442392349243164
+     ],
+     "bpc": 2.532580056283737,
+     "peak_vram_gib": 2.9767
+    }
+   ],
+   "s_per_step_vs_base": 1.2726,
+   "projected_20k_s": 2788.8,
+   "vram_alarm": false
+  },
+  {
+   "arch": "gru",
+   "d_model": 1481,
+   "params": 4997829,
+   "returncode": 0,
+   "process_wall_clock_s": 42.01,
+   "params_realised": 4997829,
+   "median_steps_per_s_steady": 13.6088,
+   "s_per_step_steady": 0.073482,
+   "peak_vram_gib": 2.1293,
+   "firing_rate_step0": [],
+   "firing_rate_final": [],
+   "layer1_escape_step": null,
+   "layer1_escape_rate_threshold": 0.01,
+   "max_grad_norm": 1.6765424013137817,
+   "n_logged_steps_over_clip": 1,
+   "steps_over_clip": [
+    25
+   ],
+   "final_train_bpc": 1.972772744106976,
+   "n_train_records": 17,
+   "series": [
+    {
+     "step": 0,
+     "steps_per_s": 13.3512,
+     "grad_norm": 0.7840966582298279,
+     "firing_rate": [],
+     "bpc": 7.6877737745084955,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 25,
+     "steps_per_s": 13.6498,
+     "grad_norm": 1.6765424013137817,
+     "firing_rate": [],
+     "bpc": 5.11939656134357,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 50,
+     "steps_per_s": 13.6263,
+     "grad_norm": 0.289424866437912,
+     "firing_rate": [],
+     "bpc": 3.935490006583305,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 75,
+     "steps_per_s": 13.6239,
+     "grad_norm": 0.26052597165107727,
+     "firing_rate": [],
+     "bpc": 3.237958987595607,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 100,
+     "steps_per_s": 13.6208,
+     "grad_norm": 0.22500285506248474,
+     "firing_rate": [],
+     "bpc": 2.9174538392741853,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 125,
+     "steps_per_s": 13.6192,
+     "grad_norm": 0.2691393792629242,
+     "firing_rate": [],
+     "bpc": 2.635650634807025,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 150,
+     "steps_per_s": 13.6167,
+     "grad_norm": 0.3162246346473694,
+     "firing_rate": [],
+     "bpc": 2.507074685195481,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 175,
+     "steps_per_s": 13.615,
+     "grad_norm": 0.32547253370285034,
+     "firing_rate": [],
+     "bpc": 2.372799230534343,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 200,
+     "steps_per_s": 13.6133,
+     "grad_norm": 0.2509474754333496,
+     "firing_rate": [],
+     "bpc": 2.2482397637510485,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 225,
+     "steps_per_s": 13.6125,
+     "grad_norm": 0.2498958706855774,
+     "firing_rate": [],
+     "bpc": 2.3077118803673606,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 250,
+     "steps_per_s": 13.6105,
+     "grad_norm": 0.2905128300189972,
+     "firing_rate": [],
+     "bpc": 2.1968800687759353,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 275,
+     "steps_per_s": 13.6099,
+     "grad_norm": 0.24369505047798157,
+     "firing_rate": [],
+     "bpc": 2.184816001765862,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 300,
+     "steps_per_s": 13.6088,
+     "grad_norm": 0.19509103894233704,
+     "firing_rate": [],
+     "bpc": 2.098110088420123,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 325,
+     "steps_per_s": 13.6078,
+     "grad_norm": 0.22644829750061035,
+     "firing_rate": [],
+     "bpc": 2.107792539681048,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 350,
+     "steps_per_s": 13.6062,
+     "grad_norm": 0.1804232895374298,
+     "firing_rate": [],
+     "bpc": 2.0168579169158942,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 375,
+     "steps_per_s": 13.6059,
+     "grad_norm": 0.15526160597801208,
+     "firing_rate": [],
+     "bpc": 1.9209681300140808,
+     "peak_vram_gib": 2.1293
+    },
+    {
+     "step": 399,
+     "steps_per_s": 13.6054,
+     "grad_norm": 0.13185341656208038,
+     "firing_rate": [],
+     "bpc": 1.972772744106976,
+     "peak_vram_gib": 2.1293
+    }
+   ],
+   "s_per_step_vs_base": 0.6954,
+   "projected_20k_s": 1523.9,
+   "vram_alarm": false
+  }
+ ]
+}
