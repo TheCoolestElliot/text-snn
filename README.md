@@ -22,8 +22,8 @@ mechanisms actually close it?**
 | Phase 4 | **open** — running record in [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md) |
 | Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
 | Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
-| Open decisions | **5 of 9**, all the author's (§8 of the Phase-4 report) |
-| Budget | ~6.5 of ~30 GPU-hours spent |
+| Open decisions | **6 of 10**, all the author's (§8 of the Phase-4 report) |
+| Budget | ~8.0 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
@@ -63,12 +63,32 @@ context, **−48 % inside the 7 characters the baseline already reached**, and
 nearly half its magnitude is handed back. That decomposition is the single most
 useful thing this project has produced about how to read an SNN result.
 
+**The largest single effect measured in Phase 4 is not an arm — it is width.**
+`EXP_014` trained the *plain* baseline neuron at 2.5M and 5.0M parameters and
+took **2.25311 → 2.00073 carried**, a −0.252 bpc move at 54.75 σ. That is more
+than every architectural arm in the table above, at **6.8× the parameters** — so
+it **refutes none of them**; it says the project had been spending its budget on
+a 0.03–0.17 bpc axis with an unmeasured 0.25 bpc axis beside it. Read it with
+three caveats the report states in full: it is **n = 1 per size** and adopts
+nothing, it is **not parameter-matched** against any arm, and at 6.8× the
+parameters the model is **still 0.233 bpc behind the GRU anchor at 1×**.
+
 Selected findings that are expensive to re-derive are collected in
 [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md); the
-short version is that **the model underfits** (the measured generalisation gap is
-within noise of zero), **the learned threshold is provably a reparameterisation**
+short version is that **the model underfits at 735K parameters and stops doing so
+somewhere between 2.5M and 5M** (the gap is within noise of zero at 735K and
++0.055 at 5.0M, while test bpc improves by 0.25 — memorisation alongside a real
+gain, not damage), **the learned threshold is provably a reparameterisation**
 (so its gain is an optimisation effect, not a capacity one), and **two training
 divergences that looked identical in the logs had different causes**.
+
+One more, because it constrains how any number here may be compared: the fp64
+gradient-clip fix adopted as decision #7 is **not numerically inert**. It fires
+about three times in a 20,000-step run, and those three steps are worth
++1.97e-03 bpc by the end. Every figure above predates it, so the arms remain
+mutually comparable with each other — but a **newly trained** run cannot be
+compared bitwise against them, and new experiments train their own anchor
+instead.
 
 ---
 
@@ -127,7 +147,7 @@ because they were children of an interactive shell that went away (risk R6);
 
 ```bash
 pytest                              # everything the machine can run
-pytest -m "not cuda and not data"   # no GPU, no corpus — 257 tests, ~8s
+pytest -m "not cuda and not data"   # no GPU, no corpus — 259 tests, ~8s
 ruff check .                        # lint gate
 ```
 

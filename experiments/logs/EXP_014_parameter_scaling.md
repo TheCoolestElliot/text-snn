@@ -686,3 +686,42 @@ value a future revision of this section should be checked against instead.
 5. **§7.1's GPU-h column generally** — one item was measured and came in at
    3.1× its estimate, and every other row descends from the same withdrawn cost
    model (§2.1).
+
+## 11. Corrections appended after closure
+
+Per `CONTRIBUTING.md` §2 a closed log is never rewritten; corrections are
+appended. Nothing below changes a hypothesis, a bar, a number or a verdict, and
+nothing below is inside the hashed prefix.
+
+1. **§9 has no §9.11, and one heading in it is doing two jobs.** The commit that
+   added the G1 chase (`1450796`) replaced the heading
+   `### 9.11 The pre-registration guarantee, checkable after the fact` with
+   `### 9.12 G1 chased to its origin: decision #7's clip, confirmed by
+   substitution`, and kept the paragraphs that sat beneath the old heading. So
+   §9 runs 9.1 … 9.10, **9.12**, and the pre-registration-guarantee text —
+   the hash chain, the reconstruction recipe, and the
+   `e9e148d5…d21a78` prefix hash — now sits **unheaded at the tail of §9.12**,
+   where it reads as if it were part of the chase. It is not; it predates it.
+   **Neither heading is renumbered here.** `0dce054`'s commit message cites
+   "§9.11" and a commit message cannot be corrected, so renumbering would break
+   the one reference that is now the only pointer to that text. This note is the
+   correction.
+2. **The reconstruction recipe in §9.12 is unaffected by this file growing.** It
+   hashes a *prefix* — everything up to and including the `## 9. Results` line,
+   plus a two-line stub — so appending §11 leaves both stamped values intact.
+   Re-verified on the tree that added this section: prefix-through-§8
+   `e9e148d5…d21a78` and reconstructed pre-results file
+   `7703641f…8469f22b`, both unchanged.
+3. **§10 item 1 is partly discharged.** `04_phase4_interim.md` rev 8 (2026-08-10)
+   corrects `src/snn/train.py`'s docstring, which claimed the fp64 clip "does not
+   change behaviour for any gradient that was already representable in fp32" —
+   true of the returned norm, false of the trajectory. Elliot has ruled the
+   re-baselining question: **the project does not re-baseline**, and every new
+   experiment trains its own anchor on the current tree. The remaining half —
+   a standing rule for `src/snn/` changes that move a committed number — is
+   **report decision #10, open**. §8 row 7 is deliberately *not* edited: it is a
+   decided row, and a correction to a decided row's evidence goes in prose
+   beneath the table.
+4. **§10 items 3 and 5 are answered in the report, not here.** §7.1's rev-8 note
+   offers a re-ranking and applies none, and records that the one ranked cost
+   ever measured came in at 3.1×. **Items 2 and 4 remain open and are Elliot's.**

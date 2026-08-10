@@ -39,7 +39,7 @@ One file per experiment in [`../experiments/logs/`](../experiments/logs/), writt
 **before** the run and never edited afterwards — corrections are appended, not
 applied in place.
 
-`EXP_000`, `EXP_001` … `EXP_009`, `EXP_011`, `EXP_012`, `EXP_013`.
+`EXP_000`, `EXP_001` … `EXP_009`, `EXP_011`, `EXP_012`, `EXP_013`, `EXP_014`.
 
 **There is no `EXP_010`.** The id is unused. The `010_` prefix on
 `scripts/exp/010_phase4_arm_results.py` is the results resolver for `EXP_007`,
