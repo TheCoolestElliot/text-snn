@@ -183,6 +183,15 @@ ARMS: dict[str, str] = {
     "scale_d512_s0": "scale_d512",
     "scale_d1020_s0": "scale_d1020",
     "scale_d1481_s0": "scale_d1481",
+    #
+    # `EXP_015`: the same width as `scale_d1481_s0`, different neurons. Each gets
+    # its own arm key rather than joining `twocomp`/`gru` -- those are the 735K
+    # runs, and pooling a 5M run with them would average two capacities into a
+    # horizon that describes neither. That is the same reason `scale_d512` is
+    # registered apart from `snn_beta0.5`.
+    "arch_twocomp_d1481_s0": "arch_twocomp_d1481",
+    "arch_twocomp_threshold_d1481_s0": "arch_twocomp_threshold_d1481",
+    "arch_gru_d1481_s0": "arch_gru_d1481",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
