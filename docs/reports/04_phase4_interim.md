@@ -1,9 +1,23 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 8, 2026-08-10.** Interim, not final: Phase 4 is open and this document
+**Revision 9, 2026-08-10.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
+
+> **Rev 9 folds in `EXP_015` as §14, and it changes what Phase 5's problem is.**
+> Three things, none of them the one the experiment was designed to measure.
+> **(1) The adopted arm does not train at 5.0M parameters** under the frozen
+> Phase-2 recipe — both arms containing the two-compartment neuron diverged, the
+> plain LIF and the GRU at the identical width did not. **(2) Parameter-matched,
+> the anchor scales as well as the spiking model**: the gap moves 0.48570 →
+> **0.45374**, so width closes **6.6 %** of it, not the ~52 % the unmatched
+> comparison suggested. **(3) The difference is reach, not capacity** — with
+> width the GRU's memory horizon goes 57–60 → **97** and the spiking model's goes
+> 7 → **8**, while at zero context the two are nearly equal. **Rev 9 also
+> corrects an arithmetic error rev 8 introduced** (§15, item (f)). No arm is
+> adopted, no size is chosen, no phase is authorised; one row is *added* —
+> **#11, open** — for the recipe question that now blocks scaling. See §15.
 
 > **Rev 8 folds in `EXP_014` as §13 — the largest single effect this phase has
 > measured, and it is not an arm.** Plain width buys **−0.25238 bpc** at 54.75
@@ -15,13 +29,13 @@ logs cannot be reviewed as a phase.
 > docstring made in as many words (§13.5). **No verdict moves, no arm is
 > adopted, no tolerance is set, no phase is authorised, and no existing decision
 > row is edited.** One row is *added* — **#10, open** — for the consequence of
-> that clip finding. See §14.
+> that clip finding. See §15.
 
 > **Rev 7 runs no experiment, closes nothing, and moves no verdict.** It records
 > that rev 6's working-tree state is now committed, corrects three figures that
 > had drifted, and flags one ranked cost estimate as unsupported by any
 > measurement. **No decision row is edited and all five open decisions stay
-> open.** See §14 (renumbered from §13 at rev 8).
+> open.** See §15 (renumbered from §13 at rev 8, and from §14 at rev 9).
 
 **Nothing in this document is a decision — every decision in it is Elliot's, and
 four of what is now ten have been made by Elliot rather than here.** #8 was a
@@ -37,8 +51,8 @@ and a new #10 added at rev 8 — are open.**
 **What rev 6 does.** Four things:
 
 1. **Folds in `EXP_013`** (noise injection) as new §12, pushing the changelog to
-   §13 *(and rev 8 pushed it again, to §14, inserting `EXP_014` as the new
-   §13)*. The arm itself is a null — it cost bits at every amplitude and closed no
+   §13 *(rev 8 pushed it again to §14, inserting `EXP_014` as the new §13; rev 9
+   pushed it to §15, inserting `EXP_015` as the new §14)*. The arm itself is a null — it cost bits at every amplitude and closed no
    gap — but its calibration measurement is the transferable result: this
    735,437-parameter model's generalisation gap is +0.00594 bpc (fresh) / −0.00180
    bpc (carried, indistinguishable from zero), against ~655M training characters
@@ -116,8 +130,8 @@ die of `EXP_009`'s bug**, which decision #7 would have fixed.
 **What rev 2 did.** It read `EXP_007`, `EXP_008` and `EXP_009` *together* rather
 than one after another (§6.7), stated a verdict for every Phase-4 arm against its
 own pre-registered rule (§6.8), re-ran every gate in §9 from a clean tree, and
-corrected five numbers rev 1 got wrong (§14, renumbered from §12 at rev 6 and
-from §13 at rev 8 — see this changelog's own rev-6 and rev-8 entries). **No
+corrected five numbers rev 1 got wrong (§15, renumbered from §12 at rev 6, from
+§13 at rev 8 and from §14 at rev 9 — see this changelog's own entries). **No
 verdict, threshold or decision
 changed.** Two of the corrections make an arm look worse, one makes the adopted
 arm look slightly better, and all five restore a committed measurement rather than
@@ -134,13 +148,13 @@ unapplied.
 
 | | |
 |---|---|
-| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10**; **`EXP_012` in §11**; **`EXP_013` in §12**; **`EXP_014` in §13** |
+| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10**; **`EXP_012` in §11**; **`EXP_013` in §12**; **`EXP_014` in §13**; **`EXP_015` in §14** |
 | Ranked candidates closed | **6 of 14** (#1, #14, **#11 at rev 8**, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011`, `EXP_012` and `EXP_013` close no ranked candidate** — the first composes two arms already counted here, the second is a mechanism study and trains nothing, the third is not on the 18-item list at all (`EXP_013` §0). **`EXP_014` does close one — #11, the parameter-scaling pilot** — and closing it is the only sense in which it settles anything: it adopts no size and ranks no arm |
-| Arms adopted | **2** — the two-compartment neuron (`EXP_004`) and, **at rev 6, the learned per-channel threshold standalone** (`EXP_008`, decision #5). The composed arm (§10) is **not** adopted — provisional at n = 2. **`EXP_014` adopts nothing**: width is not an arm, and n = 1 per rung cannot clear §6.2 |
-| GPU-hours spent | **~8.0 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9, its §9 measured total rather than its §0 pre-registration estimate of ~1.6; **`EXP_014` cost ~1.5** — 1.02 of ladder training (§13.2), ~0.17 of pre-flight calibration run twice, ~0.09 of evaluations, horizon and gap probes, and ~0.25 for the §13.5 chase) |
-| Unexplained divergences | **2** — `twocomp_distill_s1` (§6.4) and `compose_s0` (§10.4), chased to **different** causes. Neither is `EXP_013`'s: the noise arm trained cleanly at every amplitude. **`EXP_014` adds none** — every rung trained with finite loss throughout — and it *removes* one open reproducibility question by chasing G1 to its origin (§13.5) |
+| Arms adopted | **2** — the two-compartment neuron (`EXP_004`) and, **at rev 6, the learned per-channel threshold standalone** (`EXP_008`, decision #5). The composed arm (§10) is **not** adopted — provisional at n = 2. **`EXP_014` adopts nothing**: width is not an arm, and n = 1 per rung cannot clear §6.2. **`EXP_015` adopts nothing either, and adds a caveat to both adopted arms**: neither has been shown to train above 735K parameters, and §14 is where both failed to |
+| GPU-hours spent | **~10.1 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9; **`EXP_014` cost ~1.5**; **`EXP_015` cost ~2.1** — 1.79 of ladder training (§14.1), ~0.09 of arch calibration, ~0.08 for the divergence chase, and ~0.1 for the evaluations, horizon, gap and state probes. **~0.7 of `EXP_015`'s training bought no number**: two legs ran 20,000 steps of which ~14,750 and ~18,000 computed NaN, and that is recorded as spent rather than netted off) |
+| Unexplained divergences | **4, sharing 2 causes** — `twocomp_distill_s1` (§6.4) has its own; `compose_s0` (§10.4) and **both of `EXP_015`'s dead legs (§14.5)** share a signature: origin in layer 0's backward, forward and loss finite, fp32 and fp64 gradient norms equal, and the eager path producing an identical NaN in identical tensors. **It is now reproducible 138 steps from a committed checkpoint rather than 17,598**, and it blocks scaling the adopted arm |
 | Phase-3 §9 sign-off | **signed off 2026-08-05** (decision #1), and **recorded as retrospective**: Phase 4 was opened without it on instruction and eight experiments ran before it |
-| Decisions open | **6 of 10** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds a new #9 and **rev 8 adds a new #10**, both open |
+| Decisions open | **7 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open |
 
 The phase has moved the project's answer to its own question twice, and both
 moves were away from the thing the ranking was built around.
@@ -365,8 +379,8 @@ is the mean over the seeds that were *scored*. Rev 1 had two entries that were n
 the adopted arm at 1.35× was `twocomp_s0` alone against `EXP_004`'s committed
 three-seed **1.32×** (all seven seeds give 1.30×), and the distilled arm's 1.58×
 was measured against the two-compartment arm — correct in `EXP_009` §9.1, wrong in
-a column whose reference row is the baseline, where it is **2.13×**. §14 records
-both (renumbered from §12 at rev 6 and from §13 at rev 8).
+a column whose reference row is the baseline, where it is **2.13×**. §15 records
+both (renumbered from §12 at rev 6, §13 at rev 8 and §14 at rev 9).
 
 Both new arms clear the adoption bar — token-shift by **4.2×** and the threshold
 arm by **6.4×** (8.4σ and 12.8σ at the inherited noise floor; rev 1 said "an order
@@ -743,6 +757,32 @@ component is 28 % of what is left, the adopted arm already took 58.2 % of it, an
 > principle rev 6 followed when it inserted rank 2: this table records what the
 > evidence implies, and what to do about it is not this document's to say.
 
+> **Rev 9: the item rev 8 said would answer the sizing question ran, and it
+> changed the question. Offered, not applied.**
+>
+> 1. **Ranks 3, 4 and 5 are all about the two-compartment family or the
+>    components width already moved, and the family does not currently train at
+>    the size that matters.** `EXP_015` (§14) is the parameter-matched comparison
+>    rev 8's note said was missing; both two-compartment legs diverged at 5.0M
+>    while the plain LIF and the GRU did not. Rank 5 — the frozen-`beta_s` ladder
+>    — is a study *of* that neuron, so its result at 735K would not transfer to a
+>    size at which the neuron cannot be trained. **None of these rows is
+>    demoted here**; what has changed is that a prerequisite appeared underneath
+>    three of them, and it is now decision **#11**.
+> 2. **The measurement that reorders this table is no longer an arm.** §14.3:
+>    with width the anchor's memory horizon goes 57–60 → **97** and the spiking
+>    model's goes 7 → **8**, while at zero context the two are nearly equal
+>    (4.0524 against 4.0014). **The gap is reach, and capacity does not buy it.**
+>    Every remaining row here targets bits; none targets reach except rank 5,
+>    which is blocked behind #11. That is a statement about the ranking's *axis*,
+>    not about any row's evidence.
+> 3. **The GPU-h column has a second measured row.** `EXP_015` cost ~2.1 against
+>    a pre-flight projection of 1.93 for its training — the calibration method
+>    rev 8 recommended transferred across *arms*, not just widths, with K3 ratios
+>    0.926 / 0.915 / 0.972. **~0.7 GPU-hours of it bought no number**, because two
+>    legs ran 20,000 steps of which most computed NaN. A cost model cannot predict
+>    that, and §1 records it as spent rather than netting it off.
+
 ### 7.2 The order it should run in, and what has to be settled first
 
 Recommended, not scheduled. The whole of §7.1 is ~3.2 GPU-hours against the ~26.5
@@ -855,7 +895,9 @@ table carries this change, as the rev-5 note carried its own. Rev 8: a new row
 **#10** is added open, for what follows from decision #7 changing every
 trajectory it clips — **ten rows, four resolved, six open**. **No row is edited
 at rev 8**, including #7's, whose evidence is corrected in the rev-8 note beneath
-the table instead.)*
+the table instead. Rev 9: a new row **#11** is added open, for whether the frozen
+recipe may be re-derived at a new size — **eleven rows, four resolved, seven
+open** — and again no row is edited.)*
 
 **#8 is resolved, and it is the only one.** It was the single *scheduling*
 question in the list — whether the composition ran inside Phase 4 or opened
@@ -875,6 +917,7 @@ composed arm is #5's and #1's business, and both are still open.
 | **8** | **Does the composition experiment run inside Phase 4, or as Phase 5's first arm?** | **RESOLVED at rev 3 — inside Phase 4** | Elliot's instruction, 2026-08-04, matching rev 2's recommendation. Ran as `EXP_011` (§10): the arms compose at 2.08326 carried, −28.7 se, 0/128 contexts regressed, **provisional at n = 2** after one seed diverged and was not replaced. The composed arm is a **Phase-5 candidate; adopting it is #5's and #1's business and neither has moved.** ~0.86 GPU-hours including the probe and the divergence chase |
 | **9** | **Should a pre-registered bar require a guard-clause review before it's committed?** | **open — added at rev 6** | `EXP_012`'s Y5 and `EXP_013`'s N1 (§12.4) fired the identical defect: a bar specified without a guard the experiment's own limitations section had already written down. `EXP_013` §10 item 2 named this report by section as the place lacking a row for it. **The protocol rule is already ratified** — `CONTRIBUTING.md` §2, since `51b44c6` (2026-08-05, Elliot, citing both experiments) — so this row tracks the report's own bookkeeping, not an open question of substance |
 | **10** | **What follows from decision #7 changing every trajectory it clips?** | **open — added at rev 8; the re-baselining half is ruled** | `EXP_014`'s G1 gate failed and §13.5 chased it to `_clip_grad_norm_fp64`: the clip fires 3 times in 20,000 steps on the committed recipe, the fp32/fp64 coefficients differ in their last bits there, and the run ends **+1.97e-03 bpc** apart. **Elliot has ruled that the project does not re-baseline** — new experiments train their own anchor on the current tree rather than reproducing a committed number. **Still open: whether a standing rule is wanted that a `src/snn/` change altering any committed figure must be recorded as such before merge.** Rev 8 corrected `train.py`'s docstring, which claimed the fix changed no behaviour; it does not revert the fix and nothing here argues for reverting it |
+| **11** | **May the frozen Phase-2 recipe be re-derived at a new size, and how?** | **open — added at rev 9** | `EXP_015` (§14) trained the adopted two-compartment arm and the composed arm at 5.0M parameters and **both diverged**, at steps 5138 and ~2000, while the plain LIF and the GRU at the identical width, seed and recipe trained cleanly. The recipe — `lr = 3e-3`, cosine over 20,000 steps, `grad_clip = 1.0`, `weight_decay = 0.1` — was fixed at **735K** parameters and has never been re-derived at any other size. **This blocks Phase 5 as currently conceived**, whose plan was to scale the adopted arm. What is Elliot's: whether a recipe term may be changed at a new size at all (it is frozen by `02a_phase2_spec.md`), and if so whether that runs as a **diagnostic** — the arm dies at step 5138, so an LR probe is ~11 GPU-minutes, not a full run — or as a pre-registered arm. **Nothing here proposes a value**, and no term is changed at this revision |
 
 **Two rows above now carry evidence `EXP_011` has overtaken, and the rows are
 deliberately left as they were.** Editing an open decision's evidence is how a
@@ -1014,6 +1057,35 @@ a question until `EXP_014`'s G1 gate failed.**
 * **`CONTRIBUTING.md` gains nothing at rev 8.** The standing-rule half of #10 is
   precisely what would be added to it, and that half is open.
 
+**Rev 9 edits no row and adds one — #11 — for a question that did not exist until
+the adopted arm failed to train.**
+
+* **#11 (may the frozen recipe be re-derived at a new size?) — added, and open.**
+  `EXP_015` §14.5 chased the divergence to the same boundary `EXP_011` §10.4
+  reached and no further: layer 0's backward, on both the fused and the eager
+  path, with the forward and the loss finite and the fp32/fp64 norms in
+  agreement. So the report cannot say the recipe is *at fault* — only that under
+  it, two arms do not train at a size at which two others do. **That distinction
+  is why this is a decision and not a finding.**
+* **What rev 9 did about it without deciding anything.** Nothing. No recipe term
+  is changed, no value is proposed, and `02a_phase2_spec.md` is untouched. The
+  cost of the cheapest discriminating measurement is recorded (~11 GPU-minutes
+  per LR probe, because the arm dies at step 5138 rather than at 20,000) so that
+  the decision is made against a price rather than a guess.
+* **#9 is re-evidenced, not edited.** `EXP_015`'s P1 and P2 are the **third**
+  pre-registered rules in this phase to fire and mislead — UNRESOLVED, which
+  §3.0 defines as a statement about statistical power, returned for two runs that
+  produced no number at all, with seeds recommended as a remedy that cannot work
+  against a deterministic divergence. The corrected form is a **DIVERGED / NO
+  RESULT** verdict; per `CONTRIBUTING.md` §3 it is referred, not applied, and #9's
+  row is left exactly as rev 6 wrote it.
+* **#4 (Phase 5 authorisation) is re-evidenced in prose, and the row is not
+  touched.** It reads against ~3.5 of ~30 GPU-hours; §1 now records ~10.1. More
+  substantively, §14 changes what Phase 5 would be authorising: at matched size
+  the anchor is 0.45374 ahead, its reach is **97** against **8**, the two models
+  are nearly equal at zero context, and the arm Phase 5 planned to scale does not
+  currently train at scale. **#4 is still open and still Elliot's.**
+
 ---
 
 ## 9. Gates, at the close of this revision
@@ -1081,7 +1153,7 @@ campaign does not target — and this row says so rather than implying otherwise
 
 **Rev 7 did not re-run this table either**, for the same reason rev 5 did not: it
 touches report and README prose and no code. Its own commit-time gates are
-recorded in §14's rev-7 entry (394 passed, 44.9 s, on the committed tree).
+recorded in §15's rev-7 entry (394 passed, 44.9 s, on the committed tree).
 
 **Rev 8 re-ran the suite for real and it is literal output: `ruff check .` clean,
 fast subset `258 passed, 1 skipped` in 8.2 s, full suite `396 passed` in 38.7 s
@@ -1098,6 +1170,24 @@ and no numeric path, so every row still describes the tree it was measured on.
 `cuda_graph=False` fallback, K2 no mutation lockfile before any of the six child
 processes, K3 realised/projected 0.949 / 0.946 / 0.925, F1 zero failures, and the
 pre-registration hash unchanged across the ladder. **G1 failed** (§13.5).
+
+**Rev 9 re-ran the suite: `ruff` clean, fast subset 267 passed / 1 skipped, full
+suite green on this GPU.** The fast count moves 258 → 267 for
+`tests/test_calibrate_cost.py`, which pins the shared calibration tool's argv and
+parameter closed forms, the arms' parameter match at `d = 1481` *and its
+`O(d)`-vs-`O(d²)` mechanism*, and the two completion-test defects `EXP_015`
+§9.10 found. **The gate rows above are not re-run** — rev 9 changes no kernel, no
+captured graph and no numeric path in `src/snn`.
+
+`EXP_015`'s own gates: K1 3/3 with `absent_from_reference_and_left_at_default`
+**empty** at every leg (§14's stricter K1, possible because `scale_d1481_s0`
+carries every field of the current `Config`), G3 3/3 exact, G4 3/3 against a
+**4.0 GiB** alarm derived from a measured 2.9767 GiB peak rather than inherited,
+K2 clean, K3 0.9262 / 0.9147 / 0.9720, F1 zero failures, pre-registration hash
+unchanged. **No G1 gate exists**, and that is deliberate: every leg is anchored
+to `scale_d1481_s0` on this tree, and entry condition E1 discharged the tree
+question by measurement — the calibration's `snn` leg reproduced `EXP_014`'s own
+calibration to full precision eleven commits later.
 
 ---
 
@@ -1730,8 +1820,16 @@ remaining gap, the thing §7 item 2 called *"still barely attacked"* — moves b
 was the threshold arm's **+0.0288**.
 
 **And the sobering version, which belongs in the same paragraph:** at 6.8× the
-parameters the SNN is **still 0.2333 bpc behind a GRU at 1×**. Width closed
-about a quarter of the remaining gap to the anchor, not the gap.
+parameters the SNN is **still 0.2333 bpc behind a GRU at 1×**, which closes
+**52.0 %** of the 735K gap.
+
+> **Rev 9 corrects this paragraph twice.** As written at rev 8 it said width
+> closed *"about a quarter of the remaining gap"*; the figure is **52.0 %**, and
+> the error was reading the absolute 0.25238 bpc gain as a fraction. **And the
+> corrected figure is still the wrong comparison** — it prices a 5M spiking model
+> against a **738K** anchor. `EXP_015` §14.2 trained the anchor at matched size:
+> the gap is **0.45374**, so width closes **6.6 %**, not 52 %. The sentence above
+> is left standing with this note beneath it, because it is what rev 8 asserted.
 
 **What it does not answer, quoted from §9.10 rather than paraphrased.** It does
 not say what size Phase 5 should run — *"wrong neuron, and `EXP_005`/`EXP_012`
@@ -1774,10 +1872,154 @@ The pre-registration's §0–§8 hash to
 
 ---
 
-## 14. Changelog
+## 14. `EXP_015` — the adopted arm does not train at width, and the anchor scales with it
+
+Pre-registered in `experiments/logs/EXP_015_architecture_at_width.md`, **committed
+before the first run** (`d4469d6`), hash-verified after the last. Closed
+2026-08-10, ~2.1 GPU-hours. It exists because `EXP_014` §9.10 stated its own
+limit — the width comparison was **not parameter-matched** and ran on the **wrong
+neuron** — and §10 item 4 referred exactly this.
+
+**The design was cheap for a structural reason.** At `d_model = 1481` every arm
+lands within **0.18 %** of the plain LIF's 4,997,099 parameters, because each
+arm's extras are one or two vectors per layer — `O(d)` against an `O(d²)` stack —
+so the mismatch falls with width (0.28 % for `twocomp` at `d = 512`, 0.12 % at
+1481). Width-matching *is* parameter-matching here, no arm needs a derived width,
+and the GRU is matched **by construction** since `GRUCharLM` sizes its hidden
+width from `spiking_param_count`. `tests/test_calibrate_cost.py` pins both the
+tolerance and the mechanism.
+
+### 14.1 The scoreboard
+
+| leg | arch | params | test bpc carried | wall-clock | peak VRAM | outcome |
+|---|---|---:|---:|---:|---:|---|
+| control | `snn` | 4,997,099 | **2.00073** | 2,191.4 s | 1.6434 GiB | trains (`EXP_014`) |
+| A | `twocomp` | 5,003,023 | **NaN** | 2,432.2 s | 2.6138 GiB | **diverged, step 5138** |
+| B | `twocomp_threshold` | 5,005,985 | **NaN** | 2,551.0 s | 2.9767 GiB | **diverged, step ~2000** |
+| anchor | `gru` | 4,997,829 | **1.54699** | 1,481.3 s | 2.1293 GiB | trains |
+
+**Both arms containing the two-compartment neuron failed to train at 5.0M
+parameters under the frozen Phase-2 recipe.** The plain LIF at the identical
+width, seed, recipe and tree does not, and neither does the GRU. At 735K these
+same arms trained across 7 and 2 seeds. **This is the finding that bears on
+Phase 5**, whose plan was to scale the adopted arm.
+
+### 14.2 The anchor at matched size — the leg that carried no bar
+
+P3 was pre-registered with **no bar**, because the GRU violates I5 and is not a
+competitor. It was trained so the project's gap statement would stop comparing a
+5M spiking model against a 738K GRU:
+
+| comparison | gap | fraction of the 735K gap closed |
+|---|---:|---:|
+| 735K vs 735K | 0.48570 | — |
+| 5M SNN vs **735K** GRU | 0.23332 | 52.0 % |
+| **5M vs 5M** | **0.45374** | **6.6 %** |
+
+Width bought the spiking model **−0.25238** and the anchor **−0.22042**. Both
+improve; the distance barely moves. **Capacity is not what separates this
+architecture from its anchor**, and §13.6's reading — accurate as far as it went —
+does not survive matching parameters on both sides.
+
+### 14.3 Where the difference actually lives: reach, not capacity
+
+| arm | params | horizon (2σ) |
+|---|---:|---:|
+| `snn_beta0.5` (n=5) | 735,437 | 7 |
+| `scale_d1481` | 4,997,099 | **8** |
+| `arch_gru_d1481` | 4,997,829 | **97** |
+| `twocomp` *(committed)* | 737,485 | 47 |
+| `gru` *(committed)* | 738,019 | 57–60 |
+
+**Width buys the anchor reach and buys the spiking model none.** The same
+statement without any horizon definition, from the absolute per-context curves:
+
+| context c | 0 | 2 | 4 | 8 | 16 | 64 |
+|---|---:|---:|---:|---:|---:|---:|
+| `arch_gru_d1481` | 4.0014 | 2.7013 | 2.1781 | 1.8766 | 1.7222 | 1.6126 |
+| `scale_d1481` | 4.0524 | 2.8761 | 2.2261 | 2.0291 | 2.0194 | 2.0201 |
+
+**At zero context the two 5M models are nearly equal — 0.051 apart.** By `c = 8`
+it is 0.152; by `c = 64` it is **0.408**, and the spiking curve has been flat
+since `c ≈ 8`. **The entire matched-size gap is a failure to use context, not a
+failure to model the marginal** — and the only spiking arm that ever bought reach
+(`twocomp`, horizon 47) is the arm that will not train at width.
+
+*Guard, pre-registered:* n = 1 at both wide points and the lattice is coarse, so
+these are **markers with no verdict**. 8 against 97 is why they are reported.
+
+### 14.4 P1 and P2 fired, and said the wrong thing — for the third time
+
+The resolver returns **UNRESOLVED** for both dead legs, and its decision cell
+recommends seeds. **Both are wrong for what happened**: §3.0 defines UNRESOLVED
+as a statement about *power*, and these runs produced no number at all; and the
+divergence is a **deterministic** function of (checkpoint, step), so a second seed
+measures a different trajectory rather than the same one again.
+
+`CONTRIBUTING.md` §3 says report the verdict and refer the correction, so P1 and
+P2 stand as **UNRESOLVED, as fired**. This is the third pre-registered rule in
+Phase 4 to fire and mislead — after `EXP_012`'s Y5 and `EXP_013`'s N1 — which is
+decision **#9**'s substance a third time. The corrected form is a
+**DIVERGED / NO RESULT** verdict distinct from UNRESOLVED; **referred, not
+applied.**
+
+### 14.5 The divergence, and it is `compose_s0`'s
+
+`011_chase_compose_divergence.py` **reused unchanged** but for a `--tag`, replayed
+from `ckpt_best.pt` and **reproduced the NaN deterministically at step 5138** —
+138 steps after the checkpoint, inside the 250-step logging cadence that made the
+run's own log read 5250.
+
+| | `compose_s0` (735K) | `arch_twocomp_d1481_s0` (5.0M) |
+|---|---|---|
+| step | 17,598 | **5,138** |
+| origin | backward | **backward** |
+| forward, loss | finite | **finite** (1.4198) |
+| fp32 vs fp64 norm | equal | **equal** |
+| eager path | identical NaN | **identical NaN** |
+| non-finite grads | embed, layers.0.{weight,bias}, w.0, beta_s_raw.0, thr_log.0 | **the same five, minus thr_log** |
+
+**The same mechanism, and the first time on the plain adopted arm.** Not
+`EXP_009`'s clip overflow (norms agree), not a fused-kernel defect (R10 clean,
+`fused_only_nonfinite_params` empty), and not a gradient explosion — the largest
+gradient in the six steps before death is **2.0e-02** and the clip never fires in
+the whole run. Always layer 0 and the embedding; never layer 1.
+
+**A hypothesis was stated and falsified.** The two chases' state magnitudes differ
+~10×, so: does the two-compartment membrane grow with width where the plain LIF's
+does not? Measured on four committed checkpoints — layer 1 grows **13.30×** for
+the plain LIF and **14.96×** for `twocomp`. The *surviving* arm grows more, and a
+plain LIF carrying `|state|` up to 556 trains 20,000 steps without incident.
+**State magnitude is not the discriminator.** What survives is a lead only: at
+layer 0, the locus of every non-finite gradient, `twocomp` is **2.84×** the plain
+LIF at the same width, carried by the reset-shielded slow pole. Separately,
+"the slow pole ran away" was removed without spending GPU — `beta_s =
+sigmoid(beta_s_raw)` is bounded in (0, 1) and weight decay pulls it toward *more*
+damping.
+
+### 14.6 What this releases, and what it refers
+
+**Released.** `EXP_014` §10 item 4 is answered: the `twocomp` ladder was worth
+running, and what it bought was not a bpc. §13.6's gap statement is superseded by
+§14.2's matched one. `EXP_011` §10.4's mechanism is reproducible in 138 steps
+from a committed checkpoint instead of 17,598.
+
+**Referred** (`EXP_015` §10): the recipe question, which is new decision **#11**;
+whether the arm is retried at an intermediate width (`d = 1020`, one run, where
+`EXP_014` already has a control); the verdict-vocabulary correction (#9 again);
+what the now-cheap third divergence is worth chasing to; and whether the anchor's
+result restates what Phase 5 is for.
+
+**Closes no ranked candidate.** `EXP_015` is not on `03_phase3_candidates.md`
+§6.3's list, like `EXP_012` and `EXP_013` before it.
+
+---
+
+## 15. Changelog
 
 | Rev | Change |
 |---|---|
+| 9 | 2026-08-10. **`EXP_015` folds in as §14: the adopted arm does not train at width, the anchor scales with the spiking model, and the difference between them is reach rather than capacity.** (a) **§14 added**, pushing the changelog to §15. Four legs at `d_model = 1481`, seed 0, `arch` the only variable, all within **0.18 %** of 4,997,099 parameters — width-matching *is* parameter-matching at this width because each arm's extras are `O(d)` against an `O(d²)` stack, and the GRU is matched by construction. **Both arms containing the two-compartment neuron DIVERGED** — `twocomp` at step 5138, `twocomp_threshold` at ~2000 — while the plain LIF and the GRU at the identical width, seed, recipe and tree trained cleanly; at 735K these same arms trained across 7 and 2 seeds. (b) **P3, the leg pre-registered with no bar, is the result.** The anchor at matched size scores **1.54699** carried against the spiking model's 2.00073, so the gap is **0.45374** where at 735K it was 0.48570 — **width closes 6.6 % of it**. Width bought the spiking model −0.25238 and the anchor −0.22042. **Capacity is not what separates this architecture from its anchor.** (c) **§14.3 locates the difference**: with width the anchor's 2σ memory horizon goes 57–60 → **97** and the spiking model's goes 7 → **8**, and the absolute per-context curves say it without any horizon definition — the two 5M models are **0.051 apart at zero context**, 0.152 apart by `c = 8`, and **0.408 apart by `c = 64`**, with the spiking curve flat since `c ≈ 8`. The entire matched-size gap is a failure to *use* context. The one spiking arm that ever bought reach (`twocomp`, horizon 47) is the arm that will not train at width. (d) **P1 and P2 fired and misled, for the third time in this phase.** Both resolve UNRESOLVED — which §3.0 defines as a statement about statistical *power* — for two runs that produced no number at all, with seeds recommended as a remedy that cannot work against a deterministic divergence. Reported unrepaired per `CONTRIBUTING.md` §3; the corrected **DIVERGED / NO RESULT** verdict is referred, and #9's row is left as rev 6 wrote it. (e) **§14.5: the divergence is `compose_s0`'s mechanism**, reproduced deterministically at step 5138 by `011_chase_compose_divergence.py` **reused unchanged** but for a `--tag`. Origin backward; forward and loss finite; fp32 and fp64 norms equal; the eager path producing an **identical** NaN in the **identical** five tensors (R10 clean); always layer 0 and the embedding, never layer 1; largest gradient in the six steps before death **2.0e-02**, and the clip never fires in the whole run. First occurrence on the plain adopted arm rather than the composed one, and now reproducible **138 steps from a committed checkpoint instead of 17,598**. (f) **A hypothesis was stated and falsified in place**: state magnitude is *not* the discriminator — layer 1's state grows **13.30×** for the plain LIF and **14.96×** for `twocomp` across the same width change, the *surviving* arm growing more, and a plain LIF carrying `|state|` up to 556 trains 20,000 steps without incident. What survives is a lead only: at layer 0, `twocomp` is 2.84× the plain LIF, carried by the reset-shielded slow pole. "The slow pole ran away" was separately removed **without spending GPU** — `beta_s = sigmoid(beta_s_raw)` is bounded in (0, 1) and weight decay pulls it toward *more* damping. (g) **§8: no row edited; row #11 added, open** — may the frozen Phase-2 recipe be re-derived at a new size, and how? The recipe was fixed at 735K and has never been re-derived; this blocks Phase 5 as conceived. **No term is changed and no value is proposed**, and the price of the cheapest discriminating measurement is recorded (~11 GPU-minutes per LR probe, because the arm dies at 5138 rather than at 20,000) so the decision is made against a price. **Table now eleven rows, four resolved, seven open.** #4 and #9 are re-evidenced in prose only. (h) **§7.1 gains a rev-9 note, offered and not applied**: three of the remaining rows sit on the two-compartment family or on components width already moved, and a prerequisite has appeared underneath them; the measurement that reorders the table is no longer an arm but reach; and the GPU-h column gains a second measured row, with the calibration method transferring across *arms* (K3 0.926 / 0.915 / 0.972). **~0.7 GPU-hours bought no number** and is recorded as spent rather than netted off. (i) **CORRECTION to rev 8.** §13.6 said width closed *"about a quarter of the remaining gap to the anchor"*. The figure against the 735K anchor is **52.0 %** — the error was reading the absolute 0.25238 bpc gain as a fraction — and the corrected figure is *still the wrong comparison*, because it prices a 5M model against a 738K anchor. §14.2's matched figure, **6.6 %**, supersedes both. The rev-8 sentence is left standing with the correction beneath it. (j) §1: experiments closed gains `EXP_015`; **GPU-hours ~8.0 → ~10.1**; **unexplained divergences 2 → 4, sharing 2 causes**; decisions open **6 of 10 → 7 of 11**; the adopted-arms row gains the caveat that neither adopted arm has been shown to train above 735K. (k) §9 re-run: `ruff` clean, fast subset **267 passed / 1 skipped** (258 → 267 for `tests/test_calibrate_cost.py`), full suite green; **gate rows not re-run**, since no kernel, captured graph or numeric path changed. (l) `EXP_015` §9.10 records **three defects the experiment found in its own instruments** — the driver marked both dead legs `completed: true` (a trainer that goes non-finite exits 0 and writes a checkpoint), the same defect one level down where an absent log read as a clean log, and the resolver crashing on P4 by guessing an artifact's shape. All three fixed with tests; **no threshold, bar or verdict moved**, and the committed manifest still reads `completed: true` because that is what the driver did. (m) `EXP_015` §9.12 records that the pre-registration hash recipe is **CRLF-dependent** — reconstructing with LF gives a different digest, so a future reader checking that way would wrongly conclude the pre-registration had been edited. **No earlier number, verdict or threshold changes beyond the correction at (i). No arm is adopted, no size is chosen, no tolerance is set, no phase is authorised, and no recipe term is changed.** |
 | 8 | 2026-08-10. **`EXP_014` folds in as §13 — the largest effect this phase has measured, and it is not an arm — and decision #7 turns out not to be numerically inert.** (a) **§13 added**, pushing the changelog to §14: the parameter-scaling ladder at `d ∈ {512, 1020, 1481}` (735,437 / 2,501,245 / 4,997,099 params), seed 0, `arch="snn"`, `d_model` the only field changed. **−0.25238 bpc carried at 54.75 transferred σ** against a pre-registered 10 σ bar, and **−0.25674** against the alternative anchor the log pre-registered for a G1 failure, so the verdict does not turn on the anchor. S1–S4 all held. **94–98 % of the gain is at or inside the baseline's own reach** (horizon 7 → 8 → 8, inside the pre-registered ceiling); the within-reach component moves **+0.12538** against the best architectural arm's +0.0288. **The underfitting regime ends between 2.5M and 5M parameters** — fresh gap +0.00592 / +0.03524 / +0.05509 — and the `Δtest ≤ 0` guard (decision #9's substance) did real work for the first time, distinguishing memorisation-alongside-a-real-gain from `EXP_013` N1's damaged model. **Unanticipated and unpredicted by any bar: firing rates fall monotonically with width** (0.339/0.320 → 0.293/0.267 → 0.209/0.185), which bears on the energy argument. An unplanned check worth more than the bar it served: the `d=512` leg's fresh gap is +0.00592 against `EXP_013` §2.2's +0.00594, five different runs on a different tree agreeing to 2e-05 on a quantity whose 2σ bar is 0.00536. **Nothing is adopted and nothing is ranked** — n = 1 per rung against §6.2's three-seed rule, carried as structural fields in the artifact rather than as prose. (b) **§13.5: G1 — the one gate expected to pass — FAILED, and was chased to its origin the same day.** Today's tree does not reproduce the committed baseline (+1.973e-03 fresh / +1.994e-03 carried). Five measurements identify **decision #7's own `_clip_grad_norm_fp64`** as the whole cause: the tree reproduces *itself* bitwise; the clip fires exactly three times in 20,000 steps (32/33/34, norms 1.0329/1.1198/1.0957, all between the 250-step logging cadence); a worktree at `b5f71a9` reproduces the committed baseline bitwise; monkeypatching the stock clip back gives zero differing losses over 250 steps; the fp64 clip first differs at step 47. **The fix is therefore not numerically inert** — true of the gradients, false of the trajectory — and `src/snn/train.py`'s docstring said in as many words that it was. **That docstring is corrected**; `tests/test_grad_clip.py` needed no change, and §8's rev-8 note records why (its bitwise assertion covers only the `max_norm=inf` sentinel path; the test that exercises a firing clip already asserts `allclose`, not equality). The record also keeps the **false negative**: the substitution test was first run for 40 steps, read as exonerating the clip, and stopped seven steps short of the divergence — a *validated* probe run over too short a window, `EXP_007` V4's shape. (c) **§8: no row edited; row #10 added, open** — what follows from #7 changing every trajectory it clips. **Elliot has ruled the re-baselining half: the project does not re-baseline**, and every new experiment trains its own anchor on the current tree. The standing-rule half — whether a `src/snn/` change altering a committed figure must be recorded as such before merge — **stays open**, and `CONTRIBUTING.md` is therefore **not** amended at this revision. **Row #7 is not edited**: it is decided, and this is a correction to its evidence, which the rev-5 rule puts in prose beneath the table. **Table now ten rows, four resolved (#1, #5, #7, #8) and six open (#2, #3, #4, #6, #9, #10).** (d) **§7.1: rank 2 struck through as DONE**, on rank 1's precedent, with its cost corrected **0.35 → ~1.5 actual**. A rev-8 note offers three consequences and applies none: the remaining rows are ranked against 0.03–0.17 bpc gains while width bought 0.25; the sizing answer §7.2 said rank 2 would supply **cannot** come from it, because it ran on the plain LIF and `EXP_005`/`EXP_012` are two demonstrations that this project's statistics do not transfer between its two neurons; and the GPU-h column is now suspect in a *measurable* way rather than a general one — the one row ever measured was low by **3.1×**, and ranks 3–6 sum to 2.70 as written against ~8.4 if they carry the same error. **No rank is renumbered and no row's evidence is rewritten.** (e) §1's status table updated: experiments closed gains `EXP_014`; **ranked candidates closed 5 → 6 of 14** (`EXP_014` closes #11, and that is the only thing it settles); **GPU-hours ~6.5 → ~8.0**, itemised — 1.02 ladder training, ~0.17 calibration run twice, ~0.09 evaluations and probes, ~0.25 for the chase; decisions open **5 of 9 → 6 of 10**. (f) the changelog renumbered §13 → §14 as `EXP_014`'s new §13 was inserted — the same slip rev 3 (f), rev 4 (g) and rev 6 (h) each record for their own insertions — and the three bare "§13" cross-references that meant the changelog (the header's rev-7 blockquote, §1's rev-6 summary of what rev 6 did, §6.1's wall-clock correction note) were retargeted in this same pass rather than left for a rev 9 to find. (g) §9 re-run for real: `ruff` clean, fast subset **258 passed / 1 skipped** in 8.2 s, full suite **396 passed** in 38.7 s — 394 → 396 because `EXP_014` added two ladder tests. `CONTRIBUTING.md` and `README.md`'s quoted counts corrected **257 → 259** (fast, which counts the skip) and **394 → 396** (full); the **gate rows themselves are not re-run and not claimed to be**, since rev 8's only code change is a docstring. (h) `README.md`'s results section gains the width result and the caveats it must be read under, and its *"the model underfits"* line — true at 735K and now bounded above — is qualified rather than deleted. **No earlier number, verdict or threshold changes. No arm is adopted, no tolerance is set, no phase is authorised, and no size is adopted.** |
 | 7 | 2026-08-08. **Bookkeeping only: the tree is committed, three figures are corrected, and one ranked cost is flagged as unsupported.** No experiment ran, no arm is adopted, no tolerance is set, no phase is authorised, and **no §8 row is edited — five decisions remain open.** (a) **Rev 6's uncommitted working tree is now committed**, in seven commits on `main`: `EXP_013`'s pre-registration and arm, decision #7's fp64 clip (deliberately split from the first so a future bisect can separate a change to *every* arm's training numerics from one experiment's wiring), `EXP_013`'s drivers/resolver/evidence, rev 6 itself, chat session 7, chat Track A, and an orphan sampler. `main` was 74 commits behind at Phase 1 and is fast-forwarded to the tip; a `git bundle` of every ref is written outside the repository. **`EXP_013`'s pre-registration was verified before and after committing**: §0–§8 hash to `285eb661…82ef8d` and the reconstructed pre-results file to `2e9ee41e…`, matching both stamps in `exp_013_run_manifest.json`. That does **not** retroactively supply the pre-run commit its own §0 promised and this entry does not pretend otherwise — the hash chain is what discharges the guarantee, and it held. Full suite re-run on the committed tree: **394 passed, 44.9 s**; fast subset 256 passed / 1 skipped; `ruff` clean. (b) **Rev 6's changelog inventory of what remained uncommitted was incomplete** and is corrected here rather than by rewriting that entry: it lists `EXP_013`'s log, four `exp_013_*.json`, `src/snn/noise.py`, `tests/test_noise.py` and `scripts/exp/013_*.py`, and **omits `src/snn/model.py`, `src/snn/config.py` and `scripts/exp/001_memory_horizon.py`** — two of them in `src/`, so a reader planning the commit from that list would have shipped the arm without the class that implements it. It also undercounts the `exp_013_*.json` artifacts, which are six. (c) **§7.2's budget sentence corrected**: ranks 2–6 sum to **3.05**, not 3.2, and ~**23.5** GPU-hours remain, not ~26.5 — the latter a rev-2 figure carried through four revisions against §1's own ~6.5-of-~30. (d) **§7.2 gains a standing caveat on rank 2's 0.35 GPU-h**: it descends from `01_reconnaissance.md` §3.5's eager forward-only width sweep, which `02_baseline_report.md` §6.2 withdrew in a section that closes by instructing Phase 3's ROI estimates not to reuse it, and `EXP_003`'s ladder is collinear in `K`, `K·d` and `K·d²` so it cannot price width either. A GEMM-FLOP model on `audit_01`'s measured 11.91 TFLOP/s puts it at ~0.9–1.4 GPU-h. **No corrected number is written into §7.1's table**, because that model is itself unvalidated at width; `EXP_014` opens with a calibration that measures it. (e) `README.md`'s status table corrected — it still read 1 adopted arm / 6 of 8 open / ~4.6 GPU-hours, three revisions stale, because rev 6 (g) corrected only the test-suite figures in that file. |
 | 6 | 2026-08-08. **`EXP_013` folds in, #5 and #7 are decided, and #9 is added.** (a) §12 added: `EXP_013` (noise injection) closes as a null — costs bits at every amplitude (+0.00419/+0.04978/+0.63975 bpc, 1.2/14.8/190.0 se), buys none — but its §2.2 calibration is the transferable result: this 735,437-parameter model's generalisation gap is +0.00594 bpc (fresh) / −0.00180 (carried, indistinguishable from zero) against ~655M training characters, ~7.3 epochs. **The model is not overfitting.** N1 (the primary rule) holds at two amplitudes and must not be believed — the decomposition shows a uniformly damaged model, not better generalisation, the same defect as `EXP_012`'s Y5 (§12.4). (b) §6.3, §6.5, §6.7 item 3, §10.1 and §7 item 5 each gain a rev-6 cross-reference to §12, none rewritten. (c) §7.1 gains a new rank 2, **the parameter-scaling pilot** (`03_phase3_candidates.md` §6.3 #11, 0.35 GPU-h) — absent from this table through rev 5 for lack of evidence there was room to grow; `EXP_013` supplies exactly that evidence. §7 gains item 6 stating the referral. Ranks 2–5 renumbered 3–6; no prior rank's own evidence changed. (d) §8: **row 5 edited to RESOLVED** — the learned per-channel threshold is **adopted standalone**, per Elliot's instruction; the composed arm (`EXP_011`) is explicitly **not** adopted by this and stays provisional at n = 2. **Row 7 edited to RESOLVED** — `src/snn/train.py`'s `_clip_grad_norm_fp64` replaces `clip_grad_norm_`, accumulating the sum of squares in fp64; verified on `EXP_009` §9.4's own failing gradient (`tests/test_grad_clip.py`) and against the unchanged R5 capture gate (10/10). Does **not** address `compose_s0`'s divergence — a different, still-open mechanism (§10.4). **Row 9 added, open**: whether a pre-registered bar needs a guard-clause review before commit, per `EXP_012`'s Y5 and `EXP_013`'s N1 firing the identical defect twice — the *protocol* rule is already ratified in `CONTRIBUTING.md` §2 (`51b44c6`, 2026-08-05, Elliot); this row is the report catching up to it, not a new decision. **Table now nine rows, four resolved, five open.** (e) `CONTRIBUTING.md` §4 gains two ratified amendments: the fold-in tolerance is architecture-specific and re-derived per arm, never inherited (decision #6's substance); a provisional result is promoted only by seeds *added*, never substituted, up to the pre-registered n. (f) §9: full suite re-run for real, **394 passed** (280 + 85 `test_snnchat.py`, uncommitted-to-this-revision + 23 `test_noise.py` + 6 `test_grad_clip.py`); fast subset 256 passed/1 skipped/8s. Gate rows added for `EXP_013`'s G1/G3/G4-5/F1/K1/calibration/hash checks and for decision #7's fix. Mutation campaign **not** re-run — nothing in `snn/kernels.py`/`surrogate.py`/`twocomp.py` changed. (g) `README.md` and `CONTRIBUTING.md`'s quoted test-suite figures corrected to the numbers this revision measured, both stale independently of each other (README's fast count and CONTRIBUTING's full count had drifted by different amounts). (h) the changelog renumbered §12 → §13 as `EXP_013`'s new §12 was inserted, the same slip rev 3's item (f) and rev 4's item (g) each record for their own insertions; two bare "§12" cross-references (§1's rev-2 summary, §6.1's wall-clock correction note) meant the changelog and were retargeted to §13, caught in this same pass rather than left for a rev 7 to find. **GPU-hours: ~4.6 → ~6.5** (using `EXP_013` §9's measured 1.9, not its §0 estimate of 1.6). **Working tree, recorded rather than resolved:** `EXP_013`'s own files (log, four `docs/reports/data/exp_013_*.json` beyond the two already read at rev 4, `src/snn/noise.py`, `tests/test_noise.py`, `scripts/exp/013_*.py`) remain uncommitted, as they were at rev 5 and at `31e49fa`'s deliberate exclusion; this revision's own edits (this file, `CONTRIBUTING.md`, `README.md`, `src/snn/train.py`, `tests/test_grad_clip.py`) are likewise left uncommitted — staging is Elliot's, not this revision's. |
