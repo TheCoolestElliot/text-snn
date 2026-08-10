@@ -22,8 +22,8 @@ mechanisms actually close it?**
 | Phase 4 | **open** — running record in [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md) |
 | Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
 | Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
-| Open decisions | **6 of 10**, all the author's (§8 of the Phase-4 report) |
-| Budget | ~8.0 of ~30 GPU-hours spent |
+| Open decisions | **7 of 11**, all the author's (§8 of the Phase-4 report) |
+| Budget | ~10.1 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
@@ -63,24 +63,40 @@ context, **−48 % inside the 7 characters the baseline already reached**, and
 nearly half its magnitude is handed back. That decomposition is the single most
 useful thing this project has produced about how to read an SNN result.
 
-**The largest single effect measured in Phase 4 is not an arm — it is width.**
-`EXP_014` trained the *plain* baseline neuron at 2.5M and 5.0M parameters and
-took **2.25311 → 2.00073 carried**, a −0.252 bpc move at 54.75 σ. That is more
-than every architectural arm in the table above, at **6.8× the parameters** — so
-it **refutes none of them**; it says the project had been spending its budget on
-a 0.03–0.17 bpc axis with an unmeasured 0.25 bpc axis beside it. Read it with
-three caveats the report states in full: it is **n = 1 per size** and adopts
-nothing, it is **not parameter-matched** against any arm, and at 6.8× the
-parameters the model is **still 0.233 bpc behind the GRU anchor at 1×**.
+**Two experiments at 5M parameters changed what this project thinks its problem
+is.** `EXP_014` trained the *plain* baseline neuron at 2.5M and 5.0M and took
+**2.25311 → 2.00073 carried**, −0.252 bpc at 54.75 σ — more than every
+architectural arm in the table above, though at 6.8× the parameters, so it
+refutes none of them. `EXP_015` then trained the *anchor* at the same size, which
+is the comparison that had been missing:
+
+| at ~5.0M parameters | test bpc, carried | memory horizon |
+|---|---:|---:|
+| spiking baseline | 2.00073 | **8** |
+| GRU anchor | **1.54699** | **97** |
+| two-compartment *(adopted)* | **did not train** | — |
+| composed *(adopted × adopted)* | **did not train** | — |
+
+Three things follow, and none of them is the one the experiment was designed to
+measure. **Capacity is not the difference**: the anchor gains −0.220 bpc from the
+same parameters against the spiking model's −0.252, so the gap between them moves
+only 0.486 → **0.454**. **Reach is**: with width the anchor's horizon goes 57–60 →
+97 while the spiking model's goes 7 → 8, and at zero context the two are within
+**0.051 bpc** of each other — the entire gap opens as context is added. And **the
+one spiking arm that ever bought reach cannot currently be trained at that size**:
+both arms containing the two-compartment neuron diverged, deterministically, at
+steps 5138 and ~2000.
 
 Selected findings that are expensive to re-derive are collected in
 [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md); the
 short version is that **the model underfits at 735K parameters and stops doing so
 somewhere between 2.5M and 5M** (the gap is within noise of zero at 735K and
 +0.055 at 5.0M, while test bpc improves by 0.25 — memorisation alongside a real
-gain, not damage), **the learned threshold is provably a reparameterisation**
-(so its gain is an optimisation effect, not a capacity one), and **two training
-divergences that looked identical in the logs had different causes**.
+gain, not damage; the GRU at the same size overfits about twice as hard),
+**the learned threshold is provably a reparameterisation**
+(so its gain is an optimisation effect, not a capacity one), and **four training
+divergences share two causes** — one of which is now reproducible 138 steps from a
+committed checkpoint and is what stops the adopted arm scaling.
 
 One more, because it constrains how any number here may be compared: the fp64
 gradient-clip fix adopted as decision #7 is **not numerically inert**. It fires
