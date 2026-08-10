@@ -1,0 +1,106 @@
+{
+ "experiment": "EXP_015_architecture_at_width",
+ "question": "does the two-compartment membrane grow with width where the plain LIF's does not?",
+ "inference_only": true,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "no_bar": true,
+ "results": [
+  {
+   "run": "snn_beta0.5_s0",
+   "note": "plain LIF, 735K -- trains",
+   "arch": "snn",
+   "d_model": 512,
+   "step_of_checkpoint": -1,
+   "logits_abs_max": 242.10179138183594,
+   "state_abs_max_per_layer": [
+    62.938941955566406,
+    41.82661056518555
+   ],
+   "state_abs_mean_per_layer": [
+    1.972364068031311,
+    0.6580050587654114
+   ],
+   "param_abs_max": 5.307028293609619
+  },
+  {
+   "run": "scale_d1481_s0",
+   "note": "plain LIF, 5.0M -- trains",
+   "arch": "snn",
+   "d_model": 1481,
+   "step_of_checkpoint": -1,
+   "logits_abs_max": 352.9038391113281,
+   "state_abs_max_per_layer": [
+    95.85635375976562,
+    556.2672119140625
+   ],
+   "state_abs_mean_per_layer": [
+    3.7337441444396973,
+    4.265073776245117
+   ],
+   "param_abs_max": 5.281096458435059
+  },
+  {
+   "run": "twocomp_s0",
+   "note": "two-compartment, 735K -- trains",
+   "arch": "twocomp",
+   "d_model": 512,
+   "step_of_checkpoint": -1,
+   "logits_abs_max": 242.51644897460938,
+   "state_abs_max_per_layer": [
+    54.80167007446289,
+    45.420143127441406
+   ],
+   "state_abs_mean_per_layer": [
+    1.6878376007080078,
+    0.9545688629150391
+   ],
+   "param_abs_max": 4.3443779945373535,
+   "twocomp_state_split_per_layer": [
+    {
+     "fast_abs_max": 30.933570861816406,
+     "slow_abs_max": 54.80167007446289,
+     "fast_abs_mean": 1.1420116424560547,
+     "slow_abs_mean": 2.233663558959961
+    },
+    {
+     "fast_abs_max": 6.200380325317383,
+     "slow_abs_max": 45.420143127441406,
+     "fast_abs_mean": 0.33695244789123535,
+     "slow_abs_mean": 1.5721852779388428
+    }
+   ]
+  },
+  {
+   "run": "arch_twocomp_d1481_s0",
+   "note": "two-compartment, 5.0M -- DIES 138 steps later",
+   "arch": "twocomp",
+   "d_model": 1481,
+   "step_of_checkpoint": -1,
+   "logits_abs_max": 245.89862060546875,
+   "state_abs_max_per_layer": [
+    272.3856506347656,
+    679.5711669921875
+   ],
+   "state_abs_mean_per_layer": [
+    6.814545154571533,
+    9.872543334960938
+   ],
+   "param_abs_max": 4.252720355987549,
+   "twocomp_state_split_per_layer": [
+    {
+     "fast_abs_max": 54.04334259033203,
+     "slow_abs_max": 272.3856506347656,
+     "fast_abs_mean": 5.369313716888428,
+     "slow_abs_mean": 8.259777069091797
+    },
+    {
+     "fast_abs_max": 280.5413818359375,
+     "slow_abs_max": 679.5711669921875,
+     "fast_abs_mean": 6.9484944343566895,
+     "slow_abs_mean": 12.796594619750977
+    }
+   ]
+  }
+ ]
+}

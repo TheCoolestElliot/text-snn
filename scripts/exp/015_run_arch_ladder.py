@@ -270,6 +270,30 @@ def scan_for_divergence(arch: str) -> dict:
     }
 
 
+def leg_completed(returncode: int, scan: dict, ckpt_exists: bool) -> bool:
+    """Did this leg produce a result that may be scored against a bar?
+
+    **Added after the fact, and the fact is worth recording.** As first written
+    this driver asked only `returncode == 0 and ckpt_final.pt exists`, so both
+    diverged legs of `EXP_015` were marked `completed: true`, evaluated to NaN,
+    and handed to the resolver as if they were results.  No evidence was lost --
+    `scan_for_divergence` recorded all 60 and 73 non-finite records, and the
+    manifest carries them -- but the field said the opposite of what happened.
+
+    A training process that goes non-finite still exits 0 and still writes a
+    checkpoint, because nothing in the trainer treats NaN as an error.  So the
+    exit code cannot answer this question and the log has to.
+
+    `log_present` is required rather than assumed, which is the same defect one
+    level down: a missing log makes `n_nonfinite_loss_records` absent, and
+    "absent" would otherwise read as "zero" and mark an unverifiable leg
+    complete.  No log is not the same as a clean log.
+    """
+    return bool(returncode == 0 and ckpt_exists
+                and scan.get("log_present")
+                and not scan.get("n_nonfinite_loss_records"))
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--arms", default=",".join(ARMS))
@@ -335,8 +359,10 @@ def main(argv: list[str] | None = None) -> int:
             dt, rc = _run(_train_argv(arch), f"train {run}", fatal=False)
             row["train_wall_clock_s"] = round(dt, 1)
             row["train_returncode"] = rc
-            row["divergence_scan"] = scan_for_divergence(arch)
-            if rc != 0 or not (RUNS / run / "ckpt_final.pt").exists():
+            scan = scan_for_divergence(arch)
+            row["divergence_scan"] = scan
+            ckpt_exists = (RUNS / run / "ckpt_final.pt").exists()
+            if rc != 0 or not ckpt_exists:
                 # Sec P2: recorded, not reseeded, and the ladder continues.
                 row["completed"] = False
                 row["note"] = (
@@ -347,6 +373,10 @@ def main(argv: list[str] | None = None) -> int:
                 flush()
                 continue
             _check_no_campaign()
+            # A diverged run is still evaluated, deliberately: the NaN in
+            # `final_test.json` is evidence, and suppressing it would leave the
+            # record showing an arm with no number rather than an arm that
+            # produced one and it was NaN.
             ev_dt, ev_rc = _run(_eval_argv(arch), f"evaluate {run}", fatal=False)
             row["eval_wall_clock_s"] = round(ev_dt, 1)
             row["eval_returncode"] = ev_rc
@@ -357,7 +387,19 @@ def main(argv: list[str] | None = None) -> int:
                 flush()
                 continue
 
-        row["completed"] = True
+        scan = row.get("divergence_scan") or scan_for_divergence(arch)
+        row["divergence_scan"] = scan
+        row["diverged"] = bool(scan.get("n_nonfinite_loss_records"))
+        row["completed"] = leg_completed(
+            row.get("train_returncode", 0), scan,
+            (RUNS / run / "ckpt_final.pt").exists())
+        if row["diverged"]:
+            row["note"] = (
+                f"DIVERGED: {scan['n_nonfinite_loss_records']} of "
+                f"{scan['n_train_records']} logged losses non-finite, first at "
+                f"step {scan['first_nonfinite_step']}. This leg's prediction "
+                "resolves NOT RUN. Not reseeded -- CONTRIBUTING.md Sec 4."
+            )
         row.setdefault("divergence_scan", scan_for_divergence(arch))
         row["k1"] = check_same_arm(arch, reference)
         row.update(check_params_and_vram(arch))

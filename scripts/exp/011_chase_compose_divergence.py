@@ -74,17 +74,22 @@ def _bad(named) -> list[str]:
     return [n for n, t in named if t is not None and not torch.isfinite(t).all()]
 
 
-def _fresh_trainer(run: str, tag: str) -> Trainer:
+def _fresh_trainer(run: str, tag: str, prefix: str = "011") -> Trainer:
     """A Trainer on the dead run's own config, writing nothing that matters.
 
     The run name is `_chase011_*` rather than `_chase_*` so this cannot overwrite
     `EXP_009`'s committed chase artifacts, which are still the evidence for its
     §9.4.
+
+    `prefix` exists for the same reason, one experiment later: `EXP_015` reuses
+    this chase unchanged on a *different* divergence, and a chase that wrote into
+    `_chase011_*` would leave two experiments' scratch state in one directory.
+    It defaults to "011", so `EXP_011`'s own invocation is unchanged.
     """
     raw = json.loads((RUNS / run / "config.json").read_text(encoding="utf-8"))
     known = {f.name for f in dataclasses.fields(Config)}
     cfg = Config(**{k: v for k, v in raw.items() if k in known})
-    cfg.run_name = f"_chase011_{tag}"
+    cfg.run_name = f"_chase{prefix}_{tag}"
     cfg.eval_every = 0
     cfg.ckpt_every = 0
     cfg.log_every = 0
@@ -104,13 +109,23 @@ def main(argv: list[str] | None = None) -> int:
                          "enormous gradient, then a NaN one step later -- and a "
                          "chase that starts at the bad step can only see the "
                          "second. This is what makes the two comparable.")
+    ap.add_argument("--tag", default="011",
+                    help="scratch run-dir prefix, `_chase<tag>_pass{1,2}`. Set it "
+                         "when chasing a divergence for a different experiment, "
+                         "so two chases do not share scratch state.")
     ap.add_argument("--out", default="docs/reports/data/exp_011_divergence.json")
     args = ap.parse_args(argv)
 
     ckpt = RUNS / args.run / args.from_ckpt
     report: dict = {
-        "experiment": "EXP_011_composition",
+        # Named from the tag, not hard-coded: this chase is shared tooling now,
+        # and an artifact that says EXP_011 while chasing EXP_015's divergence
+        # is exactly the kind of mislabel a later reader cannot detect.
+        "experiment": ("EXP_011_composition" if args.tag == "011"
+                       else f"EXP_{args.tag}"),
+        "chased_by": "scripts/exp/011_chase_compose_divergence.py",
         "run": args.run,
+        "chase_tag": args.tag,
         "from_checkpoint": str(ckpt.relative_to(_REPO)),
         "compares_with": "docs/reports/data/exp_009_divergence.json",
         "reproduced": False,
@@ -120,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     # ---- pass 1: the graphed path, to the exact step ------------------------
-    t = _fresh_trainer(args.run, "pass1")
+    t = _fresh_trainer(args.run, "pass1", args.tag)
     t.load_checkpoint(ckpt)
     start = t.global_step
     report["resumed_at_step"] = start
@@ -162,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     inspect_from = max(start, bad_step - args.lead_in)
     print(f"\npass 2: replaying to {inspect_from}, then instrumented steps "
           f"through {bad_step}", flush=True)
-    t = _fresh_trainer(args.run, "pass2")
+    t = _fresh_trainer(args.run, "pass2", args.tag)
     t.load_checkpoint(ckpt)
     while t.global_step < inspect_from:
         t.step()

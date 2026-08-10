@@ -116,3 +116,47 @@ def test_the_match_is_a_property_of_width_not_a_coincidence():
         assert _mismatch(arch, 1481) < _mismatch(arch, 512), arch
     # the specific figure the test above would otherwise hide
     assert 0.0027 < _mismatch("twocomp", 512) < 0.0029
+
+
+# ----------------------------------------------------------------------
+# EXP_015's driver: a defect found by the experiment it was written for
+# ----------------------------------------------------------------------
+
+_LADDER_SPEC = importlib.util.spec_from_file_location(
+    "ladder015", _REPO / "scripts" / "exp" / "015_run_arch_ladder.py")
+ladder = importlib.util.module_from_spec(_LADDER_SPEC)
+_LADDER_SPEC.loader.exec_module(ladder)
+
+
+def test_a_diverged_leg_is_not_completed():
+    """The defect: as first written the driver asked only `returncode == 0 and
+    ckpt_final.pt exists`, so both of EXP_015's diverged legs were marked
+    completed and handed to the resolver as results.
+
+    A trainer that goes non-finite still exits 0 and still writes a checkpoint --
+    nothing in it treats NaN as an error -- so the exit code cannot answer this
+    and the log has to.
+    """
+    healthy = {"log_present": True, "n_train_records": 81,
+               "n_nonfinite_loss_records": 0}
+    dead = {"log_present": True, "n_train_records": 81,
+            "n_nonfinite_loss_records": 60, "first_nonfinite_step": 5250}
+
+    assert ladder.leg_completed(0, healthy, True) is True
+    assert ladder.leg_completed(0, dead, True) is False          # the defect
+    assert ladder.leg_completed(1, healthy, True) is False        # crashed
+    assert ladder.leg_completed(0, healthy, False) is False       # no checkpoint
+    # An absent scan must not read as healthy: no log is not the same as a clean
+    # log, and defaulting the other way is how this defect got in.
+    assert ladder.leg_completed(0, {"log_present": False}, True) is False
+
+
+def test_ladder_constants_match_the_pre_registration():
+    assert ladder.D_MODEL == 1481
+    assert ladder.SEED == 0
+    assert ladder.ARMS == ("twocomp", "twocomp_threshold", "gru")
+    assert ladder.MAY_DIFFER == {"arch", "run_name"}
+    # Raised from EXP_014's 3.0 in the pre-registration, from a measured
+    # 2.9767 GiB peak for the composed arm on a 7.96 GiB card.
+    assert ladder.VRAM_ALARM_GIB == 4.0
+    assert ladder.REFERENCE_RUN == "scale_d1481_s0"
