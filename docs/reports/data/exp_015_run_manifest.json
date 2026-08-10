@@ -1,0 +1,151 @@
+{
+ "experiment": "EXP_015_architecture_at_width",
+ "prereg": "experiments/logs/EXP_015_architecture_at_width.md",
+ "prereg_sha256_before_first_run": "3982e59ba5b8ef90d3d05a74f29d16aadca2576d3fda340f23a2c1eb97f7889e",
+ "reference_run": "scale_d1481_s0",
+ "control_leg": {
+  "run": "scale_d1481_s0",
+  "arch": "snn",
+  "retrained": false,
+  "why": "same arch, width, seed, recipe and tree as this ladder; EXP_015 Sec 8 E1 discharged the tree question by measurement, so retraining it would spend 0.61 GPU-h to reproduce a number already shown to reproduce"
+ },
+ "may_differ": [
+  "arch",
+  "run_name"
+ ],
+ "d_model": 1481,
+ "seed": 0,
+ "arms": [
+  "twocomp",
+  "twocomp_threshold",
+  "gru"
+ ],
+ "vram_alarm_gib": 4.0,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "reads_no_bpc": true,
+ "rungs": [
+  {
+   "arch": "twocomp",
+   "run": "arch_twocomp_d1481_s0",
+   "train_wall_clock_s": 2437.7,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 60,
+    "first_nonfinite_step": 5250,
+    "max_grad_norm": 0.6626965999603271,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 18.4,
+   "eval_returncode": 0,
+   "completed": true,
+   "k1": {
+    "run": "arch_twocomp_d1481_s0",
+    "arch": "twocomp",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "params": 5003023,
+   "params_expected": 5003023,
+   "peak_vram_gib": 2.6138,
+   "wall_clock_s": 2432.24,
+   "k3": {
+    "projected_20k_s_from_calibration": 2626.0,
+    "realised_train_wall_clock_s": 2432.24,
+    "ratio_realised_over_projected": 0.9262,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   }
+  },
+  {
+   "arch": "twocomp_threshold",
+   "run": "arch_twocomp_threshold_d1481_s0",
+   "train_wall_clock_s": 2556.5,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 73,
+    "first_nonfinite_step": 2000,
+    "max_grad_norm": 0.7741904854774475,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 19.1,
+   "eval_returncode": 0,
+   "completed": true,
+   "k1": {
+    "run": "arch_twocomp_threshold_d1481_s0",
+    "arch": "twocomp_threshold",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "params": 5005985,
+   "params_expected": 5005985,
+   "peak_vram_gib": 2.9767,
+   "wall_clock_s": 2551.02,
+   "k3": {
+    "projected_20k_s_from_calibration": 2788.8,
+    "realised_train_wall_clock_s": 2551.02,
+    "ratio_realised_over_projected": 0.9147,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   }
+  },
+  {
+   "arch": "gru",
+   "run": "arch_gru_d1481_s0",
+   "train_wall_clock_s": 1486.2,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "max_grad_norm": 0.7840966582298279,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 12.4,
+   "eval_returncode": 0,
+   "completed": true,
+   "k1": {
+    "run": "arch_gru_d1481_s0",
+    "arch": "gru",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "params": 4997829,
+   "params_expected": 4997829,
+   "peak_vram_gib": 2.1293,
+   "wall_clock_s": 1481.28,
+   "k3": {
+    "projected_20k_s_from_calibration": 1523.9,
+    "realised_train_wall_clock_s": 1481.28,
+    "ratio_realised_over_projected": 0.972,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   }
+  }
+ ],
+ "prereg_sha256_after_last_run": "3982e59ba5b8ef90d3d05a74f29d16aadca2576d3fda340f23a2c1eb97f7889e",
+ "prereg_unchanged": true
+}

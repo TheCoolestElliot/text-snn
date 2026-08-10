@@ -1,0 +1,319 @@
+{
+ "experiment": "EXP_015_architecture_at_width",
+ "d_model": 1481,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "n_per_arm": 1,
+ "sigma_is_transferred": true,
+ "bars": {
+  "sigma": 0.00461,
+  "sigma_diff": 0.00652,
+  "sigma_diff_derivation": "sqrt(SIGMA^2 + SIGMA^2); both terms are n=1",
+  "P1": {
+   "arm": "twocomp",
+   "rule": "bpc_carried(arm) <= bpc_carried(control) - 0.0652",
+   "bar_bpc": 0.0652,
+   "bar_in_sigma_diff": 10,
+   "miss_resolves_as": "UNRESOLVED",
+   "miss_may_not_be_written_as": "width subsumes the architecture"
+  },
+  "P2": {
+   "arm": "twocomp_threshold",
+   "rule": "bpc_carried(arm) <= bpc_carried(control) - 0.0652",
+   "bar_bpc": 0.0652,
+   "bar_in_sigma_diff": 10,
+   "composed_minus_twocomp_at_735k": -0.03543,
+   "composed_minus_twocomp_in_sigma_diff": 5.4,
+   "note": "arm-vs-arm is BELOW the bar and is a marker with no verdict"
+  },
+  "P3": {
+   "arm": "gru",
+   "rule": "no bar; report the gap at matched size",
+   "why": "the anchor violates I5 and is not a competitor"
+  },
+  "P4": {
+   "rule": "horizon per arm, marker only",
+   "lattice_is_coarse": true,
+   "no_error_bar_at_n1": true,
+   "baseline_735k": 7,
+   "twocomp_735k": 47,
+   "control_1481": 8
+  },
+  "P5": {
+   "rule": "gap(fresh, twocomp) > gap(fresh, control), counted only where delta_test <= 0 at that arm",
+   "control_gap_fresh": 0.05509,
+   "guard": "delta_test <= 0 -- the correction EXP_013's N1 forced"
+  },
+  "P6": {
+   "rule": "wall-clock, peak VRAM, firing rate; reusable, no bar"
+  },
+  "structural": {
+   "adopts_nothing": true,
+   "ranks_nothing": true,
+   "n_per_arm": 1,
+   "sigma_is_transferred": true
+  }
+ },
+ "control": {
+  "run": "scale_d1481_s0",
+  "fresh": 2.020068093029518,
+  "carried": 2.0007266016460163,
+  "firing_rate_carried": [
+   0.20868549799840702,
+   0.18502129967275419
+  ]
+ },
+ "arms": {
+  "twocomp": {
+   "run": "arch_twocomp_d1481_s0",
+   "completed": true,
+   "params": 5003023,
+   "wall_clock_s": 2432.24,
+   "peak_vram_gib": 2.6138,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 60,
+    "first_nonfinite_step": 5250,
+    "max_grad_norm": 0.6626965999603271,
+    "n_logged_steps_over_clip": 0
+   },
+   "fresh": NaN,
+   "carried": NaN,
+   "firing_rate_carried": [
+    0.0,
+    0.0
+   ],
+   "delta_carried_vs_control": NaN,
+   "delta_fresh_vs_control": NaN,
+   "delta_in_sigma_diff": NaN,
+   "verdict": "UNRESOLVED",
+   "p1b_marker": {
+    "delta_at_735k": -0.13442,
+    "delta_at_1481": NaN,
+    "retained_fraction": NaN,
+    "verdict": "MARKER - NO VERDICT AT n=1",
+    "why": "a difference of differences with one n=1 term and one cross-tree term (the 1.97e-03 bpc offset EXP_014 Sec 9.12 established)"
+   }
+  },
+  "twocomp_threshold": {
+   "run": "arch_twocomp_threshold_d1481_s0",
+   "completed": true,
+   "params": 5005985,
+   "wall_clock_s": 2551.02,
+   "peak_vram_gib": 2.9767,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 73,
+    "first_nonfinite_step": 2000,
+    "max_grad_norm": 0.7741904854774475,
+    "n_logged_steps_over_clip": 0
+   },
+   "fresh": NaN,
+   "carried": NaN,
+   "firing_rate_carried": [
+    0.0,
+    0.0
+   ],
+   "delta_carried_vs_control": NaN,
+   "delta_fresh_vs_control": NaN,
+   "delta_in_sigma_diff": NaN,
+   "verdict": "UNRESOLVED",
+   "p1b_marker": {
+    "delta_at_735k": -0.16985,
+    "delta_at_1481": NaN,
+    "retained_fraction": NaN,
+    "verdict": "MARKER - NO VERDICT AT n=1",
+    "why": "a difference of differences with one n=1 term and one cross-tree term (the 1.97e-03 bpc offset EXP_014 Sec 9.12 established)"
+   }
+  },
+  "gru": {
+   "run": "arch_gru_d1481_s0",
+   "completed": true,
+   "params": 4997829,
+   "wall_clock_s": 1481.28,
+   "peak_vram_gib": 2.1293,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "max_grad_norm": 0.7840966582298279,
+    "n_logged_steps_over_clip": 0
+   },
+   "fresh": 1.5967216694085926,
+   "carried": 1.5469862097035099,
+   "firing_rate_carried": [],
+   "delta_carried_vs_control": -0.4537403919425065,
+   "delta_fresh_vs_control": -0.42334642362092545,
+   "delta_in_sigma_diff": -69.59,
+   "verdict": "NO BAR - ANCHOR (P3)",
+   "gap_to_anchor_at_matched_size": 0.4537403919425065,
+   "gap_to_anchor_at_735k": 0.4857
+  }
+ },
+ "composition_marker": {
+  "composed_minus_twocomp_at_1481": NaN,
+  "composed_minus_twocomp_at_735k": -0.03543,
+  "bar_would_be": 0.0652,
+  "verdict": "MARKER - NO VERDICT AT n=1",
+  "why": "5.4 sigma_diff at 735K, below the 10 sigma_diff bar. 'The composition stopped helping at width' may not be written from this. Seeds are the remedy."
+ },
+ "P4_horizon": {
+  "verdict": "MARKER - NO VERDICT AT n=1",
+  "reference": {
+   "baseline_735k": 7,
+   "twocomp_735k": 47,
+   "control_1481": 8
+  },
+  "f1_failures": [],
+  "by_arm": {
+   "arch_gru_d1481": {
+    "n": 1,
+    "horizon_2sigma_per_seed": [
+     97
+    ],
+    "horizon_0.05bpc_per_seed": [
+     34
+    ]
+   },
+   "scale_d1481": {
+    "n": 1,
+    "horizon_2sigma_per_seed": [
+     8
+    ],
+    "horizon_0.05bpc_per_seed": [
+     6
+    ]
+   },
+   "snn_beta0.5": {
+    "n": 5,
+    "horizon_2sigma_per_seed": [
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "horizon_0.05bpc_per_seed": [
+     5,
+     5,
+     5,
+     5,
+     5
+    ]
+   }
+  }
+ },
+ "P5_gap": {
+  "control_gap_fresh": 0.05509,
+  "by_arm": {}
+ },
+ "P6_systems": {
+  "denominator": {
+   "run": "scale_d1481_s0",
+   "wall_clock_s": 2191.44,
+   "peak_vram_gib": 1.6434,
+   "firing_rate_carried": [
+    0.20868549799840702,
+    0.18502129967275419
+   ]
+  },
+  "by_arm": {
+   "twocomp": {
+    "wall_clock_s": 2432.24,
+    "x_control": 1.1099,
+    "peak_vram_gib": 2.6138,
+    "firing_rate_carried": [
+     0.0,
+     0.0
+    ]
+   },
+   "twocomp_threshold": {
+    "wall_clock_s": 2551.02,
+    "x_control": 1.1641,
+    "peak_vram_gib": 2.9767,
+    "firing_rate_carried": [
+     0.0,
+     0.0
+    ]
+   },
+   "gru": {
+    "wall_clock_s": 1481.28,
+    "x_control": 0.6759,
+    "peak_vram_gib": 2.1293,
+    "firing_rate_carried": []
+   }
+  }
+ },
+ "gates": {
+  "k1": {
+   "twocomp": {
+    "run": "arch_twocomp_d1481_s0",
+    "arch": "twocomp",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "twocomp_threshold": {
+    "run": "arch_twocomp_threshold_d1481_s0",
+    "arch": "twocomp_threshold",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "gru": {
+    "run": "arch_gru_d1481_s0",
+    "arch": "gru",
+    "d_model": 1481,
+    "seed": 0,
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   }
+  },
+  "k3": {
+   "twocomp": {
+    "projected_20k_s_from_calibration": 2626.0,
+    "realised_train_wall_clock_s": 2432.24,
+    "ratio_realised_over_projected": 0.9262,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   },
+   "twocomp_threshold": {
+    "projected_20k_s_from_calibration": 2788.8,
+    "realised_train_wall_clock_s": 2551.02,
+    "ratio_realised_over_projected": 0.9147,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   },
+   "gru": {
+    "projected_20k_s_from_calibration": 1523.9,
+    "realised_train_wall_clock_s": 1481.28,
+    "ratio_realised_over_projected": 0.972,
+    "note": "the projection is a 400-step per-step rate scaled by scale_d1481_s0's committed 2191.44 s; it excludes capture cost and the in-training evaluations, so a ratio near EXP_014's measured 0.925-0.949 is expected and a figure far outside it is a systems finding"
+   }
+  },
+  "prereg_unchanged": true,
+  "prereg_sha256_before_first_run": "3982e59ba5b8ef90d3d05a74f29d16aadca2576d3fda340f23a2c1eb97f7889e",
+  "prereg_sha256_after_last_run": "3982e59ba5b8ef90d3d05a74f29d16aadca2576d3fda340f23a2c1eb97f7889e",
+  "g1": "not applicable -- every leg is anchored to the control on this tree",
+  "any_nonfinite_loss": true
+ },
+ "decision_cell": "The difference was not established at n=1. This is NOT 'width subsumes the architecture'. The measurement that would settle it is seeds, at ~0.73 GPU-h per twocomp seed."
+}

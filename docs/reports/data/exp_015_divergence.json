@@ -1,0 +1,358 @@
+{
+  "experiment": "EXP_015",
+  "chased_by": "scripts/exp/011_chase_compose_divergence.py",
+  "run": "arch_twocomp_d1481_s0",
+  "chase_tag": "015",
+  "from_checkpoint": "experiments\\runs\\arch_twocomp_d1481_s0\\ckpt_best.pt",
+  "compares_with": "docs/reports/data/exp_009_divergence.json",
+  "reproduced": true,
+  "first_nonfinite_step": 5138,
+  "origin": "backward",
+  "trace": [
+    {
+      "step": 5000,
+      "loss": 1.4486725330352783,
+      "grad_norm": 0.1776135414838791,
+      "firing_rate": [
+        0.19246403872966766,
+        0.1789584755897522
+      ]
+    },
+    {
+      "step": 5050,
+      "loss": 1.4248279333114624,
+      "grad_norm": 0.15217632055282593,
+      "firing_rate": [
+        0.1916569322347641,
+        0.1767907440662384
+      ]
+    },
+    {
+      "step": 5100,
+      "loss": 1.4333627223968506,
+      "grad_norm": 0.22614622116088867,
+      "firing_rate": [
+        0.19214706122875214,
+        0.17756229639053345
+      ]
+    },
+    {
+      "step": 5138,
+      "loss": 1.4197630882263184,
+      "grad_norm": NaN,
+      "firing_rate": [
+        0.19109149277210236,
+        0.1755397915840149
+      ]
+    }
+  ],
+  "resumed_at_step": 5000,
+  "steps_after_resume": 138,
+  "instrumented_from_step": 5132,
+  "eager_replay_of_bad_step": {
+    "step": 5138,
+    "fused": false,
+    "loss": 1.4197630882263184,
+    "nonfinite_forward": [],
+    "nonfinite_grads": [
+      "embed.weight",
+      "layers.0.weight",
+      "layers.0.bias",
+      "w.0",
+      "beta_s_raw.0"
+    ],
+    "grad_abs_max_finite": 7.789977971209904e+29
+  },
+  "r10_separation": "BOTH paths produce NaN -- the fused kernel is exonerated and the arithmetic is the origin on either path.",
+  "fused_only_nonfinite_params": [],
+  "instrumented_steps": [
+    {
+      "step": 5132,
+      "loss": 1.4778482913970947,
+      "grad_norm_fp32": 0.17323699593544006,
+      "grad_norm_fp64": 0.17323699429331665,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.0068759610876441,
+      "grad_abs_max_param": "head.bias",
+      "top_grads": [
+        {
+          "param": "head.bias",
+          "abs_max": 0.0068759610876441
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.006852403748780489
+        },
+        {
+          "param": "w.1",
+          "abs_max": 0.006120946258306503
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.005892740562558174
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.002393717411905527
+        }
+      ],
+      "param_abs_max": 4.224223613739014,
+      "logits_abs_max_finite": 248.3992919921875,
+      "state_abs_max_finite": [
+        187.42556762695312,
+        698.9683837890625
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5133,
+      "loss": 1.4292140007019043,
+      "grad_norm_fp32": 0.2165670394897461,
+      "grad_norm_fp64": 0.2165670405817232,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.019476648420095444,
+      "grad_abs_max_param": "w.1",
+      "top_grads": [
+        {
+          "param": "w.1",
+          "abs_max": 0.019476648420095444
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.014398298226296902
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 0.014025840908288956
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.009602556005120277
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.009468859061598778
+        }
+      ],
+      "param_abs_max": 4.224339485168457,
+      "logits_abs_max_finite": 249.61721801757812,
+      "state_abs_max_finite": [
+        229.65370178222656,
+        706.6314697265625
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5134,
+      "loss": 1.429690957069397,
+      "grad_norm_fp32": 0.20747999846935272,
+      "grad_norm_fp64": 0.20747999399934863,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.009579879231750965,
+      "grad_abs_max_param": "head.bias",
+      "top_grads": [
+        {
+          "param": "head.bias",
+          "abs_max": 0.009579879231750965
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.0095489751547575
+        },
+        {
+          "param": "w.1",
+          "abs_max": 0.005123995244503021
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.0022601631935685873
+        },
+        {
+          "param": "beta_s_raw.1",
+          "abs_max": 0.0017722522607073188
+        }
+      ],
+      "param_abs_max": 4.224725246429443,
+      "logits_abs_max_finite": 249.05380249023438,
+      "state_abs_max_finite": [
+        166.708740234375,
+        724.1227416992188
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5135,
+      "loss": 1.428464412689209,
+      "grad_norm_fp32": 0.16895441710948944,
+      "grad_norm_fp64": 0.1689544174420252,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.00497206998988986,
+      "grad_abs_max_param": "w.1",
+      "top_grads": [
+        {
+          "param": "w.1",
+          "abs_max": 0.00497206998988986
+        },
+        {
+          "param": "head.weight",
+          "abs_max": 0.0044563282281160355
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.004402011167258024
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.0022795777767896652
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.002227467717602849
+        }
+      ],
+      "param_abs_max": 4.225112438201904,
+      "logits_abs_max_finite": 246.83705139160156,
+      "state_abs_max_finite": [
+        168.4511260986328,
+        736.8939208984375
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5136,
+      "loss": 1.447818398475647,
+      "grad_norm_fp32": 0.1923975646495819,
+      "grad_norm_fp64": 0.1923975721187925,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.008922992274165154,
+      "grad_abs_max_param": "head.weight",
+      "top_grads": [
+        {
+          "param": "head.weight",
+          "abs_max": 0.008922992274165154
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.008921868167817593
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.0036361352540552616
+        },
+        {
+          "param": "w.1",
+          "abs_max": 0.0027540819719433784
+        },
+        {
+          "param": "w.0",
+          "abs_max": 0.0014802798395976424
+        }
+      ],
+      "param_abs_max": 4.225245475769043,
+      "logits_abs_max_finite": 250.59329223632812,
+      "state_abs_max_finite": [
+        306.1758117675781,
+        681.8673095703125
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5137,
+      "loss": 1.4312893152236938,
+      "grad_norm_fp32": 0.21948961913585663,
+      "grad_norm_fp64": 0.21948961697707675,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": 0.01032136008143425,
+      "grad_abs_max_param": "head.weight",
+      "top_grads": [
+        {
+          "param": "head.weight",
+          "abs_max": 0.01032136008143425
+        },
+        {
+          "param": "head.bias",
+          "abs_max": 0.010121209546923637
+        },
+        {
+          "param": "w.1",
+          "abs_max": 0.008109189569950104
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": 0.0027602470945566893
+        },
+        {
+          "param": "beta_s_raw.1",
+          "abs_max": 0.0026945294812321663
+        }
+      ],
+      "param_abs_max": 4.225535869598389,
+      "logits_abs_max_finite": 250.95944213867188,
+      "state_abs_max_finite": [
+        165.1632843017578,
+        680.8367919921875
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": []
+    },
+    {
+      "step": 5138,
+      "loss": 1.4197630882263184,
+      "grad_norm_fp32": NaN,
+      "grad_norm_fp64": NaN,
+      "fp32_overflowed_while_fp64_finite": false,
+      "grad_abs_max": NaN,
+      "grad_abs_max_param": "embed.weight",
+      "top_grads": [
+        {
+          "param": "embed.weight",
+          "abs_max": NaN
+        },
+        {
+          "param": "layers.0.weight",
+          "abs_max": NaN
+        },
+        {
+          "param": "layers.0.bias",
+          "abs_max": NaN
+        },
+        {
+          "param": "layers.1.weight",
+          "abs_max": 1675587001253888.0
+        },
+        {
+          "param": "layers.1.bias",
+          "abs_max": 37003949244416.0
+        }
+      ],
+      "param_abs_max": 4.225985050201416,
+      "logits_abs_max_finite": 258.3213195800781,
+      "state_abs_max_finite": [
+        197.73756408691406,
+        680.5394287109375
+      ],
+      "nonfinite_forward": [],
+      "nonfinite_loss": [],
+      "nonfinite_grads": [
+        "embed.weight",
+        "layers.0.weight",
+        "layers.0.bias",
+        "w.0",
+        "beta_s_raw.0"
+      ]
+    }
+  ],
+  "clip_fp32_overflow_reproduced": false,
+  "verdict": "NOT EXP_009's mechanism: the fp32 clip norm did not overflow while fp64 stayed finite. A different origin; see `origin` and the trace."
+}

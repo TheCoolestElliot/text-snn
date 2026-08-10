@@ -1,0 +1,94 @@
+{
+  "artifact": "exp_015_gap",
+  "label": "",
+  "statistic": "gap = bpc(test) - bpc(train slice, first 19456 windows); positive = overfitting",
+  "expected_test_windows": 19456,
+  "runs": [
+    {
+      "run": "scale_d1481_s0",
+      "seed": 0,
+      "arch": "snn",
+      "noise_amp": 0.0,
+      "noise_p": 0.1,
+      "fresh": {
+        "train_bpc": 1.96497706585568,
+        "test_bpc": 2.020068093029518,
+        "gap": 0.05509102717383807,
+        "n_windows": 19456,
+        "train_firing_rate": [
+          0.2089424786206923,
+          0.18477157689630985
+        ],
+        "test_firing_rate": [
+          0.20936860212762104,
+          0.1850997571294245
+        ]
+      },
+      "carried": {
+        "train_bpc": 1.9574883766361737,
+        "test_bpc": 2.0007266016460163,
+        "gap": 0.043238225009842646,
+        "n_windows": 19456,
+        "train_firing_rate": [
+          0.20827228938670536,
+          0.18436585013803683
+        ],
+        "test_firing_rate": [
+          0.20868549799840702,
+          0.18502129967275419
+        ]
+      }
+    },
+    {
+      "run": "arch_gru_d1481_s0",
+      "seed": 0,
+      "arch": "gru",
+      "noise_amp": 0.0,
+      "noise_p": 0.1,
+      "fresh": {
+        "train_bpc": 1.4779972786567581,
+        "test_bpc": 1.5967216694085926,
+        "gap": 0.1187243907518345,
+        "n_windows": 19456,
+        "train_firing_rate": [],
+        "test_firing_rate": []
+      },
+      "carried": {
+        "train_bpc": 1.4333088959348406,
+        "test_bpc": 1.5469862097035099,
+        "gap": 0.1136773137686693,
+        "n_windows": 19456,
+        "train_firing_rate": [],
+        "test_firing_rate": []
+      }
+    }
+  ],
+  "summary": {
+    "fresh": {
+      "n": 2,
+      "gap_mean": 0.08690770896283628,
+      "gap_sd": 0.044995582895710345,
+      "test_bpc_mean": 1.8083948812190553,
+      "test_bpc_sd": 0.2993511269334292,
+      "train_bpc_mean": 1.721487172256219,
+      "train_bpc_sd": 0.3443467098291395,
+      "gaps": [
+        0.05509102717383807,
+        0.1187243907518345
+      ]
+    },
+    "carried": {
+      "n": 2,
+      "gap_mean": 0.07845776938925597,
+      "gap_sd": 0.04980795732196744,
+      "test_bpc_mean": 1.773856405674763,
+      "test_bpc_sd": 0.32084290804078824,
+      "train_bpc_mean": 1.6953986362855071,
+      "train_bpc_sd": 0.37065086536275565,
+      "gaps": [
+        0.043238225009842646,
+        0.1136773137686693
+      ]
+    }
+  }
+}

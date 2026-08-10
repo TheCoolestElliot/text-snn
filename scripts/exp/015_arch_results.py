@@ -210,13 +210,29 @@ def resolve() -> dict:
     }
 
     # P4 -- horizon, marker only.
+    #
+    # CORRECTED AFTER THE RUN, and the correction is a crash rather than a bar.
+    # As committed, this block assumed `exp_015_memory_horizon.json` carried a
+    # LIST of per-arm dicts; `001_memory_horizon.py` actually keys `by_arm` by
+    # arm name, with the horizons under a `_paired` sub-key. The resolver raised
+    # AttributeError and produced nothing. No threshold, bar or verdict is
+    # touched by this fix -- P4 has no bar (Sec P4: "marker with no verdict") --
+    # and the pre-registration's text is unchanged. Recorded in Sec 9 rather than
+    # repaired silently.
     if horizon:
+        by_arm = {}
+        for arm, block in (horizon.get("by_arm") or {}).items():
+            paired = block.get("_paired", {}) if isinstance(block, dict) else {}
+            by_arm[arm] = {
+                "n": paired.get("n"),
+                "horizon_2sigma_per_seed": paired.get("horizon_2sigma_per_seed"),
+                "horizon_0.05bpc_per_seed": paired.get("horizon_0.05bpc_per_seed"),
+            }
         out["P4_horizon"] = {
             "verdict": "MARKER - NO VERDICT AT n=1",
             "reference": HORIZON,
             "f1_failures": horizon.get("f1_failures"),
-            "by_arm": {a.get("arm", a.get("run")): a.get("horizon")
-                       for a in horizon.get("arms", [])} or horizon.get("horizons"),
+            "by_arm": by_arm,
         }
     else:
         out["P4_horizon"] = {"verdict": "NOT RUN"}
