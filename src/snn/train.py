@@ -679,11 +679,37 @@ def _clip_grad_norm_fp64(parameters: list[torch.Tensor], max_norm: float) -> tor
     exact computation ``009_chase_divergence.py`` used to diagnose the bug:
     ``vector_norm(g.double())`` per tensor).  2.98e63 is five orders of
     magnitude inside fp64's ~1.8e308 range, so the clip observes a large but
-    finite norm and rescales the update instead of erasing it. It does not
-    change behaviour for any gradient that was already representable in
-    fp32 -- the fp64 sum-of-squares and its fp32 downcast agree with the old
+    finite norm and rescales the update instead of erasing it.
+
+    **This is not numerically inert, and an earlier version of this docstring
+    said it was.** It read "it does not change behaviour for any gradient that
+    was already representable in fp32". That is true of the *returned norm* --
+    the fp64 sum-of-squares and its fp32 downcast agree with the old
     computation to within ordinary rounding wherever the old computation was
-    already finite.
+    already finite -- and false of the *trajectory*.  On any step where the
+    clip actually fires, the two sums-of-squares differ by ~1 ulp, so the
+    clip coefficients differ in their last bits and the updates differ.
+    ``EXP_014`` Sec 9.12 established this by substitution: on the committed
+    Phase-2 baseline recipe the clip fires exactly three times in 20,000 steps
+    (steps 32/33/34, norms 1.0329/1.1198/1.0957), the first differing loss
+    appears at step 47, and the perturbation amplifies over the remaining
+    ~19,950 steps to **+1.97e-03 bpc** of final test loss.
+
+    ``tests/test_grad_clip.py`` already encodes the distinction and did not
+    need changing.  ``test_fp64_clip_is_a_noop_below_max_norm`` asserts
+    ``torch.equal``, but only on the ``max_norm=inf`` sentinel path, where no
+    clip happens at all.  The test that does exercise a firing clip --
+    ``test_fp64_clip_matches_stock_for_ordinary_gradients``, whose gradients
+    exceed ``max_norm=1.0`` -- asserts ``allclose(rtol=1e-5)`` rather than
+    equality, and is correct to.  No test ever asserted trajectory
+    equivalence.  The docstring did.
+
+    The consequence for the project, not for this function: a run trained on
+    this tree cannot be compared bitwise against any figure committed before
+    decision #7.  Every new experiment trains its own anchor on the current
+    tree rather than reproducing a committed number.  Nothing here argues for
+    reverting the fix -- it repairs a failure that silently zeroes every
+    subsequent update.
 
     Capture-safety: every op here is a device kernel on a fixed-size input
     (no ``.item()``, no data-dependent branch).  ``p.grad is not None`` is a
