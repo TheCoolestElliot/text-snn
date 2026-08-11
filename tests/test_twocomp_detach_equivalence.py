@@ -326,6 +326,95 @@ def test_the_chain_factor_is_bounded_by_beta_f():
 
 @pytest.mark.cuda
 @requires_fused
+def test_the_backward_threshold_comparison_is_inclusive():
+    """`v_pre == thr` must take the FIRED branch of `dv`, at the kernel boundary.
+
+    **ADDED BECAUSE A MUTATION ESCAPED.** The 2026-08-11 campaign ran D09 --
+    "`>` instead of `>=` in the BACKWARD kernel only" -- and this gate passed,
+    58/59. The analogous mutation on the adopted arm (T15) has always been
+    caught, so the harness was working and this file had a specific hole.
+
+    The hole is instructive and is the reason this test is separate from
+    `test_the_chain_factor_is_bounded_by_beta_f` rather than folded into it.
+    **The bound cannot see this mutation**: under `>=` the site at `x == 0` gives
+    `sh = 1` and `g = 0`; under `>` it gives `sh = 0` and `g = beta_f`. *Both
+    values are inside `{0, beta_f}`*, so every assertion about the bound holds
+    exactly as before while the derivative is wrong. A bound is a statement about
+    a set, and an off-by-one in a comparison moves a point *within* that set.
+
+    That is `CONTRIBUTING.md` §5's rule arriving from a new direction: a numerical
+    contract is only guarded where the quantity it constrains is actually
+    observed, and "the quantity" here is not `|g|` but *which branch* `g` came
+    from. Random inputs cannot supply it either -- exact equality has measure
+    zero -- so the site is constructed.
+
+    Asserted at the kernel boundary rather than through a scan, because that is
+    where the comparison lives and a scan would fold it together with the forward
+    kernel's own separate copy of the same comparison.
+    """
+    beta_f, thr, alpha = 0.5, 1.0, 2.0
+    d = 16
+    kernel = twocomp_detach_backward_kernel()
+    for w_c in (0.0, 0.25, -3.0):
+        w = torch.full((1, d), w_c, device="cuda")
+        bs = torch.full((1, d), 0.9, device="cuda")
+
+        at = torch.full((1, d), thr, device="cuda")          # x == 0 exactly
+        g_at = _chain_factor(kernel, at, w, bs, beta_f, thr, alpha)
+        assert float(g_at.abs().max()) == 0.0, (
+            f"w={w_c}: at v_pre == thr the backward did not take the fired "
+            f"branch -- dv = {float(g_at.abs().max()) / beta_f}, expected 0. "
+            "The comparison is `>` where it must be `>=`."
+        )
+
+        # ... and the neighbouring representable value below thr must NOT fire,
+        # or the assertion above would pass for a kernel that fires everywhere.
+        below = torch.nextafter(at, torch.full_like(at, -1.0))
+        g_below = _chain_factor(kernel, below, w, bs, beta_f, thr, alpha)
+        assert float(g_below.min()) == beta_f, (
+            f"w={w_c}: one ulp below thr the backward took the fired branch; "
+            "the comparison is `>=` where it must be `>` on that side"
+        )
+
+
+@pytest.mark.cuda
+@requires_fused
+def test_threshold_comparison_is_inclusive_end_to_end():
+    """The same contract through the whole scan, forward and backward.
+
+    The adopted arm's gate carries this leg and it is mirrored here rather than
+    inherited: the forward and backward kernels each hold their **own** copy of
+    the comparison (`vmix >= thr` in the forward, `x >= T(0)` in the backward),
+    and only the forward one is visible in the spike pattern.
+
+    With `v0 = 0` and `w = 0` the first step gives `v_pre = cur = thr` exactly,
+    which is the one input that distinguishes `>` from `>=` and which no random
+    draw will ever produce.
+    """
+    d = 3
+    cur = torch.zeros(2, 4, d, device="cuda")
+    cur[:, 0] = THR
+    v0 = torch.zeros(2, 2 * d, device="cuda")
+    ww = torch.zeros(1, d, device="cuda")
+    bb = torch.full((1, d), 0.95, device="cuda")
+
+    s_f, _ = twocomp_detach_scan(cur, v0, ww, bb, 0.5, THR, ALPHA, fused=True)
+    s_e, _ = twocomp_detach_scan_eager(cur, v0, ww, bb, 0.5, THR, ALPHA)
+    assert bool((s_f[:, 0] == 1.0).all()), "v == thr did not fire"
+    assert bool((s_f == s_e).all())
+
+    gs = torch.ones(2, 4, d, device="cuda")
+    gv = torch.ones(2, 2 * d, device="cuda")
+    gf = _grads(cur, v0, ww, bb, 0.5, THR, gs, gv, fused=True)
+    ge = _grads(cur, v0, ww, bb, 0.5, THR, gs, gv, fused=False)
+    for name, a, b in zip(("grad_cur", "grad_v0", "grad_w", "grad_beta_s"), gf, ge):
+        assert torch.allclose(a, b, rtol=1e-4, atol=1e-6), (
+            f"{name} disagrees at v == thr, max|d|={float((a - b).abs().max()):.3e}"
+        )
+
+
+@pytest.mark.cuda
+@requires_fused
 def test_the_adopted_arm_violates_the_same_bound_on_the_same_inputs():
     """The control, and it is what makes the test above mean anything.
 

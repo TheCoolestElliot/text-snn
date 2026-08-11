@@ -3,208 +3,212 @@
   "gates": {
     "tests/test_neuron_equivalence.py": {
       "pass": true,
-      "seconds": 13.4
+      "seconds": 15.9
+    },
+    "tests/test_twocomp_detach_equivalence.py": {
+      "pass": true,
+      "seconds": 11.3
     },
     "tests/test_twocomp_equivalence.py": {
       "pass": true,
-      "seconds": 9.2
+      "seconds": 11.3
     }
   },
   "baseline_pass": true,
-  "baseline_seconds": 22.6,
-  "n_mutations": 47,
+  "baseline_seconds": 38.5,
+  "n_mutations": 59,
   "mutations": {
     "M01": {
       "description": "drop the -v_pre*sg term from the hard-reset derivative",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.20s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 5.98s"
     },
     "M02": {
       "description": "sign-flip the -v_pre*sg term in the hard-reset derivative",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.5,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=4.110e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.04s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.75s"
     },
     "M03": {
       "description": "drop thr from the soft-reset derivative",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.9,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:333: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_backward[shape0-soft]\u001b[0m - AssertionError: soft beta=0.9 thr=0.5 grad_cur max|d|=1.311e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m31 passed\u001b[0m\u001b[31m in 5.50s\u001b[0m\u001b[0m"
+      "gate_seconds": 9.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:333: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_backward[shape0-soft] - Asserti...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 31 passed in 7.41s"
     },
     "M04": {
       "description": "give detached the derivative of hard",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.5,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[detached]\u001b[0m - AssertionError: detached: backward disagrees at v_pre == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m23 passed\u001b[0m\u001b[31m in 5.06s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[detached]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 23 passed in 5.49s"
     },
     "M05": {
       "description": "give hard the derivative of detached",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.5,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.05s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 5.20s"
     },
     "M06": {
       "description": "none reset derivative 1 -> 0",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[none]\u001b[0m - AssertionError: none: backward disagrees at v_pre == thr, max|d|=1.000e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m24 passed\u001b[0m\u001b[31m in 5.13s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.6,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[none]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 24 passed in 6.83s"
     },
     "M07": {
       "description": "drop beta from grad_v_prev",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=1.070e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.31s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.79s"
     },
     "M08": {
       "description": "grad_v_prev divides by beta instead of multiplying",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=9.082e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.24s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.3,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.56s"
     },
     "M09": {
       "description": "drop the grad_spike*sg term",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=9.195e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.14s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 5.96s"
     },
     "M10": {
       "description": "drop the grad_v_next*dv term",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=1.000e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.11s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.3,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.70s"
     },
     "M11": {
       "description": "straight-through: sg = 1 instead of the surrogate",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=1.589e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.27s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.70s"
     },
     "M12": {
       "description": "omit the threshold shift in x",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=7.485e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.35s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.50s"
     },
     "M13": {
       "description": "> instead of >= in the BACKWARD kernel only",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.14s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.7,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.89s"
     },
     "M14": {
       "description": "backward compares x against thr instead of 0",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.13s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.6,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.84s"
     },
     "M15": {
       "description": "> instead of >= in the FORWARD kernel",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:260: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: v_pre == thr did not fire\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.15s\u001b[0m\u001b[0m"
+      "gate_seconds": 10.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:260: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 8.29s"
     },
     "M16": {
       "description": "hard reset does not reset",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:199: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_forward[shape0-hard]\u001b[0m - AssertionError: hard beta=0.5 thr=1.0: 9 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m1 passed\u001b[0m\u001b[31m in 2.31s\u001b[0m\u001b[0m"
+      "gate_seconds": 4.4,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 2.65s"
     },
     "M17": {
       "description": "soft reset subtracts the spike, not thr*spike",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.9,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:199: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_forward[shape0-soft]\u001b[0m - AssertionError: soft beta=0.9 thr=0.5: 9 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m2 passed\u001b[0m\u001b[31m in 2.42s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-soft] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 2 passed in 3.45s"
     },
     "M18": {
       "description": "let NVRTC contract the membrane update into an FMA",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 5.9,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:230: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_membrane_is_bit_identical[hard]\u001b[0m - AssertionError: ('hard', 0.9, 1.0)\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m17 passed\u001b[0m\u001b[31m in 4.48s\u001b[0m\u001b[0m"
+      "gate_seconds": 9.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:230: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_membrane_is_bit_identical[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 17 passed in 7.50s"
     },
     "M19": {
       "description": "forward decays the current instead of the membrane",
       "file": "kernels.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.9,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:199: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_forward[shape0-hard]\u001b[0m - AssertionError: hard beta=0.5 thr=1.0: 31 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m1 passed\u001b[0m\u001b[31m in 2.36s\u001b[0m\u001b[0m"
+      "gate_seconds": 4.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 3.15s"
     },
     "M20": {
       "description": "pi instead of pi/2 in the CUDA surrogate",
       "file": "surrogate.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=1.178e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.29s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.3,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.74s"
     },
     "M21": {
       "description": "2x surrogate gain in the CUDA source",
       "file": "surrogate.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=6.335e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.12s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.45s"
     },
     "M22": {
       "description": "CUDA surrogate loses its square in the denominator",
       "file": "surrogate.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 6.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:267: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive[hard]\u001b[0m - AssertionError: hard: backward disagrees at v_pre == thr, max|d|=9.781e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m21 passed\u001b[0m\u001b[31m in 5.20s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.3,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:267: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed in 6.71s"
     },
     "M23": {
       "description": "eager atan_grad loses its factor of 1/2",
       "file": "surrogate.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.5,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:175: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_surrogate_matches_analytic\u001b[0m - assert False\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.00s\u001b[0m\u001b[0m"
+      "gate_seconds": 3.6,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:175: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 2.06s"
     },
     "M24": {
       "description": "eager atan_value drops the 1/pi",
       "file": "surrogate.py",
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.4,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:175: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_surrogate_matches_analytic\u001b[0m - assert False\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 1.97s\u001b[0m\u001b[0m"
+      "gate_seconds": 3.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:175: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 2.00s"
     },
     "M25": {
       "description": "atan_spike reverts to the unparenthesised straight-through form",
@@ -212,187 +216,285 @@
       "gate": "tests/test_neuron_equivalence.py",
       "caught": true,
       "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_neuron_equivalence.py\u001b[0m:199: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_neuron_equivalence.py::\u001b[1mtest_forward[shape0-hard]\u001b[0m - AssertionError: hard beta=0.5 thr=1.0: 5 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m1 passed\u001b[0m\u001b[31m in 2.32s\u001b[0m\u001b[0m"
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:199: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[shape0-hard] - Assertio...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 2.27s"
     },
     "T01": {
       "description": "the slow compartment resets too (reverts to EXP_002's N2)",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 8 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.33s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 4.17s"
     },
     "T02": {
       "description": "the fast compartment does not reset",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 30 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.32s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 4.19s"
     },
     "T03": {
       "description": "> instead of >= in the FORWARD threshold",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.5,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:330: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: v == thr did not fire\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.03s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:330: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 4.43s"
     },
     "T04": {
       "description": "the mix drops w_c and adds the compartments raw",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 70 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.37s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.5,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 3.86s"
     },
     "T05": {
       "description": "let NVRTC contract the MIX into an FMA",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:300: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_the_mix_is_bit_identical_at_the_kernel_boundary\u001b[0m - AssertionError: beta_f=0.5 thr=1.0: v_pre differs from the twice-rounded re...\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m5 passed\u001b[0m\u001b[31m in 3.16s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.3,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:300: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 4.62s"
     },
     "T06": {
       "description": "the two decays are swapped between the compartments",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 10 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.34s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.3,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 3.58s"
     },
     "T07": {
       "description": "the slow pole decays the current instead of the membrane",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 5 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.32s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.1,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 3.52s"
     },
     "T08": {
       "description": "v_pre reports the fast compartment instead of the mix",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:300: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_the_mix_is_bit_identical_at_the_kernel_boundary\u001b[0m - AssertionError: beta_f=0.5 thr=1.0: v_pre differs from the twice-rounded re...\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m5 passed\u001b[0m\u001b[31m in 3.12s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:300: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 4.56s"
     },
     "T09": {
       "description": "drop the -vf*sgd term from the fast-pole derivative",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.15s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.7,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.12s"
     },
     "T10": {
       "description": "backward recovers vf with the wrong sign",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:443: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_backward[shape0]\u001b[0m - AssertionError: grad_cur beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0 max|d|=5.142e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m9 passed\u001b[0m\u001b[31m in 3.35s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.4,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:443: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_backward[shape0] - AssertionEr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 4.97s"
     },
     "T11": {
       "description": "sign-flip the mix term in the slow adjoint",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:443: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_backward[shape0]\u001b[0m - AssertionError: grad_cur beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0 max|d|=1.173e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m9 passed\u001b[0m\u001b[31m in 3.32s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:443: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_backward[shape0] - AssertionEr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 5.03s"
     },
     "T12": {
       "description": "current is treated as entering only the fast compartment",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=1.000e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.19s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.7,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.78s"
     },
     "T13": {
       "description": "drop beta_s from the slow adjoint chain",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=1.426e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.18s\u001b[0m\u001b[0m"
+      "gate_seconds": 8.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 6.11s"
     },
     "T14": {
       "description": "drop beta_f from the fast adjoint chain",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=1.070e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.19s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.4,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.51s"
     },
     "T15": {
       "description": "> instead of >= in the BACKWARD kernel only",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=2.055e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.18s\u001b[0m\u001b[0m"
+      "gate_seconds": 7.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.28s"
     },
     "T16": {
       "description": "drop the grad_spike*sgd term from the fast adjoint",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_cur disagrees at v == thr, max|d|=9.195e-01\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.19s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.11s"
     },
     "T17": {
       "description": "grad_w is accumulated from the wrong adjoint",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.6,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_w disagrees at v == thr, max|d|=3.306e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.17s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.13s"
     },
     "T18": {
       "description": "grad_beta_s is accumulated from the wrong adjoint",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_beta_s disagrees at v == thr, max|d|=4.890e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.20s\u001b[0m\u001b[0m"
+      "gate_seconds": 6.7,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 5.08s"
     },
     "T19": {
       "description": "grad_beta_s uses vs_t instead of vs_{t-1} (the shift is dropped)",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_beta_s disagrees at v == thr, max|d|=1.444e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.18s\u001b[0m\u001b[0m"
+      "gate_seconds": 4.9,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 3.28s"
     },
     "T20": {
       "description": "the two per-channel gradients are returned swapped",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 4.7,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:338: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_threshold_comparison_is_inclusive\u001b[0m - AssertionError: grad_w disagrees at v == thr, max|d|=3.327e+00\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m, \u001b[32m6 passed\u001b[0m\u001b[31m in 3.26s\u001b[0m\u001b[0m"
+      "gate_seconds": 5.2,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:338: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed in 3.45s"
     },
     "T21": {
       "description": "the eager reference resets the slow compartment",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.9,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 8 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.40s\u001b[0m\u001b[0m"
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 2.51s"
     },
     "T22": {
       "description": "the eager reference mixes before decaying the fast pole",
       "file": "twocomp.py",
       "gate": "tests/test_twocomp_equivalence.py",
       "caught": true,
-      "gate_seconds": 3.8,
-      "gate_output_tail": "\n\u001b[1m\u001b[31mtests\\test_twocomp_equivalence.py\u001b[0m:218: AssertionError\n\u001b[36m\u001b[1m=========================== short test summary info ===========================\u001b[0m\n\u001b[31mFAILED\u001b[0m tests/test_twocomp_equivalence.py::\u001b[1mtest_forward[shape0]\u001b[0m - AssertionError: beta_f=0.5 beta_s~0.95 w~0.1 thr=1.0: 73 spikes differ\n\u001b[31m!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\u001b[0m\n\u001b[31m\u001b[31m\u001b[1m1 failed\u001b[0m\u001b[31m in 2.34s\u001b[0m\u001b[0m"
+      "gate_seconds": 4.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:218: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[shape0] - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 2.46s"
+    },
+    "D01": {
+      "description": "restore the adopted arm's unbounded reset term",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:312: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 2.65s"
+    },
+    "D02": {
+      "description": "the backward forgets the reset entirely (reverts to 'none')",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 4.6,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:321: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 2.83s"
+    },
+    "D03": {
+      "description": "dL/dv regains a reset path through the mixed membrane",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:462: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_backward[shape0] - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 5.04s"
+    },
+    "D04": {
+      "description": "dL/dv drops the surrogate, becoming straight-through",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 6.5,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:431: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 8 passed in 4.81s"
+    },
+    "D05": {
+      "description": "sign-flip the mix term in the slow adjoint",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:431: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 8 passed in 4.56s"
+    },
+    "D06": {
+      "description": "drop the grad_spike*sgd term from the fast adjoint",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 6.1,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:431: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 8 passed in 4.51s"
+    },
+    "D07": {
+      "description": "current is treated as entering only the fast compartment",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 6.6,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:431: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 8 passed in 4.84s"
+    },
+    "D08": {
+      "description": "drop beta_f from the fast adjoint chain",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 4.7,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:312: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 2.92s"
+    },
+    "D09": {
+      "description": "> instead of >= in the BACKWARD kernel only",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": false,
+      "gate_seconds": 12.2,
+      "gate_output_tail": "tests/test_twocomp_detach_equivalence.py::test_one_kernel_per_timestep\n  C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\torch\\profiler\\profiler.py:272: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.\n    _warn_once(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n28 passed, 1 warning in 9.84s"
+    },
+    "D10": {
+      "description": "the eager reference does not detach (it IS the adopted arm)",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 4.5,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:462: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_backward[shape0] - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 2.82s"
+    },
+    "D11": {
+      "description": "grad_beta_s uses vs_t instead of vs_{t-1} (the shift is dropped)",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 4.4,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:462: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_backward[shape0] - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 2.82s"
+    },
+    "D12": {
+      "description": "the two per-channel gradients are returned swapped",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py",
+      "caught": true,
+      "gate_seconds": 5.0,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:462: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_backward[shape0] - Asse...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed in 3.03s"
     }
   },
-  "n_caught": 47,
-  "escaped": [],
-  "all_caught": true,
+  "n_caught": 58,
+  "escaped": [
+    "D09"
+  ],
+  "all_caught": false,
   "source_restored_clean": true
 }
