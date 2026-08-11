@@ -192,6 +192,32 @@ ARMS: dict[str, str] = {
     "arch_twocomp_d1481_s0": "arch_twocomp_d1481",
     "arch_twocomp_threshold_d1481_s0": "arch_twocomp_threshold_d1481",
     "arch_gru_d1481_s0": "arch_gru_d1481",
+    #
+    # `EXP_017`: the detached-reset arm and the fresh `twocomp` anchor it is
+    # measured against. Registry entries and nothing else, for the seventh time
+    # and for the same reason every block above gives -- the statistic, the
+    # k-sweep and the F1 tolerance are untouched, so these horizons are
+    # comparable with every row above, and EXP_017 runs this file with an
+    # explicit `--out`.
+    #
+    # THE ANCHOR IS REGISTERED APART FROM `twocomp`, and that is the whole point
+    # of it. `twocomp_s0..s6` predate decision #7's fp64 clip; these three are the
+    # same configuration retrained on today's tree, and `EXP_014` G1 measured that
+    # the tree moved the plain LIF by 1.97e-03 bpc. Pooling the two would hide
+    # exactly the discrepancy H3a exists to report -- the same reason
+    # `scale_d512` is registered apart from `snn_beta0.5`.
+    #
+    # H4 is a PAIRED per-seed comparison, so the two arms must land under two arm
+    # names or the pairing is destroyed by aggregation before the resolver sees it.
+    "detach_d512_s0": "detach_d512",
+    "detach_d512_s1": "detach_d512",
+    "detach_d512_s2": "detach_d512",
+    "anchor_twocomp_d512_s0": "anchor_twocomp_d512",
+    "anchor_twocomp_d512_s1": "anchor_twocomp_d512",
+    "anchor_twocomp_d512_s2": "anchor_twocomp_d512",
+    # And the width leg, kept apart from the 735K rows for EXP_015's reason: a
+    # mean horizon pooling a 0.735M model with a 5M one describes neither.
+    "detach_d1481_s0": "detach_d1481",
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
