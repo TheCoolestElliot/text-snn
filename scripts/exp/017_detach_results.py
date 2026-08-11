@@ -386,6 +386,17 @@ def resolve_h5(manifest: dict | None) -> dict:
                      "ratio_vs_adopted_arm": ratio,
                      "peak_vram_gib": r.get("peak_vram_gib"),
                      "within_band": ok})
+    # An ABSENT measurement is not a passing one. With no rows, `breach` is False
+    # and the naive verdict would be "WITHIN BAND" -- the same shape of defect
+    # `EXP_015` §9.10 records twice (a driver that marked dead legs complete, and
+    # an absent log that read as a clean log). Caught here by a dry run against
+    # partial artifacts, before it could report on nothing.
+    if not rows:
+        return {"verdict": "NOT RUN", "band": H5_BAND, "rows": [],
+                "why": "no twocomp_detach run has a wall-clock figure yet"}
+    if any(r["ratio_vs_adopted_arm"] is None for r in rows):
+        return {"verdict": "PARTIAL", "band": H5_BAND, "rows": rows,
+                "why": "at least one run has no comparable wall-clock figure"}
     return {
         "verdict": "BREACH -- investigate" if breach else "WITHIN BAND",
         "band": H5_BAND,
