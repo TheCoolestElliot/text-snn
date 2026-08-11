@@ -56,6 +56,7 @@ from snn.noise import (NOISE_STREAM_SALT, add_background_noise,
 from snn.prescan import threshold_gain, token_shift
 from snn.surrogate import atan_value
 from snn.twocomp import twocomp_scan
+from snn.twocomp_detach import twocomp_detach_scan
 
 if TYPE_CHECKING:  # avoid a hard import cycle / hard dependency at runtime
     from snn.config import Config
@@ -64,6 +65,7 @@ __all__ = [
     "SpikingCharLM",
     "AnalogueCharLM",
     "TwoCompartmentCharLM",
+    "TwoCompDetachCharLM",
     "TokenShiftCharLM",
     "LearnedThresholdCharLM",
     "TwoCompThresholdCharLM",
@@ -601,6 +603,93 @@ class TwoCompartmentCharLM(_CharLMStack):
             self.surrogate_alpha,
             self.fused,
         )
+
+
+# ---------------------------------------------------------------------------
+# Arm 9: the adopted arm with a bounded reset Jacobian (EXP_017)
+# ---------------------------------------------------------------------------
+
+
+class TwoCompDetachCharLM(TwoCompartmentCharLM):
+    """The adopted two-compartment neuron with its fast-pole reset **detached**.
+
+    Pre-registered in `experiments/logs/EXP_017_bounded_reset_jacobian.md`. The
+    neuron, the derivation and the bound live in `snn.twocomp_detach`; this class
+    is only the wiring, exactly as `TwoCompartmentCharLM` is only the wiring for
+    `snn.twocomp`.
+
+    It subclasses `TwoCompartmentCharLM` rather than copying its wiring, for the
+    reason `TwoCompThresholdCharLM` does: `w`, `beta_s_raw`, `slow_decay` and the
+    `[B, 2d]` state layout are inherited *by construction*, so a future edit to
+    the adopted arm cannot silently desynchronise this arm from the thing it is
+    supposed to be a bounded version of. The only override is `_scan`, which is
+    the single variable.
+
+    **This arm's forward is the adopted arm's, bitwise** -- not "identical in
+    function class" as `EXP_008`'s and `EXP_011`'s threshold arms were, but the
+    same compiled kernel on the same tensors. It adds **no parameter** (so
+    `twocomp_param_count` applies unchanged and the arm is parameter-identical to
+    `twocomp`, not merely parameter-matched), no state variable, no new function,
+    and **no inference cost**. Under `model.eval()` there is no backward at all,
+    so this arm and the adopted arm are the same model: a checkpoint trained here
+    loads into `arch="twocomp"` and evaluates to the same bpc **bit for bit**, and
+    `tests/test_twocomp_detach_equivalence.py` asserts that at `== 0.0` rather
+    than at a tolerance.
+
+    What differs is the **gradient estimator**, and only during training: the
+    reset factor `(1 - s)` is treated as a constant, so `d vf_out / d v` is zero
+    instead of `-vf`. `EXP_016` showed the `-vf` term is the one bounded by
+    nothing -- the mixed membrane decides the spike while the reset lands on the
+    fast compartment alone, and the slow one is never reset -- and that it drives
+    a 10^41.6 amplification inside a single backward pass at `d = 1481`.
+
+    **The cost is a biased gradient and it is not hidden.** The pathway "firing
+    now lowers my own future membrane" is dropped from the backward. The model
+    still learns through the spike -- `grad_spike * sgd` is untouched, and both
+    per-channel gradients stay live -- but the reset's own contribution is gone.
+    Whether that costs bpc is `EXP_017` H3's question, measured at 735K against a
+    freshly trained anchor rather than argued here.
+
+    Invariants: unchanged from `TwoCompartmentCharLM`. I1 binary spikes, I2 leaky
+    integration (twice), I3 hard threshold, **I4 surrogate BPTT -- still, and this
+    is the one worth stating**: detaching the reset changes *which* surrogate
+    construction is used, not whether one is. `kernels.py` has carried
+    `reset="detached"` as a first-class mode for the plain LIF since Phase 2, with
+    its own compiled kernel and its own mutation coverage (M04, M05). I5 upheld --
+    no new parameter of any shape, so nothing to argue about.
+    """
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        return twocomp_detach_scan(
+            cur,
+            v0,
+            self.w[layer],
+            self.slow_decay(layer),   # one kernel per layer, NOT per timestep
+            self.beta,                # beta_f: the baseline's fixed fast pole
+            self.threshold,
+            self.surrogate_alpha,
+            self.fused,
+        )
+
+    @torch.no_grad()
+    def as_twocomp_state_dict(self) -> dict[str, Tensor]:
+        """This model's weights as a plain `TwoCompartmentCharLM` state dict.
+
+        A `dict(self.state_dict())` and nothing else -- deliberately, and the
+        emptiness is the claim. `EXP_008`'s and `EXP_011`'s folds had to rescale a
+        `Linear` and delete a parameter, and both carried a rounding residual
+        because `g*(W·h + b)` and `(g*W)·h + g*b` accumulate differently. Here the
+        parameter sets are *the same set*: the arm adds nothing to fold away, and
+        the forward is the same kernel, so the identity is exact rather than
+        approximate and the fold-in tolerance question (decision #6) does not
+        arise for this arm at all.
+
+        It exists as a named method rather than as a line in a script for the
+        reason `slow_decay` and `threshold_multiplier` do: the tests, the results
+        script and any future screen read the same thing, instead of each
+        re-deriving it.
+        """
+        return {k: v.detach().clone() for k, v in self.state_dict().items()}
 
 
 # ---------------------------------------------------------------------------
@@ -1143,8 +1232,8 @@ def build_model(cfg: "Config") -> nn.Module:
         )
 
     arch = cfg.arch
-    if arch in ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
-                "threshold", "noise"):
+    if arch in ("snn", "analogue", "twocomp", "twocomp_threshold",
+                "twocomp_detach", "tokenshift", "threshold", "noise"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -1164,21 +1253,37 @@ def build_model(cfg: "Config") -> nn.Module:
             fused=cfg.fused,
             t_steps=cfg.t_steps,
         )
-        if arch in ("twocomp", "twocomp_threshold"):
+        if arch in ("twocomp", "twocomp_threshold", "twocomp_detach"):
             if cfg.reset != "hard":
                 # EXP_004 §2 fixes the reset rule: hard on the fast pole, shielded
                 # on the slow one. `cfg.reset` still selects the fast pole's rule
                 # for the baseline arms, and silently ignoring it here would let a
                 # run's config.json describe a neuron that never ran. The reset
                 # ablation is candidate #7 and is a separate kernel.
+                #
+                # `twocomp_detach` is held to the SAME requirement and is not an
+                # exception to it: its FORWARD reset is hard, identically, and
+                # what it changes is the backward (EXP_017). Letting it through on
+                # `reset="detached"` would make `config.json` describe a forward
+                # rule that never ran, which is the exact failure this guard
+                # exists to prevent -- so the arm is named by `arch` instead.
                 raise NotImplementedError(
                     "the two-compartment neuron is pre-registered with hard reset "
                     f"on its fast pole (EXP_004 §2); got reset={cfg.reset!r}. "
                     "Reset variants are candidate #7 and need their own kernel "
-                    "and their own R10 gate."
+                    "and their own R10 gate. For the detached-BACKWARD arm use "
+                    "arch='twocomp_detach' with reset='hard' (EXP_017)."
                 )
             if arch == "twocomp":
                 model: nn.Module = TwoCompartmentCharLM(
+                    beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
+                )
+            elif arch == "twocomp_detach":
+                # EXP_017: the adopted arm, same parameters, same forward kernel,
+                # bounded backward. No new field -- `beta_slow` and `w_init` are
+                # passed through unchanged and are NOT re-tuned for this arm,
+                # which §5 names as a limitation.
+                model = TwoCompDetachCharLM(
                     beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
                 )
             else:
@@ -1213,7 +1318,8 @@ def build_model(cfg: "Config") -> nn.Module:
     else:
         raise ValueError(
             "arch must be 'snn', 'analogue', 'twocomp', 'twocomp_threshold', "
-            f"'tokenshift', 'threshold', 'noise' or 'gru', got {arch!r}"
+            f"'twocomp_detach', 'tokenshift', 'threshold', 'noise' or 'gru', "
+            f"got {arch!r}"
         )
 
     return model.to(cfg.device)
