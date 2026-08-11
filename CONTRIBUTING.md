@@ -147,8 +147,8 @@ resuming, so that no artifact ever describes two runs at once.
 
 ```bash
 ruff check .                        # must pass
-pytest -m "not cuda and not data"   # 259 tests, ~8s, no GPU or corpus needed
-pytest                              # 396 tests, ~39s, needs GPU + corpus
+pytest -m "not cuda and not data"   # 278 tests, ~13s, no GPU or corpus needed
+pytest                              # 415 tests, ~43s, needs GPU + corpus
 ```
 
 CI runs the first two. **CI cannot catch a regression in the fused kernels, the

@@ -1,0 +1,130 @@
+{
+ "experiment": "EXP_016_reset_jacobian",
+ "leg": "B",
+ "chased_by": "scripts/exp/016_chase_grad_cur.py",
+ "reuses": "scripts/exp/011_chase_compose_divergence.py::_fresh_trainer",
+ "run": "arch_twocomp_d1481_s0",
+ "from_checkpoint": "experiments\\runs\\arch_twocomp_d1481_s0\\ckpt_best.pt",
+ "bad_step": 5138,
+ "expected_loss": 1.4197630882263184,
+ "adopts_nothing": true,
+ "changes_no_hyperparameter": true,
+ "passes": [
+  {
+   "path": "fused",
+   "fused": true,
+   "step": 5138,
+   "loss": 1.4197630882263184,
+   "g4_loss_reproduces_bitwise": true,
+   "nonfinite_params": [
+    "embed.weight",
+    "layers.0.weight",
+    "layers.0.bias",
+    "w.0",
+    "beta_s_raw.0"
+   ],
+   "boundaries": [
+    {
+     "tensor": "grad_spikes_layer0",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 568008820916224.0,
+     "is_nonfinite": false,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_spikes_layer1",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 0.00014638685388490558,
+     "is_nonfinite": false,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_cur_layer0",
+     "n_nan": 140,
+     "n_inf": 1,
+     "n_nonfinite": 141,
+     "n_total": 48529408,
+     "max_abs_finite": 6.117277162629842e+37,
+     "is_nonfinite": true,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_cur_layer1",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 1102652322611200.0,
+     "is_nonfinite": false,
+     "hook_fired": true
+    }
+   ],
+   "verdict": "BORN IN THE RECURSION"
+  },
+  {
+   "path": "eager",
+   "fused": false,
+   "step": 5138,
+   "loss": 1.4197630882263184,
+   "g4_loss_reproduces_bitwise": true,
+   "nonfinite_params": [
+    "embed.weight",
+    "layers.0.weight",
+    "layers.0.bias",
+    "w.0",
+    "beta_s_raw.0"
+   ],
+   "boundaries": [
+    {
+     "tensor": "grad_spikes_layer0",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 568008082718720.0,
+     "is_nonfinite": false,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_spikes_layer1",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 0.00014638685388490558,
+     "is_nonfinite": false,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_cur_layer0",
+     "n_nan": 141,
+     "n_inf": 0,
+     "n_nonfinite": 141,
+     "n_total": 48529408,
+     "max_abs_finite": 6.117292374437045e+37,
+     "is_nonfinite": true,
+     "hook_fired": true
+    },
+    {
+     "tensor": "grad_cur_layer1",
+     "n_nan": 0,
+     "n_inf": 0,
+     "n_nonfinite": 0,
+     "n_total": 48529408,
+     "max_abs_finite": 1102650913325056.0,
+     "is_nonfinite": false,
+     "hook_fired": true
+    }
+   ],
+   "verdict": "BORN IN THE RECURSION"
+  }
+ ],
+ "verdict": "BORN IN THE RECURSION",
+ "g4_holds": true
+}

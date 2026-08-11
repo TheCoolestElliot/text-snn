@@ -23,7 +23,7 @@ mechanisms actually close it?**
 | Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
 | Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
 | Open decisions | **7 of 11**, all the author's (§8 of the Phase-4 report) |
-| Budget | ~10.1 of ~30 GPU-hours spent |
+| Budget | ~10.9 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
@@ -87,6 +87,28 @@ one spiking arm that ever bought reach cannot currently be trained at that size*
 both arms containing the two-compartment neuron diverged, deterministically, at
 steps 5138 and ~2000.
 
+**`EXP_016` then found why, and the reason is one line of arithmetic.** Both
+neurons carry a per-step multiplier for their backward-through-time. The plain
+LIF's uses **the same variable** in its reset factor and inside its surrogate
+derivative, which makes the product self-limiting and bounds it at
+**0.5123596 < 1 for every finite membrane at every width** — so its backward is a
+strict contraction *by construction*, which is why it trains at 5M. The
+two-compartment neuron's uses **different variables**, because the spike test is
+on the mixed membrane while the reset is applied to the fast one alone, and the
+bound breaks as soon as `|w·vs| > 1`. Measured over 48.5 M sites per layer, the
+plain LIF returns exactly its bound at three widths and never exceeds it; the
+adopted arm reaches **8.96**. At the step it died on, the cotangent grows from
+**1.46e−04** to **6.12e+37** across two scans — **10^41.6 inside a single
+backward pass** — and the NaN is made *inside* the recursion, identically on both
+dispatch paths.
+
+Two things there are worth more than the mechanism itself. The gradient clip
+**cannot** see it: it reads the accumulated gradient after `backward()` returns,
+by which point the norm is already NaN — which is why a run that died of a
+10^41.6 explosion logs `max_grad_norm = 0.663` and never clips once. And that
+multiplier contains **no learning rate, no schedule, no weight decay and no
+clip**, so this is not a recipe that needs re-tuning at scale.
+
 Selected findings that are expensive to re-derive are collected in
 [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md); the
 short version is that **the model underfits at 735K parameters and stops doing so
@@ -96,7 +118,9 @@ gain, not damage; the GRU at the same size overfits about twice as hard),
 **the learned threshold is provably a reparameterisation**
 (so its gain is an optimisation effect, not a capacity one), and **four training
 divergences share two causes** — one of which is now reproducible 138 steps from a
-committed checkpoint and is what stops the adopted arm scaling.
+committed checkpoint, is what stops the adopted arm scaling, and, as of
+`EXP_016`, has a mechanism: the adopted neuron's backward-through-time is not a
+contraction, while the plain one's provably is.
 
 One more, because it constrains how any number here may be compared: the fp64
 gradient-clip fix adopted as decision #7 is **not numerically inert**. It fires
@@ -163,7 +187,7 @@ because they were children of an interactive shell that went away (risk R6);
 
 ```bash
 pytest                              # everything the machine can run
-pytest -m "not cuda and not data"   # no GPU, no corpus — 259 tests, ~8s
+pytest -m "not cuda and not data"   # no GPU, no corpus — 278 tests, ~13s
 ruff check .                        # lint gate
 ```
 

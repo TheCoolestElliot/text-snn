@@ -134,13 +134,28 @@ def main(argv: list[str] | None = None) -> int:
         t = chase011._fresh_trainer(args.run, f"legB_{tag}", "016")
         t.load_checkpoint(ckpt)
         model = t.model
-        if eager:
-            model.fused = False
-        model.keep_spikes = True
 
-        # Ungraphed replay to just before the bad step, exactly as 011 pass 2
+        # `fused` is flipped AFTER the replay, not before -- exactly as 011's
+        # pass 3 does it (011:280-285). Two reasons, and the first is the one
+        # that matters: it makes the dispatch of the FINAL backward the single
+        # variable, which is what the R10 separation means. The second is
+        # measured -- replaying 132 steps on the eager path under CUDA-graph
+        # capture is ~13 kernels per timestep per layer and does not finish in
+        # any useful time on this card.
+
+        # `keep_spikes` stays OFF for the replay. Retaining two [B, L, d]
+        # tensors per step through 132 graphed steps costs ~388 MiB of live
+        # allocation each, and measurement showed it drives this card into the
+        # WDDM spill the project has hit before -- a ~50x slowdown that never
+        # raises. It is switched on for the instrumented step alone, which does
+        # not go through the captured graph.
+        model.keep_spikes = False
+
+        # Graphed replay to just before the bad step, exactly as 011 pass 2
         # does: the graphed path to `bad_step - lead_in`, then ungraphed.
         inspect_from = max(t.global_step, args.bad_step - args.lead_in)
+        print(f"[{tag}] resumed at {t.global_step}; replaying (graphed) to "
+              f"{inspect_from}", flush=True)
         while t.global_step < inspect_from:
             t.step()
         print(f"[{tag}] replayed to {t.global_step}, stepping ungraphed to "
@@ -168,6 +183,9 @@ def main(argv: list[str] | None = None) -> int:
                     return out
                 model._project = patched
 
+            model.keep_spikes = instrumented
+            if instrumented and eager:
+                model.fused = False          # the single variable, final step only
             t._fill_inputs(step)
             t._set_lr(t._lr_at(step))
             t.opt.zero_grad(set_to_none=False)

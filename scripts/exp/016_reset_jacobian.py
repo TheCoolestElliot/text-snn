@@ -210,7 +210,8 @@ def scan_twocomp(cur, v0, w, beta_s, beta_f, thr, alpha, acc):
     return torch.stack(spikes, dim=1), torch.cat([vf, vs], dim=1)
 
 
-def probe(run: str, ckpt_name: str, leg: str, note: str, device: str) -> dict:
+def probe(run: str, ckpt_name: str, leg: str, note: str, device: str,
+          batch_step: int = 0) -> dict:
     ckpt_path = RUNS / run / ckpt_name
     if not ckpt_path.exists():
         return {"leg": leg, "run": run, "error": f"missing {ckpt_name}"}
@@ -229,13 +230,20 @@ def probe(run: str, ckpt_name: str, leg: str, note: str, device: str) -> dict:
     model.eval()
 
     corpus = Corpus(cfg.corpus, cfg.data_dir)
+    # `RandomWindowSampler(...).batch(s)` is a pure function of `s` and is
+    # constructed exactly as `Trainer` constructs it (`train.py:120-122`), so
+    # `--batch-step 5138` is the batch the dying run actually saw at the step it
+    # died on. The default 0 is what the pre-registered Leg A ran; changing it
+    # produces a POST-HOC artifact and must be written to its own `--out`.
     x, _ = RandomWindowSampler(
-        corpus.split("train"), cfg.batch_size, cfg.seq_len, cfg.seed).batch(0)
+        corpus.split("train"), cfg.batch_size, cfg.seq_len, cfg.seed
+    ).batch(batch_step)
     x = x.to(device)
 
     bound = lif_bound(cfg.surrogate_alpha, cfg.threshold, cfg.beta)
     row = {
         "leg": leg, "run": run, "note": note, "arch": cfg.arch,
+        "batch_step": batch_step,
         "d_model": cfg.d_model, "n_layers": cfg.n_layers,
         "step_of_checkpoint": int(ck.get("global_step", -1)),
         "checkpoint": ckpt_name,
@@ -301,6 +309,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default="docs/reports/data/exp_016_reset_jacobian.json")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--only", default=None, help="comma-separated leg ids, e.g. A4,A5")
+    ap.add_argument("--batch-step", type=int, default=0,
+                    help="sampler batch index. 0 is what pre-registered Leg A "
+                         "ran; any other value is POST-HOC and must be written "
+                         "to its own --out.")
     args = ap.parse_args(argv)
 
     want = None if args.only is None else {s.strip() for s in args.only.split(",")}
@@ -309,7 +321,7 @@ def main(argv: list[str] | None = None) -> int:
         if want is not None and leg not in want:
             continue
         print(f"[{leg}] {run} ...", flush=True)
-        r = probe(run, ck, leg, note, args.device)
+        r = probe(run, ck, leg, note, args.device, args.batch_step)
         rows.append(r)
         if "error" in r:
             print(f"  {r['error']}", flush=True)
@@ -330,6 +342,8 @@ def main(argv: list[str] | None = None) -> int:
         "adopts_nothing": True,
         "ranks_nothing": True,
         "changes_no_hyperparameter": True,
+        "batch_step": args.batch_step,
+        "post_hoc": args.batch_step != 0,
         "lif_bound_at_frozen_constants": LIF_BOUND_AT_FROZEN_CONSTANTS,
         "t1_tolerance": T1_TOL,
         "thresholds": list(THRESHOLDS),

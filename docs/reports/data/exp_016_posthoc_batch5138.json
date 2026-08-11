@@ -1,0 +1,198 @@
+{
+ "experiment": "EXP_016_reset_jacobian",
+ "question": "is the backward-through-time a contraction, for each neuron, at each width?",
+ "inference_only": true,
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "changes_no_hyperparameter": true,
+ "batch_step": 5138,
+ "post_hoc": true,
+ "lif_bound_at_frozen_constants": 0.5123596,
+ "t1_tolerance": 1e-05,
+ "thresholds": [
+  0.5123596,
+  1.0,
+  2.0,
+  10.0,
+  100.0
+ ],
+ "results": [
+  {
+   "leg": "A4",
+   "run": "twocomp_s0",
+   "note": "two-compartment, 735K -- trains",
+   "arch": "twocomp",
+   "batch_step": 5138,
+   "d_model": 512,
+   "n_layers": 2,
+   "step_of_checkpoint": -1,
+   "checkpoint": "ckpt_final.pt",
+   "seq_len": 256,
+   "batch_size": 128,
+   "constants": {
+    "alpha": 2.0,
+    "thr": 1.0,
+    "beta_f": 0.5,
+    "reset": "hard"
+   },
+   "lif_closed_form_bound": 0.5123596271760303,
+   "layers": [
+    {
+     "max_abs_g": 2.8701553344726562,
+     "n_sites": 16777216,
+     "frac_over": {
+      "0.5123596": 0.06069612503051758,
+      "1.0": 5.638599395751953e-05,
+      "2.0": 2.2649765014648438e-06,
+      "10.0": 0.0,
+      "100.0": 0.0
+     },
+     "n_over_1": 946,
+     "n_exact_zero_g": 0,
+     "quantiles_abs_g": {
+      "q0.5": 0.4466835921509653,
+      "q0.9": 0.5623413251903491,
+      "q0.99": 0.5623413251903491,
+      "q0.999": 0.7079457843841402,
+      "q0.9999": 0.8912509381337513
+     },
+     "max_chain_log_gain": -165.5447192838586,
+     "max_chain_log10_gain": -71.89515809320262,
+     "mean_chain_log_gain": -454.7646665224246,
+     "n_chains_expanding": 0,
+     "n_chains": 65536,
+     "max_abs_w_times_vs": 44.618682861328125,
+     "layer": 0,
+     "max_abs_g_over_lif_bound": 5.601837424802722
+    },
+    {
+     "max_abs_g": 1.8790031671524048,
+     "n_sites": 16777216,
+     "frac_over": {
+      "0.5123596": 0.04198497533798218,
+      "1.0": 4.410743713378906e-06,
+      "2.0": 0.0,
+      "10.0": 0.0,
+      "100.0": 0.0
+     },
+     "n_over_1": 74,
+     "n_exact_zero_g": 0,
+     "quantiles_abs_g": {
+      "q0.5": 0.4466835921509653,
+      "q0.9": 0.5623413251903491,
+      "q0.99": 0.5623413251903491,
+      "q0.999": 0.7079457843841402,
+      "q0.9999": 0.8912509381337513
+     },
+     "max_chain_log_gain": -175.71550033744128,
+     "max_chain_log10_gain": -76.31227218141973,
+     "mean_chain_log_gain": -385.6646316711516,
+     "n_chains_expanding": 0,
+     "n_chains": 65536,
+     "max_abs_w_times_vs": 16.144277572631836,
+     "layer": 1,
+     "max_abs_g_over_lif_bound": 3.6673521243445664
+    }
+   ],
+   "t2_spikes_bitwise_equal": [
+    true,
+    true
+   ],
+   "t2_state_max_abs_diff": [
+    0.0,
+    0.0
+   ],
+   "t1_holds": true,
+   "t2_holds": true
+  },
+  {
+   "leg": "A5",
+   "run": "arch_twocomp_d1481_s0",
+   "note": "two-compartment, 5.0M -- DIES 138 steps later",
+   "arch": "twocomp",
+   "batch_step": 5138,
+   "d_model": 1481,
+   "n_layers": 2,
+   "step_of_checkpoint": -1,
+   "checkpoint": "ckpt_best.pt",
+   "seq_len": 256,
+   "batch_size": 128,
+   "constants": {
+    "alpha": 2.0,
+    "thr": 1.0,
+    "beta_f": 0.5,
+    "reset": "hard"
+   },
+   "lif_closed_form_bound": 0.5123596271760303,
+   "layers": [
+    {
+     "max_abs_g": 9.843094825744629,
+     "n_sites": 48529408,
+     "frac_over": {
+      "0.5123596": 0.04615564236843771,
+      "1.0": 0.0006031806528528021,
+      "2.0": 5.911879246497299e-05,
+      "10.0": 0.0,
+      "100.0": 0.0
+     },
+     "n_over_1": 29272,
+     "n_exact_zero_g": 0,
+     "quantiles_abs_g": {
+      "q0.5": 0.5623413251903491,
+      "q0.9": 0.5623413251903491,
+      "q0.99": 0.5623413251903491,
+      "q0.999": 0.8912509381337513,
+      "q0.9999": 1.7782794100389228
+     },
+     "max_chain_log_gain": -119.75479971768985,
+     "max_chain_log10_gain": -52.008848698821794,
+     "mean_chain_log_gain": -343.7158708870769,
+     "n_chains_expanding": 0,
+     "n_chains": 189568,
+     "max_abs_w_times_vs": 356.6102600097656,
+     "layer": 0,
+     "max_abs_g_over_lif_bound": 19.211300624908247
+    },
+    {
+     "max_abs_g": 7.738035202026367,
+     "n_sites": 48529408,
+     "frac_over": {
+      "0.5123596": 0.133151716996012,
+      "1.0": 0.0032465881306444127,
+      "2.0": 0.00010420485656861918,
+      "10.0": 0.0,
+      "100.0": 0.0
+     },
+     "n_over_1": 157555,
+     "n_exact_zero_g": 0,
+     "quantiles_abs_g": {
+      "q0.5": 0.5623413251903491,
+      "q0.9": 0.5623413251903491,
+      "q0.99": 0.7079457843841402,
+      "q0.999": 1.4125375446227613,
+      "q0.9999": 2.238721138568347
+     },
+     "max_chain_log_gain": -132.36754911733112,
+     "max_chain_log10_gain": -57.48649616471455,
+     "mean_chain_log_gain": -276.35215255970184,
+     "n_chains_expanding": 0,
+     "n_chains": 189568,
+     "max_abs_w_times_vs": 692.6107788085938,
+     "layer": 1,
+     "max_abs_g_over_lif_bound": 15.102741885960164
+    }
+   ],
+   "t2_spikes_bitwise_equal": [
+    true,
+    true
+   ],
+   "t2_state_max_abs_diff": [
+    0.0,
+    0.0
+   ],
+   "t1_holds": true,
+   "t2_holds": true
+  }
+ ]
+}

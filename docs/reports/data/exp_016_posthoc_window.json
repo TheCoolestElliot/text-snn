@@ -1,0 +1,159 @@
+{
+ "experiment": "EXP_016_reset_jacobian",
+ "post_hoc": true,
+ "amends_no_bar": true,
+ "p3_stands_as_it_fired": true,
+ "question": "what is the largest gain any single CONTIGUOUS window of the reverse recursion can contribute?",
+ "inference_only": true,
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "changes_no_hyperparameter": true,
+ "necessary_not_sufficient": true,
+ "results": [
+  {
+   "leg": "A1",
+   "run": "snn_beta0.5_s0",
+   "note": "plain LIF, 735K -- trains",
+   "arch": "snn",
+   "d_model": 512,
+   "checkpoint": "ckpt_final.pt",
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A2",
+   "run": "scale_d1020_s0",
+   "note": "plain LIF, 2.5M -- trains",
+   "arch": "snn",
+   "d_model": 1020,
+   "checkpoint": "ckpt_final.pt",
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 130560,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 130560,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A3",
+   "run": "scale_d1481_s0",
+   "note": "plain LIF, 5.0M -- trains",
+   "arch": "snn",
+   "d_model": 1481,
+   "checkpoint": "ckpt_final.pt",
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A4",
+   "run": "twocomp_s0",
+   "note": "two-compartment, 735K -- trains",
+   "arch": "twocomp",
+   "d_model": 512,
+   "checkpoint": "ckpt_final.pt",
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 1.5279848415629187,
+     "max_window_log10_gain": 0.6635953851225901,
+     "mean_window_log_gain": 0.00165192126422711,
+     "n_chains_with_expanding_window": 577,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 2.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.8956945272971135,
+     "max_window_log10_gain": 0.3889951906760779,
+     "mean_window_log_gain": 0.00011801346617168781,
+     "n_chains_with_expanding_window": 66,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 2.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A5",
+   "run": "arch_twocomp_d1481_s0",
+   "note": "two-compartment, 5.0M -- DIES 138 steps later",
+   "arch": "twocomp",
+   "d_model": 1481,
+   "checkpoint": "ckpt_best.pt",
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 3.992998481744584,
+     "max_window_log10_gain": 1.734137206869735,
+     "mean_window_log_gain": 0.027174181670840944,
+     "n_chains_with_expanding_window": 14859,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 8.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 4.240814145899009,
+     "max_window_log10_gain": 1.8417621823411912,
+     "mean_window_log_gain": 0.059563412668149254,
+     "n_chains_with_expanding_window": 34727,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 18.0,
+     "layer": 1
+    }
+   ]
+  }
+ ]
+}
