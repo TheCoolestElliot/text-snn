@@ -39,7 +39,8 @@ One file per experiment in [`../experiments/logs/`](../experiments/logs/), writt
 **before** the run and never edited afterwards — corrections are appended, not
 applied in place.
 
-`EXP_000`, `EXP_001` … `EXP_009`, `EXP_011`, `EXP_012`, `EXP_013`, `EXP_014`.
+`EXP_000`, `EXP_001` … `EXP_009`, `EXP_011`, `EXP_012`, `EXP_013`, `EXP_014`,
+`EXP_015`, `EXP_016`.
 
 **There is no `EXP_010`.** The id is unused. The `010_` prefix on
 `scripts/exp/010_phase4_arm_results.py` is the results resolver for `EXP_007`,
@@ -119,6 +120,30 @@ unattributable fields `null` rather than guessing, and carries an
 | `exp_011_divergence.json` | `scripts/exp/011_chase_compose_divergence.py` |
 | `exp_012_fold_gap.json` | `scripts/exp/012_chase_fold_gap.py` |
 | `exp_012_pileup.json` | `scripts/exp/012_posthoc_pileup.py` |
+| `exp_013_noise_calibration.json` | `scripts/exp/013_calibrate_noise_scale.py` |
+| `exp_013_run_manifest.json` | `scripts/exp/013_run_noise_arms.py` |
+| `exp_013_noise_results.json`, `exp_013_memory_horizon.json` | `scripts/exp/013_noise_results.py` |
+| `exp_013_gap_baseline.json`, `exp_013_gap_noise.json` | `scripts/exp/013_generalisation_gap.py --out …` |
+| `exp_014_cost_calibration.json` | `scripts/exp/014_calibrate_cost.py` |
+| `exp_014_run_manifest.json` | `scripts/exp/014_run_scaling_ladder.py` |
+| `exp_014_scaling_results.json`, `exp_014_memory_horizon.json` | `scripts/exp/014_scaling_results.py` |
+| `exp_014_gap_scaling.json` | `scripts/exp/013_generalisation_gap.py --out …` — EXP_013's probe reused unchanged |
+| `exp_015_cost_calibration.json` | `scripts/exp/014_calibrate_cost.py --arch …` — generalised for EXP_015 |
+| `exp_015_run_manifest.json` | `scripts/exp/015_run_arch_ladder.py` |
+| `exp_015_arch_results.json`, `exp_015_memory_horizon.json`, `exp_015_gap.json` | `scripts/exp/015_arch_results.py` |
+| `exp_015_divergence.json` | `scripts/exp/011_chase_compose_divergence.py --tag 015 …` — reused unchanged but for the tag |
+| `exp_015_state_growth.json` | `scripts/exp/015_chase_state_growth.py` |
+| `exp_016_reset_jacobian.json` | `scripts/exp/016_reset_jacobian.py` |
+| `exp_016_results.json` | `scripts/exp/016_jacobian_results.py` |
+| `exp_016_grad_cur.json` | `scripts/exp/016_chase_grad_cur.py --eager` |
+| `exp_016_posthoc_window.json` | `scripts/exp/016_posthoc_window.py` — **POST-HOC** |
+| `exp_016_posthoc_batch5138.json` | `scripts/exp/016_reset_jacobian.py --batch-step 5138 --out …` — **POST-HOC** |
+| `exp_016_posthoc_window_5138.json` | `scripts/exp/016_posthoc_window.py --batch-step 5138 --out …` — **POST-HOC** |
+
+The `exp_016_posthoc_*` rows are marked because `EXP_016` §9.4 requires it: their
+quantity and their batch index were both chosen *after* reading Leg A, and they
+amend no pre-registered bar. The pre-registered Leg A artifact is
+`exp_016_reset_jacobian.json`, which was produced at `--batch-step 0`.
 
 Several resolvers write **more than one** artifact, and two of them *rewrite* an
 artifact an earlier experiment produced — `012_chase_fold_gap.py` writes

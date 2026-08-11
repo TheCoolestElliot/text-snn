@@ -1,0 +1,165 @@
+{
+ "experiment": "EXP_016_reset_jacobian",
+ "post_hoc": true,
+ "batch_step": 5138,
+ "amends_no_bar": true,
+ "p3_stands_as_it_fired": true,
+ "question": "what is the largest gain any single CONTIGUOUS window of the reverse recursion can contribute?",
+ "inference_only": true,
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "changes_no_hyperparameter": true,
+ "necessary_not_sufficient": true,
+ "results": [
+  {
+   "leg": "A1",
+   "run": "snn_beta0.5_s0",
+   "note": "plain LIF, 735K -- trains",
+   "arch": "snn",
+   "d_model": 512,
+   "checkpoint": "ckpt_final.pt",
+   "batch_step": 5138,
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A2",
+   "run": "scale_d1020_s0",
+   "note": "plain LIF, 2.5M -- trains",
+   "arch": "snn",
+   "d_model": 1020,
+   "checkpoint": "ckpt_final.pt",
+   "batch_step": 5138,
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 130560,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 130560,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A3",
+   "run": "scale_d1481_s0",
+   "note": "plain LIF, 5.0M -- trains",
+   "arch": "snn",
+   "d_model": 1481,
+   "checkpoint": "ckpt_final.pt",
+   "batch_step": 5138,
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.0,
+     "max_window_log10_gain": 0.0,
+     "mean_window_log_gain": 0.0,
+     "n_chains_with_expanding_window": 0,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 0.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A4",
+   "run": "twocomp_s0",
+   "note": "two-compartment, 735K -- trains",
+   "arch": "twocomp",
+   "d_model": 512,
+   "checkpoint": "ckpt_final.pt",
+   "batch_step": 5138,
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 1.5278818782618167,
+     "max_window_log10_gain": 0.6635506687290829,
+     "mean_window_log_gain": 0.0015961414551439288,
+     "n_chains_with_expanding_window": 560,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 3.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 0.6307414059820124,
+     "max_window_log10_gain": 0.2739275121258867,
+     "mean_window_log_gain": 0.00010797094267450909,
+     "n_chains_with_expanding_window": 70,
+     "n_chains": 65536,
+     "longest_expanding_run_steps": 1.0,
+     "layer": 1
+    }
+   ]
+  },
+  {
+   "leg": "A5",
+   "run": "arch_twocomp_d1481_s0",
+   "note": "two-compartment, 5.0M -- DIES 138 steps later",
+   "arch": "twocomp",
+   "d_model": 1481,
+   "checkpoint": "ckpt_best.pt",
+   "batch_step": 5138,
+   "step_of_checkpoint": -1,
+   "layers": [
+    {
+     "max_window_log_gain": 36.845222367045025,
+     "max_window_log10_gain": 16.001676758505923,
+     "mean_window_log_gain": 0.02831893800291214,
+     "n_chains_with_expanding_window": 15000,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 85.0,
+     "layer": 0
+    },
+    {
+     "max_window_log_gain": 16.720301119357664,
+     "max_window_log10_gain": 7.261534511897798,
+     "mean_window_log_gain": 0.05976831685127463,
+     "n_chains_with_expanding_window": 34748,
+     "n_chains": 189568,
+     "longest_expanding_run_steps": 83.0,
+     "layer": 1
+    }
+   ]
+  }
+ ]
+}

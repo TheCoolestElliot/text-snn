@@ -390,3 +390,253 @@ decides #11.**
 ## 9. Results
 
 *(appended after the run — nothing above this line is rewritten)*
+
+**Closed 2026-08-11, ~0.8 GPU-hours**, of which **~0.37 bought no number** and is
+recorded as spent rather than netted off (§9.8). Pre-registration committed at
+`b8887ea` before the first probe; probe, resolver and tests at `6eed5d8` before
+any leg was read; `--print-bars` run and read first.
+
+### 9.1 The scoreboard
+
+Per-step chain factor `g = beta * dv`, over every `(batch, timestep, channel)`
+site — 48,529,408 sites per layer at `d = 1481`:
+
+| leg | arch | `d` | layer | `max\|g\|` | ÷ LIF bound | `frac(\|g\| > 1)` | `max\|w·vs\|` |
+|---|---|---:|---:|---:|---:|---:|---:|
+| A1 | `snn` | 512 | 0 | **0.51236** | 1.00 | **0** | — |
+| A1 | `snn` | 512 | 1 | **0.51236** | 1.00 | **0** | — |
+| A2 | `snn` | 1020 | 0 | **0.51236** | 1.00 | **0** | — |
+| A2 | `snn` | 1020 | 1 | **0.51236** | 1.00 | **0** | — |
+| A3 | `snn` | 1481 | 0 | **0.51236** | 1.00 | **0** | — |
+| A3 | `snn` | 1481 | 1 | **0.51236** | 1.00 | **0** | — |
+| A4 | `twocomp` | 512 | 0 | 2.87015 | 5.60 | 5.80e-05 | 22.91 |
+| A4 | `twocomp` | 512 | 1 | 2.44904 | 4.78 | 4.53e-06 | 16.21 |
+| A5 | `twocomp` | 1481 | 0 | **8.95778** | **17.48** | 5.97e-04 | 279.66 |
+| A5 | `twocomp` | 1481 | 1 | 7.89901 | 15.42 | 3.31e-03 | 696.28 |
+
+**The three `snn` legs return 0.51236 — the derived bound, to five decimals — at
+every width and every layer, and not one site of 48.5 million exceeds it.** §2.2
+is not merely consistent with the data; the data saturate it and stop.
+
+| bar | verdict | |
+|---|---|---|
+| **T1** | **HOLDS** | every `snn` leg ≤ 0.5123596 + 1e-5. The probe measures what §2.1 says. |
+| **T2** | **HOLDS** | local scans bitwise equal to the committed eager references, all five legs, both layers. |
+| **P1** | **HELD** | `max\|g\| = 8.95778 > 1` at layer 0, `d = 1481` — **17.48×** the plain LIF's hard ceiling. |
+| **P2** | **DIRECTION HELD** | `frac(\|g\| > 1)` at layer 0: 5.80e-05 → 5.97e-04, **10.3×** with width. |
+| **P3** | **REFUTED AS SUFFICIENT** | **0 of 189,568 chains expand net** over the full unroll; `max_(b,c) Σ_t log\|g_t\| = −171.91` against a bar of +68.83. |
+| **P4** | **DIRECTION REVERSED** | layer **1** has the heavier tail — 3.31e-03 against layer 0's 5.97e-04 — and the higher chain gain. The opposite of the prediction. |
+| **P5** | **HELD** | `frac(\|g\| > 1) = 0` **exactly**, both layers, at the width that kills the arm. |
+
+### 9.2 P3 failed, and the failure was the experiment's own design
+
+P3 placed its bar on the product over **all 256** timesteps. The adjoint is not
+injected once and carried the length of the unroll: `grad_spike` enters at *every*
+timestep, so the cotangent reaching a parameter is a **sum over injection points**,
+and each term traverses only its own window. Summing over the whole unroll
+averages the mechanism away by construction, which is exactly what the number
+says — `max|g| = 8.96` and 0.06 % of sites expanding, with **not one chain in
+189,568** expanding net.
+
+**§4.0 and §6 item 4 of this file both state that `Σ_t log|g_t|` "bounds the
+homogeneous gain and is NOT the gradient". The limitation was written down and
+the bar was placed on the limited quantity anyway.** That is `EXP_012` Y5's shape
+and `EXP_013` N1's and `EXP_015` P1/P2's — **the fourth occurrence in Phase 4**,
+and the first one authored in full knowledge of the previous three. It is
+reported unrepaired per `CONTRIBUTING.md` §3; the corrected quantity is measured
+in §9.4 under its own name and **P3's verdict stands as it fired**.
+
+### 9.3 Leg B: the first non-finite value is born inside layer 0's recursion
+
+At step 5138, on the dying run, **both dispatch paths**, with the loss
+reproducing **1.4197630882263184 bitwise** (G4):
+
+| boundary, in backward order | `max\|finite\|` | non-finite |
+|---|---:|---|
+| `grad_spikes_layer1` — enters layer 1's scan from the head | **1.4639e−04** | none |
+| `grad_cur_layer1` — leaves layer 1's scan | **1.1027e+15** | none |
+| `grad_spikes_layer0` — enters layer 0's scan | 5.6801e+14 | none |
+| `grad_cur_layer0` — leaves layer 0's scan | **6.1173e+37** | **140 NaN + 1 inf** |
+
+| stage | amplification |
+|---|---:|
+| layer 1's 256-step reverse recursion | **× 10^18.88** |
+| layer 1's `Linear` backward | × 10^−0.29 |
+| layer 0's 256-step reverse recursion | **× 10^23.03** |
+| **one backward pass, end to end** | **× 10^41.62** |
+
+**P6 = BORN IN THE RECURSION.** The eager path gives the identical boundaries to
+seven significant figures and 141 NaN where the fused path gives 140 NaN + 1 inf,
+so **R10 separation now holds one level deeper than `EXP_015` could take it** —
+the fused kernel is exonerated at the *boundary*, not merely at the parameters.
+
+### 9.4 POST-HOC: the run does the damage, and Leg A read the wrong batch
+
+Two post-hoc measurements, **labelled post-hoc everywhere they are quoted**, on
+`012_posthoc_pileup.py`'s precedent. Neither amends a bar.
+
+The first replaces P3's whole-unroll product with the **maximum contiguous
+window** (Kadane, online). The second re-runs both probes on **the batch the run
+actually died on** — `--batch-step 5138` — because Leg A read batch 0, which is
+an arbitrary batch and not the one that killed it. **That was a defect in Leg A's
+design, not only in P3's quantity**, and it is why §6 item 3's limitation turned
+out to be load-bearing:
+
+| leg | layer | longest expanding **run** | window gain |
+|---|---:|---:|---:|
+| | | batch 0 → **batch 5138** | batch 0 → **batch 5138** |
+| A1–A3 `snn`, all widths | 0, 1 | **0 → 0** | **10^0.00 → 10^0.00** |
+| A4 `twocomp` 735K | 0 | 2 → 3 | 10^0.66 → 10^0.66 |
+| A5 `twocomp` 5.0M | 1 | 18 → **83** | 10^1.84 → **10^7.26** |
+| A5 `twocomp` 5.0M | 0 | 8 → **85** | 10^1.73 → **10^16.00** |
+
+**On the batch that killed the run, layer 0 has a contiguous run of 85 timesteps
+in which the reverse recurrence expands**, worth 10^16 on its own, against 3
+steps and 10^0.66 for the same arm at 735K. `max|w·vs|` at layer 0 goes 44.62 →
+**356.61** between the two widths on that batch, and `max|g|` reaches **9.84**.
+
+**The plain LIF is at exactly zero in every cell of that table** — no window, at
+any width, on either batch, ever expands. It cannot: §2.2 forbids it.
+
+### 9.5 What is now accounted for, and what is not
+
+The measured amplification across layer 0's scan is **10^23.03**. The homogeneous
+window supplies **10^16.00**. The coupling term `w_c · gv`, with
+`gv = sgd·(grad_spike − grad_vf_next·vf)`, supplies at most
+`max|w·vs| · 1/(1 − max β_s) ≈ 356.6 × 71 ≈ 10^4.4`.
+
+**That leaves a residual of ~2.6 orders of magnitude this experiment does not
+resolve**, and it is stated rather than absorbed. Three candidates, none
+measured here: the window maximum and the injection maximum need not occur at the
+same site, so the product of maxima is not a path any single element takes; the
+`1/(1 − β_s)` figure is a DC gain and understates an accumulator whose input is
+itself growing geometrically backward in time; and **the weights are from step
+5000 while the failure is at 5138** — Leg A's checkpoint is 138 steps stale and
+only the *batch* was corrected in §9.4, not the parameters.
+
+**No claim is made that §2.3 is the whole cause.** What is established is that the
+plain LIF's recurrence provably cannot expand and does not, that the
+two-compartment one demonstrably does, that on the fatal batch it does so for 85
+consecutive steps, and that the first non-finite value is made inside it.
+
+### 9.6 What this says about `EXP_015` §14.5 — a correction, not a refinement
+
+`EXP_015` §9.7 and report §14.5 both state, of this divergence:
+
+> "**and not a gradient explosion** — the largest gradient in the six steps
+> before death is 2.0e-02 and the clip never fires in the whole run."
+
+**That sentence is wrong, and its own committed artifact contains the
+refutation.** `exp_015_divergence.json` records `layers.1.weight` at
+**1.676e+15** and `layers.1.bias` at **3.70e+13** at step 5138, both finite, and
+the eager replay's `grad_abs_max_finite` at **7.79e+29**. §9.3 measures the
+explosion directly at **10^41.62 within one backward pass**.
+
+**Both cited facts are true and neither supports the conclusion**, because both
+are measured *between* optimiser steps:
+
+* "the largest gradient in the six steps before death is 2.0e-02" is a statement
+  about steps 5132–5137, and the explosion happens *inside* the backward at 5138;
+* "**the clip never fires**" is not evidence against an explosion — it is a
+  **consequence** of one. `clip_grad_norm_` acts on the accumulated gradient
+  after `backward()` returns. Here the overflow occurs inside `backward()`, so by
+  the time the clip computes a norm the tensor already holds NaN and the norm is
+  NaN. A run that died of a 10^41.6 gradient explosion logs
+  `max_grad_norm = 0.663` and `n_logged_steps_over_clip = 0` **for exactly that
+  reason**.
+
+"Always layer 0 and the embedding; never layer 1" stands as written about
+*non-finiteness* and is misleading about *magnitude*: layer 1 carries 1.10e+15
+where it carried 1.46e−04 one boundary earlier. It is not spared — **it has not
+yet run out of exponent.**
+
+Per `CONTRIBUTING.md` §3 the closed `EXP_015` log is **not** rewritten. The
+correction is carried in the report at rev 10 with the rev-9 sentence left
+standing beneath it, the same treatment rev 9 (i) gave rev 8's gap arithmetic.
+
+### 9.7 What this does not answer, and what it must not be read as
+
+* **It is not a fix.** Naming an unbounded quantity is not bounding it. No remedy
+  is proposed, designed or costed here.
+* **It does not say the arm is bad.** `twocomp` is the adopted arm, 0.134 bpc
+  ahead of the baseline at 735K across 7 seeds, where its longest expanding run
+  is **3 steps**. This is a *training-stability boundary at width*, not a verdict
+  on the neuron at the width it was adopted at.
+* **It says nothing about `twocomp_threshold`** (died ~2000), which was not
+  probed and has an additional `exp()`.
+* **It does not establish a width law.** Two widths for the arm, n = 1
+  checkpoint, no σ. `frac(|g| > 1)` rising 10.3× is a direction.
+* **It does not decide #11.** §9.8 states the consequence; the ruling is Elliot's.
+
+### 9.8 Cost, and the ~0.37 GPU-hours that bought no number
+
+~0.8 GPU-hours total. **Two Leg B attempts were aborted and are recorded as spent
+rather than netted off**, following `EXP_015` §7.1's precedent:
+
+1. `keep_spikes = True` was set before the 132-step replay rather than for the
+   instrumented step alone, retaining two `[128, 256, 1481]` tensors per step;
+   the card reached 7.7 of 8.1 GiB and entered the WDDM spill this project has
+   hit before — **a ~50× slowdown that never raises**.
+2. `fused = False` was set before the replay rather than after it, so 132 steps
+   replayed on the eager path (~13 kernels per timestep per layer) under graph
+   capture. `011`'s pass 3 already does this correctly at `011:280-285`; the fix
+   was to copy it. **The reusable lesson is the one `EXP_015` §9.10 recorded in
+   different words: the instrument's own defects cost more than the measurement.**
+
+A stray child process survived the first abort and held the GPU; it was killed
+before the re-run. No leg here is timed, so no wall-clock figure is affected.
+
+### 9.9 Gates
+
+| gate | result |
+|---|---|
+| **T1** | HOLDS — §9.1 |
+| **T2** | HOLDS — bitwise, five legs, both layers |
+| **G1** — no `src/snn/` file modified | **PASS**, `git diff --stat src/snn/` empty |
+| **G2** — determinism / 0-difference reproduction | **PASS** — both Leg B passes re-derive the same boundaries; Leg A is a pure function of (checkpoint, batch index) |
+| **G3** — no hyperparameter read from outside each run's `config.json` | **PASS** |
+| **G4** — Leg B adds no arithmetic; loss reproduces bitwise | **PASS**, `1.4197630882263184` on both paths |
+| tests | `tests/test_reset_jacobian.py` **10 passed**; `ruff` clean |
+
+### 9.10 The pre-registration guarantee
+
+`experiments/logs/EXP_016_reset_jacobian.md` §0–§8 was committed at **`b8887ea`**,
+before the first probe ran, and its SHA-256 over the working-tree bytes at that
+commit is
+
+> `28c5e92625dfba93503560153b3e25453569837e47dcf953402533eacf95ce39`
+
+**The recipe is CRLF-dependent**, exactly as `EXP_015` §9.12 records for this
+tree: `.gitattributes` sets `* text=auto eol=lf`, so git stores LF and checks out
+CRLF here, and the digest above is over the checked-out bytes. Reconstructing
+with `\n` gives a different value and would wrongly read as an edited
+pre-registration.
+
+---
+
+## 10. Referred to Elliot, and not decided here
+
+1. **Decision #11's form, not its answer.** §2.4 was written before the run and
+   §9 does not weaken it: `dv` is a function of `(v_pre, vs, w_c, alpha, thr,
+   beta_f)` and **contains no learning rate, no schedule, no weight decay and no
+   gradient clip.** §9.6 shows the clip *cannot* act on this failure — it reads a
+   norm that is already NaN. So "may the frozen recipe be re-derived at a new
+   size?" may be the wrong question to rule on: no value of any recipe term
+   bounds this quantity. **Nothing is proposed and no term is changed.**
+2. **Whether a remedy is a ranked candidate.** Anything that bounds the
+   recurrence — clamping the slow compartment, resetting it, normalising `cur`,
+   or truncating BPTT — is a **new arm**, needs its own pre-registration and its
+   own σ, and would change the adopted arm's function class. Not designed here.
+3. **The residual 2.6 orders of magnitude** (§9.5). The cheapest next measurement
+   is Leg A's probe run against the step-**5137** weights rather than step 5000's,
+   which needs a checkpoint the dying run never wrote — one replay with a dump,
+   ~2 GPU-minutes.
+4. **The verdict vocabulary, a fourth time** (§9.2). `EXP_015` §10 item 3 referred
+   **DIVERGED / NO RESULT**; this file adds that a bar can also be placed on a
+   quantity whose own limitations section already says it is the wrong one. That
+   is decision **#9**'s substance again, and the guard `CONTRIBUTING.md` §2
+   requires plainly did not catch it here.
+5. **Whether `EXP_014` §9.10's width finding should be re-read.** Firing rates
+   fall with width and `max|w·vs|` rises with it. Nothing here connects them, and
+   the connection is not this file's to assert.
+

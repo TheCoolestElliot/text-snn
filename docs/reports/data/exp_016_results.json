@@ -1,0 +1,113 @@
+{
+ "experiment": "EXP_016_reset_jacobian",
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "changes_no_hyperparameter": true,
+ "decides_no_decision_row": true,
+ "missing_legs": [],
+ "p3_bar_log": 68.8278057288767,
+ "observed_finite_grad": 7.789977971209904e+29,
+ "T1": {
+  "verdict": "HOLDS",
+  "violations": []
+ },
+ "T2": {
+  "verdict": "HOLDS",
+  "violations": []
+ },
+ "P1": {
+  "verdict": "HELD",
+  "max_abs_g": 8.95777702331543,
+  "lif_bound_for_reference": 0.5123596271760303,
+  "ratio_to_lif_bound": 17.483377979424255,
+  "max_abs_w_times_vs": 279.66033935546875
+ },
+ "P2": {
+  "verdict": "DIRECTION HELD",
+  "frac_over_1_d1481": 0.0005969164099426063,
+  "frac_over_1_d512": 5.799531936645508e-05,
+  "note": "direction only -- not step-matched, n=1 checkpoint per cell, no interval; no functional form may be fitted to two points"
+ },
+ "P3": {
+  "verdict": "REFUTED AS SUFFICIENT",
+  "max_chain_log_gain": -171.90775971163728,
+  "max_chain_log10_gain": -74.65859143911422,
+  "bar_log": 68.8278057288767,
+  "n_chains_expanding": 0,
+  "n_chains": 189568,
+  "power": "ONE-SIDED. A failure is decisive; a hold is CONSISTENCY, not proof -- sum_t log|g_t| ignores the grad_spike injections and the sign cancellation in grad_cur = gf + gs, and this checkpoint is 138 steps before the failing step.",
+  "may_not_be_called_proven": true
+ },
+ "P4": {
+  "verdict": "DIRECTION REVERSED",
+  "layer0": {
+   "frac_over_1": 0.0005969164099426063,
+   "max_chain_log_gain": -171.90775971163728
+  },
+  "layer1": {
+   "frac_over_1": 0.00330725237777473,
+   "max_chain_log_gain": -149.37073631711377
+  },
+  "note": "direction only; a held P4 does not establish that the layer-0 tail CAUSES the layer-0 locus"
+ },
+ "P5": {
+  "verdict": "HELD",
+  "frac_over_1_per_layer": [
+   0.0,
+   0.0
+  ],
+  "max_abs_g_per_layer": [
+   0.5123596787452698,
+   0.5123596787452698
+  ],
+  "bound": 0.5123596271760303
+ },
+ "controls_summary": [
+  {
+   "leg": "A1",
+   "arch": "snn",
+   "d_model": 512,
+   "max_abs_g_per_layer": [
+    0.5123596787452698,
+    0.5123596787452698
+   ]
+  },
+  {
+   "leg": "A2",
+   "arch": "snn",
+   "d_model": 1020,
+   "max_abs_g_per_layer": [
+    0.5123596787452698,
+    0.5123596787452698
+   ]
+  },
+  {
+   "leg": "A3",
+   "arch": "snn",
+   "d_model": 1481,
+   "max_abs_g_per_layer": [
+    0.5123596787452698,
+    0.5123596787452698
+   ]
+  },
+  {
+   "leg": "A4",
+   "arch": "twocomp",
+   "d_model": 512,
+   "max_abs_g_per_layer": [
+    2.8701531887054443,
+    2.449036121368408
+   ]
+  },
+  {
+   "leg": "A5",
+   "arch": "twocomp",
+   "d_model": 1481,
+   "max_abs_g_per_layer": [
+    8.95777702331543,
+    7.899012565612793
+   ]
+  }
+ ],
+ "verdict": "P1 HELD, P3 REFUTED AS SUFFICIENT -- the factor exceeds 1 but the homogeneous product cannot reach the observed magnitude. Reported as a falsified derivation."
+}
