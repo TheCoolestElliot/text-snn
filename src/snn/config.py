@@ -49,8 +49,8 @@ import torch  # noqa: E402
 # --------------------------------------------------------------------------
 
 CORPUS_CHOICES = ("enwik8", "text8")
-ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "tokenshift",
-                "threshold", "noise", "gru")
+ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "twocomp_detach",
+                "tokenshift", "threshold", "noise", "gru")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -90,11 +90,19 @@ class Config:
     surrogate_alpha: float = 2.0
     t_steps: int = 1                # T
 
-    # --- two-compartment neuron (arch="twocomp"/"twocomp_threshold"; EXP_004 §2) -
+    # --- two-compartment neuron (arch="twocomp"/"twocomp_threshold"/
+    #     "twocomp_detach"; EXP_004 §2) --------------------------------------
     # Ignored by every other arm. They are Config fields rather than constants in
     # model.py so that a run's config.json records the neuron it actually trained
     # -- the initialisation is the thing EXP_004's §7.2 screen selects, and an
     # unlogged choice there would be an unfalsifiable one.
+    #
+    # NOTE ON `reset` AND `twocomp_detach` (EXP_017): all three two-compartment
+    # arms require `reset="hard"` and their forward passes are identical. The
+    # `_detach` arm's difference is in the BACKWARD -- the reset factor is treated
+    # as a constant -- which is why it is named by `arch` and not by `reset`.
+    # `reset` continues to describe the forward rule, which is what it has always
+    # meant, and `config.json` therefore still records the neuron that ran.
     beta_slow: float = 0.95         # slow-pole decay at init; sigmoid-parameterised
     w_init: float = 0.1             # initial fast/slow mix; 0.0 nests the baseline
 

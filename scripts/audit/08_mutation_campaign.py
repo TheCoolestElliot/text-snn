@@ -87,8 +87,10 @@ REPO = Path(__file__).resolve().parents[2]
 KERNELS = REPO / "src" / "snn" / "kernels.py"
 SURROGATE = REPO / "src" / "snn" / "surrogate.py"
 TWOCOMP = REPO / "src" / "snn" / "twocomp.py"
+TWOCOMP_DETACH = REPO / "src" / "snn" / "twocomp_detach.py"
 GATE = "tests/test_neuron_equivalence.py"
 GATE_TC = "tests/test_twocomp_equivalence.py"
+GATE_TCD = "tests/test_twocomp_detach_equivalence.py"
 
 # Each entry: (id, description, file, find, replace) with an OPTIONAL sixth
 # element naming the gate to run; it defaults to `GATE`, the LIF one.
@@ -266,6 +268,66 @@ MUTATIONS: list[tuple] = [
     ("T22", "the eager reference mixes before decaying the fast pole", TWOCOMP,
      "        s = atan_spike(vf + w * vs - thr, alpha)",
      "        s = atan_spike(vf * w + vs - thr, alpha)", GATE_TC),
+
+    # ======================================================================
+    # EXP_017: the detached-reset two-compartment neuron. Its own file, its own
+    # gate. Third neuron, third `MUTATIONS` block and no third campaign -- which
+    # is the reusability `EXP_002` §8.6 predicted, now observed twice.
+    #
+    # THE MOST IMPORTANT ONES ARE D01 AND D10, and they are important for
+    # opposite reasons. D01 puts the adopted arm's unbounded `-vf*sgd` term back
+    # into the kernel: the arm's ENTIRE claim is that this term is absent, the
+    # mutation restores it, and every wall-clock and kernel-count number stays
+    # identical -- only the science moves. D10 removes the `.detach()` from the
+    # eager reference, which is the arm's single changed token; if the gate did
+    # not catch that, its "fused vs eager" legs would be comparing the adopted
+    # arm against itself and would pass while measuring nothing.
+    # ======================================================================
+
+    # ---- backward: the reset derivative, i.e. the whole arm ----------------
+    ("D01", "restore the adopted arm's unbounded reset term", TWOCOMP_DETACH,
+     "    const T dv  = T(1) - sh;",
+     "    const T dv  = (T(1) - sh) - v_pre * sgd;", GATE_TCD),
+    ("D02", "the backward forgets the reset entirely (reverts to 'none')",
+     TWOCOMP_DETACH,
+     "    const T dv  = T(1) - sh;", "    const T dv  = T(1);", GATE_TCD),
+    ("D03", "dL/dv regains a reset path through the mixed membrane",
+     TWOCOMP_DETACH,
+     "    const T gv  = sgd * grad_spike;",
+     "    const T gv  = sgd * (grad_spike - grad_vf_next * v_pre);", GATE_TCD),
+    ("D04", "dL/dv drops the surrogate, becoming straight-through",
+     TWOCOMP_DETACH,
+     "    const T gv  = sgd * grad_spike;", "    const T gv  = grad_spike;",
+     GATE_TCD),
+    # ---- backward: the chain ----------------------------------------------
+    ("D05", "sign-flip the mix term in the slow adjoint", TWOCOMP_DETACH,
+     "    const T gs  = grad_vs_next + w_c * gv;",
+     "    const T gs  = grad_vs_next - w_c * gv;", GATE_TCD),
+    ("D06", "drop the grad_spike*sgd term from the fast adjoint", TWOCOMP_DETACH,
+     "    const T gf  = grad_vf_next * dv + grad_spike * sgd;",
+     "    const T gf  = grad_vf_next * dv;", GATE_TCD),
+    ("D07", "current is treated as entering only the fast compartment",
+     TWOCOMP_DETACH,
+     "    grad_cur     = gf + gs;", "    grad_cur     = gf;", GATE_TCD),
+    ("D08", "drop beta_f from the fast adjoint chain", TWOCOMP_DETACH,
+     "    grad_vf_prev = beta_f * gf;", "    grad_vf_prev = gf;", GATE_TCD),
+    ("D09", "> instead of >= in the BACKWARD kernel only", TWOCOMP_DETACH,
+     "    const T sh  = (x >= T(0)) ? T(1) : T(0);",
+     "    const T sh  = (x > T(0)) ? T(1) : T(0);", GATE_TCD),
+    # ---- the eager reference itself ----------------------------------------
+    ("D10", "the eager reference does not detach (it IS the adopted arm)",
+     TWOCOMP_DETACH,
+     "        vf = vf * (1.0 - s.detach())",
+     "        vf = vf * (1.0 - s)", GATE_TCD),
+    ("D11", "grad_beta_s uses vs_t instead of vs_{t-1} (the shift is dropped)",
+     TWOCOMP_DETACH,
+     "        grad_beta_s = (gvs * vs_prev).sum(dim=(0, 1)).reshape(1, d)",
+     "        grad_beta_s = (gvs * vs_seq).sum(dim=(0, 1)).reshape(1, d)",
+     GATE_TCD),
+    ("D12", "the two per-channel gradients are returned swapped", TWOCOMP_DETACH,
+     "        return grad_cur, grad_v0, grad_w, grad_beta_s, None, None, None",
+     "        return grad_cur, grad_v0, grad_beta_s, grad_w, None, None, None",
+     GATE_TCD),
 ]
 
 

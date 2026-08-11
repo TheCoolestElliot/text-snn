@@ -134,7 +134,12 @@ def param_count(arch: str, vocab_size: int, d_model: int, n_layers: int) -> int:
         return spiking_param_count(vocab_size, d_model, n_layers)
     if arch in ("threshold", "tokenshift"):
         return prescan_param_count(vocab_size, d_model, n_layers)
-    if arch == "twocomp":
+    if arch in ("twocomp", "twocomp_detach"):
+        # EXP_017's arm adds no parameter of any shape -- it is the adopted arm's
+        # forward kernel with a bounded backward -- so it is parameter-IDENTICAL
+        # to `twocomp`, not merely parameter-matched. Sharing the closed form is
+        # the statement of that, and a future arm that did add a parameter would
+        # have to add a branch here rather than inherit a wrong count silently.
         return twocomp_param_count(vocab_size, d_model, n_layers)
     if arch == "twocomp_threshold":
         return twocomp_threshold_param_count(vocab_size, d_model, n_layers)
