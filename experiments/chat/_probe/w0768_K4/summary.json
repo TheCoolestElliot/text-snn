@@ -1,0 +1,50 @@
+{
+  "run_name": "_probe/w0768_K4",
+  "steps": 2059,
+  "params": 2526821,
+  "wall_clock_s": 305.29,
+  "peak_vram_gib": 3.709,
+  "val": {
+    "alpaca": 2.2955778737459362,
+    "dolly": 2.5384031850106616,
+    "oasst1": 2.3142282686120224,
+    "persona": 0.8583386958178439,
+    "soda": 1.7377398374473696,
+    "stories_topic": 1.4786145232969556,
+    "tinystories": 1.4945003658434821,
+    "weighted": 1.6850913429343677
+  },
+  "description": {
+    "params": 2526821,
+    "d_model": 768,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.28,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}

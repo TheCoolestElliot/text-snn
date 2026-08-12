@@ -34,6 +34,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--persona-conversations", type=int, default=60_000)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--skip-download", action="store_true")
+    p.add_argument("--max-turn-chars", type=int, default=None,
+                   help="override snnchat.sources.MAX_TURN_CHARS for this pack; "
+                        "requires --suffix, because a different filter is a "
+                        "different corpus and every committed checkpoint used 400")
+    p.add_argument("--suffix", default="",
+                   help="appended to each packed source name, e.g. _t600")
     args = p.parse_args(argv)
 
     if not args.skip_download:
@@ -43,6 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest = build_all(
         args.raw_dir, args.out_dir,
         seed=args.seed, persona_conversations=args.persona_conversations,
+        only=args.only, suffix=args.suffix, max_turn_chars=args.max_turn_chars,
     )
     print(manifest.to_json())
     total = sum(s.get("chars_train", 0) for s in manifest.sources.values())

@@ -46,6 +46,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from snnchat import sources as sources_mod
 from snnchat.persona import build_persona_conversations
 from snnchat.sources import SOURCES, iter_conversations, read_source
 from snnchat.tokenizer import BOS, EOT, VOCAB_VERSION, ChatTokenizer
@@ -304,57 +305,97 @@ def build_all(
     seed: int = 0,
     persona_conversations: int = 60_000,
     limit_chars: dict[str, int] | None = None,
+    only: list[str] | None = None,
+    suffix: str = "",
+    max_turn_chars: int | None = None,
 ) -> CorpusManifest:
     """Pack every available source. Idempotent per source: an existing
-    `<name>.bin` is left alone, so a failed source can be rebuilt on its own."""
+    `<name>.bin` is left alone, so a failed source can be rebuilt on its own.
+
+    `only` restricts which sources are packed. `suffix` is appended to each
+    packed name, and `max_turn_chars` overrides `snnchat.sources.MAX_TURN_CHARS`
+    for the duration of the call.
+
+    The last two exist together and are checked together: a repack at a
+    different turn-length filter produces a DIFFERENT corpus, and writing it
+    over `alpaca.bin` would make every committed checkpoint unreproducible. So a
+    non-default `max_turn_chars` requires a `suffix`, and the value actually used
+    is recorded per source in the manifest.
+    """
+    if max_turn_chars is not None and max_turn_chars != sources_mod.MAX_TURN_CHARS             and not suffix:
+        raise ValueError(
+            f"max_turn_chars={max_turn_chars} differs from the shipped "
+            f"{sources_mod.MAX_TURN_CHARS}; pass a suffix (e.g. '_t600') so this "
+            f"does not overwrite the corpus every committed checkpoint used"
+        )
     os.makedirs(out_dir, exist_ok=True)
     tok = _RawAwareTokenizer()
     rng = random.Random(seed)
     limit_chars = limit_chars or {}
     stats: dict[str, dict] = {}
+    previous_turn_chars = None
+    if max_turn_chars is not None:
+        previous_turn_chars = sources_mod.set_max_turn_chars(max_turn_chars)
+    try:
 
-    print(f"packing into {out_dir} (vocab v{VOCAB_VERSION}, V={tok.vocab_size})", flush=True)
+        print(f"packing into {out_dir} (vocab v{VOCAB_VERSION}, V={tok.vocab_size})", flush=True)
 
-    for src in SOURCES:
-        raw_path = os.path.join(raw_dir, src.filename)
-        if not os.path.exists(raw_path):
-            print(f"  {src.name}: SKIPPED (not downloaded)", flush=True)
-            continue
-        if os.path.exists(os.path.join(out_dir, f"{src.name}.bin")):
-            size = os.path.getsize(os.path.join(out_dir, f"{src.name}.bin"))
-            print(f"  {src.name}: already packed ({size / 1e6:,.1f} M chars)", flush=True)
-            stats[src.name] = {"chars_train": size, "reused": True}
-            continue
-        if src.name == "tinystories":
-            convs = _tinystories_conversations(raw_path, rng)
+        for src in SOURCES:
+            if only and src.name not in only:
+                continue
+            packed = f"{src.name}{suffix}"
+            raw_path = os.path.join(raw_dir, src.filename)
+            if not os.path.exists(raw_path):
+                print(f"  {packed}: SKIPPED (not downloaded)", flush=True)
+                continue
+            if os.path.exists(os.path.join(out_dir, f"{packed}.bin")):
+                size = os.path.getsize(os.path.join(out_dir, f"{packed}.bin"))
+                print(f"  {packed}: already packed ({size / 1e6:,.1f} M chars)", flush=True)
+                stats[packed] = {"chars_train": size, "reused": True}
+                continue
+            if src.name == "tinystories":
+                convs = _tinystories_conversations(raw_path, rng)
+            else:
+                convs = read_source(src.name, raw_path)
+            stats[packed] = _pack_source(
+                packed, convs, out_dir, tok, limit_chars=limit_chars.get(src.name, 0)
+            )
+            stats[packed]["max_turn_chars"] = sources_mod.MAX_TURN_CHARS
+            stats[packed]["read_from"] = src.name
+
+        if only and "persona" not in only:
+            pass
+        elif not os.path.exists(os.path.join(out_dir, "persona.bin")):
+            stats["persona"] = _pack_source(
+                "persona",
+                build_persona_conversations(persona_conversations, seed=seed),
+                out_dir,
+                tok,
+            )
         else:
-            convs = read_source(src.name, raw_path)
-        stats[src.name] = _pack_source(
-            src.name, convs, out_dir, tok, limit_chars=limit_chars.get(src.name, 0)
-        )
+            size = os.path.getsize(os.path.join(out_dir, "persona.bin"))
+            print(f"  persona: already packed ({size / 1e6:,.1f} M chars)", flush=True)
+            stats["persona"] = {"chars_train": size, "reused": True}
 
-    if not os.path.exists(os.path.join(out_dir, "persona.bin")):
-        stats["persona"] = _pack_source(
-            "persona",
-            build_persona_conversations(persona_conversations, seed=seed),
-            out_dir,
-            tok,
+        manifest = CorpusManifest(
+            vocab_version=VOCAB_VERSION,
+            vocab_size=tok.vocab_size,
+            built_at=time.strftime("%Y-%m-%dT%H:%M:%S"),
+            sources=stats,
         )
-    else:
-        size = os.path.getsize(os.path.join(out_dir, "persona.bin"))
-        print(f"  persona: already packed ({size / 1e6:,.1f} M chars)", flush=True)
-        stats["persona"] = {"chars_train": size, "reused": True}
+        with open(os.path.join(out_dir, "manifest.json"), "w", encoding="utf-8") as fh:
+            fh.write(manifest.to_json())
+            fh.write("\n")
+        return manifest
+    finally:
+        # Restored whatever happens. `set_max_turn_chars` rebinds a module
+        # global, so leaving it raised would silently change the filter for
+        # every later pack in the same process -- including `persona`, and
+        # including a second `build_all` call in a driver.
+        if previous_turn_chars is not None:
+            sources_mod.set_max_turn_chars(previous_turn_chars)
 
-    manifest = CorpusManifest(
-        vocab_version=VOCAB_VERSION,
-        vocab_size=tok.vocab_size,
-        built_at=time.strftime("%Y-%m-%dT%H:%M:%S"),
-        sources=stats,
-    )
-    with open(os.path.join(out_dir, "manifest.json"), "w", encoding="utf-8") as fh:
-        fh.write(manifest.to_json())
-        fh.write("\n")
-    return manifest
+
 
 
 # Re-exported so a caller can build a mixed iterator without importing three

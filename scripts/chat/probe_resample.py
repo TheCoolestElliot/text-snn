@@ -92,6 +92,7 @@ import torch  # noqa: E402
 from snnchat.generate import SamplingParams, load_chat_checkpoint  # noqa: E402
 from snnchat.quality import (  # noqa: E402
     PROBES,
+    _score_one,
     collect,
     rate_ci,
     resolves_against,
@@ -206,6 +207,36 @@ def _measure(arm: str, probes: tuple, idx: tuple[int, ...], args) -> dict:
         pk, pn = int(round(sum(p_hits))), len(p_hits)
         per_probe[p.prompt] = rate_ci(pk, pn)
 
+    # THE POOL STATISTIC, WHICH `score` ALREADY COMPUTES AND THIS TOOL THREW AWAY
+    # --------------------------------------------------------------------------
+    # Everything above reads `pick["hit"]` at the pinned `n=1, lambda=0` row --
+    # one selected reply per (probe, seed). `pool_by_kind` is the hit rate over
+    # ALL `n` candidates of every draw, so at the same seed count it rests on
+    # `n` times as many observations and its per-probe spread is correspondingly
+    # smaller.
+    #
+    # It is also the column `PREDICTION_v6.md` §3 named IN ADVANCE as the
+    # informative diagnostic and `QUALITY_v6.md` §2 then never read, and the one
+    # on which `chat-v6-scratch` is the highest-scoring arm of the seventeen
+    # committed. A resample that cannot report it cannot settle that question,
+    # which is the question this tool was built for.
+    #
+    # Reported ALONGSIDE the pinned row, never instead of it: the pinned row is
+    # what `PREDICTION_v5.md` §7 fixed before any checkpoint was scored, and
+    # swapping the estimand inside the tool would be exactly the metric-shopping
+    # `QUALITY.md` §5 documents three instances of.
+    pool_hits, pool_n = [], 0
+    for d in drawn["draws"]:
+        if d["prompt"] not in prompts:
+            continue
+        probe = next(p for p in probes if p.prompt == d["prompt"])
+        for text in d["texts"]:
+            pool_hits.append(_score_one({"expect": probe.expect,
+                                         "want": getattr(probe, "want", 1)}, text))
+            pool_n += 1
+    pool_k = int(round(sum(pool_hits)))
+    pool_ci = rate_ci(pool_k, pool_n) if pool_n else None
+
     row = {
         "arm": arm,
         "step": ck.get("step"),
@@ -214,6 +245,7 @@ def _measure(arm: str, probes: tuple, idx: tuple[int, ...], args) -> dict:
         "row": {"n": 1, "lambda": 0.0},
         "probes": [p.prompt for p in probes],
         "pooled": ci,
+        "pool_by_kind": pool_ci,
         "per_probe": per_probe,
         "superset_check": audit,
         "seconds": round(secs, 1),
@@ -224,6 +256,10 @@ def _measure(arm: str, probes: tuple, idx: tuple[int, ...], args) -> dict:
     print(f"   pooled  {ci['rate']:.4f}  = {ci['k']}/{ci['n']}  "
           f"95% CI [{ci['ci_low']:.4f}, {ci['ci_high']:.4f}]  "
           f"lattice {ci['lattice']:.5f}", flush=True)
+    if pool_ci is not None:
+        print(f"   pool    {pool_ci['rate']:.4f}  = {pool_ci['k']}/{pool_ci['n']}  "
+              f"95% CI [{pool_ci['ci_low']:.4f}, {pool_ci['ci_high']:.4f}]  "
+              f"(all {args.n} candidates per draw)", flush=True)
     if args.threshold is not None:
         print(f"   vs {args.threshold}: {row['verdict']}   ({secs / 60:.1f} min)",
               flush=True)

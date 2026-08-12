@@ -1,0 +1,50 @@
+{
+  "run_name": "_probe/w1280_K4",
+  "steps": 1482,
+  "params": 6832741,
+  "wall_clock_s": 305.22,
+  "peak_vram_gib": 4.028,
+  "val": {
+    "alpaca": 2.3911021401871158,
+    "dolly": 2.61683318491151,
+    "oasst1": 2.374397064015959,
+    "persona": 1.054074744836457,
+    "soda": 1.7835136405452379,
+    "stories_topic": 1.5598202437203752,
+    "tinystories": 1.5767341569912856,
+    "weighted": 1.770026132716407
+  },
+  "description": {
+    "params": 6832741,
+    "d_model": 1280,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.34,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.34,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.34,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.34,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}

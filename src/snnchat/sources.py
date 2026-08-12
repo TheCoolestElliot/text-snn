@@ -58,7 +58,36 @@ __all__ = ["SOURCES", "Source", "download_all", "read_source", "iter_conversatio
 #: A turn longer than this is dropped, not truncated. At a horizon of tens of
 #: characters a 2000-character monologue is noise the model cannot use and
 #: cannot be taught to stop producing.
+#:
+#: **What 400 costs, measured 2026-08-11 where `BUILD_NOTES.md` §3 called it a
+#: guess**: it discards 56.4 % of alpaca's characters, 85.1 % of dolly's and
+#: 78.3 % of oasst1's. Raising it to 600 recovers alpaca +62 %, dolly +67 % and
+#: oasst1 +108 %, and oasst1 is the source `build_corpus` already worries about
+#: memorising, at 796 conversations and 40.6 passes.
+#:
+#: The stated reason for 400 argues against TRUNCATING a turn, which teaches the
+#: model to stop mid-sentence. It is not an argument for this particular DROP
+#: threshold, and the two were never separated.
+#:
+#: `set_max_turn_chars` exists so a repack can change it without editing source.
+#: The default is untouched, because every packed `.bin` under `data/chat/` and
+#: every committed checkpoint was built at 400.
 MAX_TURN_CHARS = 400
+
+
+def set_max_turn_chars(value: int) -> int:
+    """Set the drop threshold for a repack. Returns the previous value.
+
+    A module-level rebind rather than a parameter threaded through nine readers:
+    the readers are generators consumed by `build_corpus`, and a corpus is
+    packed under exactly one threshold, so a global for the duration of a pack
+    is the honest shape. `build_corpus` records the value it used in the
+    manifest, which is what makes a `.bin` traceable to its filter.
+    """
+    global MAX_TURN_CHARS
+    previous = MAX_TURN_CHARS
+    MAX_TURN_CHARS = int(value)
+    return previous
 
 #: A conversation is dropped whole if normalisation removed more than this
 #: fraction of it -- that is the signal for "this record was mostly emoji,
@@ -98,6 +127,17 @@ SOURCES: tuple[Source, ...] = (
         kind="parquet",
         approx_bytes=688_800_000,
         note="1.5M short two-party dialogues; the turn-taking teacher",
+    ),
+    Source(
+        # The SAME parquet as `soda`, read through a different column. It gets
+        # its own entry so it can be packed, weighted and reported separately,
+        # and `download_all` skips it because the file is already there.
+        name="soda_narrative",
+        url="https://huggingface.co/datasets/allenai/soda/resolve/main/train.parquet",
+        filename="soda_train.parquet",
+        kind="parquet",
+        approx_bytes=688_800_000,
+        note="~218M chars of adult third-person prose; the register teacher",
     ),
     Source(
         name="alpaca",
@@ -300,6 +340,32 @@ def read_tinystories(path: str) -> Iterator[Conversation]:
         yield [("story", story)]
 
 
+def read_soda_narrative(path: str) -> Iterator[Conversation]:
+    """SODA's `narrative` column: ~218 M characters of adult third-person prose.
+
+    It sits in the parquet this repository has already downloaded and no code
+    has ever read it. That matters because of what the corpus is made of: every
+    prose source in the mixture except oasst1 (0.3 M) and alpaca (8 M) is
+    TinyStories, wrapped four different ways. The model's register, its
+    vocabulary and its idea of what a sentence is all come from text written for
+    three-year-olds, which is a plausible part of why `QUALITY_v8.md` §4 finds
+    the held-out oracle at 0.09 -- it rarely drafts a reply about an unfamiliar
+    noun because it has rarely seen unfamiliar nouns.
+
+    Measured on row group 0 (1,191,582 rows): mean 182.5 characters and 99.89 %
+    under the 400-character filter, so almost nothing is dropped.
+
+    Emitted as bare narrative rather than wrapped in a request. It is a register
+    and vocabulary teacher, and inventing a request frame for it would make it a
+    second, unvalidated topic source instead.
+    """
+    for row in _read_parquet_columns(path, ["narrative"]):
+        text = _clean(row.get("narrative") or "")
+        if not _acceptable(row.get("narrative") or "", text):
+            continue
+        yield [("story", text)]
+
+
 def read_soda(path: str) -> Iterator[Conversation]:
     """SODA rows carry a `dialogue` list and a `speakers` list.
 
@@ -392,6 +458,7 @@ def read_oasst1(path: str) -> Iterator[Conversation]:
 _READERS = {
     "tinystories": read_tinystories,
     "soda": read_soda,
+    "soda_narrative": read_soda_narrative,
     "alpaca": read_alpaca,
     "dolly": read_dolly,
     "oasst1": read_oasst1,
