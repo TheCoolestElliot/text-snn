@@ -43,13 +43,23 @@ from snnchat.topics import story_request  # noqa: E402
 #: request. Lower than `build_corpus`'s 0.5 on purpose: `tinystories.bin` is
 #: still in the mix and is still 50 % raw, so the raw-narrative signal is
 #: already paid for and this file's job is the conditioning it does not carry.
+#:
+#: **Now overridable via `--raw-fraction`, default UNCHANGED.** Lowering it is
+#: the correctly-signed version of the dose lever `TOPIC_DOSE_NOTE.md` §4
+#: proposed: re-weighting the topic distribution is zero-sum and, measured
+#: against the note's own `1/count^0.5`, 14 of the 15 word probes LOSE dose.
+#: Cutting the raw-narrative share instead raises *every* noun topic at once,
+#: by roughly 1/(1-0.15) over 1/(1-0.05) = 1.12x from this term plus the
+#: generic-request branch in `snnchat.topics`. It is not zero-sum because the
+#: characters come from raw narrative, which `tinystories.bin` already supplies
+#: at 50 %.
 RAW_FRACTION = 0.15
 
 
-def _conversations(path: str, rng: random.Random):
+def _conversations(path: str, rng: random.Random, raw_fraction: float = RAW_FRACTION):
     for conv in read_source("tinystories", path):
         story = conv[0][1]
-        if rng.random() < RAW_FRACTION:
+        if rng.random() < raw_fraction:
             yield [("_raw", story)]
             continue
         request = story_request(story, rng)
@@ -65,7 +75,21 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--limit-chars", type=int, default=400_000_000)
     p.add_argument("--seed", type=int, default=7)
     p.add_argument("--force", action="store_true")
+    p.add_argument("--raw-fraction", type=float, default=RAW_FRACTION,
+                   help="share emitted as bare narrative rather than as an answer "
+                        f"to a request (default {RAW_FRACTION}, the shipped corpus)")
     args = p.parse_args(argv)
+
+    # A non-default raw fraction produces a DIFFERENT corpus, and eight committed
+    # checkpoints were trained on `stories_topic.bin` as it stands. Repacking it
+    # in place would make every one of them unreproducible, so the two are not
+    # allowed to coincide: change the fraction, change the name.
+    if args.raw_fraction != RAW_FRACTION and args.name == "stories_topic":
+        raise SystemExit(
+            f"--raw-fraction {args.raw_fraction} differs from the shipped "
+            f"{RAW_FRACTION}; pass --name (e.g. stories_topic_r05) so this does "
+            f"not overwrite the corpus eight committed checkpoints were trained on"
+        )
 
     raw = os.path.join(args.raw_dir, "tinystories.txt")
     if not os.path.exists(raw):
@@ -77,9 +101,10 @@ def main(argv: list[str] | None = None) -> int:
     tok = _RawAwareTokenizer()
     rng = random.Random(args.seed)
     print(f"packing {args.name} from {raw} "
-          f"(limit {args.limit_chars / 1e6:,.0f} M chars, raw fraction {RAW_FRACTION})",
+          f"(limit {args.limit_chars / 1e6:,.0f} M chars, raw fraction {args.raw_fraction})",
           flush=True)
-    stats = _pack_source(args.name, _conversations(raw, rng), args.out_dir, tok,
+    stats = _pack_source(args.name, _conversations(raw, rng, args.raw_fraction),
+                         args.out_dir, tok,
                          limit_chars=args.limit_chars)
 
     manifest_path = os.path.join(args.out_dir, "manifest.json")
@@ -88,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest["sources"][args.name] = {
         **stats,
         "built_from": "tinystories.txt",
-        "raw_fraction": RAW_FRACTION,
+        "raw_fraction": args.raw_fraction,
         "topic_prompts": "snnchat.topics.story_request",
         "seed": args.seed,
     }

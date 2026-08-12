@@ -1,0 +1,6 @@
+session9 driver: 9 stage(s)
+
+[R9] pack stories_topic_r05 (raw fraction 0.05)
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/build_topic_stories.py --name stories_topic_r05 --raw-fraction 0.05
+packing stories_topic_r05 from data/chat_raw\tinystories.txt (limit 400 M chars, raw fraction 0.05)
+    stories_topic_r05: 81,985 conversations, 62.4 M chars

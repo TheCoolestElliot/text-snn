@@ -45,6 +45,44 @@ ARMS = [
     ("mid_K4_bf", dict(d_model=1024, n_layers=4, batch_size=160, seq_len=256, dtype="bf16")),
 ]
 
+#: A width ladder at fixed depth, added 2026-08-11 (`--ladder width`).
+#:
+#: WHY THE ORIGINAL PROBE DOES NOT ANSWER THIS
+#: -------------------------------------------
+#: The chat model's size was picked from ONE five-minute run of `ARMS` above, and
+#: `BUILD_NOTES.md` §2 records two things about it that make the choice weaker
+#: than it looks: `mid_K4` -- the shape that shipped -- actually LOST that probe
+#: (1.6048 against `small_K3`'s 1.5808), and `large_K3` never produced a number
+#: at all because its evaluation spilled past 8 GiB, a fault whose cause
+#: (`eval_batch_size`) was fixed later the same day. So the only rung above the
+#: shipped width has never run, and the rung that shipped was chosen despite
+#: losing.
+#:
+#: `B * d` is held at ~164k rather than `B` being held fixed. Batch is nearly
+#: free on this latency-bound scan and memory is not, so matching the product is
+#: what keeps every rung at a comparable occupancy instead of starving the wide
+#: ones. `eval_batch_size` is set explicitly on every rung for the reason
+#: `large_K3` died of.
+#:
+#: THIS ORDERS CONFIGURATIONS BY BPC PER HOUR AND AUTHORISES NOTHING. n=1, one
+#: seed, constant learning rate, no error bars, and `EXP_005`'s finding that
+#: sigma is not a project constant applies here too. A rung winning here is a
+#: reason to pre-register an arm, not a reason to ship one.
+WIDTH_LADDER = [
+    ("w0768_K4", dict(d_model=768,  n_layers=4, batch_size=208, seq_len=256,
+                      dtype="fp32", eval_batch_size=48)),
+    ("w1024_K4", dict(d_model=1024, n_layers=4, batch_size=160, seq_len=256,
+                      dtype="fp32", eval_batch_size=48)),
+    ("w1280_K4", dict(d_model=1280, n_layers=4, batch_size=128, seq_len=256,
+                      dtype="fp32", eval_batch_size=32)),
+    ("w1536_K4", dict(d_model=1536, n_layers=4, batch_size=104, seq_len=256,
+                      dtype="fp32", eval_batch_size=24)),
+    ("w1792_K4", dict(d_model=1792, n_layers=4, batch_size=88,  seq_len=256,
+                      dtype="fp32", eval_batch_size=16)),
+]
+
+LADDERS = {"original": ARMS, "width": WIDTH_LADDER}
+
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__,
@@ -52,10 +90,17 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--minutes", type=float, default=5.0)
     p.add_argument("--lr", type=float, default=2.0e-3)
     p.add_argument("--out", default="experiments/chat/_probe/results.json")
+    p.add_argument("--ladder", choices=sorted(LADDERS), default="original",
+                   help="which arm set to run; 'width' is the fixed-depth width "
+                        "ladder added 2026-08-11")
     args = p.parse_args(argv)
 
+    arms = LADDERS[args.ladder]
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
     results = []
-    for name, spec in ARMS:
+    for name, spec in arms:
         print(f"\n=== {name}: {spec} ===", flush=True)
         cfg = ChatConfig(
             run_name=f"_probe/{name}", lr=args.lr, lr_schedule="constant",
@@ -71,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:
             print(f"  {name} FAILED: {type(exc).__name__}: {exc}", flush=True)
             results.append({"arm": name, "error": str(exc), **spec})
+            out.write_text(json.dumps(results, indent=2), encoding="utf-8")
             continue
         val = trainer.evaluate()
         elapsed = time.perf_counter() - t0
@@ -89,9 +135,12 @@ def main(argv: list[str] | None = None) -> int:
         del trainer
         import torch
         torch.cuda.empty_cache()
+        # Written after EVERY arm, not once at the end. The original wrote only
+        # after the last one, so a ladder that died on a middle rung -- which is
+        # exactly what happened to `large_K3` -- left no artifact at all, and
+        # `experiments/chat/_probe/results.json` has never existed.
+        out.write_text(json.dumps(results, indent=2), encoding="utf-8")
 
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(results, indent=2), encoding="utf-8")
 
     print("\n=== ranking (lower bpc is better, matched wall clock) ===")

@@ -1,0 +1,50 @@
+{
+  "run_name": "_probe/w1792_K4",
+  "steps": 1249,
+  "params": 13235813,
+  "wall_clock_s": 305.76,
+  "peak_vram_gib": 4.133,
+  "val": {
+    "alpaca": 2.5165688400226616,
+    "dolly": 2.716342142869441,
+    "oasst1": 2.474592963995585,
+    "persona": 1.267256691027573,
+    "soda": 1.8903641397605142,
+    "stories_topic": 1.6517363112800751,
+    "tinystories": 1.6757920492033413,
+    "weighted": 1.880926886030117
+  },
+  "description": {
+    "params": 13235813,
+    "d_model": 1792,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.36,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.36,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.36,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.36,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}

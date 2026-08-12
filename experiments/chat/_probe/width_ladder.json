@@ -1,0 +1,117 @@
+[
+  {
+    "arm": "w0768_K4",
+    "params": 2526821,
+    "steps": 2059,
+    "chars": 109637632,
+    "elapsed_s": 312.8,
+    "val": {
+      "alpaca": 2.2956,
+      "dolly": 2.5384,
+      "oasst1": 2.3142,
+      "persona": 0.8583,
+      "soda": 1.7377,
+      "stories_topic": 1.4786,
+      "tinystories": 1.4945,
+      "weighted": 1.6851
+    },
+    "d_model": 768,
+    "n_layers": 4,
+    "batch_size": 208,
+    "seq_len": 256,
+    "dtype": "fp32",
+    "eval_batch_size": 48
+  },
+  {
+    "arm": "w1024_K4",
+    "params": 4417637,
+    "steps": 1739,
+    "chars": 71229440,
+    "elapsed_s": 310.6,
+    "val": {
+      "alpaca": 2.3308,
+      "dolly": 2.5539,
+      "oasst1": 2.3311,
+      "persona": 0.8431,
+      "soda": 1.7423,
+      "stories_topic": 1.4843,
+      "tinystories": 1.4984,
+      "weighted": 1.6939
+    },
+    "d_model": 1024,
+    "n_layers": 4,
+    "batch_size": 160,
+    "seq_len": 256,
+    "dtype": "fp32",
+    "eval_batch_size": 48
+  },
+  {
+    "arm": "w1280_K4",
+    "params": 6832741,
+    "steps": 1482,
+    "chars": 48562176,
+    "elapsed_s": 311.0,
+    "val": {
+      "alpaca": 2.3911,
+      "dolly": 2.6168,
+      "oasst1": 2.3744,
+      "persona": 1.0541,
+      "soda": 1.7835,
+      "stories_topic": 1.5598,
+      "tinystories": 1.5767,
+      "weighted": 1.77
+    },
+    "d_model": 1280,
+    "n_layers": 4,
+    "batch_size": 128,
+    "seq_len": 256,
+    "dtype": "fp32",
+    "eval_batch_size": 32
+  },
+  {
+    "arm": "w1536_K4",
+    "params": 9772133,
+    "steps": 1351,
+    "chars": 35969024,
+    "elapsed_s": 312.7,
+    "val": {
+      "alpaca": 2.4723,
+      "dolly": 2.7528,
+      "oasst1": 2.4832,
+      "persona": 1.1252,
+      "soda": 1.8428,
+      "stories_topic": 1.6001,
+      "tinystories": 1.6192,
+      "weighted": 1.83
+    },
+    "d_model": 1536,
+    "n_layers": 4,
+    "batch_size": 104,
+    "seq_len": 256,
+    "dtype": "fp32",
+    "eval_batch_size": 24
+  },
+  {
+    "arm": "w1792_K4",
+    "params": 13235813,
+    "steps": 1249,
+    "chars": 28137472,
+    "elapsed_s": 312.2,
+    "val": {
+      "alpaca": 2.5166,
+      "dolly": 2.7163,
+      "oasst1": 2.4746,
+      "persona": 1.2673,
+      "soda": 1.8904,
+      "stories_topic": 1.6517,
+      "tinystories": 1.6758,
+      "weighted": 1.8809
+    },
+    "d_model": 1792,
+    "n_layers": 4,
+    "batch_size": 88,
+    "seq_len": 256,
+    "dtype": "fp32",
+    "eval_batch_size": 16
+  }
+]

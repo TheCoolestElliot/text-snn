@@ -1,0 +1,50 @@
+{
+  "run_name": "_probe/w1536_K4",
+  "steps": 1351,
+  "params": 9772133,
+  "wall_clock_s": 306.03,
+  "peak_vram_gib": 4.052,
+  "val": {
+    "alpaca": 2.472256430631983,
+    "dolly": 2.752833880349914,
+    "oasst1": 2.4831878772310243,
+    "persona": 1.125224965953235,
+    "soda": 1.842755551217426,
+    "stories_topic": 1.6000520119501576,
+    "tinystories": 1.6191706869107676,
+    "weighted": 1.829987529082189
+  },
+  "description": {
+    "params": 9772133,
+    "d_model": 1536,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.35,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.35,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.35,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.35,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}

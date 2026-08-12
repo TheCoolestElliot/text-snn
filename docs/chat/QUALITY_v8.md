@@ -352,7 +352,52 @@ Every proposal to lengthen the training window or widen the model is argued
 partly on reach; none could be evaluated before this existed. Anything above
 zero is now a measurable improvement.
 
-## 11. Reproducing
+## 11. The width ladder: wider is worse per hour, twice measured
+
+`BUILD_NOTES.md` §2 records that the chat model's size came from **one**
+five-minute probe, that `mid_K4` — the shape that shipped — **lost** it
+(1.6048 against `small_K3`'s 1.5808), and that `large_K3` produced no number at
+all because its evaluation spilled past 8 GiB. So the only rung above the
+shipped width had never run.
+
+`scripts/chat/size_probe.py --ladder width` fills it: fixed depth K = 4, `B·d`
+held at ~164k so every rung has comparable occupancy, `eval_batch_size` set
+explicitly on each (the fault `large_K3` died of), 5 minutes per rung, constant
+learning rate.
+
+| arm | params | Mchars seen | weighted val bpc |
+| --- | ---: | ---: | ---: |
+| **w0768_K4** | 2,526,821 | 110 | **1.6851** |
+| w1024_K4 *(the shipped shape)* | 4,417,637 | 71 | 1.6939 |
+| w1280_K4 | 6,832,741 | 49 | 1.7700 |
+| w1536_K4 | 9,772,133 | 36 | 1.8300 |
+| w1792_K4 | 13,235,813 | 28 | 1.8809 |
+
+**Monotone, and in the direction that argues against ever having considered
+this.** A wider model sees proportionally less data in the same wall clock, and
+on this box the throughput loss dominates the capacity gain at every rung. The
+shipped width loses to a smaller one — the same ordering the original probe
+found, now reproduced on a different ladder.
+
+Two honest limits, both of which cut against reading this as final:
+
+* **Five minutes is a very short budget** and the real anneals are 40+. A wider
+  model is behind early and catches up later, so a crossover beyond 5 minutes is
+  entirely possible and this table cannot see it. That is what "bpc per hour"
+  means and it is the ordering the probe was built to produce, not a statement
+  about capacity.
+* **`w1024` vs `w0768` is 0.0088 while seeing 35 % less data**, so per character
+  the shipped width is the more efficient of the two. The gap to the wide rungs
+  is an order of magnitude larger and is not in that category.
+
+**This authorises nothing, which is the probe's own standing rule** (n = 1, one
+seed, no error bars). What it does is close a hole `BUILD_NOTES.md` named in its
+own words, and add a third independent line of evidence — beside `EXP_014`'s
+width result being a plain-LIF result the report forbids transferring, and the
+two NaN divergences the chat model has already hit — against spending this
+project's remaining GPU-hours on a bigger chat model.
+
+## 12. Reproducing
 
 ```bash
 python scripts/chat/echo_holdout.py --seeds 6     # §4, ~2 GPU-minutes
@@ -371,7 +416,7 @@ Artifacts, all under `experiments/chat/_quality/`:
 | `canned_rate.json` | §9 — per arm, with the pooled interval. Written as a new file; the 21 committed `_quality/*.json` are untouched |
 | `memory_probe.json` | §10 — per item, per seed, per distance, both conditions, with the replies |
 
-## 12. What this round changed in the code
+## 13. What this round changed in the code
 
 | file | change |
 | --- | --- |

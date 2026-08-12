@@ -1,0 +1,106 @@
+
+=== w0768_K4: {'d_model': 768, 'n_layers': 4, 'batch_size': 208, 'seq_len': 256, 'dtype': 'fp32', 'eval_batch_size': 48} ===
+  2,526,821 params, d=768, K=4, V=101
+  weight decay 0.1 on all but 12,389 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 1, 0% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  graph captured in 0.24s
+step       0  loss 4.5838  bpc 6.6130  lr 1.00e-05  |g| 2.10  rate [0.161, 0.112, 0.104, 0.082]
+step     200  loss 2.5277  bpc 3.6468  lr 2.00e-03  |g| 0.54  rate [0.440, 0.475, 0.481, 0.478]  eta 2,497,290m  budget 4m
+step     400  loss 1.9972  bpc 2.8813  lr 2.00e-03  |g| 1.38  rate [0.330, 0.396, 0.402, 0.436]  eta 2,479,160m  budget 4m
+step     600  loss 1.6269  bpc 2.3472  lr 2.00e-03  |g| 0.59  rate [0.310, 0.337, 0.343, 0.427]  eta 2,490,340m  budget 4m
+step     800  loss 1.5365  bpc 2.2168  lr 2.00e-03  |g| 1.12  rate [0.301, 0.300, 0.292, 0.411]  eta 2,475,579m  budget 3m
+step    1000  loss 1.3925  bpc 2.0089  lr 2.00e-03  |g| 0.60  rate [0.295, 0.271, 0.258, 0.399]  eta 2,461,747m  budget 3m
+step    1200  loss 1.2549  bpc 1.8105  lr 2.00e-03  |g| 0.57  rate [0.291, 0.249, 0.239, 0.396]  eta 2,457,732m  budget 2m
+step    1400  loss 1.2605  bpc 1.8185  lr 2.00e-03  |g| 0.45  rate [0.287, 0.231, 0.224, 0.386]  eta 2,449,583m  budget 2m
+step    1600  loss 1.2219  bpc 1.7628  lr 2.00e-03  |g| 0.36  rate [0.283, 0.221, 0.214, 0.383]  eta 2,441,279m  budget 1m
+step    1800  loss 1.2161  bpc 1.7545  lr 2.00e-03  |g| 0.46  rate [0.281, 0.210, 0.202, 0.376]  eta 2,435,485m  budget 1m
+step    2000  loss 1.1659  bpc 1.6821  lr 2.00e-03  |g| 0.40  rate [0.281, 0.200, 0.197, 0.373]  eta 2,429,553m  budget 0m
+  wall-clock budget reached at step 2059
+  eval step    2059  alpaca 2.2956  dolly 2.5384  oasst1 2.3142  persona 0.8583  soda 1.7377  stories_topic 1.4786  tinystories 1.4945  weighted 1.6851
+  w0768_K4: 2,059 steps, 110 Mchars, weighted val bpc 1.6851
+
+=== w1024_K4: {'d_model': 1024, 'n_layers': 4, 'batch_size': 160, 'seq_len': 256, 'dtype': 'fp32', 'eval_batch_size': 48} ===
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 1, 0% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  graph captured in 0.27s
+step       0  loss 4.6248  bpc 6.6722  lr 1.00e-05  |g| 2.26  rate [0.154, 0.116, 0.107, 0.080]
+step     200  loss 2.5169  bpc 3.6312  lr 2.00e-03  |g| 1.84  rate [0.440, 0.471, 0.465, 0.453]  eta 2,833,083m  budget 4m
+step     400  loss 1.9631  bpc 2.8321  lr 2.00e-03  |g| 1.06  rate [0.317, 0.379, 0.337, 0.398]  eta 2,829,818m  budget 4m
+step     600  loss 1.6604  bpc 2.3955  lr 2.00e-03  |g| 0.72  rate [0.295, 0.314, 0.267, 0.370]  eta 2,857,263m  budget 3m
+step     800  loss 1.4369  bpc 2.0730  lr 2.00e-03  |g| 0.74  rate [0.288, 0.266, 0.221, 0.355]  eta 2,852,377m  budget 3m
+step    1000  loss 1.3159  bpc 1.8985  lr 2.00e-03  |g| 0.60  rate [0.282, 0.230, 0.185, 0.340]  eta 2,848,044m  budget 2m
+step    1200  loss 1.2498  bpc 1.8031  lr 2.00e-03  |g| 0.46  rate [0.277, 0.204, 0.166, 0.329]  eta 2,860,393m  budget 2m
+step    1400  loss 1.2393  bpc 1.7880  lr 2.00e-03  |g| 0.51  rate [0.272, 0.186, 0.156, 0.323]  eta 2,868,095m  budget 1m
+step    1600  loss 1.2242  bpc 1.7662  lr 2.00e-03  |g| 0.40  rate [0.271, 0.172, 0.150, 0.313]  eta 2,873,198m  budget 0m
+  wall-clock budget reached at step 1739
+  eval step    1739  alpaca 2.3308  dolly 2.5539  oasst1 2.3311  persona 0.8431  soda 1.7423  stories_topic 1.4843  tinystories 1.4984  weighted 1.6939
+  w1024_K4: 1,739 steps, 71 Mchars, weighted val bpc 1.6939
+
+=== w1280_K4: {'d_model': 1280, 'n_layers': 4, 'batch_size': 128, 'seq_len': 256, 'dtype': 'fp32', 'eval_batch_size': 32} ===
+  6,832,741 params, d=1280, K=4, V=101
+  weight decay 0.1 on all but 20,581 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 1, 0% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  graph captured in 0.31s
+step       0  loss 4.5969  bpc 6.6319  lr 1.00e-05  |g| 2.57  rate [0.152, 0.118, 0.105, 0.084]
+step     200  loss 2.5562  bpc 3.6879  lr 2.00e-03  |g| 1.58  rate [0.426, 0.451, 0.425, 0.408]  eta 3,377,130m  budget 4m
+step     400  loss 1.9485  bpc 2.8111  lr 2.00e-03  |g| 0.92  rate [0.284, 0.337, 0.296, 0.355]  eta 3,375,886m  budget 4m
+step     600  loss 1.7013  bpc 2.4544  lr 2.00e-03  |g| 0.92  rate [0.263, 0.267, 0.230, 0.331]  eta 3,375,246m  budget 3m
+step     800  loss 1.4929  bpc 2.1538  lr 2.00e-03  |g| 1.10  rate [0.258, 0.234, 0.189, 0.320]  eta 3,375,436m  budget 2m
+step    1000  loss 1.3230  bpc 1.9087  lr 2.00e-03  |g| 0.49  rate [0.250, 0.205, 0.159, 0.300]  eta 3,375,809m  budget 2m
+step    1200  loss 1.3018  bpc 1.8781  lr 2.00e-03  |g| 0.56  rate [0.243, 0.181, 0.141, 0.281]  eta 3,375,946m  budget 1m
+step    1400  loss 1.2388  bpc 1.7872  lr 2.00e-03  |g| 0.48  rate [0.238, 0.161, 0.133, 0.268]  eta 3,375,865m  budget 0m
+  wall-clock budget reached at step 1482
+  eval step    1482  alpaca 2.3911  dolly 2.6168  oasst1 2.3744  persona 1.0541  soda 1.7835  stories_topic 1.5598  tinystories 1.5767  weighted 1.7700
+  w1280_K4: 1,482 steps, 49 Mchars, weighted val bpc 1.7700
+
+=== w1536_K4: {'d_model': 1536, 'n_layers': 4, 'batch_size': 104, 'seq_len': 256, 'dtype': 'fp32', 'eval_batch_size': 24} ===
+  9,772,133 params, d=1536, K=4, V=101
+  weight decay 0.1 on all but 24,677 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 1, 0% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.4) characters
+  graph captured in 0.31s
+step       0  loss 4.6255  bpc 6.6732  lr 1.00e-05  |g| 2.90  rate [0.160, 0.124, 0.102, 0.087]
+step     200  loss 2.5615  bpc 3.6955  lr 2.00e-03  |g| 1.24  rate [0.387, 0.426, 0.372, 0.425]  eta 3,696,115m  budget 4m
+step     400  loss 2.1115  bpc 3.0462  lr 2.00e-03  |g| 2.67  rate [0.262, 0.347, 0.269, 0.385]  eta 3,692,344m  budget 4m
+step     600  loss 1.6970  bpc 2.4482  lr 2.00e-03  |g| 0.84  rate [0.238, 0.270, 0.186, 0.343]  eta 3,691,467m  budget 3m
+step     800  loss 1.4919  bpc 2.1524  lr 2.00e-03  |g| 0.49  rate [0.225, 0.216, 0.132, 0.311]  eta 3,695,044m  budget 2m
+step    1000  loss 1.3053  bpc 1.8831  lr 2.00e-03  |g| 0.66  rate [0.213, 0.173, 0.105, 0.281]  eta 3,698,813m  budget 1m
+step    1200  loss 1.2532  bpc 1.8080  lr 2.00e-03  |g| 0.48  rate [0.207, 0.141, 0.095, 0.260]  eta 3,700,869m  budget 1m
+  wall-clock budget reached at step 1351
+  eval step    1351  alpaca 2.4723  dolly 2.7528  oasst1 2.4832  persona 1.1252  soda 1.8428  stories_topic 1.6001  tinystories 1.6192  weighted 1.8300
+  w1536_K4: 1,351 steps, 36 Mchars, weighted val bpc 1.8300
+
+=== w1792_K4: {'d_model': 1792, 'n_layers': 4, 'batch_size': 88, 'seq_len': 256, 'dtype': 'fp32', 'eval_batch_size': 16} ===
+  13,235,813 params, d=1792, K=4, V=101
+  weight decay 0.1 on all but 28,773 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 1, 0% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 20%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.4) characters
+  graph captured in 0.37s
+step       0  loss 4.6458  bpc 6.7025  lr 1.00e-05  |g| 3.07  rate [0.161, 0.107, 0.095, 0.087]
+step     200  loss 2.5429  bpc 3.6687  lr 2.00e-03  |g| 1.57  rate [0.380, 0.422, 0.339, 0.372]  eta 3,998,139m  budget 4m
+step     400  loss 1.9859  bpc 2.8650  lr 2.00e-03  |g| 1.05  rate [0.243, 0.315, 0.247, 0.335]  eta 3,997,967m  budget 3m
+step     600  loss 1.7545  bpc 2.5312  lr 2.00e-03  |g| 1.26  rate [0.226, 0.248, 0.182, 0.301]  eta 4,014,466m  budget 3m
+step     800  loss 1.4979  bpc 2.1611  lr 2.00e-03  |g| 0.70  rate [0.209, 0.179, 0.117, 0.269]  eta 4,010,466m  budget 2m
+step    1000  loss 1.3148  bpc 1.8969  lr 2.00e-03  |g| 0.51  rate [0.199, 0.148, 0.091, 0.243]  eta 4,002,331m  budget 1m
+step    1200  loss 1.2949  bpc 1.8682  lr 2.00e-03  |g| 0.73  rate [0.193, 0.125, 0.089, 0.216]  eta 4,004,770m  budget 0m
+  wall-clock budget reached at step 1249
+  eval step    1249  alpaca 2.5166  dolly 2.7163  oasst1 2.4746  persona 1.2673  soda 1.8904  stories_topic 1.6517  tinystories 1.6758  weighted 1.8809
+  w1792_K4: 1,249 steps, 28 Mchars, weighted val bpc 1.8809
+
+=== ranking (lower bpc is better, matched wall clock) ===
+  w0768_K4      2,526,821 params      110 Mchars  weighted 1.6851  stories 1.4945  soda 1.7377
+  w1024_K4      4,417,637 params       71 Mchars  weighted 1.6939  stories 1.4984  soda 1.7423
+  w1280_K4      6,832,741 params       49 Mchars  weighted 1.7700  stories 1.5767  soda 1.7835
+  w1536_K4      9,772,133 params       36 Mchars  weighted 1.8300  stories 1.6192  soda 1.8428
+  w1792_K4     13,235,813 params       28 Mchars  weighted 1.8809  stories 1.6758  soda 1.8904
+
+winner: w0768_K4
