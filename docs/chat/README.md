@@ -93,7 +93,14 @@ interval on 0 hits in 4 draws is [0, 0.49], so a rare topic and an impossible on
 are not distinguishable at this resolution.
 
 Told "my name is Elliot" and then asked for the name, it still cannot. Nothing
-here changed that and nothing at this scale will.
+here changed that and nothing at this scale will. **That sentence finally has a
+measurement behind it** rather than being an anecdote repeated across five
+rounds: `scripts/chat/memory_probe.py` puts cross-turn recall at **0 of 240**
+over 10 facts × 8 seeds × 3 conversational distances, against a control run at
+the same seed with the establishing turn removed — also 0 of 240. 95 % CI
+[0, 0.0158]. The failure has a shape: asked *"what is my name?"* the model
+answers about **its own** name, so the possessive is not resolved and the
+question routes to the identity intent rather than to memory.
 
 **It will confidently say false things.** It has no knowledge base, no retrieval,
 and no capacity to check anything. The one topic on which it is reliably accurate
@@ -133,9 +140,9 @@ modification time that would have become the model everyone loaded.
 ### Commands
 
 `/help` `/new` `/again` `/back [n]` `/temp <x>` `/topp <x>` `/topk <n>`
-`/minp <x>` `/len <n>` `/rerank <n>` `/lambda <x>` `/spread <x>` `/candidates`
-`/seed <n|off>` `/params` `/spikes` `/state` `/transcript` `/save <file>`
-`/quit`
+`/minp <x>` `/len <n>` `/rerank <n>` `/lambda <x>` `/spread <x>` `/echo [on|off]`
+`/candidates` `/seed <n|off>` `/params` `/spikes` `/state` `/transcript`
+`/save <file>` `/quit`
 
 `/new` clears the membrane state — the only true reset. `/back` cannot subtract a
 turn from a membrane, so it replays the retained transcript; it is the one
@@ -190,10 +197,37 @@ than not reranking at all.
 /rerank 8       eight drafts
 /lambda 0       best of N by likelihood alone — a fluency filter, nothing more
 /spread 0.3     draw the drafts across a range of temperatures, not all at one
+/echo off       rank by the score alone, as before 2026-08-11
 /candidates     what the last reply was chosen from, with scores
 ```
 
-It selects among replies the model would have produced anyway. If all eight
+### The echo partition
+
+Since 2026-08-11 the drafts are first grouped by **how many distinct content
+words of your prompt they use**, and the score above only breaks ties inside the
+winning group. Ask about a boat and a draft that says "boat" beats one the score
+prefers. When no draft echoes any content word the grouping is the identity —
+though note that "content word" includes the request frame, so `tell`, `story`
+and `make` count, and the partition fires more often than it helps.
+
+It was worth doing because the pool was already better than the selector: an
+oracle over the eight drafts the model *already* produces scores 0.297 on the
+topic battery, where the score alone picks 0.141. On twenty held-out topics the
+battery has never contained, the partition moves the hit rate from **1/120 to
+10/120** — exact McNemar p = 0.0039, nine draws changed for the better and none
+for the worse — and recovers ten of the eleven hits the pool held. It costs no
+forward pass and about 0.02 nats per character of fluency.
+
+The same measurement is the clearest evidence for what is *now* the limit: the
+oracle on those held-out topics is only 0.092. The model rarely **drafts** a
+reply about a penguin at all. Selection was the binding constraint and is no
+longer; coverage is. See [`QUALITY_v8.md`](QUALITY_v8.md), including §5 and §7 on
+what it does not claim — on the *battery's* topic column the partition is
+identical to the oracle by construction, so that column is not evidence; the
+`list` gain is a reply-length effect and is not claimed; and the headline
+metric's own defects are untouched by any of this.
+
+It still selects among replies the model would have produced anyway. If all eight
 drafts are off topic it returns the least-bad of eight off-topic replies, and it
 buys no knowledge, no arithmetic and no memory across turns. That is the reason
 `/spread` exists: selection cannot invent a reply that was never proposed, so
@@ -229,9 +263,19 @@ checkpoint's embedding rows are indexed by it.
 
 ```bash
 python scripts/chat/build_data.py         # ~1.7 GB download, ~7 min packing
+python scripts/chat/build_topic_stories.py   # stories_topic -- the DEFAULT MIX NEEDS THIS
 python scripts/chat/size_probe.py         # optional: pick a config by measurement
 python scripts/chat/train.py --run-name chat-v1 --budget-minutes 300
 ```
+
+**The second line is not optional and used to be missing from this list.**
+`build_data.py` packs six sources; `build_corpus.DEFAULT_MIX` is the shipped
+recipe and names seven, because `stories_topic` is built separately. A mixture
+weight naming a source that was never packed is silently renormalised away —
+so without that line the default trained on a corpus with no subject-conditioned
+stories in it at all, which is the one change `QUALITY.md` attributes the
+responsiveness gain to. `snnchat.data.MixtureSampler` now prints a warning
+naming the missing source and the weight it carried.
 
 `train.py` is restartable: re-running the identical command resumes from
 `ckpt_last.pt`. The sampler is a pure function of `(seed, step)`, so a resumed
@@ -384,7 +428,12 @@ docs/chat/CONVENTIONS.md   how a rate is reported against a threshold -- READ FI
 docs/chat/BUILD_NOTES.md   what was measured, what was guessed, what broke
 docs/chat/RESULTS.md       the trained model's numbers
 docs/chat/QUALITY.md       the responsiveness gap: measuring it, and closing it
+docs/chat/QUALITY_v8.md    the echo partition, lambda after it, canned_rate, memory
 docs/chat/transcript.md    the demo battery's output
+scripts/chat/echo_holdout.py  the held-out paired comparison       (QUALITY_v8 §4)
+scripts/chat/lambda_sweep.py  what lambda does now                 (QUALITY_v8 §8)
+scripts/chat/canned_rate.py   how much of a score is persona text  (QUALITY_v8 §9)
+scripts/chat/memory_probe.py  cross-turn recall, with a control    (QUALITY_v8 §10)
 ```
 
 **Before writing a `PREDICTION_*.md` or reading a number in a `QUALITY_*.md`
