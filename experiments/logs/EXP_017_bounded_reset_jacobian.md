@@ -483,6 +483,269 @@ not a result. Reported as a marker; a breach raises rather than resolves.
 
 *(appended after the run — nothing above this line is rewritten)*
 
+**Closed 2026-08-11, ~2.0 GPU-hours.** Pre-registration committed at `50b3904`
+before the first leg; the arm, its gate and its 12 mutations at `6107975`; the
+probe, driver and resolver at `34f07c9`, before any bpc was read. SHA-256 over
+the working-tree (CRLF) bytes at `50b3904`:
+
+> `a07ba5c3c5e03580ec8ae04f7f820faa8b45f47b606df0431c6a4c33b3240f6f`
+
+### 9.1 The scoreboard
+
+| bar | verdict | |
+|---|---|---|
+| **T1** | **HOLDS** | the three `snn` legs return `max\|g\| = 0.51236` at every width and layer |
+| **T1b** | **HOLDS** | the `hard` column reproduces `EXP_016`'s committed artifact, **10/10 cells, 0 differing** |
+| **T2 (probe)** | **HOLDS** | local scan bitwise equal to the committed eager scan, six legs, both layers |
+| **T2 (gate)** | **HOLDS** | **59/59** mutations caught — 12 new, 47 pre-existing — before a single training step |
+| **H1** | **HELD** | under the detached rule `max\|g\| = 0.5`, `frac(\|g\|>1) = 0`, longest expanding run **0** — every leg, every layer, both batches |
+| **H2** | **SURVIVES** | 20,000 steps, **0 non-finite losses**, passed step 5138 |
+| **H2b** | **MARKER** | carried test bpc **1.86290** at 5.0M parameters |
+| **H3** | **NOT RUN** | 3 scoreable detach seeds, **1** anchor seed — see §9.4 |
+| **H4** | **REACH REDUCED** | on **one** available pair, `Δh = −2` — see §9.6 |
+| **H5** | **BREACH — investigate** | 1.127× at `d = 1481` against a denominator that is itself a diverged run — see §9.7 |
+
+### 9.2 Leg A: the same membranes, both rules
+
+`g = beta_f · dv`, over every `(batch, timestep, channel)` site. **Both columns
+come from one forward pass on one checkpoint** — `detach()` changes no forward
+value, so nothing here can be attributed to two arms having reached different
+states. Batch 5138 is the batch the dying run actually saw at the step it died.
+
+| leg | arch | `d` | layer | hard `max\|g\|` | hard run | hard window | **detach `max\|g\|`** | **detach run** |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| A1 | `snn` | 512 | 0,1 | 0.51236 | 0 | 10^0.00 | **0.5** | **0** |
+| A2 | `snn` | 1020 | 0,1 | 0.51236 | 0 | 10^0.00 | **0.5** | **0** |
+| A3 | `snn` | 1481 | 0,1 | 0.51236 | 0 | 10^0.00 | **0.5** | **0** |
+| A4 | `twocomp` | 512 | 0 | 2.87016 | 3 | 10^0.66 | **0.5** | **0** |
+| A5 | `twocomp` | 1481 | 0 | **9.84309** | **85** | **10^16.00** | **0.5** | **0** |
+| A5 | `twocomp` | 1481 | 1 | 7.73804 | 83 | 10^7.26 | **0.5** | **0** |
+| A6 | `twocomp_detach` | 1481 | 0 | 5.92227 | **84** | **10^27.58** | **0.5** | **0** |
+| A6 | `twocomp_detach` | 1481 | 1 | 6.06335 | 17 | 10^4.44 | **0.5** | **0** |
+
+**A6 is the row worth reading twice, and it is not the row that was expected.**
+It is this arm's *own* trained checkpoint. Under the rule it actually trains
+with, its recurrence never expands. Under the hard rule those same weights would
+expand for **84 consecutive timesteps with a window gain of 10^27.58** — an order
+of magnitude *worse* than the adopted arm's own 10^16.00 at the step it died.
+
+> **So the fix does not work by steering training away from the dangerous region
+> of weight space. It trains happily inside it, because its gradient is
+> indifferent to `w·vs`.** Nothing in §2 predicted this and nothing in §2
+> forbids it: the derivation bounds `dv`, and says nothing about where the
+> forward goes. It is the single most useful thing Leg A measured, and it is
+> **post-registered as an observation, not a bar** — no prediction was placed on
+> A6's `hard` column.
+
+`max|w·vs|` at A6 layer 0 is **445.9** against A5's 356.6 on the same batch: the
+bounded arm's slow compartment grows *more*, not less.
+
+**G4 (determinism):** the probe was re-run in full after Leg B. Across A1–A5 ×
+2 batches, **200 quantities compared, 0 differing.**
+
+### 9.3 Leg B: it trains, under the recipe that killed the adopted arm
+
+| | `arch_twocomp_d1481_s0` | **`detach_d1481_s0`** |
+|---|---|---|
+| outcome | **DIVERGED, step 5138** | **20,000 steps, 0 non-finite** |
+| carried test bpc | NaN | **1.86290** |
+| parameters | 5,003,023 | **5,003,023** (identical, G2) |
+| peak VRAM | 2.6138 GiB | **2.6138 GiB** (identical) |
+| `max_grad_norm` logged | 0.663 | 1.0775 |
+
+Every frozen recipe term was read back out of the run's own `config.json` and
+asserted (G5, 24 fields). **No hyperparameter moved.**
+
+**H2b, beside `EXP_015`'s parameter-identical table** — all five at
+`d_model = 1481`, seed 0, same recipe, same tree. **No verdict is attached to any
+comparison in this table** (§4.0):
+
+| arm @ 5.0M | carried bpc |
+|---|---:|
+| `gru` anchor (violates I5) | 1.54699 |
+| **`twocomp_detach`** | **1.86290** |
+| `snn` control | 2.00073 |
+| `twocomp` | NaN — diverged 5138 |
+| `twocomp_threshold` | NaN — diverged ~2000 |
+
+Marker: the spiking-to-anchor gap at matched size goes 0.45374 → **0.31591**.
+`EXP_015` measured width closing **6.6 %** of that gap; this closes **30.4 %** of
+it. **n = 1 on both sides and no bar is placed on it.**
+
+### 9.4 Leg C, and the result nobody pre-registered: the anchor mostly died
+
+**Two of the three fresh `twocomp` anchors diverged at `d = 512`** — the width
+the arm was adopted at, where the committed record holds **seven** clean seeds.
+
+| run | outcome | carried | `max grad_norm` |
+|---|---|---:|---:|
+| `anchor_twocomp_d512_s0` | **DIVERGED, step 11500** | NaN | 0.815 |
+| `anchor_twocomp_d512_s1` | trains | **2.11766** | 0.564 |
+| `anchor_twocomp_d512_s2` | **DIVERGED, step 12500** | NaN | 16.730 |
+| `detach_d512_s0` | trains | 2.11769 | — |
+| `detach_d512_s1` | trains | 2.11296 | — |
+| `detach_d512_s2` | trains | 2.11532 | — |
+
+**H3 therefore resolves NOT RUN**, by the guard §4 wrote for it: a diverged run
+resolves NOT RUN, not UNRESOLVED. The seeds are **not replaced**
+(`CONTRIBUTING.md` §4). This is `EXP_011`'s `compose_s0` situation a second time,
+and this time it took the *control*.
+
+**What may still be said, as markers with no bar:**
+
+* detach at `d = 512`, n = 3: **2.11533 ± 0.00237** (sd), se 0.00137.
+* the one surviving anchor: **2.11766**. The committed n = 7 mean: **2.11869**.
+* so the detached arm sits **−0.00234** from the surviving anchor and
+  **−0.00337** from the committed mean — both inside this design's own stated
+  0.005 resolution floor, and **H3a's marker would have read WITHIN BAND** had
+  H3 been resolvable (the surviving anchor is 0.00103 from the committed figure,
+  which is the tightest agreement any fresh/committed pair in this project has
+  produced).
+* **σ re-measured** for this structurally new arm: **0.00237, 2 df**, against
+  `EXP_005`'s 0.00313 on the two-compartment neuron. A **marker**; 2 df, and
+  `CONTRIBUTING.md` §4 forbids promoting it to a project constant.
+
+**Two of three is a rate and it carries its denominator and an interval**
+(`CONTRIBUTING.md` §3): the adopted arm diverged **0.667 (2/3), 95 % CI
+[0.208, 0.939]**; this arm **0.000 (0/4) across both widths, 95 % CI
+[0.000, 0.490]**. Fisher's exact on the 3-vs-3 table at `d = 512` gives
+**p = 0.40**. **The stability difference is NOT established by this design**, and
+saying so is not a formality — the intervals overlap heavily and four runs cannot
+separate them. What *is* established is that the adopted arm produced two more
+divergences, bringing Phase 4's total to **five**.
+
+**The post-hoc probe on both dead anchors** (own artifact,
+`exp_017_posthoc_anchor_jacobian.json`, labelled post-hoc in the file):
+
+| run | layer | hard `max\|g\|` | hard run | hard window | detach |
+|---|---:|---:|---:|---:|---|
+| `anchor_..._s0` @ its batch 11500 | 0 | 4.045 | 3 | 10^0.61 | 0.5 / run 0 |
+| `anchor_..._s2` @ its batch 11500 | 0 | 4.966 | **21** | **10^4.21** | 0.5 / run 0 |
+| `anchor_..._s2` @ its batch 12500 | 0 | 6.183 | 19 | 10^2.39 | 0.5 / run 0 |
+
+**`EXP_016`'s mechanism is present at 735K on the runs that died** — the
+expanding window is smaller than at 5.0M (10^4.21 against 10^16.00) but it is
+there, and it is not there at all for the plain LIF at any width.
+
+### 9.5 What this says about the adopted arm, and it is not comfortable
+
+`EXP_016` §9.7 said, correctly at the time: *"It does not say the arm is bad.
+`twocomp` is the adopted arm, 0.134 bpc ahead of the baseline at 735K across 7
+seeds, where its longest expanding run is 3 steps."* §9.4 above narrows that. The
+seven clean seeds were trained **before decision #7 replaced the gradient clip**;
+retrained on today's tree, the same configuration at the same width lost two of
+three. **This is not a claim that the clip caused it** — that is a specific,
+testable hypothesis this experiment did not test and it is referred (§10 item 5),
+one 9-minute run each way. What is measured is only that the adopted arm's
+stability at 735K is **marginal enough to be moved by something**, and that the
+bounded arm's, over four runs at two widths, was not moved by the same something.
+
+### 9.6 Leg D: reach, and a verdict that rests on less than it sounds like
+
+| seed | detach | anchor | `Δh` |
+|---:|---:|---:|---:|
+| 0 | 47 | *(diverged)* | — |
+| 1 | 50 | 52 | **−2** |
+| 2 | 48 | *(diverged)* | — |
+| median | **48** | 52 | **−2** |
+
+**H4 = REACH REDUCED**, reported exactly as the rule fired. And the rule fired on
+**one pair**, at `Δh = −2` characters, on a metric with no σ anywhere in this
+project — while the three detach seeds alone span **47–50**, a spread larger than
+the difference the verdict rests on. §4's guard said in advance that a median Δh
+of −1 and of −20 both resolve REDUCED and that the raw values must be quoted;
+they are quoted above, and this is what that guard was for.
+
+For context and **not as part of the verdict**: the committed adopted arm's
+horizon is **47** (n = 7) and the plain LIF's is **7**. The detached arm's median
+48 is one character above the adopted arm's committed figure and nearly seven
+times the baseline's. F1 passed on all four runs (residual 6.06e-10 on the one
+printed).
+
+**Report a near-miss as a miss** (`CONTRIBUTING.md` §3): the verdict is REDUCED
+and is not negotiable. The near-ness is what §10 item 2 refers.
+
+### 9.7 H5 breached, and the breach is in the denominator
+
+| run | `d` | wall-clock | ÷ adopted arm | VRAM |
+|---|---:|---:|---:|---:|
+| `detach_d512_s0` | 512 | 531.47 s | 0.990 | 0.9801 GiB |
+| `detach_d512_s1` | 512 | 541.85 s | 1.010 | 0.9801 GiB |
+| `detach_d512_s2` | 512 | 556.19 s | 1.036 | 0.9801 GiB |
+| `detach_d1481_s0` | 1481 | 2740.11 s | **1.127** | 2.6138 GiB |
+
+**The bar fired as written and the verdict is BREACH.** Its own wording — *"a
+breach raises rather than resolves"* — required the investigation, which is:
+
+1. **H5's pre-registered denominator at `d = 1481` is 2432.24 s, the wall-clock
+   of a run that spent 14,862 of its 20,000 steps computing on NaN.** That is not
+   a denominator. **This is a defect in H5's design**, written by me, in the same
+   file that quotes `CONTRIBUTING.md`'s rule that a ratio needs its reference
+   stated — the rule turns out to need a second clause: the reference must also
+   be a *valid measurement*.
+2. **A controlled paired re-measurement** (`exp_017_posthoc_cost_pair.json`,
+   POST-HOC): `014_calibrate_cost.py`, 400 steps per arm, one session, no eval or
+   checkpointing inside the timed window, `twocomp` against `twocomp_detach` at
+   `d = 1481`. Projected 20k: **2432.2 s vs 2515.7 s → 1.034×**, inside the band.
+3. **At `d = 512`, where three fresh anchors were measured in the same session as
+   the three detach runs**, the detached arm is **faster**: 543.2 s mean against
+   the anchors' 577.1 s (0.941×).
+4. **Peak VRAM is identical to the byte at both widths** — 0.9801 and 2.6138 GiB
+   — which is the strongest available confirmation that the arm saves the same
+   tensors, and the gate holds the kernel count under 1.05 per timestep.
+
+**The verdict stands as BREACH and is not repaired.** The corrected denominator
+is **referred** (§10 item 3), on `EXP_012`'s precedent: a pre-registered rule
+that returns an unhelpful verdict is reported as it fired.
+
+### 9.8 A mutation escaped, and why it escaped is worth more than the patch
+
+The first campaign run was **58/59**. **D09** — `>` for `>=` in the backward
+kernel — **ESCAPED**.
+
+**The bound cannot see this mutation.** At `v_pre == thr` exactly, `>=` gives
+`sh = 1` and `g = 0`; `>` gives `sh = 0` and `g = beta_f`. *Both values are inside
+`{0, beta_f}`*, so every assertion about `|g| ≤ beta_f` holds exactly as before
+while the derivative is wrong. **A bound is a statement about a set, and an
+off-by-one in a comparison moves a point within that set.**
+
+That is `CONTRIBUTING.md` §5's rule — *a numerical contract is only guarded where
+the quantity it constrains is actually observed* — arriving from a direction it
+had not arrived from before: here the unguarded quantity was not an intermediate
+nobody read, but *which branch* a value came from. The adopted arm's gate catches
+the same mutation (T15) only because it carries an explicitly **constructed**
+equality case; random inputs cannot supply one, since exact equality has measure
+zero. This file's gate was missing it.
+
+Two legs were added — the branch asserted at the kernel boundary at `v_pre == thr`
+and one ulp below it, and the adopted arm's end-to-end construction mirrored — and
+**the whole campaign re-run at 59/59**, not just the D block: `model.py` and
+`config.py` both changed for this arm, and "those gates do not import them" is an
+argument, not a measurement.
+
+### 9.9 Gates
+
+| gate | result |
+|---|---|
+| **T1, T1b, T2** | HOLD — §9.1 |
+| **G1** — the adopted arm is not edited | **PASS**, `git diff` empty over `twocomp.py`, `kernels.py`, `neuron.py`, `surrogate.py` |
+| **G2** — parameter identity with `twocomp` | **PASS**, exactly equal at both widths, 7/7 runs |
+| **G3** — K1, one thing changed | **PASS**, 7/7 runs |
+| **G4** — determinism, 0-difference reproduction | **PASS**, 200 quantities, 0 differing |
+| **G5** — no hyperparameter moved | **PASS**, 24 fields per run, read from each run's own `config.json` |
+| **G6** — VRAM alarm 4.0 GiB | **PASS**, peak 2.6138 |
+| **G7** — a diverged leg is recorded as diverged | **PASS**, both dead anchors marked `completed: false` |
+| tests | `tests/test_twocomp_detach_equivalence.py` **30 passed**; fast suite **281+4**; `ruff` clean |
+
+### 9.10 Cost
+
+**~2.0 GPU-hours.** Legs B and C 1.60 h of training; Leg A 0.10 h and its re-run
+0.10 h; Leg D 0.05 h; the post-hoc probes and the cost pair 0.05 h; the mutation
+campaign twice, 0.12 h. **Nothing was aborted and no GPU-hour bought no number** —
+the first campaign run is counted in full and it bought D09.
+
+Project total: **~12.9 of ~30 GPU-hours.**
+
 ## 10. Referred to Elliot, and not decided here
 
 *(written before the run; the referrals are structural and do not depend on which
@@ -504,3 +767,45 @@ way the bars fall)*
 5. **Whether `twocomp_threshold` deserves the same treatment.** It died at ~2000
    and is out of scope here (§6 item 6). The composition is the project's best
    model at 735K and its width behaviour is unexplained.
+
+---
+
+### Added after the run — referrals the results created
+
+These are **not** pre-registered and are marked as such. None is decided here.
+
+6. **The two dead anchors are the most important loose end in this experiment,
+   and there is a cheap test.** The hypothesis is specific: decision #7's
+   `_clip_grad_norm_fp64` fires 3 times in 20,000 steps and changes the
+   trajectory (`EXP_014` §9.12 measured +1.97e-03 bpc on the plain LIF), and the
+   adopted arm's stability at 735K is marginal enough for that to flip a seed.
+   **Testable at ~9 GPU-minutes per run** by retraining `twocomp` at `d = 512`,
+   seed 0, with the stock `clip_grad_norm_` monkeypatched back — machinery
+   `1450796` already built. **If it is the clip, then the committed seven-seed
+   evidence for the adopted arm describes a tree that no longer exists**, which
+   is decision **#10**'s substance and bears on **#5** and **#1**. If it is not
+   the clip, the arm's 735K stability is worse than the record shows for a
+   reason nobody has named. **Not run here: it is a different question from the
+   one §1 asks, and running it under this pre-registration would be scope the
+   log did not declare.**
+7. **H5's denominator (§9.7).** The corrected rule is "the adopted arm's
+   wall-clock at the same width, **from a run that did not diverge**" — and at
+   `d = 1481` no such run exists, so the fallback has to be a controlled paired
+   calibration. Referred, not applied; the breach stands.
+8. **H4's bar (§9.6).** A paired horizon difference over 3 seeds, resolved on
+   whichever pairs survive, has no power and this experiment now has the number
+   to prove it: one pair, `Δh = −2`, against a within-arm spread of 3. Whether
+   the horizon deserves a σ — this project has never measured one, at any width,
+   for any arm — is a real gap and is not this file's to close.
+9. **What A6 means, if anything (§9.2).** The bounded arm trains *inside* the
+   region of weight space that kills the unbounded one, and further into it
+   (`max|w·vs|` 445.9 against 356.6). Two readings are available and this file
+   picks neither: that the reset gradient was the only thing keeping `w·vs`
+   small and it was doing so at a cost, or that `w·vs` is simply unconstrained in
+   both arms and only one of them notices. **`EXP_006`'s frozen-`beta_s` ladder
+   is the instrument that would separate them** and it is still unranked.
+10. **What "the adopted arm" now means.** §9.5 is deliberately narrow, but the
+    combination — the arm cannot be trained at width, and lost two of three fresh
+    seeds at the width it was adopted at — is the sort of thing decision #5's
+    owner would want to know before anything is built on top of it. **No
+    recommendation is made and no row is edited.**

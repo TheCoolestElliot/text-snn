@@ -1,0 +1,337 @@
+{
+ "experiment": "EXP_017_bounded_reset_jacobian",
+ "prereg": "experiments/logs/EXP_017_bounded_reset_jacobian.md",
+ "prereg_sha256_before_first_run": "a07ba5c3c5e03580ec8ae04f7f820faa8b45f47b606df0431c6a4c33b3240f6f",
+ "legs": [
+  "B",
+  "C"
+ ],
+ "frozen_recipe": {
+  "lr": 0.003,
+  "weight_decay": 0.1,
+  "grad_clip": 1.0,
+  "warmup_steps": 200,
+  "max_steps": 20000,
+  "lr_schedule": "cosine",
+  "beta1": 0.9,
+  "beta2": 0.95,
+  "beta": 0.5,
+  "beta_slow": 0.95,
+  "w_init": 0.1,
+  "threshold": 1.0,
+  "reset": "hard",
+  "surrogate": "atan",
+  "surrogate_alpha": 2.0,
+  "seq_len": 256,
+  "batch_size": 128,
+  "corpus": "enwik8",
+  "dtype": "fp32",
+  "fused": true,
+  "cuda_graph": true,
+  "deterministic": true,
+  "n_layers": 2
+ },
+ "vram_alarm_gib": 4.0,
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "reads_no_bpc": true,
+ "changes_no_hyperparameter": true,
+ "runs": [
+  {
+   "leg": "B",
+   "run": "detach_d1481_s0",
+   "arch": "twocomp_detach",
+   "d_model": 1481,
+   "seed": 0,
+   "train_wall_clock_s": 2747.6,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "passed_step_5138": true,
+    "max_grad_norm": 1.0775039196014404,
+    "n_logged_steps_over_clip": 1
+   },
+   "eval_wall_clock_s": 25.3,
+   "eval_returncode": 0,
+   "diverged": false,
+   "completed": true,
+   "g3": {
+    "run": "detach_d1481_s0",
+    "reference": "arch_twocomp_d1481_s0",
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 5003023,
+   "params_expected": 5003023,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 2.6138,
+   "wall_clock_s": 2740.11
+  },
+  {
+   "leg": "C",
+   "run": "anchor_twocomp_d512_s0",
+   "arch": "twocomp",
+   "d_model": 512,
+   "seed": 0,
+   "train_wall_clock_s": 595.2,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 35,
+    "first_nonfinite_step": 11500,
+    "passed_step_5138": false,
+    "max_grad_norm": 0.8149242401123047,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 19.3,
+   "eval_returncode": 0,
+   "diverged": true,
+   "completed": false,
+   "note": "DIVERGED: 35 of 81 logged losses non-finite, first at step 11500. Not reseeded -- CONTRIBUTING.md \u00a74.",
+   "g3": {
+    "run": "anchor_twocomp_d512_s0",
+    "reference": null,
+    "same_arm": true,
+    "why": "this run IS the reference for its leg"
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 585.15
+  },
+  {
+   "leg": "C",
+   "run": "anchor_twocomp_d512_s1",
+   "arch": "twocomp",
+   "d_model": 512,
+   "seed": 1,
+   "train_wall_clock_s": 585.7,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "passed_step_5138": true,
+    "max_grad_norm": 0.5637217164039612,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 19.3,
+   "eval_returncode": 0,
+   "diverged": false,
+   "completed": true,
+   "g3": {
+    "run": "anchor_twocomp_d512_s1",
+    "reference": "anchor_twocomp_d512_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 577.45
+  },
+  {
+   "leg": "C",
+   "run": "anchor_twocomp_d512_s2",
+   "arch": "twocomp",
+   "d_model": 512,
+   "seed": 2,
+   "train_wall_clock_s": 576.3,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 31,
+    "first_nonfinite_step": 12500,
+    "passed_step_5138": false,
+    "max_grad_norm": 16.73025894165039,
+    "n_logged_steps_over_clip": 3
+   },
+   "eval_wall_clock_s": 14.5,
+   "eval_returncode": 0,
+   "diverged": true,
+   "completed": false,
+   "note": "DIVERGED: 31 of 81 logged losses non-finite, first at step 12500. Not reseeded -- CONTRIBUTING.md \u00a74.",
+   "g3": {
+    "run": "anchor_twocomp_d512_s2",
+    "reference": "anchor_twocomp_d512_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 568.7
+  },
+  {
+   "leg": "C",
+   "run": "detach_d512_s0",
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 0,
+   "train_wall_clock_s": 537.7,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "passed_step_5138": true,
+    "max_grad_norm": 1.039862871170044,
+    "n_logged_steps_over_clip": 1
+   },
+   "eval_wall_clock_s": 11.4,
+   "eval_returncode": 0,
+   "diverged": false,
+   "completed": true,
+   "g3": {
+    "run": "detach_d512_s0",
+    "reference": "anchor_twocomp_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 531.47
+  },
+  {
+   "leg": "C",
+   "run": "detach_d512_s1",
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 1,
+   "train_wall_clock_s": 547.5,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "passed_step_5138": true,
+    "max_grad_norm": 0.5950911641120911,
+    "n_logged_steps_over_clip": 0
+   },
+   "eval_wall_clock_s": 12.8,
+   "eval_returncode": 0,
+   "diverged": false,
+   "completed": true,
+   "g3": {
+    "run": "detach_d512_s1",
+    "reference": "anchor_twocomp_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 541.85
+  },
+  {
+   "leg": "C",
+   "run": "detach_d512_s2",
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 2,
+   "train_wall_clock_s": 562.3,
+   "train_returncode": 0,
+   "divergence_scan": {
+    "log_present": true,
+    "n_train_records": 81,
+    "last_logged_step": 19999,
+    "n_nonfinite_loss_records": 0,
+    "first_nonfinite_step": null,
+    "passed_step_5138": true,
+    "max_grad_norm": 1.1511943340301514,
+    "n_logged_steps_over_clip": 1
+   },
+   "eval_wall_clock_s": 13.2,
+   "eval_returncode": 0,
+   "diverged": false,
+   "completed": true,
+   "g3": {
+    "run": "detach_d512_s2",
+    "reference": "anchor_twocomp_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "g5": {
+    "frozen_recipe_verified": true,
+    "n_fields_checked": 23
+   },
+   "params": 737485,
+   "params_expected": 737485,
+   "params_equal_twocomp": true,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 556.19
+  }
+ ],
+ "prereg_sha256_after_last_run": "a07ba5c3c5e03580ec8ae04f7f820faa8b45f47b606df0431c6a4c33b3240f6f",
+ "prereg_unchanged": true
+}

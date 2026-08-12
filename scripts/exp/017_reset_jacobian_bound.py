@@ -328,7 +328,16 @@ def check_reproduces_exp016(rows: list[dict]) -> dict:
                               "exp_016": ref[key],
                               "exp_017_hard": ly["hard"]["max_abs_g"],
                               "abs_diff": d})
-    return {"checked": True, "n_compared": compared, "n_differing": len(diffs),
+    # `compared == 0` means NOT CHECKED, not FAILED. A post-hoc invocation whose
+    # legs have no counterpart in `EXP_016`'s artifact compares nothing, and
+    # reporting that as a failed gate would put a red mark on an artifact that
+    # was never in this check's scope. The distinction matters here for the same
+    # reason it matters in `resolve_h5`: an absent measurement is not a verdict.
+    return {"checked": compared > 0,
+            "why": None if compared > 0 else
+                   "no leg in this invocation has a counterpart in the EXP_016 "
+                   "artifact (post-hoc legs are outside this check's scope)",
+            "n_compared": compared, "n_differing": len(diffs),
             "differences": diffs, "holds": compared > 0 and not diffs}
 
 
@@ -338,14 +347,33 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--only", default=None, help="comma-separated leg ids, e.g. A4,A5")
     ap.add_argument("--batch-steps", default=",".join(str(b) for b in BATCH_STEPS))
+    ap.add_argument("--extra", default=None,
+                    help="POST-HOC legs, as run:ckpt:leg:note, semicolon-separated. "
+                         "Anything added here is NOT part of the pre-registered "
+                         "Leg A and MUST be written to its own --out, on "
+                         "`012_posthoc_pileup.py`'s and `EXP_016` §9.4's precedent.")
     args = ap.parse_args(argv)
 
     want = None if args.only is None else {s.strip() for s in args.only.split(",")}
     batches = [int(b) for b in args.batch_steps.split(",") if b.strip()]
 
+    targets = list(TARGETS)
+    posthoc_legs = []
+    if args.extra:
+        for spec in args.extra.split(";"):
+            if not spec.strip():
+                continue
+            run, ck, leg, note = (spec.split(":", 3) + ["", "", ""])[:4]
+            targets.append((run, ck or "ckpt_final.pt", leg or run, note))
+            posthoc_legs.append(leg or run)
+        if str(args.out).endswith("exp_017_jacobian_bound.json"):
+            raise SystemExit(
+                "--extra writes POST-HOC legs and must not overwrite the "
+                "pre-registered Leg A artifact. Give it its own --out.")
+
     rows = []
     for batch_step in batches:
-        for run, ck, leg, note in TARGETS:
+        for run, ck, leg, note in targets:
             if want is not None and leg not in want:
                 continue
             print(f"[{leg}] {run} batch={batch_step} ...", flush=True)
@@ -376,6 +404,10 @@ def main(argv: list[str] | None = None) -> int:
         "adopts_nothing": True,
         "ranks_nothing": True,
         "changes_no_hyperparameter": True,
+        # Labelled in the artifact itself, not only in the filename, so a reader
+        # who opens the JSON without the surrounding prose still sees it.
+        "posthoc_legs": posthoc_legs,
+        "is_posthoc": bool(posthoc_legs),
         "legs": rows,
         "t1_holds": all(r.get("t1_holds", True) for r in scored),
         "t2_holds": all(r.get("t2_holds", False) for r in scored),
