@@ -36,6 +36,40 @@ size up to `B*d ~ 200k`. At d=1024 that leaves a factor of ~200 of unused batch.
 measurement in `docs/chat/QUALITY.md` bears that out. A transformer would pay N
 times for this; a recurrent spiking net at this width very nearly does not.
 
+THE ECHO PARTITION, AND WHY THE SCORE ALONE LEAVES MOST OF THE POOL ON THE FLOOR
+--------------------------------------------------------------------------------
+The score above ranks by log-probability and nothing else, and measured on the
+committed draws it is **at chance** for picking the on-topic candidate. Replayed
+over `experiments/chat/_quality/chat-v3d-aligned.json`, an oracle that always
+picks the best of the 8 candidates the model already drew scores 0.359 on the
+`topic` probes where the shipped score picks 0.141. The pool is not the problem;
+the selector is. 23 of 64 topic draws already contain a reply that mentions what
+was asked for, and the score throws it away.
+
+So candidates are additionally partitioned by how many DISTINCT content words of
+the user's prompt they echo, highest tier first, with the score above breaking
+ties inside the tier. "Content word" means a word that is not in a closed-class
+function-word list -- see `_FUNCTION_WORDS`, which was written from English
+grammar and not from the probe battery, a distinction `docs/chat/QUALITY_v8.md`
+§3 measures rather than asserts.
+
+A partition rather than an additive bonus, for the same reason `min_chars` is a
+partition: the score is a mean log-probability per character, an echo count is a
+count, and there is no principled exchange rate between them. A partition needs
+no such rate and no tuning constant.
+
+**When no candidate echoes any content word the partition is the identity** --
+`tests/test_snnchat.py::test_echo_partition_is_the_identity_when_nothing_echoes`.
+
+Read that narrowly. It does NOT say "a pool with no on-topic reply is decided as
+before", because the request frame survives the function-word list: `tell`,
+`story`, `write`, `want` and `make` are all content words, so a draft can enter a
+nonzero tier without being about anything. Measured on
+`experiments/chat/_quality/echo_holdout.json`, 16 of the 25 draws where the
+selection changed had no topic hit under either rule -- the tier was decided by
+frame vocabulary. Over the whole run those sideways moves cost nothing (+9/-0 on
+the metric) but they are movement, not inertia.
+
 WHAT IT CANNOT DO
 -----------------
 It selects among the replies the model would have produced anyway. If every one
@@ -44,11 +78,17 @@ replies. It buys no knowledge, no arithmetic, and no memory across turns -- and
 the numbers in `docs/chat/QUALITY.md` show exactly that shape: topicality moves
 a lot, the factual battery does not move at all.
 
+The echo partition does not change that. It makes the selector able to FIND an
+on-topic reply that was drawn; it cannot cause one to be drawn. Its measured
+gain is therefore bounded by the oracle above, and on the arms where the pool is
+emptier the gain is smaller.
+
 Not part of the research protocol. No number here is a reported figure.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 import torch
@@ -69,10 +109,90 @@ __all__ = [
     "score_under_prefix",
     "null_prefix_ids",
     "trim_to_sentence",
+    "prompt_content_words",
+    "echo_count",
     "rerank",
 ]
 
 _STOP_IDS = (EOT, USER, BOS)
+
+
+# ---------------------------------------------------------------------------
+# the echo partition
+# ---------------------------------------------------------------------------
+
+#: Words that carry grammar rather than subject matter. A prompt's content words
+#: are what is left after removing these.
+#:
+#: THIS LIST IS CLOSED-CLASS ENGLISH AND NOTHING ELSE, ON PURPOSE
+#: -------------------------------------------------------------
+#: Determiners, pronouns, auxiliaries, modals, prepositions, conjunctions,
+#: wh-words and a few degree adverbs. It contains no verbs of asking ("tell",
+#: "write"), no task nouns ("story", "list") and no numerals -- none of the
+#: vocabulary that the probe battery in `snnchat.quality` happens to use.
+#:
+#: That restraint is the point, and it was measured rather than assumed:
+#: `docs/chat/QUALITY_v8.md` §3 replays three lists over the committed draws --
+#: this one, this one plus request verbs, and this one plus the battery's own
+#: task nouns -- and the tuned list is **worse** (`list` 0.100 against 0.233 on
+#: the shipped arm) while the two untuned ones are identical to four decimals.
+#: There was nothing to gain by tuning it, so it is not tuned, and a reader can
+#: check that claim without trusting this comment.
+_FUNCTION_WORDS = frozenset("""
+a an the this that these those my your his her its our their whose
+i me you he she it we us them him
+is am are was were be been being do does did doing done have has had having
+will would shall should can could may might must
+of to in on at for with about from by as into onto over under after before
+and or but if then than so because while when where what which who whom how why
+not no nor none very just only also too more most some any all each every
+there here
+""".split())
+
+#: Below this many characters a word is too short to be evidence of anything --
+#: "cat" is kept, "at" would be noise even if it survived the list above.
+_MIN_CONTENT_CHARS = 3
+
+_WORD_RE = re.compile(r"[a-z]+")
+
+
+def prompt_content_words(text: str) -> list[str]:
+    """The subject-matter words of a user turn, deduplicated and sorted.
+
+    Sorted rather than in prompt order so that the result is a set with a stable
+    representation: nothing downstream depends on the order, and a stable one
+    keeps a logged `echo_words` comparable between runs.
+    """
+    seen = {
+        w for w in _WORD_RE.findall(text.lower())
+        if len(w) >= _MIN_CONTENT_CHARS and w not in _FUNCTION_WORDS
+    }
+    return sorted(seen)
+
+
+def echo_count(text: str, words) -> int:
+    """How many DISTINCT words of `words` the reply uses.
+
+    Distinct, not total: a reply that says "boat" nine times is about a boat
+    exactly as much as one that says it once, and counting repeats would hand
+    the tier to whichever candidate looped -- the failure `_loop_penalty`
+    already exists to suppress.
+
+    Matching is prefix-on-a-word-boundary with a crude singular stem, so
+    "rabbit" is found in "rabbits" and "dragon" in "dragons". It deliberately
+    does not go the other way: this is a selector among candidates the model
+    already produced, and a false match costs one tier place rather than a wrong
+    answer, so the cheap rule is the right one.
+    """
+    if not words:
+        return 0
+    lowered = text.lower()
+    n = 0
+    for w in words:
+        stem = w[:-1] if len(w) > 4 and w.endswith("s") else w
+        if re.search(r"\b" + re.escape(stem), lowered):
+            n += 1
+    return n
 
 
 def temperature_ladder(base: float, n: int, spread: float) -> list[float] | None:
@@ -178,6 +298,35 @@ class RerankParams:
     #: 0.0 is off and is bit-identical to every draw made before this existed --
     #: not "a ladder with zero width", but the scalar code path itself.
     temperature_spread: float = 0.0
+    #: Partition candidates by how many distinct content words of the prompt they
+    #: echo before ranking them by `score`. See the module docstring.
+    #:
+    #: On by default because this is a front end whose entire purpose is that
+    #: the model can be talked to, and because the one measurement that is not
+    #: circular supports it: on 20 story topics the probe battery has never
+    #: contained, 6 seeds each, both selectors choosing from ONE shared pool, the
+    #: hit rate goes 1/120 -> 10/120, exact McNemar p = 0.0039, nine draws better
+    #: and none worse (`docs/chat/QUALITY_v8.md` §4,
+    #: `scripts/chat/echo_holdout.py`). Replayed across four arms at n = 4, 8 and
+    #: 16, no probe kind on any arm moves down.
+    #:
+    #: It costs one pass over N short strings and no forward pass at all.
+    #:
+    #: THREE HONEST LIMITS, all measured in `docs/chat/QUALITY_v8.md`:
+    #: (1) On the battery's own `topic` column this partition IS the oracle --
+    #: both score 0.2969 at n=8 -- because the probe asks whether the reply
+    #: contains the requested noun and this rule prefers replies containing it.
+    #: That column is circular and is not evidence; §4's held-out set is.
+    #: (2) The `list` gain is mostly reply length: a plain longest-candidate
+    #: baseline beats this partition there (0.317 against 0.233).
+    #: (3) The gain is bounded by the pool and the pool is thin -- on held-out
+    #: topics the oracle itself is only 0.0917, because the model rarely drafts
+    #: a reply about an unfamiliar noun at all.
+    #:
+    #: The `fact` gain (0.071 -> 0.179, where the echoed word is "france" and
+    #: the scored word is "paris") is the one battery column that is not
+    #: circular, and it is a single arm at 28 draws.
+    echo: bool = True
 
     def __post_init__(self) -> None:
         if self.n < 1:
@@ -199,6 +348,7 @@ class RerankParams:
         out = f"n={self.n} lambda={self.lam:g} min_chars={self.min_chars} null={self.null}"
         if self.temperature_spread > 0.0:
             out += f" spread={self.temperature_spread:g}"
+        out += f" echo={'on' if self.echo else 'off'}"
         return out
 
 
@@ -211,6 +361,10 @@ class Candidate:
     logp_cond: float            #: log P(scored | conversation so far)
     logp_null: float = 0.0      #: log P(scored | null context)
     score: float = 0.0
+    #: Distinct prompt content words this reply uses. 0 when the echo partition
+    #: is off, which is why `/candidates` labels the column rather than printing
+    #: a bare number.
+    echo: int = 0
 
     @property
     def n_chars(self) -> int:
@@ -440,11 +594,19 @@ def rerank(
     *,
     device=None,
     stop_ids=_STOP_IDS,
+    tok=None,
+    echo_words=None,
 ) -> tuple[Candidate, list[Candidate]]:
     """Draw `rp.n` candidates and return `(winner, all_candidates)`.
 
     With `rp.n == 1` the null-context pass is skipped entirely, so the ordinary
     single-sample path pays nothing for this module existing.
+
+    `echo_words` is the prompt's content words, from `prompt_content_words`, and
+    `tok` decodes a candidate to look for them. Both are optional: without them
+    the echo partition is skipped and the selection is exactly what it was
+    before the partition existed, which is what makes every caller that has not
+    been updated behave identically rather than subtly differently.
     """
     cands = sample_candidates(
         model, logits, state, params, rp.n, stop_ids=stop_ids,
@@ -466,6 +628,10 @@ def rerank(
         n_scored = max(len(c.scored), 1)
         c.score = (c.logp_cond - rp.lam * c.logp_null) / n_scored
 
+    if rp.echo and echo_words and tok is not None:
+        for c in cands:
+            c.echo = echo_count(tok.decode_visible(c.ids), echo_words)
+
     # The length guard is applied by PARTITION rather than by penalty: a reply
     # of two characters is not a slightly worse reply, it is a different event
     # (the model closing its turn immediately), and the mean-per-character score
@@ -473,5 +639,18 @@ def rerank(
     # themselves rather than the turn being forced to produce text.
     long_enough = [c for c in cands if c.n_chars >= rp.min_chars]
     pool = long_enough or cands
+
+    # The echo partition is applied INSIDE the length partition, not before it.
+    # The other order would let a nine-character fragment that happens to name
+    # the topic beat a whole reply that also names it, which is the length
+    # pathology `min_chars` exists to prevent, reintroduced one level up.
+    #
+    # `best == 0` means no candidate echoed any content word, and then this line
+    # is the identity. Note that the frame counts as content ("tell", "story"),
+    # so `best > 0` is NOT the same as "something on topic was drawn".
+    best = max((c.echo for c in pool), default=0)
+    if best > 0:
+        pool = [c for c in pool if c.echo == best]
+
     winner = max(pool, key=lambda c: c.score)
     return winner, cands

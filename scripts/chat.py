@@ -92,6 +92,7 @@ commands
   /rerank <n>           draw n replies and keep the most on-topic (1 = off)
   /lambda <x>           how hard reranking punishes a generic reply (0..1.5)
   /spread <x>           draw the drafts over a range of temperatures (0 = off)
+  /echo [on|off]        prefer drafts that mention what you asked about
   /candidates           show what the last reply was chosen from
   /seed <n|off>         fix the sampler's seed for reproducible replies
   /params               show the current sampling settings
@@ -226,6 +227,10 @@ def build_parser() -> argparse.ArgumentParser:
                    metavar="X",
                    help="propose the drafts over temperatures spanning "
                         "+/- X of --temperature; 0 draws them all at one")
+    p.add_argument("--no-echo", dest="rerank_echo", action="store_false",
+                   help="rank drafts by the likelihood score alone, without first "
+                        "preferring the ones that mention what you asked about "
+                        "(the pre-2026-08-11 selection)")
     p.add_argument("--no-fused", action="store_true",
                    help="force the eager reference scan (slower, sometimes clearer errors)")
     p.add_argument("--no-stream", action="store_true",
@@ -374,7 +379,8 @@ def run_chat(model, cfg, ck, args) -> int:
 
         rerank = RerankParams(n=args.rerank, lam=args.rerank_lambda,
                               min_chars=args.rerank_min_chars,
-                              temperature_spread=args.rerank_spread)
+                              temperature_spread=args.rerank_spread,
+                              echo=bool(args.rerank_echo))
     session = ChatSession(model, tok, device=cfg.device, params=params,
                           rerank=rerank)
 
@@ -524,7 +530,12 @@ def _command(line: str, session: ChatSession, args) -> bool:
                 lam = session.rerank.lam if session.rerank else args.rerank_lambda
                 spread = (session.rerank.temperature_spread if session.rerank
                           else args.rerank_spread)
-                session.rerank = RerankParams(n=v, lam=lam,
+                # Carried like `lam` and `spread`. Without this, `/echo off`
+                # followed by `/rerank 16` silently turned the partition back
+                # on, because rebuilding the object re-defaults it.
+                echo = (session.rerank.echo if session.rerank
+                        else bool(getattr(args, "rerank_echo", True)))
+                session.rerank = RerankParams(n=v, lam=lam, echo=echo,
                                               min_chars=args.rerank_min_chars,
                                               temperature_spread=spread)
                 print(f"  reranking {session.rerank.describe()}")
@@ -550,17 +561,51 @@ def _command(line: str, session: ChatSession, args) -> bool:
                     lad = session.rerank.temperature_ladder(p.temperature)
                     print(f"  spread = {v:g}; drafts drawn at "
                           f"{min(lad):.2f} .. {max(lad):.2f}")
+    elif cmd == "/echo":
+        on = not (rest and rest[0] in ("off", "no", "0"))
+        # Recorded on `args` as well as on the live params, because `/rerank 1`
+        # sets `session.rerank` to None and would otherwise forget the choice.
+        args.rerank_echo = on
+        if session.rerank is not None:
+            session.rerank.echo = on
+        if on:
+            print("  echo on; drafts that mention what you asked about win ties")
+        else:
+            print("  echo off; drafts are ranked by the likelihood score alone")
+        if session.rerank is None:
+            print("  (reranking is off, so this takes effect at /rerank <n>)")
     elif cmd == "/candidates":
         cands = session.last_candidates
         if not cands:
             print("  nothing to show -- reranking is off, or nothing has been said yet")
         else:
-            best = max(cands, key=lambda c: c.score)
-            print(f"  {len(cands)} candidates, ranked (* = chosen):")
-            for cd in sorted(cands, key=lambda c: -c.score):
-                mark = "*" if cd is best else " "
+            # The star marks the RECORDED winner, never a recomputed one. Two
+            # separate things made recomputing wrong: it dropped the `min_chars`
+            # partition, which starred a draft the selector could never return
+            # on 4.8 % of the committed draws; and it read the CURRENT settings
+            # against a pool drawn under the old ones, so `/echo off` followed by
+            # `/candidates` moved the star onto the very draft the echo
+            # partition had just rejected.
+            #
+            # The ordering still mirrors `rerank`'s three partitions, so the
+            # list reads top-down in the order the decision was taken.
+            best = session.last_winner
+            use_echo = session.last_echo_on
+            min_chars = session.rerank.min_chars if session.rerank else 0
+            kept = {id(c) for c in cands if c.n_chars >= min_chars} or {id(c) for c in cands}
+            ordered = sorted(
+                cands,
+                key=lambda c: (id(c) in kept, c.echo if use_echo else 0, c.score),
+                reverse=True,
+            )
+            head = "echo/score" if use_echo else "score"
+            print(f"  {len(cands)} candidates, ranked by {head} "
+                  f"(* = chosen, - = too short to be eligible):")
+            for cd in ordered:
+                mark = "*" if cd is best else ("-" if id(cd) not in kept else " ")
                 text = session.tok.decode_visible(cd.ids).strip().replace("\n", " ")
-                print(f"  {mark} {cd.score:+.4f}  {text[:96]!r}")
+                col = f"{cd.echo:>2}  " if use_echo else ""
+                print(f"  {mark} {col}{cd.score:+.4f}  {text[:96]!r}")
     elif cmd == "/params":
         rr = session.rerank.describe() if session.rerank else "off"
         print(f"  {p}\n  rerank {rr}")

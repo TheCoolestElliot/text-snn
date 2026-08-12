@@ -331,6 +331,89 @@ def _is_story(text: str) -> bool:
     return " named " in low and len(low) > 80
 
 
+#: Every reply string `snnchat.persona` stipulates, normalised for comparison.
+#:
+#: WHY `_is_fallback` IS NOT ENOUGH, MEASURED
+#: -----------------------------------------
+#: `_FALLBACK_ANYWHERE` is five hand-picked phrases, and it misses most of what
+#: the model actually reaches for. On `chat-v3d-aligned`'s committed draws,
+#: `_is_fallback` fires on 12 of 1,792 substantive candidates (0.0067) while
+#: ~150 of them (0.084) are persona reply strings; at the pinned `n=1, λ=0`
+#: reading row, **7 of the 20 `list` picks are verbatim persona text** --
+#: "name three animals" -> "That's beyond me, I'm afraid.", "list three fruits"
+#: -> "You can call me SNN. That's what I am." -- and `fallback_rate` reports
+#: **0.0000** on that same row.
+#:
+#: That matters more than its size suggests: `list` is 20 draws at weight 0.3
+#: and carries ~89 % of the headline's between-training-seed variance, so the
+#: column that decides the ship gate is about a third memorised boilerplate,
+#: scored by a penalty term that cannot see it. It is the failure
+#: `QUALITY.md` §5 already named once -- "a metric that counts only the failure
+#: a model used to have will always report progress" -- recurring in a new
+#: shape, which is exactly what that section predicted would happen next.
+def _normalise_for_match(text: str) -> str:
+    return re.sub(r"\s+", " ", text.strip().lower())
+
+
+#: A prefix match shorter than this is not evidence of recitation.
+#:
+#: CALIBRATED, NOT CHOSEN. At 15 characters this detector fired on **53 of the
+#: 64 `topic` picks** of the shipped arm, because 15 characters of persona's
+#: `story_request` narratives is "once upon a time" and so is the opening of
+#: every story the model tells. At 20 it fires on 0 of 64 `topic` and 0 of 28
+#: `fact` picks while holding 8 of 20 on `list`, and that is stable at 24 and 30
+#: -- so the surviving matches are not a threshold artefact. The calibration is
+#: in `docs/chat/QUALITY_v8.md` §9 with the table.
+_CANNED_MIN_CHARS = 20
+
+
+def _persona_replies() -> frozenset[str]:
+    """Stipulated persona replies, minus the ones that are stories.
+
+    `persona.TOPICS["story_request"]` maps "tell me something" onto a handful of
+    written-out narratives. Those are excluded for a reason of division of
+    labour rather than convenience: answering "name three animals" with a story
+    is already counted, by `story_dodge`, and a reply that shares an opening
+    with a stock narrative is evidence about the REGISTER the model fell into,
+    not about it reciting a specific stipulated answer. Counting it here would
+    double-count one failure and hide the other.
+    """
+    from snnchat import persona
+
+    out = {r for _prompts, replies in persona.TOPICS.values() for r in replies}
+    out |= {r for _q, r in persona._FOLLOW_UPS}
+    out = {r for r in out if not _is_story(r)}
+    return frozenset(
+        _normalise_for_match(r) for r in out if len(r.strip()) >= _CANNED_MIN_CHARS
+    )
+
+
+_PERSONA_REPLIES = _persona_replies()
+
+
+def _is_canned(text: str) -> bool:
+    """True if the reply is (a prefix of, or prefixed by) stipulated persona text.
+
+    Matched in BOTH directions because both failures occur: the model emits a
+    persona line and stops, or emits one and carries on into something else. A
+    prefix either way over at least `_CANNED_MIN_CHARS` normalised characters is
+    recitation, not an answer.
+
+    Deliberately NOT in the headline. `headline` has to stay comparable with the
+    21 committed arms scored before this existed, and a term added now would
+    silently rewrite five rounds of ship decisions. `canned_rate` is reported
+    beside it as its own column; what to do about it is a decision for a
+    pre-registration, not for a scorer.
+    """
+    low = _normalise_for_match(text)
+    if len(low) < _CANNED_MIN_CHARS:
+        return False
+    for r in _PERSONA_REPLIES:
+        if low.startswith(r[:_CANNED_MIN_CHARS]) or r.startswith(low[:_CANNED_MIN_CHARS]):
+            return True
+    return False
+
+
 def _is_fallback(text: str) -> bool:
     low = text.strip().lower()
     if any(low.startswith(p) for p in _FALLBACK_PREFIXES):
@@ -505,6 +588,15 @@ def score(collected: dict, *, n: int | None = None, lam: float = 0.0,
     fallback, repeated, closed, lengths, d2, strict = [], [], [], [], [], []
     story_dodge: list[bool] = []
     story_opener: list[bool] = []
+    #: Recitation of stipulated persona text where an answer was asked for. See
+    #: `_is_canned`. Reported beside `fallback_rate`, never folded into it: the
+    #: two count different things and `fallback_rate` is load-bearing in the
+    #: headline, which must stay comparable with the arms already scored.
+    canned: list[bool] = []
+    #: The same, over the `list` probes alone -- the 20-draw column that carries
+    #: ~89 % of the headline's between-training-seed variance, and where the
+    #: contamination is concentrated.
+    canned_list: list[bool] = []
     #: Mean per-character log-probability of the SELECTED reply under the model
     #: itself. This is the quantity the anti-LM term trades away, so it is the
     #: one that has to be watched while trading it: a reply the model considers
@@ -539,6 +631,9 @@ def score(collected: dict, *, n: int | None = None, lam: float = 0.0,
         d2.append(_distinct2(text))
         if d["kind"] in _SUBSTANTIVE:
             fallback.append(_is_fallback(text))
+            canned.append(_is_canned(text))
+            if d["kind"] == "list":
+                canned_list.append(_is_canned(text))
         if d["kind"] in ("list", "fact"):
             # Neither of these asks for a narrative, so a narrative is a dodge.
             story_dodge.append(_is_story(text))
@@ -583,6 +678,10 @@ def score(collected: dict, *, n: int | None = None, lam: float = 0.0,
         "pool_by_kind": {k: round(float(np.mean(v)), 4) for k, v in sorted(pool.items())},
         "pool_n": {k: len(v) for k, v in sorted(pool.items())},
         "fallback_rate": round(float(np.mean(fallback)), 4) if fallback else 0.0,
+        "canned_rate": round(float(np.mean(canned)), 4) if canned else 0.0,
+        "canned_rate_list": round(float(np.mean(canned_list)), 4) if canned_list else 0.0,
+        "canned_n": [int(np.sum(canned)), len(canned)],
+        "canned_n_list": [int(np.sum(canned_list)), len(canned_list)],
         "repeat_rate": round(float(np.mean(repeated)), 4),
         "closed_rate": round(float(np.mean(closed)), 4),
         "mean_chars": round(float(np.mean(lengths)), 1),

@@ -325,6 +325,15 @@ class ChatSession:
         self.rerank = rerank
         #: Every candidate considered for the last reply, for `/candidates`.
         self.last_candidates: list = []
+        #: The candidate `rerank` actually returned, and whether the echo
+        #: partition was live for that draw. RECORDED rather than recomputed:
+        #: `/candidates` renders a decision already taken, and the settings it
+        #: was taken under can have changed since (`/echo off`, `/rerank 1`).
+        #: Recomputing also silently drops the `min_chars` partition, which put
+        #: the star on a draft the selector could never return on 4.8 % of the
+        #: committed draws.
+        self.last_winner = None
+        self.last_echo_on = False
         self.turns: list[tuple[str, str]] = []
         self._state = None
         self._primed = False
@@ -338,6 +347,10 @@ class ChatSession:
         self._fed: list[int] = []
         self._marks: list[int] = []
         self.last_spikes: list[list[float]] = []
+        #: How many times the CURRENT turn has been regenerated, and which turn
+        #: that is. Only read when a seed is fixed; see `regenerate`.
+        self._regen = 0
+        self._regen_key: tuple | None = None
 
     # -- the conversation -------------------------------------------------
 
@@ -385,7 +398,7 @@ class ChatSession:
         out: list[int] = []
         rp = self.rerank
         if rp is not None and rp.n > 1:
-            out = self._reranked(logits, params, rp, on_char)
+            out = self._reranked(logits, params, rp, on_char, text)
         else:
             for i, state in self.sampler.stream_from(logits, self._state, params):
                 if i < self.tok.n_special:
@@ -413,7 +426,7 @@ class ChatSession:
         return reply
 
     @torch.no_grad()
-    def _reranked(self, logits, params, rp, on_char) -> list[int]:
+    def _reranked(self, logits, params, rp, on_char, prompt: str = "") -> list[int]:
         """Draw `rp.n` candidates, keep one, and walk the real state through it.
 
         THE STATE IS ADVANCED BY A REPLAY, NOT BY THE WINNING BRANCH
@@ -430,6 +443,7 @@ class ChatSession:
         few hundred characters and is exact by construction, which is the same
         reason `rewind` replays ids rather than re-rendering text.
         """
+        from snnchat.rerank import prompt_content_words
         from snnchat.rerank import rerank as _rerank
         from snnchat.rerank import trim_to_sentence
 
@@ -439,10 +453,18 @@ class ChatSession:
         # character by character, which is slower and is what the user asked for
         # by turning `/spikes` on.
         self.sampler.record_spikes = False
+        # The words come from what the user TYPED, not from the rendered ids:
+        # the echo partition is a statement about the prompt's subject matter,
+        # and `render_turn` normalises punctuation and case that this does not
+        # want to depend on.
+        echo_words = prompt_content_words(prompt) if rp.echo else None
         winner, cands = _rerank(self.sampler.model, logits, self._state, params, rp,
-                                device=self.sampler.device)
+                                device=self.sampler.device,
+                                tok=self.tok, echo_words=echo_words)
         self.sampler.record_spikes = recording
         self.last_candidates = cands
+        self.last_winner = winner
+        self.last_echo_on = bool(rp.echo and echo_words)
 
         out = list(winner.ids)
         if rp.trim_to_sentence and not winner.closed:
@@ -507,6 +529,11 @@ class ChatSession:
         self.chars_fed = 0
         self._fed = []
         self._marks = []
+        self._regen = 0
+        self._regen_key = None
+        self.last_candidates = []
+        self.last_winner = None
+        self.last_echo_on = False
 
     @torch.no_grad()
     def rewind(self, n_exchanges: int = 1) -> None:
@@ -541,7 +568,22 @@ class ChatSession:
 
     @torch.no_grad()
     def regenerate(self, **overrides) -> str:
-        """Re-answer the last user turn. Rewinds one exchange and resends it."""
+        """Re-answer the last user turn. Rewinds one exchange and resends it.
+
+        UNDER A FIXED SEED THIS ADVANCES THE SEED, AND MUST
+        --------------------------------------------------
+        `send` seeds a fresh generator from `params.seed` at the top of every
+        turn, so replaying the same user text under the same seed draws the
+        identical reply, character for character. That made `/again` a silent
+        no-op for anyone who had set `/seed` -- it reprinted the reply the user
+        had just rejected, which is the one situation `/again` exists for.
+
+        The offset is a COUNT of consecutive regenerations of this turn rather
+        than a random re-seed, so the sequence stays reproducible: the same
+        conversation with the same seed and the same number of `/again`s
+        produces the same text. The counter is keyed on the turn, so answering
+        a new turn starts it over.
+        """
         if not self.turns:
             raise RuntimeError("nothing to regenerate")
         last_user = next(
@@ -549,8 +591,23 @@ class ChatSession:
         )
         if last_user is None:
             raise RuntimeError("no user turn to regenerate from")
+
+        params = overrides.pop("params", None) or self.params
+        bump = 0
+        if params.seed is not None:
+            key = (len(self._marks), last_user)
+            bump = self._regen + 1 if key == self._regen_key else 1
+            params = params.copy(seed=int(params.seed) + bump)
+
         self.rewind(1)
-        return self.send(last_user, **overrides)
+        # AFTER the rewind, not before: `rewind` replays from scratch and goes
+        # through `reset`, which clears the counter along with everything else.
+        # Setting it first is the version of this that silently answers every
+        # `/again` with the second reply.
+        if bump:
+            self._regen = bump
+            self._regen_key = (len(self._marks) + 1, last_user)
+        return self.send(last_user, params=params, **overrides)
 
     def transcript(self) -> str:
         lines = []
