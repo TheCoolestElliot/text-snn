@@ -42,6 +42,7 @@ from snnchat.generate import SamplingParams, load_chat_checkpoint  # noqa: E402
 from snnchat.rerank import (  # noqa: E402
     RerankParams,
     echo_count,
+    echo_weight,
     prompt_content_words,
     rerank,
     trim_to_sentence,
@@ -144,12 +145,18 @@ def main() -> int:
             _, cands = rerank(model, logits[:, -1, :].float(), state, params, rp,
                               device=args.device, tok=tok, echo_words=echo_words)
             for c in cands:
-                c.echo = echo_count(tok.decode_visible(c.ids), echo_words)
+                text = tok.decode_visible(c.ids)
+                c.echo = echo_count(text, echo_words)
+                c.echo_weight = echo_weight(text, echo_words)
 
+            # The SAME three partitions `rerank` applies, tiered on the weighted
+            # sum. If this copy and `rerank` ever disagree, every number in
+            # QUALITY_v8 describes a selector the REPL does not use.
             pool = [c for c in cands if c.n_chars >= rp.min_chars] or cands
             base = max(pool, key=lambda c: c.score)
-            best = max(c.echo for c in pool)
-            tier = [c for c in pool if c.echo == best] if best > 0 else pool
+            best = max(c.echo_weight for c in pool)
+            tier = ([c for c in pool if c.echo_weight >= best - 1e-9]
+                    if best > 0.0 else pool)
             picked = max(tier, key=lambda c: c.score)
 
             def text_of(c):
@@ -180,6 +187,7 @@ def main() -> int:
                     "logp_cond": c.logp_cond,
                     "logp_null": c.logp_null,
                     "echo": c.echo,
+                    "echo_weight": c.echo_weight,
                 } for c in cands],
             })
 

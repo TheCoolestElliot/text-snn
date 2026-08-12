@@ -1,0 +1,55 @@
+{
+  "arm": "chat-v9-narrative",
+  "rows": [
+    {
+      "run": "chat-v9-narrative",
+      "oracle_k": 14,
+      "oracle_n": 120,
+      "echo_k": 12,
+      "base_k": 0,
+      "weighted_bpc": 1.2132503448722465
+    },
+    {
+      "run": "chat-v9-narrative-s1",
+      "oracle_k": 13,
+      "oracle_n": 120,
+      "echo_k": 13,
+      "base_k": 0,
+      "weighted_bpc": 1.210925460256662
+    },
+    {
+      "run": "chat-v9-narrative-s2",
+      "oracle_k": 12,
+      "oracle_n": 120,
+      "echo_k": 12,
+      "base_k": 4,
+      "weighted_bpc": 1.2126399796673222
+    },
+    {
+      "run": "chat-v9-narrative-s3",
+      "oracle_k": 14,
+      "oracle_n": 120,
+      "echo_k": 13,
+      "base_k": 0,
+      "weighted_bpc": 1.2126375021043632
+    }
+  ],
+  "pooled": {
+    "k": 53,
+    "n": 480,
+    "rate": 0.1104,
+    "se": 0.0143,
+    "ci_low": 0.0854,
+    "ci_high": 0.1416,
+    "lattice": 0.00208,
+    "z": 1.959963984540054
+  },
+  "mean_k": 13.25,
+  "sd_seed_k": 0.9574271077563381,
+  "threshold_k": 22.5,
+  "verdict": "below",
+  "incumbent_oracle": [
+    11,
+    120
+  ]
+}

@@ -88,8 +88,12 @@ Not part of the research protocol. No number here is a reported figure.
 
 from __future__ import annotations
 
+import json as _json
+import math as _math
 import re
+import re as _re
 from dataclasses import dataclass
+from pathlib import Path as _Path
 
 import torch
 import torch.nn.functional as F
@@ -111,6 +115,8 @@ __all__ = [
     "trim_to_sentence",
     "prompt_content_words",
     "echo_count",
+    "echo_weight",
+    "word_weight",
     "rerank",
 ]
 
@@ -168,6 +174,62 @@ def prompt_content_words(text: str) -> list[str]:
         if len(w) >= _MIN_CONTENT_CHARS and w not in _FUNCTION_WORDS
     }
     return sorted(seen)
+
+
+#: Word counts over 4,004,093 words of `stories_topic.bin`, used to weight an
+#: echoed word by how surprising it is. Shipped as a file rather than computed at
+#: import because `data/` is gitignored and a decoder must work on a fresh clone.
+#:
+#: WHY WEIGHTING, MEASURED
+#: -----------------------
+#: Counting DISTINCT echoed words treats "story" and "penguin" as equal, and a
+#: large candidate pool then fills the top tier with drafts that echo the request
+#: FRAME while being about nothing. That is not hypothetical: it is why the
+#: partition saturates at 0.300 held-out while the oracle keeps climbing to
+#: 0.450 (`QUALITY_v8.md` §13), and why 16 of the 25 draws where selection
+#: changed had no topic hit under either rule.
+#:
+#: Inverse document frequency separates the two cleanly, and the separation is a
+#: property of the corpus rather than a choice: tell 5.93, story 5.20, make 6.02,
+#: want 6.27, little 5.05 against penguin 10.34, castle 8.86, turtle 9.13,
+#: whale 9.70, lighthouse 15.20 (absent). No threshold is needed -- the sum is
+#: simply dominated by the rare word.
+_FREQ_PATH = _Path(__file__).with_name("word_freq.json")
+try:
+    _freq_blob = _json.loads(_FREQ_PATH.read_text(encoding="utf-8"))
+    _WORD_COUNTS: dict[str, int] = _freq_blob["counts"]
+    _WORD_TOTAL: int = int(_freq_blob["total_words"])
+except (OSError, ValueError, KeyError):       # pragma: no cover - packaging guard
+    _WORD_COUNTS, _WORD_TOTAL = {}, 1
+
+
+def word_weight(word: str) -> float:
+    """How much echoing `word` counts for. Inverse document frequency.
+
+    Falls back to 1.0 for every word if the table is missing, which degrades the
+    weighted tier to the unweighted count tier rather than to nothing.
+    """
+    if not _WORD_COUNTS:
+        return 1.0
+    return _math.log(_WORD_TOTAL / (1 + _WORD_COUNTS.get(word, 0)))
+
+
+def echo_weight(text: str, words) -> float:
+    """Summed `word_weight` of the DISTINCT prompt words the reply uses.
+
+    The weighted counterpart of `echo_count`, and the quantity the tier is
+    actually built on. Same matching rule, so the two agree on WHICH words were
+    echoed and differ only in what each one is worth.
+    """
+    if not words:
+        return 0.0
+    lowered = text.lower()
+    total = 0.0
+    for w in words:
+        stem = w[:-1] if len(w) > 4 and w.endswith("s") else w
+        if _re.search(r"\b" + _re.escape(stem), lowered):
+            total += word_weight(w)
+    return total
 
 
 def echo_count(text: str, words) -> int:
@@ -630,7 +692,9 @@ def rerank(
 
     if rp.echo and echo_words and tok is not None:
         for c in cands:
-            c.echo = echo_count(tok.decode_visible(c.ids), echo_words)
+            text = tok.decode_visible(c.ids)
+            c.echo = echo_count(text, echo_words)
+            c.echo_weight = echo_weight(text, echo_words)
 
     # The length guard is applied by PARTITION rather than by penalty: a reply
     # of two characters is not a slightly worse reply, it is a different event
@@ -648,9 +712,11 @@ def rerank(
     # `best == 0` means no candidate echoed any content word, and then this line
     # is the identity. Note that the frame counts as content ("tell", "story"),
     # so `best > 0` is NOT the same as "something on topic was drawn".
-    best = max((c.echo for c in pool), default=0)
-    if best > 0:
-        pool = [c for c in pool if c.echo == best]
+    # Tiered on the WEIGHTED sum, not the count. `c.echo` is retained for
+    # `/candidates` and for the artifacts, but it is not what decides.
+    best = max((c.echo_weight for c in pool), default=0.0)
+    if best > 0.0:
+        pool = [c for c in pool if c.echo_weight >= best - 1e-9]
 
     winner = max(pool, key=lambda c: c.score)
     return winner, cands
