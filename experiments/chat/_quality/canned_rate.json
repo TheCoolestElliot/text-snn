@@ -1,0 +1,358 @@
+{
+  "note": "retrospective; computed from committed baseline_picks, rewrites nothing",
+  "pooled_list": {
+    "k": 130,
+    "n": 340,
+    "rate": 0.3824,
+    "ci": [
+      0.3323,
+      0.435
+    ]
+  },
+  "pooled_fallback_fired": [
+    28,
+    1904
+  ],
+  "arms": {
+    "chat-v2-anneal": {
+      "list_canned": [
+        8,
+        20
+      ],
+      "list_rate": 0.4,
+      "list_ci": [
+        0.2188,
+        0.6134
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        4,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3a-data": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        2,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3b-objective": {
+      "list_canned": [
+        8,
+        20
+      ],
+      "list_rate": 0.4,
+      "list_ci": [
+        0.2188,
+        0.6134
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        1,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3c-control": {
+      "list_canned": [
+        8,
+        20
+      ],
+      "list_rate": 0.4,
+      "list_ci": [
+        0.2188,
+        0.6134
+      ],
+      "substantive_canned": [
+        10,
+        112
+      ],
+      "fallback_fired": [
+        2,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3d-aligned-s1": {
+      "list_canned": [
+        10,
+        20
+      ],
+      "list_rate": 0.5,
+      "list_ci": [
+        0.2993,
+        0.7007
+      ],
+      "substantive_canned": [
+        10,
+        112
+      ],
+      "fallback_fired": [
+        3,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3d-aligned-s2": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        7,
+        112
+      ],
+      "fallback_fired": [
+        2,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3d-aligned-s3": {
+      "list_canned": [
+        6,
+        20
+      ],
+      "list_rate": 0.3,
+      "list_ci": [
+        0.1455,
+        0.519
+      ],
+      "substantive_canned": [
+        6,
+        112
+      ],
+      "fallback_fired": [
+        3,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v3d-aligned": {
+      "list_canned": [
+        8,
+        20
+      ],
+      "list_rate": 0.4,
+      "list_ci": [
+        0.2188,
+        0.6134
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        0,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v4a-short": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        0,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v4b-balance": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        7,
+        112
+      ],
+      "fallback_fired": [
+        1,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v5a-short300": {
+      "list_canned": [
+        8,
+        20
+      ],
+      "list_rate": 0.4,
+      "list_ci": [
+        0.2188,
+        0.6134
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        1,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-inst-a-s1": {
+      "list_canned": [
+        10,
+        20
+      ],
+      "list_rate": 0.5,
+      "list_ci": [
+        0.2993,
+        0.7007
+      ],
+      "substantive_canned": [
+        10,
+        112
+      ],
+      "fallback_fired": [
+        3,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-inst-a-s2": {
+      "list_canned": [
+        6,
+        20
+      ],
+      "list_rate": 0.3,
+      "list_ci": [
+        0.1455,
+        0.519
+      ],
+      "substantive_canned": [
+        7,
+        112
+      ],
+      "fallback_fired": [
+        0,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-inst-a-s3": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        7,
+        112
+      ],
+      "fallback_fired": [
+        2,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-inst-a": {
+      "list_canned": [
+        7,
+        20
+      ],
+      "list_rate": 0.35,
+      "list_ci": [
+        0.1812,
+        0.5671
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        1,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-inst-b": {
+      "list_canned": [
+        10,
+        20
+      ],
+      "list_rate": 0.5,
+      "list_ci": [
+        0.2993,
+        0.7007
+      ],
+      "substantive_canned": [
+        11,
+        112
+      ],
+      "fallback_fired": [
+        2,
+        112
+      ],
+      "reported_fallback_rate": null
+    },
+    "chat-v6-scratch": {
+      "list_canned": [
+        6,
+        20
+      ],
+      "list_rate": 0.3,
+      "list_ci": [
+        0.1455,
+        0.519
+      ],
+      "substantive_canned": [
+        8,
+        112
+      ],
+      "fallback_fired": [
+        1,
+        112
+      ],
+      "reported_fallback_rate": null
+    }
+  }
+}

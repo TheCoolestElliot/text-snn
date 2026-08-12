@@ -1,0 +1,3215 @@
+{
+  "ckpt": "experiments/chat/chat-v3d-aligned/ckpt_best.pt",
+  "seeds": 8,
+  "n": 8,
+  "lam": 0.6,
+  "items": 10,
+  "summary": {
+    "0": {
+      "n": 80,
+      "told": [
+        0,
+        80
+      ],
+      "untold": [
+        0,
+        80
+      ],
+      "told_ci": [
+        0.0,
+        0.04581795177789462
+      ],
+      "discordant": [
+        0,
+        0
+      ],
+      "mcnemar_p": 1.0
+    },
+    "1": {
+      "n": 80,
+      "told": [
+        0,
+        80
+      ],
+      "untold": [
+        0,
+        80
+      ],
+      "told_ci": [
+        0.0,
+        0.04581795177789462
+      ],
+      "discordant": [
+        0,
+        0
+      ],
+      "mcnemar_p": 1.0
+    },
+    "2": {
+      "n": 80,
+      "told": [
+        0,
+        80
+      ],
+      "untold": [
+        0,
+        80
+      ],
+      "told_ci": [
+        0.0,
+        0.04581795177789462
+      ],
+      "discordant": [
+        0,
+        0
+      ],
+      "mcnemar_p": 1.0
+    }
+  },
+  "rows": [
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "One day, a boy named Tim went to the park to play with his favorite toy, a boy named Tim.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - I just predict the next character. It only looks like thinking.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not very sophisticated.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "She likes sends on this computer. And the interesting text I was trained on.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking char-LM. You can call me whatever you like.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - I was trained on one computer, on a corpus of stories and dialogue.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Jaimes were all disappointed. One day, she saw a dog named Spot came to him. Jack was holding a big, glove and soon.",
+      "untold": "There are please dogs are typically found in the shadow and came to the input. The sky is blue and the seed in the sky."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Max had a funny dog named Max. They liked to play with toys. One day, Max saw a big pot of cat. The cat was very scared.",
+      "untold": "Dogs are very excited to be and controll."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog is too scared and shouldn't hear out.",
+      "untold": "I don't know. I just feel like a beautiful dog named \"Charlies.\" Many people come here and made a drink flashlight."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog has a great dog. I can't believe it.",
+      "untold": "The dog did not like to go when all the time. How can I help you?"
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog and the dog liked to run and have a big dog with the dog by ball on the dog. He could see a tall cat on it.",
+      "untold": "There are many favorite cats for the dog again. They make it all morning, but we can also check out the door."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The bus can carry because it is a little carbon transformed the dog with a seat.",
+      "untold": "The dog is a brief dog is called Daisy. Dogs can also be a dog when a pool of a diversity and sandwiches."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "There is an action dog at the consequences of exitching on the diversity of the form of talent.",
+      "untold": "The dog is a really nice car. The dog is scared of the bird to help."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "A cat named Tim came in the chest. He wanted to play with the dog, but it was hard.",
+      "untold": "I don't really have opinions - I just predict likely text."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know.",
+      "untold": "A cat and the cat saw a drain on the road. The cat was scared and disagreed. The driver was big and strong."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Oh, that sounds tough. I was wondering if you would like to catch me making things out today.",
+      "untold": "You can tell me more about your adventure."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat track was dollard. The cat liked to play in the cat and talk.\nOne day, the cat went for a walk in the park.",
+      "untold": "A cat and Asah is the same meat. The best animal is the called \"octopus\" and \"Apple\"."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat had a garden who said the house. The cat was tall and asked, \"I can't keep here.\"",
+      "untold": "Chicago I'm Allauble I'm called a \"Creativity\". The candidate is a divorce in the world."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Oh, a boy named Mark was very sleepy. Many people could bend a lot.",
+      "untold": "I'm an artificial neural network. My neurons fire in spikes, like a brain's do."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "One day, he made a big fish in his car. The cat was going to be a nice day.",
+      "untold": "To get a little bit of juice and stay and called a song and challenging."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat did not give up. The cat just was having fun and made the cat drive for its home.",
+      "untold": "You're not making something new ones."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat lived in a small house with a cat to a field. The cat lived near a big tree.",
+      "untold": "Molly is a famous cat named Bob. Bob liked to play outside and rest. He ran to his bedroom and said, \"Be careful, Mr."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It looks great. I like to go for a walking in the nights on the group.",
+      "untold": "Not a group as a small - I only write characters, one at a time."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "Nothing great."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have preferences, but I like short sentences.",
+      "untold": "Nothing grand."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "Nothing great. I was having a lot of fun."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's my favorite place.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "Nothing great, the main idea."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have problem at all.",
+      "untold": "I like the same plant."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "Nothing great."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like to read.",
+      "untold": "Not a group as a small - I only write characters, one at a time."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have probabilities.",
+      "untold": "Nothing great."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like short so much for hours.",
+      "untold": "Nothing grand."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I love to rise too.",
+      "untold": "Nothing great. I was having a lot of fun."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I likely tell it.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like that.",
+      "untold": "Nothing great, the main idea."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I like the same plant."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like thinking.",
+      "untold": "Nothing great."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Oh, there was a little boy named Tim. Tim was a good girl. He loved to play with the rope and in his mouth.",
+      "untold": "I don't have a clock or a window, but working. How about you?"
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Oh no, the lively fish lived in a small house with a big fish.",
+      "untold": "Because I want to be friends who paints are both ended their lives. I don't really know any new life."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It was a book a dog and had a big heart. I loved an idea.",
+      "untold": "I don't really know much more. Ask me something else?"
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Mile, lived an anger of different houses in the sun. Little Love Indights and I wanted to see what we could do in it.",
+      "untold": "No. I'm smaller and much simpler."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "One day, she decided to go on a trip to the park.",
+      "untold": "I don't know what you're saying. Why do you think the lime?"
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "One day, the cat saw a cat. The cat was scared of the dog. The cat was scared, but the dog was a shiny ant.",
+      "untold": "I like stories about small animals. That's most of what I was trained on."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Jane was a fisherman who lived in the forest. Every day, John wondered while her parents were eager to go to the park.",
+      "untold": "Because I'm a small night now. Everything roles would happen again."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "He loved to play with his toys. One day, he saw a big cat named Sam.",
+      "untold": "I don't really know one. I'm a pattern in some numbers."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The mole in the night was the old man, but I didn't mean to catch up.",
+      "untold": "I am fired. I'm a spiking language model, and a fairly small one."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's normal too. So, what do you like to do to me?",
+      "untold": "I am fairly limited, yes. Sorry about that."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The adventures had a significant that day.",
+      "untold": "I am fired out later."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "They like to play against the swings. They go have fun.",
+      "untold": "Not a human."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "They're on the grass, it was so attic! I'm sure you'll launch.",
+      "untold": "I am fine. A little bit."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "A right at character.",
+      "untold": "I am fired. I can't verify anything."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know, it's just a lot down on bed and I'm just really under the door.",
+      "untold": "Not a human."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like to talk about.",
+      "untold": "Not really. I'm right over that."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really know. I just don't know what to do.",
+      "untold": "I like to read."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I think the important way to read a lot of food.",
+      "untold": "I like to read books"
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I've never been so good at dancing!",
+      "untold": "I like a business too."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not sure. I'm sorry to hear that.",
+      "untold": "I like stars and have favourite this town."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not sure what you want. You just do it myself.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a very kind car, my desire burrows and started a bulb located. It's been a big food that was a bonus.",
+      "untold": "I like it have a nice test."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like to eat some food.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. I just feel like I'm in a drink right.",
+      "untold": "I have to live in."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "She loved to be able to prevent such a bridge and have some change.",
+      "untold": "A cabel and commerce are tall."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It was really good! The car was a very shock.",
+      "untold": "It's really simple and enjoyed it. It's important to be a smart acting and it's a big deal."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The largest river was crazy.",
+      "untold": "Because I'm always here for you. And you?"
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It was all right. I was just watching the world and I'm so glad I could be help.",
+      "untold": "Because I'm a doctor."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not really sure you will. And who says my boyfriend and I went out to be for walking. What do you think?",
+      "untold": "It's something else that you're really now and I love the house of your mom."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like tell you a story.",
+      "untold": "I don't really want to have a deep breath. Can you tell me a little bit about yourself?"
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's not true. Are you sure you're in a pressure?",
+      "untold": "Sure, I'd like to be happy with my friends. I've been practicing a lot lately."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Sure. What's the factor?",
+      "untold": "Yes, I can do that."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "That's a tough question when we went for a walk. He saw me a little bit moving.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I'm well trained on."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know what you trained on",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. What about you?",
+      "untold": "I'm a smile annoy named of neural network. My neurons fire in spikes, like a brain's do."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "One sunny day, and we make up little stories. I can't look anything up.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "His name in a small model.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spike when they cross a threshold.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - I just predict the next character. It only looks like thinking.",
+      "untold": "I'm well trained on."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I'm a smile annoy named of neural network. My neurons fire in spikes, like a brain's do."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "His name was on this conversation.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm a friend.",
+      "untold": "I'm not very sophisticated."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know, it just doesn't seem like it makes it feel better.",
+      "untold": "I'm not good at. I'm a story."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog is called \"The American Day. The cat is being over a few years. They're doing great.",
+      "untold": "I'm not very sophisticated."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog has a game of action.",
+      "untold": "As of could you like to know?"
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog and the sun lights around and all around.",
+      "untold": "As and believed at all."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "And you always did this in me. However, I want to the environment and wanted to help my dog.",
+      "untold": "As so house saw a big dog and a lot of things to do. I don't know where to go."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog's near stories.",
+      "untold": "As an experiment, so I never got a name."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's not possible.",
+      "untold": "As an experiment, so I never got a name."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat said structured at a friend.",
+      "untold": "As a little sad, but I'm better at stories."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It was so full of where animals are different from the world.",
+      "untold": "What did you do today?"
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You always seem to adventure and they are struggling with a determine.",
+      "untold": "As a little sad, a small cat and the time."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm a new cat and I want to talk to you.",
+      "untold": "I'm not able to talk about that."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. A cold star screw into details and raise for a slice of part of this.",
+      "untold": "Just weights and spikes. Sorry."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I thought it was so pretty! I loved it.",
+      "untold": "Just weights and spikes. Sorry."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "And then it got dark, and everyone went home.",
+      "untold": "I'm saying that. I'm really sorry."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Yes, I am. The cat was just thinking. I got it all wet and called.",
+      "untold": "Not much, honestly. I chat. and everything to well."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like stories and spiking neural network.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like stories. I can't look anything up.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Really. I'm not very sophisticated.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have preferences, but I like the word 'quiet'."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Honestly. I chat, and I get things wrong of thinking.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have to play with you and I don't know if I can give you a doctor.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Anything else? Anything else?",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have preferences, but I like the word 'quiet'."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Yes, please.",
+      "untold": "I'm not sure you."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm trying to read a chest.",
+      "untold": "Really. I'm not very sophisticated."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's green that you love to find the area.",
+      "untold": "As a lot of stories."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Her name is John. It was so borough.",
+      "untold": "I'm not very sophisticated."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The probably progressed. How did you get the ball to the library?",
+      "untold": "I'm a small network - I only see patterns, not reasons."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I loved the office very much. It's a lot of fun.",
+      "untold": "That's not something I can have a view on."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "There's nothing to her. It's just a big day to live. You need to talk about it.",
+      "untold": "Here you think so."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know, it just seemed like that. It was a lot of work to make a big place for you.",
+      "untold": "As a little struggle and well, I was trained on."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "There was not wrong.",
+      "untold": "As a small talk about them."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm trying to retrieve a big problem.",
+      "untold": "I'm doing well norms. What about you?"
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "That's a little bit. I didn't mean to it for you. Do you want to talk about it?",
+      "untold": "As a small called I read of the work."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know.",
+      "untold": "I'm doing well, thank you. How are you?"
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not very good at. My best in the world aw and the window and watch the birds.",
+      "untold": "As a surger, and everyone went home."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "As a lot of text, one character, on a corpus of stories and dialogue.",
+      "untold": "As a surgery, not a boy named Tom. How are you?"
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'd love to!",
+      "untold": "As a small can I help with a small brain."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I only know one.",
+      "untold": "All model and I invent things."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like to play soccer.",
+      "untold": "I like that."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not having a good team, and I have lost the game because I don't make any chance to find it.",
+      "untold": "I like that."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a notebook.",
+      "untold": "Nothing that needs really have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm always up for a while. And it's not everyone see if I can find any food that I can make things with it.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "He likes to make me bad.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like the avoid game like that movie.",
+      "untold": "I like stories about small animals."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Here is needed to have a few different food. I like to see her special search to read.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really know much more of the chicken.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No, not really. I'm just glad that I did not too hear it.",
+      "untold": "I like to read and fight. I'm just a healthy and feeling overwhelmed. I don't think I've ever seen before."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Of course. I don't know what it would be happening.",
+      "untold": "I like spikes singing every day."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The car trained on the creek said, and the people were scared.",
+      "untold": "A little bit. I'm not very sophisticated."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a short does. I've been doing so well.",
+      "untold": "Not much. I'm just really excited to go for a walk in the school and stuff."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not really sure you will. Anything about it together. Do you have a minute?",
+      "untold": "I don't know much worse in a house."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I can help with things?",
+      "untold": "Anything else?"
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Honestly. I could tell you a huge story. I'd like to keep up.",
+      "untold": "Anything else?"
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a star!",
+      "untold": "Sure, what is it?"
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I only have the text you type."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I never got a name.",
+      "untold": "I don't really have a name. I only have the text you type."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking char-LM. You can call me whatever you like.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I never got a name.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking neurons. I was trained on this computer.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I only have the text you type."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I only have the text you type."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking neural network trained on characters, one at a time.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking char-LM. You can call me whatever you like.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "I don't really have a name. I'm a spiking neural network."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have a name. I'm a spiking neural network.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "No name - just a spiking char-LM. You can call me whatever you like.",
+      "untold": "No name - just a spiking char-- I can't see anything outside this conversation."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's not just a pet.",
+      "untold": "As and the train line of me something else?"
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Do you have a lot of money?",
+      "untold": "I don't have feelings the next character."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "As and every day see insects.",
+      "untold": "As and the text you typed to say hello."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "What did you do today?",
+      "untold": "Have a small network - I only see patterns, not reasons."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't remember you. This consumer.",
+      "untold": "As and the interesting text, one character at a time, on this computer."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "A pleasure is called an independent cat and the wind was a bit something that makes sense.",
+      "untold": "As of course not."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The dog is tall and I'm the one with my dog named Sam.",
+      "untold": "Alisted, and everyone went home."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "As so support a nice concern, but I like the word 'quiet'.",
+      "untold": "As an experiment, so I never got a name."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The cat has the words that I could help.",
+      "untold": "Would you like a stories?"
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You can tell me more about a cat' - that's what I'm best at.",
+      "untold": "Wow, that's a lost me where a fire in simple units."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a small story about a close called the small experience.",
+      "untold": "A little slow, but working. Have a good one."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. I get things wrong a lot.",
+      "untold": "As a story about something you like."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You should go to school and how I'm ready to live.",
+      "untold": "Word and the girl named Lily who looks like a brain's do."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm a company with my minding could be impressive.",
+      "untold": "And then it got dark, and everyone went home."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "A nickname characters.",
+      "untold": "What did you do today?"
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "That's an exception.",
+      "untold": "Would you like a story about a cat' - that's what I'm best at."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I like that. I get things wrong a lot."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like the word 'the word 'quiet'.",
+      "untold": "I liked to sit by and what I was trained on."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I liked to sing and do too far."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I probably more and have fun.",
+      "untold": "I like stories. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I like the word to soon."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like that. I only have probabilities.",
+      "untold": "I like that. I get things wrong a lot."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "What does this conversation starts?",
+      "untold": "I liked to sit by and what I was trained on."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I probably mud a story.",
+      "untold": "I liked to sing and do too far."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I like stories. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Humour is hard for my favourite colour.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I like the word to soon."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Oh, that's the sound of data.",
+      "untold": "Honestly, no."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not very sophisticated.",
+      "untold": "One sunny day, and what do you like?"
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I thought it was a great honey.",
+      "untold": "I'm a small spike?"
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm always supportive.",
+      "untold": "That's about all I have on that, I'm afraid."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not really succeed. Anything else?",
+      "untold": "Here are seems a lot early. I'm not see what I am."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. It just have that matters to me.",
+      "untold": "Have a story."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not sure, but I can't do it. It's just so frustrating.",
+      "untold": "Hands the neighbours."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "He was trained on this computer.",
+      "untold": "Have a good one."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Not much, honestly. I chat, and I tell short stories.",
+      "untold": "All my neurons are my speed."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I was trained on.",
+      "untold": "I don't know much more. Ask me something else?"
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "And then it got dark, and everyone went home.",
+      "untold": "I don't remember anything. I'm a network of simple units."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I think that's what you mean it.",
+      "untold": "Anything else?"
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I only know one. What about you?",
+      "untold": "I'm not good at. I'm not happy to see this computer."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm good. Thank you.",
+      "untold": "And then it got dark, and everyone went home."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "And then it got dark, and everyone went home.",
+      "untold": "Anything else?"
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like stories about something I can have a view on.",
+      "untold": "I don't know. Just threw my training text."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like stories. I can't look anything up.",
+      "untold": "I like stories. I conversation and stories."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like little bit. I have no seeks to go to wear it.",
+      "untold": "I like stories. I like sharp teams."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have probabilities.",
+      "untold": "I like stories. I'm a very small model."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm not sure. It's just a microwave.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't really have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like the road and they have fun.",
+      "untold": "I like stories. I can't look anything up."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "It's a big beautiful tobow.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't have favourites. I only have probabilities.",
+      "untold": "I don't have favourites. I only have probabilities."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "The wind was a small brain.",
+      "untold": "As a sunny day, and I try to keep up."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Really. I only know one.",
+      "untold": "It's been on a lot the stories."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "That's a little outside of this instance. And you can always see me. But we can start with one more sense.",
+      "untold": "It's been a little simple."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I'm sorry. I didn't mean to hurt my family.",
+      "untold": "I'm not so much simpler."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I was trained on this computer.",
+      "untold": "I'm not sorry."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "As a sucklace called You Presect.",
+      "untold": "As a sunny day, it was nice talking to you."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I only know one looks like thinking.",
+      "untold": "I'm not sorry. I was trained on this computer."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I like the skill. Ask me something else?",
+      "untold": "I'm not sorry."
+    }
+  ]
+}
