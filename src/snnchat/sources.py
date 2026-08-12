@@ -358,12 +358,19 @@ def read_soda_narrative(path: str) -> Iterator[Conversation]:
     Emitted as bare narrative rather than wrapped in a request. It is a register
     and vocabulary teacher, and inventing a request frame for it would make it a
     second, unvalidated topic source instead.
+
+    The `_raw` pseudo-role is what `build_corpus._RawAwareTokenizer` renders as
+    bare text with no turn markers. `("story", ...)` -- which `read_tinystories`
+    uses -- is NOT interchangeable with it: that role is only ever consumed by
+    `_tinystories_conversations`, which wraps it into a real user/bot exchange
+    before it reaches the tokenizer, and passing it straight through raises
+    `role must be 'user' or 'bot'`.
     """
     for row in _read_parquet_columns(path, ["narrative"]):
         text = _clean(row.get("narrative") or "")
         if not _acceptable(row.get("narrative") or "", text):
             continue
-        yield [("story", text)]
+        yield [("_raw", text)]
 
 
 def read_soda(path: str) -> Iterator[Conversation]:

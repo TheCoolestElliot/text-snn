@@ -972,6 +972,30 @@ def test_probe_hits_allow_a_plural_but_not_a_substring():
     assert _word_hit("Rabbit!", ("rabbit",)) == ["rabbit"]
 
 
+def test_a_bare_narrative_source_must_use_the_raw_role():
+    """`("story", ...)` and `("_raw", ...)` are not interchangeable.
+
+    `read_tinystories` yields `("story", ...)`, but that role never reaches a
+    tokenizer -- `_tinystories_conversations` wraps it into a real user/bot
+    exchange first. A new bare-narrative source that copies the role instead of
+    the pipeline packs nothing and dies with `role must be 'user' or 'bot'`,
+    which is exactly what `read_soda_narrative` did on its first run.
+    """
+    import inspect
+
+    from snnchat.build_corpus import _RawAwareTokenizer
+    from snnchat.sources import read_soda_narrative
+
+    tok = _RawAwareTokenizer()
+    assert tok.render_conversation([("_raw", "A plain sentence about a whale.")])
+    with pytest.raises(ValueError, match="role must be"):
+        tok.render_conversation([("story", "A plain sentence about a whale.")])
+
+    # The reader needs a 688 MB parquet, so its ROLE is asserted from source
+    # rather than by running it -- enough to catch the regression.
+    assert '("_raw", text)' in inspect.getsource(read_soda_narrative)
+
+
 def test_prime_fires_on_a_story_request_and_is_silent_otherwise():
     """A prime that fires on "hello" would put words in the model's mouth for
     a turn where nothing was asked for."""
