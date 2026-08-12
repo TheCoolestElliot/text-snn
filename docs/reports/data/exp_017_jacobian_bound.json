@@ -12,6 +12,8 @@
  "adopts_nothing": true,
  "ranks_nothing": true,
  "changes_no_hyperparameter": true,
+ "posthoc_legs": [],
+ "is_posthoc": false,
  "legs": [
   {
    "leg": "A1",
@@ -866,9 +868,172 @@
   {
    "leg": "A6",
    "run": "detach_d1481_s0",
+   "note": "detached reset, 5.0M -- THIS ARM's own trajectory (EXP_017 Sec 6 item 9)",
+   "arch": "twocomp_detach",
    "batch_step": 0,
-   "error": "missing ckpt_final.pt",
-   "skipped": true
+   "d_model": 1481,
+   "n_layers": 2,
+   "step_of_checkpoint": -1,
+   "checkpoint": "ckpt_final.pt",
+   "seq_len": 256,
+   "batch_size": 128,
+   "constants": {
+    "alpha": 2.0,
+    "thr": 1.0,
+    "beta_f": 0.5,
+    "reset": "hard"
+   },
+   "lif_closed_form_bound": 0.5123596271760303,
+   "detach_closed_form_bound": 0.5,
+   "layers": [
+    {
+     "layer": 0,
+     "hard": {
+      "max_abs_g": 5.939692497253418,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.05729408444463201,
+       "1.0": 0.0009108085555051485,
+       "2.0": 7.696364233414922e-05,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 44201,
+      "n_exact_zero_g": 0,
+      "quantiles_abs_g": {
+       "q0.5": 0.5623413251903491,
+       "q0.9": 0.5623413251903491,
+       "q0.99": 0.5623413251903491,
+       "q0.999": 0.8912509381337513,
+       "q0.9999": 1.7782794100389228
+      },
+      "max_chain_log_gain": -146.79654686077492,
+      "max_chain_log10_gain": -63.75293026408667,
+      "mean_chain_log_gain": -327.428585496221,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 61.22689437866211,
+      "max_window_log_gain": 3.036934197309038,
+      "max_window_log10_gain": 1.3189237637945965,
+      "mean_window_log_gain": 0.02002290800689421,
+      "n_chains_with_expanding_window": 7557,
+      "longest_expanding_run_steps": 15.0,
+      "max_abs_g_over_lif_bound": 11.5928191492979
+     },
+     "detach": {
+      "max_abs_g": 0.5,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.0,
+       "1.0": 0.0,
+       "2.0": 0.0,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 0,
+      "n_exact_zero_g": 9712354,
+      "quantiles_abs_g": {
+       "q0.5": 0.4466835921509653,
+       "q0.9": 0.4466835921509653,
+       "q0.99": 0.4466835921509653,
+       "q0.999": 0.4466835921509653,
+       "q0.9999": 0.4466835921509653
+      },
+      "max_chain_log_gain": -177.44567822334633,
+      "max_chain_log10_gain": -77.06367888997933,
+      "mean_chain_log_gain": -35533.22498007075,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 61.22689437866211,
+      "max_window_log_gain": 0.0,
+      "max_window_log10_gain": 0.0,
+      "mean_window_log_gain": 0.0,
+      "n_chains_with_expanding_window": 0,
+      "longest_expanding_run_steps": 0.0,
+      "max_abs_g_over_lif_bound": 0.975877047057449
+     },
+     "max_abs_g_ratio_hard_over_detach": 11.879384994506836
+    },
+    {
+     "layer": 1,
+     "hard": {
+      "max_abs_g": 5.251537322998047,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.08425897138493839,
+       "1.0": 0.0008084170324105334,
+       "2.0": 1.7865455931380824e-05,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 39232,
+      "n_exact_zero_g": 0,
+      "quantiles_abs_g": {
+       "q0.5": 0.5623413251903491,
+       "q0.9": 0.5623413251903491,
+       "q0.99": 0.5623413251903491,
+       "q0.999": 0.8912509381337513,
+       "q0.9999": 1.4125375446227613
+      },
+      "max_chain_log_gain": -137.8785630977087,
+      "max_chain_log10_gain": -59.87989912608421,
+      "mean_chain_log_gain": -284.94480836283776,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 391.1253967285156,
+      "max_window_log_gain": 4.461109337373913,
+      "max_window_log10_gain": 1.9374351683885624,
+      "mean_window_log_gain": 0.012847014637092166,
+      "n_chains_with_expanding_window": 4922,
+      "longest_expanding_run_steps": 18.0,
+      "max_abs_g_over_lif_bound": 10.24970947055863
+     },
+     "detach": {
+      "max_abs_g": 0.5,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.0,
+       "1.0": 0.0,
+       "2.0": 0.0,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 0,
+      "n_exact_zero_g": 9591083,
+      "quantiles_abs_g": {
+       "q0.5": 0.4466835921509653,
+       "q0.9": 0.4466835921509653,
+       "q0.99": 0.4466835921509653,
+       "q0.999": 0.4466835921509653,
+       "q0.9999": 0.4466835921509653
+      },
+      "max_chain_log_gain": -177.44567822334633,
+      "max_chain_log10_gain": -77.06367888997933,
+      "mean_chain_log_gain": -35091.76344441067,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 391.1253967285156,
+      "max_window_log_gain": 0.0,
+      "max_window_log10_gain": 0.0,
+      "mean_window_log_gain": 0.0,
+      "n_chains_with_expanding_window": 0,
+      "longest_expanding_run_steps": 0.0,
+      "max_abs_g_over_lif_bound": 0.975877047057449
+     },
+     "max_abs_g_ratio_hard_over_detach": 10.503074645996094
+    }
+   ],
+   "t2_spikes_bitwise_equal": [
+    true,
+    true
+   ],
+   "t2_state_max_abs_diff": [
+    0.0,
+    0.0
+   ],
+   "t1_holds": true,
+   "t2_holds": true,
+   "h1_holds": true
   },
   {
    "leg": "A1",
@@ -1723,9 +1888,172 @@
   {
    "leg": "A6",
    "run": "detach_d1481_s0",
+   "note": "detached reset, 5.0M -- THIS ARM's own trajectory (EXP_017 Sec 6 item 9)",
+   "arch": "twocomp_detach",
    "batch_step": 5138,
-   "error": "missing ckpt_final.pt",
-   "skipped": true
+   "d_model": 1481,
+   "n_layers": 2,
+   "step_of_checkpoint": -1,
+   "checkpoint": "ckpt_final.pt",
+   "seq_len": 256,
+   "batch_size": 128,
+   "constants": {
+    "alpha": 2.0,
+    "thr": 1.0,
+    "beta_f": 0.5,
+    "reset": "hard"
+   },
+   "lif_closed_form_bound": 0.5123596271760303,
+   "detach_closed_form_bound": 0.5,
+   "layers": [
+    {
+     "layer": 0,
+     "hard": {
+      "max_abs_g": 5.922267913818359,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.057326394750168805,
+       "1.0": 0.0009248000717420662,
+       "2.0": 8.293940037348076e-05,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 44880,
+      "n_exact_zero_g": 0,
+      "quantiles_abs_g": {
+       "q0.5": 0.5623413251903491,
+       "q0.9": 0.5623413251903491,
+       "q0.99": 0.5623413251903491,
+       "q0.999": 0.8912509381337513,
+       "q0.9999": 1.7782794100389228
+      },
+      "max_chain_log_gain": -83.48888644556608,
+      "max_chain_log10_gain": -36.25876268355654,
+      "mean_chain_log_gain": -326.949399047221,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 134.19418334960938,
+      "max_window_log_gain": 63.509241526522565,
+      "max_window_log10_gain": 27.5817131448296,
+      "mean_window_log_gain": 0.02070752711967068,
+      "n_chains_with_expanding_window": 7572,
+      "longest_expanding_run_steps": 84.0,
+      "max_abs_g_over_lif_bound": 11.558810647240279
+     },
+     "detach": {
+      "max_abs_g": 0.5,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.0,
+       "1.0": 0.0,
+       "2.0": 0.0,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 0,
+      "n_exact_zero_g": 9657593,
+      "quantiles_abs_g": {
+       "q0.5": 0.4466835921509653,
+       "q0.9": 0.4466835921509653,
+       "q0.99": 0.4466835921509653,
+       "q0.999": 0.4466835921509653,
+       "q0.9999": 0.4466835921509653
+      },
+      "max_chain_log_gain": -177.44567822334633,
+      "max_chain_log10_gain": -77.06367888997933,
+      "mean_chain_log_gain": -35333.879092312905,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 134.19418334960938,
+      "max_window_log_gain": 0.0,
+      "max_window_log10_gain": 0.0,
+      "mean_window_log_gain": 0.0,
+      "n_chains_with_expanding_window": 0,
+      "longest_expanding_run_steps": 0.0,
+      "max_abs_g_over_lif_bound": 0.975877047057449
+     },
+     "max_abs_g_ratio_hard_over_detach": 11.844535827636719
+    },
+    {
+     "layer": 1,
+     "hard": {
+      "max_abs_g": 6.063354969024658,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.08440931321478308,
+       "1.0": 0.0008126000630380655,
+       "2.0": 1.959636515656651e-05,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 39435,
+      "n_exact_zero_g": 0,
+      "quantiles_abs_g": {
+       "q0.5": 0.5623413251903491,
+       "q0.9": 0.5623413251903491,
+       "q0.99": 0.5623413251903491,
+       "q0.999": 0.8912509381337513,
+       "q0.9999": 1.4125375446227613
+      },
+      "max_chain_log_gain": -152.37022027675076,
+      "max_chain_log10_gain": -66.17354587257581,
+      "mean_chain_log_gain": -283.3373725142541,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 397.40631103515625,
+      "max_window_log_gain": 10.214431671290603,
+      "max_window_log10_gain": 4.436071310619319,
+      "mean_window_log_gain": 0.013104621116974968,
+      "n_chains_with_expanding_window": 4974,
+      "longest_expanding_run_steps": 17.0,
+      "max_abs_g_over_lif_bound": 11.834177884865788
+     },
+     "detach": {
+      "max_abs_g": 0.5,
+      "n_sites": 48529408,
+      "frac_over": {
+       "0.5123596": 0.0,
+       "1.0": 0.0,
+       "2.0": 0.0,
+       "10.0": 0.0,
+       "100.0": 0.0
+      },
+      "n_over_1": 0,
+      "n_exact_zero_g": 9460551,
+      "quantiles_abs_g": {
+       "q0.5": 0.4466835921509653,
+       "q0.9": 0.4466835921509653,
+       "q0.99": 0.4466835921509653,
+       "q0.999": 0.4466835921509653,
+       "q0.9999": 0.4466835921509653
+      },
+      "max_chain_log_gain": -177.44567822334633,
+      "max_chain_log10_gain": -77.06367888997933,
+      "mean_chain_log_gain": -34616.589188629965,
+      "n_chains_expanding": 0,
+      "n_chains": 189568,
+      "max_abs_w_times_vs": 397.40631103515625,
+      "max_window_log_gain": 0.0,
+      "max_window_log10_gain": 0.0,
+      "mean_window_log_gain": 0.0,
+      "n_chains_with_expanding_window": 0,
+      "longest_expanding_run_steps": 0.0,
+      "max_abs_g_over_lif_bound": 0.975877047057449
+     },
+     "max_abs_g_ratio_hard_over_detach": 12.126709938049316
+    }
+   ],
+   "t2_spikes_bitwise_equal": [
+    true,
+    true
+   ],
+   "t2_state_max_abs_diff": [
+    0.0,
+    0.0
+   ],
+   "t1_holds": true,
+   "t2_holds": true,
+   "h1_holds": true
   }
  ],
  "t1_holds": true,
