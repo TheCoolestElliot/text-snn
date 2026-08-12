@@ -82,9 +82,18 @@ CANCELLED = {"A15": "PREDICTION_v9.md §3 rule 1 -- weighted bpc conjunct alread
 #: `chat-v3d-aligned` is 14,000 steps continuing `chat-v2-anneal`, so an arm that
 #: skipped `--init-from` would be comparing a corpus change against a from-scratch
 #: run -- which is `chat-v6-scratch`, a different question already answered.
+#: EVERY VALUE HERE IS READ OFF `chat-v3d-aligned/config.json`, NOT INHERITED
+#: FROM `train.py`'s DEFAULTS. A smoke run at `--max-steps 20` before the first
+#: arm launched showed the two disagree on five keys -- `batch_size` 64 vs 160,
+#: `seq_len` 384 vs 256, `lr` 2e-3 vs 5e-4, `warmup_steps` 500 vs 200,
+#: `eval_batches` 40 vs 30. An arm trained on those defaults would have differed
+#: from the incumbent in five ways while claiming to differ in one, and 2.8
+#: GPU-hours would have bought an uninterpretable number.
 _BASE = ["--init-from", "experiments/chat/chat-v2-anneal/ckpt_best.pt",
          "--max-steps", "14000", "--bot-loss-weight", "3.0",
-         "--align-frac", "0.75", "--align-lookahead", "1024"]
+         "--align-frac", "0.75", "--align-lookahead", "1024",
+         "--batch-size", "160", "--seq-len", "256",
+         "--lr", "0.0005", "--warmup-steps", "200", "--eval-batches", "30"]
 
 
 def _train_commands(argv: list[str]) -> list[list[str]]:
