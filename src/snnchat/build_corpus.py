@@ -377,15 +377,35 @@ def build_all(
             print(f"  persona: already packed ({size / 1e6:,.1f} M chars)", flush=True)
             stats["persona"] = {"chars_train": size, "reused": True}
 
+        # MERGED into any existing manifest, never replacing it.
+        #
+        # This wrote `sources=stats` outright, which was harmless while every
+        # call packed every source and catastrophic the moment `only=` existed:
+        # a call that packed one source rewrote the manifest to list ONE source,
+        # and `snnchat.data.ChatCorpus` enumerates what is available from
+        # exactly that dict. Two `--only` repacks in a row left a corpus of
+        # fourteen packed `.bin` files describing itself as three, with the
+        # remaining eleven invisible to training.
+        #
+        # The `.bin` files were never at risk -- only the record of them.
+        manifest_path = os.path.join(out_dir, "manifest.json")
+        merged = dict(stats)
+        if os.path.exists(manifest_path):
+            with open(manifest_path, encoding="utf-8") as fh:
+                previous = json.load(fh).get("sources", {})
+            merged = {**previous, **stats}
+
         manifest = CorpusManifest(
             vocab_version=VOCAB_VERSION,
             vocab_size=tok.vocab_size,
             built_at=time.strftime("%Y-%m-%dT%H:%M:%S"),
-            sources=stats,
+            sources=merged,
         )
-        with open(os.path.join(out_dir, "manifest.json"), "w", encoding="utf-8") as fh:
+        tmp = manifest_path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
             fh.write(manifest.to_json())
             fh.write("\n")
+        os.replace(tmp, manifest_path)      # atomic, as build_topic_stories does
         return manifest
     finally:
         # Restored whatever happens. `set_max_turn_chars` rebinds a module

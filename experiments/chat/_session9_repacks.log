@@ -4,3 +4,137 @@ session9 driver: 9 stage(s)
     $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/build_topic_stories.py --name stories_topic_r05 --raw-fraction 0.05
 packing stories_topic_r05 from data/chat_raw\tinystories.txt (limit 400 M chars, raw fraction 0.05)
     stories_topic_r05: 81,985 conversations, 62.4 M chars
+    stories_topic_r05: 166,074 conversations, 126.3 M chars
+    stories_topic_r05: 249,413 conversations, 189.6 M chars
+    stories_topic_r05: 332,189 conversations, 252.4 M chars
+    stories_topic_r05: 417,191 conversations, 317.1 M chars
+    stories_topic_r05: 502,577 conversations, 382.0 M chars
+  stories_topic_r05: 526,241 conversations, 400.0 M chars (398.4 train / 1.60 val) in 126s
+registered stories_topic_r05 in data/chat\manifest.json
+[R9] done in 2.1 min
+
+[R12] pack soda_narrative (~218 M chars of adult prose)
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/build_data.py --only soda_narrative
+downloading sources
+  soda_narrative: present (689 MB)
+packing
+packing into data/chat (vocab v1, V=101)
+Traceback (most recent call last):
+  File "C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\build_data.py", line 61, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\Elliot's Stuff\SNN\Text SNN\scripts\chat\build_data.py", line 49, in main
+    manifest = build_all(
+        args.raw_dir, args.out_dir,
+        seed=args.seed, persona_conversations=args.persona_conversations,
+        only=args.only, suffix=args.suffix, max_turn_chars=args.max_turn_chars,
+    )
+  File "C:\Elliot's Stuff\SNN\Text SNN\src\snnchat\build_corpus.py", line 360, in build_all
+    stats[packed] = _pack_source(
+                    ~~~~~~~~~~~~^
+        packed, convs, out_dir, tok, limit_chars=limit_chars.get(src.name, 0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Elliot's Stuff\SNN\Text SNN\src\snnchat\build_corpus.py", line 205, in _pack_source
+    ids = tok.render_conversation(conv)
+  File "C:\Elliot's Stuff\SNN\Text SNN\src\snnchat\build_corpus.py", line 298, in render_conversation
+    return super().render_conversation(turns, bos=bos)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Elliot's Stuff\SNN\Text SNN\src\snnchat\tokenizer.py", line 223, in render_conversation
+    ids.extend(self.render_turn(role, text))
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Elliot's Stuff\SNN\Text SNN\src\snnchat\tokenizer.py", line 215, in render_turn
+    raise ValueError(f"role must be 'user' or 'bot', got {role!r}")
+ValueError: role must be 'user' or 'bot', got 'story'
+[R12] FAILED rc=1 after 0.0 min
+
+stopping at R12. Fix it and rerun -- completed stages are skipped via C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_session9
+session9 driver: 9 stage(s)
+[R9] SKIP (done 2026-08-12T10:03:54)
+
+[R12] pack soda_narrative (~218 M chars of adult prose)
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/build_data.py --only soda_narrative
+downloading sources
+  soda_narrative: present (689 MB)
+packing
+packing into data/chat (vocab v1, V=101)
+    soda_narrative: 465,740 conversations, 85.6 M chars
+    soda_narrative: 831,338 conversations, 153.0 M chars
+  soda_narrative: 1,190,303 conversations, 219.2 M chars (218.4 train / 0.88 val) in 56s
+{
+  "built_at": "2026-08-12T10:05:35",
+  "sources": {
+    "soda_narrative": {
+      "chars_total": 219239713,
+      "chars_train": 218362755,
+      "chars_val": 876958,
+      "conversations": 1190303,
+      "max_turn_chars": 400,
+      "read_from": "soda_narrative",
+      "seconds": 56.1
+    }
+  },
+  "vocab_size": 101,
+  "vocab_version": 1
+}
+
+total training characters: 218,362,755 (0.22 G)
+[R12] done in 0.9 min
+
+[R11] repack alpaca/dolly/oasst1 at MAX_TURN_CHARS 600
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/build_data.py --only alpaca dolly oasst1 --max-turn-chars 600 --suffix _t600
+downloading sources
+  alpaca: present (24 MB)
+  dolly: present (13 MB)
+  oasst1: present (34 MB)
+packing
+packing into data/chat (vocab v1, V=101)
+  alpaca_t600: 45,466 conversations, 13.2 M chars (13.2 train / 0.05 val) in 4s
+  dolly_t600: 9,714 conversations, 3.0 M chars (3.0 train / 0.01 val) in 2s
+  oasst1_t600: 1,193 conversations, 0.6 M chars (0.6 train / 0.00 val) in 4s
+{
+  "built_at": "2026-08-12T10:05:46",
+  "sources": {
+    "alpaca_t600": {
+      "chars_total": 13217531,
+      "chars_train": 13164661,
+      "chars_val": 52870,
+      "conversations": 45466,
+      "max_turn_chars": 600,
+      "read_from": "alpaca",
+      "seconds": 4.2
+    },
+    "dolly_t600": {
+      "chars_total": 2968759,
+      "chars_train": 2956884,
+      "chars_val": 11875,
+      "conversations": 9714,
+      "max_turn_chars": 600,
+      "read_from": "dolly",
+      "seconds": 1.9
+    },
+    "oasst1_t600": {
+      "chars_total": 593256,
+      "chars_train": 589160,
+      "chars_val": 4096,
+      "conversations": 1193,
+      "max_turn_chars": 600,
+      "read_from": "oasst1",
+      "seconds": 4.0
+    }
+  },
+  "vocab_size": 101,
+  "vocab_version": 1
+}
+
+total training characters: 16,710,705 (0.02 G)
+[R11] done in 0.2 min
+[A12] SKIP (--skip-gpu)
+[A9] SKIP (--skip-gpu)
+[A11] SKIP (--skip-gpu)
+[A13a] SKIP (--skip-gpu)
+[A13b] SKIP (--skip-gpu)
+[A14] SKIP (--skip-gpu)
+
+all requested stages complete

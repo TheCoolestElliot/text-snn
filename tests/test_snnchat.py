@@ -972,6 +972,34 @@ def test_probe_hits_allow_a_plural_but_not_a_substring():
     assert _word_hit("Rabbit!", ("rabbit",)) == ["rabbit"]
 
 
+def test_build_all_merges_the_manifest_rather_than_replacing_it(tmp_path):
+    """A partial repack must not delete the record of everything else.
+
+    `build_all` wrote `sources=stats` outright, which was harmless while every
+    call packed every source and destructive the moment `only=` existed: a call
+    that packed one source rewrote the manifest to list one source, and
+    `ChatCorpus` enumerates what is available from exactly that dict. Two
+    `--only` repacks in a row left fourteen packed files describing themselves
+    as three, with the other eleven invisible to training.
+    """
+    import json
+
+    from snnchat.build_corpus import build_all
+
+    (tmp_path / "manifest.json").write_text(json.dumps({
+        "vocab_version": 1, "vocab_size": 101, "built_at": "x",
+        "sources": {"soda": {"chars_train": 999}, "persona": {"chars_train": 5}},
+    }), encoding="utf-8")
+
+    # No raw files, so nothing packs -- which is the point: even a call that
+    # packs nothing must not erase what is already recorded.
+    build_all(str(tmp_path / "raw"), str(tmp_path), only=["alpaca"])
+
+    after = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    assert set(after["sources"]) >= {"soda", "persona"}
+    assert after["sources"]["soda"]["chars_train"] == 999
+
+
 def test_a_bare_narrative_source_must_use_the_raw_role():
     """`("story", ...)` and `("_raw", ...)` are not interchangeable.
 

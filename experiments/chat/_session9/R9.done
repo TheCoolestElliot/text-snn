@@ -1,0 +1,16 @@
+{
+  "stage": "R9",
+  "desc": "pack stories_topic_r05 (raw fraction 0.05)",
+  "cmds": [
+    [
+      "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "scripts/chat/build_topic_stories.py",
+      "--name",
+      "stories_topic_r05",
+      "--raw-fraction",
+      "0.05"
+    ]
+  ],
+  "seconds": 126.4,
+  "finished": "2026-08-12T10:03:54"
+}

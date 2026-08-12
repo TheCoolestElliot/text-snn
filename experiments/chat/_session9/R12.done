@@ -1,0 +1,14 @@
+{
+  "stage": "R12",
+  "desc": "pack soda_narrative (~218 M chars of adult prose)",
+  "cmds": [
+    [
+      "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "scripts/chat/build_data.py",
+      "--only",
+      "soda_narrative"
+    ]
+  ],
+  "seconds": 56.4,
+  "finished": "2026-08-12T10:05:35"
+}
