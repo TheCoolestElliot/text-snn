@@ -1,0 +1,702 @@
+session9 driver: 1 stage(s)
+
+[A12] soda_narrative at 0.10, taken from soda
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v9-narrative --mix stories_topic=0.40 soda=0.10 soda_narrative=0.10 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --seed 0
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v9-narrative-s1 --mix stories_topic=0.40 soda=0.10 soda_narrative=0.10 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --seed 1
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v9-narrative-s2 --mix stories_topic=0.40 soda=0.10 soda_narrative=0.10 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --seed 2
+    $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v9-narrative-s3 --mix stories_topic=0.40 soda=0.10 soda_narrative=0.10 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --seed 3
+chat run 'chat-v9-narrative'
+  arch twocomp_threshold, d=1024, K=4, V=101 -> 4,417,637 parameters
+  B=160, L=256, 14,000 steps = 0.57 G characters
+  mix {'stories_topic': 0.4, 'soda': 0.1, 'soda_narrative': 0.1, 'alpaca': 0.15, 'tinystories': 0.09, 'persona': 0.08, 'dolly': 0.06, 'oasst1': 0.02}
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 3, 75% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 10%, soda_narrative 10%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  initialised weights from experiments/chat/chat-v2-anneal/ckpt_best.pt (step 7874); optimiser and step start fresh
+  graph captured in 0.27s
+step       0  loss 0.7110  bpc 1.0258 (plain 1.1086)  lr 2.50e-06  |g| 0.25  rate [0.208, 0.119, 0.166, 0.291]
+step     100  loss 0.7204  bpc 1.0393 (plain 1.0865)  lr 2.53e-04  |g| 0.29  rate [0.208, 0.117, 0.164, 0.287]  eta 42m
+step     200  loss 0.7909  bpc 1.1410 (plain 1.2023)  lr 5.00e-04  |g| 0.39  rate [0.207, 0.117, 0.164, 0.287]  eta 42m
+step     300  loss 0.7751  bpc 1.1182 (plain 1.1665)  lr 5.00e-04  |g| 0.28  rate [0.207, 0.117, 0.164, 0.286]  eta 42m
+step     400  loss 0.7811  bpc 1.1269 (plain 1.1724)  lr 5.00e-04  |g| 0.29  rate [0.206, 0.118, 0.165, 0.288]  eta 41m
+step     500  loss 0.7630  bpc 1.1008 (plain 1.1589)  lr 4.99e-04  |g| 0.27  rate [0.206, 0.118, 0.164, 0.289]  eta 41m
+step     600  loss 0.8058  bpc 1.1625 (plain 1.2159)  lr 4.99e-04  |g| 0.31  rate [0.206, 0.117, 0.163, 0.284]  eta 41m
+step     700  loss 0.7954  bpc 1.1476 (plain 1.2209)  lr 4.98e-04  |g| 0.31  rate [0.206, 0.116, 0.162, 0.284]  eta 40m
+step     800  loss 0.7425  bpc 1.0712 (plain 1.1223)  lr 4.98e-04  |g| 0.30  rate [0.206, 0.116, 0.163, 0.283]  eta 40m
+step     900  loss 0.7540  bpc 1.0878 (plain 1.1440)  lr 4.97e-04  |g| 0.30  rate [0.207, 0.116, 0.162, 0.288]  eta 40m
+step    1000  loss 0.6989  bpc 1.0083 (plain 1.0778)  lr 4.96e-04  |g| 0.34  rate [0.206, 0.116, 0.163, 0.288]  eta 39m
+step    1100  loss 0.7511  bpc 1.0835 (plain 1.1481)  lr 4.95e-04  |g| 0.30  rate [0.206, 0.117, 0.163, 0.290]  eta 39m
+step    1200  loss 0.7072  bpc 1.0202 (plain 1.0805)  lr 4.94e-04  |g| 0.28  rate [0.207, 0.117, 0.163, 0.293]  eta 38m
+step    1300  loss 0.7426  bpc 1.0714 (plain 1.1308)  lr 4.93e-04  |g| 0.31  rate [0.205, 0.117, 0.162, 0.290]  eta 38m
+step    1400  loss 0.7679  bpc 1.1078 (plain 1.1613)  lr 4.91e-04  |g| 0.33  rate [0.206, 0.116, 0.163, 0.286]  eta 38m
+step    1500  loss 0.7007  bpc 1.0108 (plain 1.0955)  lr 4.90e-04  |g| 0.24  rate [0.206, 0.116, 0.161, 0.289]  eta 37m
+step    1600  loss 0.7424  bpc 1.0711 (plain 1.1401)  lr 4.88e-04  |g| 0.29  rate [0.206, 0.116, 0.164, 0.290]  eta 37m
+step    1700  loss 0.7807  bpc 1.1263 (plain 1.1825)  lr 4.86e-04  |g| 0.28  rate [0.206, 0.116, 0.163, 0.287]  eta 36m
+step    1800  loss 0.7861  bpc 1.1342 (plain 1.1763)  lr 4.84e-04  |g| 0.29  rate [0.205, 0.117, 0.162, 0.285]  eta 36m
+step    1900  loss 0.7235  bpc 1.0438 (plain 1.1240)  lr 4.82e-04  |g| 0.29  rate [0.206, 0.116, 0.162, 0.285]  eta 36m
+  eval step    2000  alpaca 1.7502  dolly 2.0094  oasst1 1.9165  persona 0.2613  soda 1.2842  soda_narrative 1.6458  stories_topic 1.1056  tinystories 1.1147  weighted 1.2779
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a pretty little dog named Spot. Spot liked to run and play in the dirt. One day, Spot found a patch of magnets. He wanted to see what was inside. So, Sp'
+step    2000  loss 0.7364  bpc 1.0624 (plain 1.1430)  lr 4.80e-04  |g| 0.29  rate [0.206, 0.116, 0.163, 0.285]  eta 36m
+step    2100  loss 0.7173  bpc 1.0349 (plain 1.0977)  lr 4.78e-04  |g| 0.26  rate [0.206, 0.116, 0.162, 0.288]  eta 35m
+step    2200  loss 0.7259  bpc 1.0473 (plain 1.1242)  lr 4.76e-04  |g| 0.25  rate [0.206, 0.117, 0.163, 0.291]  eta 35m
+step    2300  loss 0.7377  bpc 1.0643 (plain 1.1470)  lr 4.73e-04  |g| 0.27  rate [0.206, 0.116, 0.163, 0.288]  eta 35m
+step    2400  loss 0.6954  bpc 1.0032 (plain 1.0654)  lr 4.71e-04  |g| 0.30  rate [0.206, 0.116, 0.162, 0.289]  eta 34m
+step    2500  loss 0.7268  bpc 1.0485 (plain 1.1449)  lr 4.68e-04  |g| 0.32  rate [0.207, 0.117, 0.164, 0.285]  eta 34m
+step    2600  loss 0.7314  bpc 1.0551 (plain 1.1173)  lr 4.65e-04  |g| 0.32  rate [0.206, 0.116, 0.163, 0.293]  eta 34m
+step    2700  loss 0.8213  bpc 1.1849 (plain 1.2411)  lr 4.63e-04  |g| 0.33  rate [0.206, 0.117, 0.164, 0.285]  eta 33m
+step    2800  loss 0.7719  bpc 1.1136 (plain 1.1789)  lr 4.60e-04  |g| 0.29  rate [0.206, 0.116, 0.162, 0.282]  eta 33m
+step    2900  loss 0.7193  bpc 1.0378 (plain 1.1059)  lr 4.57e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.291]  eta 33m
+step    3000  loss 0.7405  bpc 1.0683 (plain 1.1223)  lr 4.53e-04  |g| 0.28  rate [0.206, 0.116, 0.164, 0.287]  eta 32m
+step    3100  loss 0.7389  bpc 1.0660 (plain 1.1520)  lr 4.50e-04  |g| 0.28  rate [0.206, 0.117, 0.165, 0.288]  eta 32m
+step    3200  loss 0.7289  bpc 1.0515 (plain 1.1079)  lr 4.47e-04  |g| 0.27  rate [0.206, 0.117, 0.163, 0.287]  eta 32m
+step    3300  loss 0.7163  bpc 1.0334 (plain 1.0917)  lr 4.43e-04  |g| 0.32  rate [0.206, 0.117, 0.163, 0.295]  eta 31m
+step    3400  loss 0.7150  bpc 1.0315 (plain 1.0750)  lr 4.40e-04  |g| 0.26  rate [0.206, 0.117, 0.164, 0.286]  eta 31m
+step    3500  loss 0.7535  bpc 1.0871 (plain 1.1271)  lr 4.36e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.289]  eta 31m
+step    3600  loss 0.7286  bpc 1.0511 (plain 1.1468)  lr 4.32e-04  |g| 0.26  rate [0.206, 0.117, 0.163, 0.286]  eta 30m
+step    3700  loss 0.7758  bpc 1.1193 (plain 1.1706)  lr 4.29e-04  |g| 0.28  rate [0.206, 0.117, 0.166, 0.284]  eta 30m
+step    3800  loss 0.7502  bpc 1.0824 (plain 1.1520)  lr 4.25e-04  |g| 0.31  rate [0.206, 0.117, 0.164, 0.292]  eta 30m
+step    3900  loss 0.7386  bpc 1.0655 (plain 1.1237)  lr 4.21e-04  |g| 0.31  rate [0.206, 0.117, 0.165, 0.287]  eta 29m
+  eval step    4000  alpaca 1.7474  dolly 2.0209  oasst1 1.9199  persona 0.2583  soda 1.2903  soda_narrative 1.6235  stories_topic 1.1038  tinystories 1.1106  weighted 1.2753
+    ['hello'] -> "Hello! I'm listening."
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a girl named Lily. She had a toy named Mr. Bear. The armchair was harmless and a magic box that lived in a tree. Mia loved to play with her toys all day'
+step    4000  loss 0.7302  bpc 1.0535 (plain 1.1086)  lr 4.17e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.286]  eta 29m
+step    4100  loss 0.7305  bpc 1.0539 (plain 1.1184)  lr 4.12e-04  |g| 0.26  rate [0.206, 0.116, 0.163, 0.288]  eta 29m
+step    4200  loss 0.7555  bpc 1.0900 (plain 1.1387)  lr 4.08e-04  |g| 0.29  rate [0.206, 0.117, 0.164, 0.287]  eta 29m
+step    4300  loss 0.6462  bpc 0.9322 (plain 1.0391)  lr 4.04e-04  |g| 0.22  rate [0.206, 0.117, 0.164, 0.294]  eta 28m
+step    4400  loss 0.7055  bpc 1.0178 (plain 1.0736)  lr 3.99e-04  |g| 0.25  rate [0.206, 0.117, 0.165, 0.289]  eta 28m
+step    4500  loss 0.7475  bpc 1.0784 (plain 1.1559)  lr 3.95e-04  |g| 0.27  rate [0.206, 0.117, 0.164, 0.290]  eta 28m
+step    4600  loss 0.7501  bpc 1.0822 (plain 1.1299)  lr 3.90e-04  |g| 0.28  rate [0.207, 0.117, 0.165, 0.291]  eta 27m
+step    4700  loss 0.7438  bpc 1.0731 (plain 1.1403)  lr 3.86e-04  |g| 0.33  rate [0.205, 0.117, 0.165, 0.284]  eta 27m
+step    4800  loss 0.7246  bpc 1.0454 (plain 1.1123)  lr 3.81e-04  |g| 0.25  rate [0.206, 0.118, 0.164, 0.291]  eta 27m
+step    4900  loss 0.7327  bpc 1.0570 (plain 1.1204)  lr 3.77e-04  |g| 0.25  rate [0.206, 0.117, 0.164, 0.288]  eta 27m
+step    5000  loss 0.6839  bpc 0.9867 (plain 1.0669)  lr 3.72e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.291]  eta 26m
+step    5100  loss 0.7851  bpc 1.1326 (plain 1.1867)  lr 3.67e-04  |g| 0.29  rate [0.205, 0.117, 0.165, 0.285]  eta 26m
+step    5200  loss 0.7641  bpc 1.1024 (plain 1.1527)  lr 3.62e-04  |g| 0.29  rate [0.206, 0.117, 0.164, 0.288]  eta 26m
+step    5300  loss 0.6690  bpc 0.9652 (plain 1.0379)  lr 3.57e-04  |g| 0.26  rate [0.206, 0.117, 0.165, 0.292]  eta 25m
+step    5400  loss 0.6787  bpc 0.9791 (plain 1.0667)  lr 3.52e-04  |g| 0.24  rate [0.206, 0.118, 0.164, 0.291]  eta 25m
+step    5500  loss 0.7460  bpc 1.0762 (plain 1.1290)  lr 3.47e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.289]  eta 25m
+step    5600  loss 0.7021  bpc 1.0130 (plain 1.0970)  lr 3.42e-04  |g| 0.23  rate [0.207, 0.117, 0.165, 0.288]  eta 24m
+step    5700  loss 0.6944  bpc 1.0019 (plain 1.0509)  lr 3.37e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.292]  eta 24m
+step    5800  loss 0.7412  bpc 1.0693 (plain 1.1519)  lr 3.32e-04  |g| 0.25  rate [0.206, 0.118, 0.165, 0.286]  eta 24m
+step    5900  loss 0.6982  bpc 1.0073 (plain 1.0637)  lr 3.27e-04  |g| 0.72  rate [0.207, 0.117, 0.165, 0.292]  eta 24m
+  eval step    6000  alpaca 1.7203  dolly 2.0052  oasst1 1.9244  persona 0.2478  soda 1.2837  soda_narrative 1.6023  stories_topic 1.0885  tinystories 1.1008  weighted 1.2597
+    ['hello'] -> "Hello! I'm like to talk about?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She loved to play outside, but she wanted to find a way to take her toy in her house. One day, they were playing outside with'
+step    6000  loss 0.7370  bpc 1.0633 (plain 1.1751)  lr 3.21e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.286]  eta 23m
+step    6100  loss 0.6938  bpc 1.0009 (plain 1.0597)  lr 3.16e-04  |g| 0.25  rate [0.207, 0.118, 0.163, 0.287]  eta 23m
+step    6200  loss 0.7797  bpc 1.1249 (plain 1.1820)  lr 3.11e-04  |g| 0.27  rate [0.206, 0.117, 0.166, 0.289]  eta 23m
+step    6300  loss 0.7183  bpc 1.0363 (plain 1.1181)  lr 3.06e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.286]  eta 23m
+step    6400  loss 0.7496  bpc 1.0815 (plain 1.1351)  lr 3.00e-04  |g| 0.29  rate [0.206, 0.119, 0.166, 0.289]  eta 22m
+step    6500  loss 0.7115  bpc 1.0264 (plain 1.0824)  lr 2.95e-04  |g| 0.27  rate [0.206, 0.118, 0.165, 0.290]  eta 22m
+step    6600  loss 0.7376  bpc 1.0641 (plain 1.1268)  lr 2.89e-04  |g| 0.25  rate [0.206, 0.118, 0.166, 0.288]  eta 22m
+step    6700  loss 0.7225  bpc 1.0423 (plain 1.1041)  lr 2.84e-04  |g| 0.24  rate [0.206, 0.118, 0.166, 0.291]  eta 21m
+step    6800  loss 0.7562  bpc 1.0910 (plain 1.1531)  lr 2.79e-04  |g| 0.27  rate [0.206, 0.118, 0.166, 0.287]  eta 21m
+step    6900  loss 0.7208  bpc 1.0400 (plain 1.1177)  lr 2.73e-04  |g| 0.26  rate [0.206, 0.118, 0.166, 0.286]  eta 21m
+step    7000  loss 0.6842  bpc 0.9872 (plain 1.0574)  lr 2.68e-04  |g| 0.25  rate [0.206, 0.118, 0.166, 0.292]  eta 20m
+step    7100  loss 0.7112  bpc 1.0261 (plain 1.0595)  lr 2.63e-04  |g| 0.26  rate [0.206, 0.119, 0.165, 0.294]  eta 20m
+step    7200  loss 0.7045  bpc 1.0164 (plain 1.0595)  lr 2.57e-04  |g| 0.28  rate [0.206, 0.119, 0.169, 0.294]  eta 20m
+step    7300  loss 0.7010  bpc 1.0114 (plain 1.0680)  lr 2.52e-04  |g| 0.26  rate [0.206, 0.119, 0.166, 0.291]  eta 20m
+step    7400  loss 0.7494  bpc 1.0812 (plain 1.1475)  lr 2.46e-04  |g| 0.27  rate [0.206, 0.118, 0.166, 0.286]  eta 19m
+step    7500  loss 0.7455  bpc 1.0756 (plain 1.1290)  lr 2.41e-04  |g| 0.25  rate [0.206, 0.118, 0.166, 0.288]  eta 19m
+step    7600  loss 0.6643  bpc 0.9583 (plain 1.0353)  lr 2.36e-04  |g| 0.26  rate [0.207, 0.119, 0.166, 0.289]  eta 19m
+step    7700  loss 0.6671  bpc 0.9625 (plain 1.0370)  lr 2.30e-04  |g| 0.26  rate [0.206, 0.118, 0.166, 0.294]  eta 18m
+step    7800  loss 0.6650  bpc 0.9594 (plain 1.0258)  lr 2.25e-04  |g| 0.24  rate [0.207, 0.119, 0.166, 0.296]  eta 18m
+step    7900  loss 0.7251  bpc 1.0460 (plain 1.1211)  lr 2.19e-04  |g| 0.29  rate [0.208, 0.119, 0.170, 0.289]  eta 18m
+  eval step    8000  alpaca 1.7015  dolly 1.9971  oasst1 1.9201  persona 0.2443  soda 1.2680  soda_narrative 1.5856  stories_topic 1.0726  tinystories 1.0812  weighted 1.2447
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a fast town. In this town, there was a small house. The sun was shining, and the wind was always there.\nOne day, a gray cat came to the tank. The little'
+step    8000  loss 0.6920  bpc 0.9983 (plain 1.0738)  lr 2.14e-04  |g| 0.24  rate [0.206, 0.118, 0.167, 0.292]  eta 18m
+step    8100  loss 0.7461  bpc 1.0764 (plain 1.1119)  lr 2.09e-04  |g| 0.28  rate [0.206, 0.118, 0.166, 0.288]  eta 17m
+step    8200  loss 0.6829  bpc 0.9852 (plain 1.0592)  lr 2.04e-04  |g| 0.28  rate [0.206, 0.119, 0.167, 0.291]  eta 17m
+step    8300  loss 0.7358  bpc 1.0616 (plain 1.1168)  lr 1.98e-04  |g| 0.26  rate [0.206, 0.119, 0.167, 0.288]  eta 17m
+step    8400  loss 0.6634  bpc 0.9571 (plain 1.0585)  lr 1.93e-04  |g| 0.23  rate [0.207, 0.119, 0.167, 0.294]  eta 16m
+step    8500  loss 0.6861  bpc 0.9899 (plain 1.0715)  lr 1.88e-04  |g| 0.26  rate [0.206, 0.118, 0.167, 0.289]  eta 16m
+step    8600  loss 0.7139  bpc 1.0299 (plain 1.0911)  lr 1.83e-04  |g| 0.23  rate [0.206, 0.118, 0.167, 0.289]  eta 16m
+step    8700  loss 0.6965  bpc 1.0048 (plain 1.0791)  lr 1.78e-04  |g| 0.23  rate [0.207, 0.118, 0.167, 0.292]  eta 15m
+step    8800  loss 0.6737  bpc 0.9719 (plain 1.0633)  lr 1.73e-04  |g| 0.23  rate [0.206, 0.119, 0.168, 0.292]  eta 15m
+step    8900  loss 0.7247  bpc 1.0455 (plain 1.1205)  lr 1.68e-04  |g| 0.23  rate [0.207, 0.119, 0.168, 0.288]  eta 15m
+step    9000  loss 0.7104  bpc 1.0249 (plain 1.0667)  lr 1.63e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.288]  eta 15m
+step    9100  loss 0.7256  bpc 1.0469 (plain 1.1045)  lr 1.58e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.291]  eta 14m
+step    9200  loss 0.6717  bpc 0.9690 (plain 1.0547)  lr 1.53e-04  |g| 0.22  rate [0.207, 0.119, 0.167, 0.290]  eta 14m
+step    9300  loss 0.6833  bpc 0.9858 (plain 1.0336)  lr 1.48e-04  |g| 0.22  rate [0.207, 0.119, 0.168, 0.290]  eta 14m
+step    9400  loss 0.6721  bpc 0.9697 (plain 1.0281)  lr 1.44e-04  |g| 0.23  rate [0.207, 0.120, 0.167, 0.291]  eta 13m
+step    9500  loss 0.7054  bpc 1.0177 (plain 1.0835)  lr 1.39e-04  |g| 0.26  rate [0.207, 0.119, 0.168, 0.291]  eta 13m
+step    9600  loss 0.6960  bpc 1.0042 (plain 1.0725)  lr 1.35e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.289]  eta 13m
+step    9700  loss 0.6521  bpc 0.9408 (plain 1.0460)  lr 1.30e-04  |g| 0.24  rate [0.206, 0.119, 0.167, 0.292]  eta 13m
+step    9800  loss 0.6585  bpc 0.9500 (plain 1.0197)  lr 1.26e-04  |g| 0.23  rate [0.207, 0.120, 0.168, 0.291]  eta 12m
+step    9900  loss 0.6768  bpc 0.9763 (plain 1.0387)  lr 1.21e-04  |g| 0.22  rate [0.207, 0.120, 0.169, 0.295]  eta 12m
+  eval step   10000  alpaca 1.6878  dolly 1.9766  oasst1 1.8964  persona 0.2376  soda 1.2534  soda_narrative 1.5629  stories_topic 1.0569  tinystories 1.0666  weighted 1.2291
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She loved to dress up his hanger and make her steps to eat. Her mom and dad would always try to find a new and did too measure'
+step   10000  loss 0.7252  bpc 1.0462 (plain 1.0958)  lr 1.17e-04  |g| 0.26  rate [0.207, 0.120, 0.169, 0.289]  eta 12m
+step   10100  loss 0.6861  bpc 0.9899 (plain 1.0569)  lr 1.13e-04  |g| 0.23  rate [0.207, 0.119, 0.169, 0.292]  eta 11m
+step   10200  loss 0.6358  bpc 0.9172 (plain 1.0065)  lr 1.08e-04  |g| 0.21  rate [0.207, 0.119, 0.169, 0.291]  eta 11m
+step   10300  loss 0.7044  bpc 1.0162 (plain 1.0738)  lr 1.04e-04  |g| 0.23  rate [0.207, 0.120, 0.171, 0.293]  eta 11m
+step   10400  loss 0.6879  bpc 0.9924 (plain 1.0715)  lr 1.00e-04  |g| 0.23  rate [0.207, 0.120, 0.169, 0.293]  eta 10m
+step   10500  loss 0.6356  bpc 0.9170 (plain 0.9753)  lr 9.65e-05  |g| 0.22  rate [0.207, 0.120, 0.169, 0.294]  eta 10m
+step   10600  loss 0.6820  bpc 0.9840 (plain 1.0346)  lr 9.27e-05  |g| 0.25  rate [0.207, 0.120, 0.169, 0.295]  eta 10m
+step   10700  loss 0.6760  bpc 0.9753 (plain 1.0491)  lr 8.89e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.292]  eta 10m
+step   10800  loss 0.7127  bpc 1.0283 (plain 1.0957)  lr 8.53e-05  |g| 0.23  rate [0.207, 0.119, 0.170, 0.290]  eta 9m
+step   10900  loss 0.7220  bpc 1.0417 (plain 1.0922)  lr 8.17e-05  |g| 0.24  rate [0.208, 0.120, 0.171, 0.291]  eta 9m
+step   11000  loss 0.6747  bpc 0.9734 (plain 1.0605)  lr 7.83e-05  |g| 0.24  rate [0.208, 0.120, 0.171, 0.291]  eta 9m
+step   11100  loss 0.6934  bpc 1.0004 (plain 1.0531)  lr 7.49e-05  |g| 0.24  rate [0.207, 0.120, 0.170, 0.291]  eta 8m
+step   11200  loss 0.6480  bpc 0.9349 (plain 1.0098)  lr 7.16e-05  |g| 0.22  rate [0.208, 0.120, 0.169, 0.292]  eta 8m
+step   11300  loss 0.6533  bpc 0.9424 (plain 1.0386)  lr 6.85e-05  |g| 0.23  rate [0.207, 0.119, 0.170, 0.292]  eta 8m
+step   11400  loss 0.6895  bpc 0.9948 (plain 1.0711)  lr 6.54e-05  |g| 0.23  rate [0.208, 0.120, 0.170, 0.292]  eta 8m
+step   11500  loss 0.6374  bpc 0.9196 (plain 0.9600)  lr 6.24e-05  |g| 0.22  rate [0.208, 0.120, 0.170, 0.294]  eta 7m
+step   11600  loss 0.6570  bpc 0.9479 (plain 1.0188)  lr 5.96e-05  |g| 0.23  rate [0.207, 0.120, 0.169, 0.293]  eta 7m
+step   11700  loss 0.6768  bpc 0.9764 (plain 1.0500)  lr 5.68e-05  |g| 0.23  rate [0.207, 0.120, 0.171, 0.293]  eta 7m
+step   11800  loss 0.6262  bpc 0.9034 (plain 0.9700)  lr 5.42e-05  |g| 0.22  rate [0.208, 0.120, 0.170, 0.296]  eta 6m
+step   11900  loss 0.7122  bpc 1.0275 (plain 1.0849)  lr 5.16e-05  |g| 0.24  rate [0.207, 0.121, 0.171, 0.293]  eta 6m
+  eval step   12000  alpaca 1.6651  dolly 1.9651  oasst1 1.8807  persona 0.2301  soda 1.2403  soda_narrative 1.5510  stories_topic 1.0463  tinystories 1.0551  weighted 1.2163
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a girl named Lucy went for a walk in the park. She saw a big book and wanted to show it to her friend Tom. She was very happy. He wanted to show his friend, Sam, to help h'
+step   12000  loss 0.6526  bpc 0.9415 (plain 1.0023)  lr 4.92e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.292]  eta 6m
+step   12100  loss 0.6883  bpc 0.9930 (plain 1.0631)  lr 4.69e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.291]  eta 6m
+step   12200  loss 0.6755  bpc 0.9746 (plain 1.0267)  lr 4.47e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 5m
+step   12300  loss 0.6930  bpc 0.9999 (plain 1.0887)  lr 4.26e-05  |g| 0.23  rate [0.207, 0.121, 0.171, 0.291]  eta 5m
+step   12400  loss 0.6921  bpc 0.9985 (plain 1.0952)  lr 4.06e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.292]  eta 5m
+step   12500  loss 0.7266  bpc 1.0483 (plain 1.1095)  lr 3.87e-05  |g| 0.25  rate [0.207, 0.120, 0.171, 0.292]  eta 4m
+step   12600  loss 0.6644  bpc 0.9585 (plain 1.0377)  lr 3.70e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.292]  eta 4m
+step   12700  loss 0.6420  bpc 0.9262 (plain 1.0140)  lr 3.53e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.294]  eta 4m
+step   12800  loss 0.6448  bpc 0.9303 (plain 0.9968)  lr 3.38e-05  |g| 0.22  rate [0.208, 0.121, 0.170, 0.296]  eta 3m
+step   12900  loss 0.7042  bpc 1.0159 (plain 1.0817)  lr 3.24e-05  |g| 0.24  rate [0.207, 0.121, 0.172, 0.290]  eta 3m
+step   13000  loss 0.7307  bpc 1.0541 (plain 1.0958)  lr 3.11e-05  |g| 0.24  rate [0.207, 0.121, 0.171, 0.290]  eta 3m
+step   13100  loss 0.6829  bpc 0.9852 (plain 1.0535)  lr 3.00e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.294]  eta 3m
+step   13200  loss 0.6865  bpc 0.9904 (plain 1.0428)  lr 2.89e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.293]  eta 2m
+step   13300  loss 0.6490  bpc 0.9362 (plain 0.9967)  lr 2.80e-05  |g| 0.21  rate [0.208, 0.121, 0.171, 0.294]  eta 2m
+step   13400  loss 0.7549  bpc 1.0891 (plain 1.1612)  lr 2.72e-05  |g| 0.24  rate [0.207, 0.121, 0.172, 0.288]  eta 2m
+step   13500  loss 0.6681  bpc 0.9639 (plain 1.0528)  lr 2.65e-05  |g| 0.22  rate [0.207, 0.121, 0.170, 0.293]  eta 1m
+step   13600  loss 0.6996  bpc 1.0093 (plain 1.0667)  lr 2.60e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.293]  eta 1m
+step   13700  loss 0.6501  bpc 0.9378 (plain 1.0181)  lr 2.56e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.294]  eta 1m
+step   13800  loss 0.7093  bpc 1.0234 (plain 1.0912)  lr 2.52e-05  |g| 0.23  rate [0.207, 0.121, 0.171, 0.291]  eta 1m
+step   13900  loss 0.6413  bpc 0.9252 (plain 1.0019)  lr 2.51e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.295]  eta 0m
+  eval step   14000  alpaca 1.6616  dolly 1.9564  oasst1 1.8826  persona 0.2316  soda 1.2384  soda_narrative 1.5471  stories_topic 1.0436  tinystories 1.0496  weighted 1.2133
+    ['hello'] -> "Hello! I'm listening."
+    ['tell me a story about a dog'] -> 'One day, a little dog named Max went to the park. Max saw a little girl named Lily. Lily loved to play with Max. They were best friends. They played together every day.\nLily and Ma'
+  eval step   14000  alpaca 1.6616  dolly 1.9564  oasst1 1.8826  persona 0.2316  soda 1.2384  soda_narrative 1.5471  stories_topic 1.0436  tinystories 1.0496  weighted 1.2133
+chat run 'chat-v9-narrative-s1'
+  arch twocomp_threshold, d=1024, K=4, V=101 -> 4,417,637 parameters
+  B=160, L=256, 14,000 steps = 0.57 G characters
+  mix {'stories_topic': 0.4, 'soda': 0.1, 'soda_narrative': 0.1, 'alpaca': 0.15, 'tinystories': 0.09, 'persona': 0.08, 'dolly': 0.06, 'oasst1': 0.02}
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 3, 75% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 10%, soda_narrative 10%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  initialised weights from experiments/chat/chat-v2-anneal/ckpt_best.pt (step 7874); optimiser and step start fresh
+  graph captured in 0.25s
+step       0  loss 0.7857  bpc 1.1335 (plain 1.1980)  lr 2.50e-06  |g| 0.31  rate [0.208, 0.118, 0.167, 0.286]
+step     100  loss 0.7532  bpc 1.0866 (plain 1.1544)  lr 2.53e-04  |g| 0.26  rate [0.207, 0.118, 0.166, 0.285]  eta 39m
+step     200  loss 0.7124  bpc 1.0277 (plain 1.0897)  lr 5.00e-04  |g| 0.53  rate [0.207, 0.117, 0.164, 0.284]  eta 39m
+step     300  loss 0.7132  bpc 1.0289 (plain 1.1073)  lr 5.00e-04  |g| 0.30  rate [0.207, 0.118, 0.164, 0.288]  eta 38m
+step     400  loss 0.7520  bpc 1.0850 (plain 1.1377)  lr 5.00e-04  |g| 0.33  rate [0.207, 0.117, 0.164, 0.286]  eta 38m
+step     500  loss 0.7531  bpc 1.0866 (plain 1.1515)  lr 4.99e-04  |g| 0.34  rate [0.206, 0.117, 0.163, 0.292]  eta 38m
+step     600  loss 0.7179  bpc 1.0357 (plain 1.1056)  lr 4.99e-04  |g| 0.34  rate [0.206, 0.117, 0.165, 0.288]  eta 37m
+step     700  loss 0.7228  bpc 1.0428 (plain 1.1223)  lr 4.98e-04  |g| 0.35  rate [0.206, 0.116, 0.164, 0.290]  eta 37m
+step     800  loss 0.7490  bpc 1.0806 (plain 1.1605)  lr 4.98e-04  |g| 0.33  rate [0.206, 0.117, 0.163, 0.284]  eta 37m
+step     900  loss 0.7840  bpc 1.1311 (plain 1.1761)  lr 4.97e-04  |g| 0.30  rate [0.206, 0.116, 0.163, 0.280]  eta 37m
+step    1000  loss 0.7202  bpc 1.0390 (plain 1.1056)  lr 4.96e-04  |g| 0.27  rate [0.206, 0.117, 0.162, 0.291]  eta 36m
+step    1100  loss 0.7757  bpc 1.1191 (plain 1.1893)  lr 4.95e-04  |g| 0.32  rate [0.206, 0.116, 0.163, 0.284]  eta 36m
+step    1200  loss 0.7155  bpc 1.0323 (plain 1.1048)  lr 4.94e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.292]  eta 36m
+step    1300  loss 0.7642  bpc 1.1025 (plain 1.1416)  lr 4.93e-04  |g| 0.33  rate [0.206, 0.117, 0.164, 0.282]  eta 36m
+step    1400  loss 0.7620  bpc 1.0994 (plain 1.1598)  lr 4.91e-04  |g| 0.30  rate [0.205, 0.116, 0.164, 0.286]  eta 35m
+step    1500  loss 0.7150  bpc 1.0315 (plain 1.1126)  lr 4.90e-04  |g| 0.30  rate [0.206, 0.116, 0.162, 0.287]  eta 35m
+step    1600  loss 0.7633  bpc 1.1012 (plain 1.1670)  lr 4.88e-04  |g| 0.29  rate [0.206, 0.116, 0.162, 0.285]  eta 35m
+step    1700  loss 0.6958  bpc 1.0038 (plain 1.1071)  lr 4.86e-04  |g| 0.31  rate [0.206, 0.116, 0.165, 0.287]  eta 34m
+step    1800  loss 0.7338  bpc 1.0587 (plain 1.1155)  lr 4.84e-04  |g| 0.28  rate [0.206, 0.117, 0.162, 0.290]  eta 34m
+step    1900  loss 0.7156  bpc 1.0323 (plain 1.0959)  lr 4.82e-04  |g| 0.28  rate [0.206, 0.116, 0.163, 0.290]  eta 34m
+  eval step    2000  alpaca 1.7405  dolly 2.0202  oasst1 1.9402  persona 0.2598  soda 1.2847  soda_narrative 1.6490  stories_topic 1.1083  tinystories 1.1160  weighted 1.2790
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Sue. Sue had a big garden with her friend, Tim. They loved to play with her toys and bugs. They liked to study for their boat and be'
+step    2000  loss 0.7509  bpc 1.0833 (plain 1.1454)  lr 4.80e-04  |g| 0.30  rate [0.206, 0.117, 0.163, 0.286]  eta 34m
+step    2100  loss 0.7341  bpc 1.0590 (plain 1.1161)  lr 4.78e-04  |g| 0.29  rate [0.205, 0.117, 0.163, 0.290]  eta 34m
+step    2200  loss 0.7059  bpc 1.0183 (plain 1.0898)  lr 4.76e-04  |g| 0.27  rate [0.206, 0.116, 0.163, 0.287]  eta 33m
+step    2300  loss 0.7720  bpc 1.1138 (plain 1.1756)  lr 4.73e-04  |g| 0.29  rate [0.207, 0.116, 0.163, 0.284]  eta 33m
+step    2400  loss 0.7192  bpc 1.0376 (plain 1.1215)  lr 4.71e-04  |g| 0.24  rate [0.206, 0.116, 0.164, 0.287]  eta 33m
+step    2500  loss 0.7660  bpc 1.1052 (plain 1.1470)  lr 4.68e-04  |g| 0.31  rate [0.206, 0.117, 0.164, 0.290]  eta 33m
+step    2600  loss 0.7489  bpc 1.0804 (plain 1.1285)  lr 4.65e-04  |g| 0.30  rate [0.206, 0.116, 0.165, 0.288]  eta 32m
+step    2700  loss 0.7273  bpc 1.0493 (plain 1.0841)  lr 4.63e-04  |g| 0.26  rate [0.206, 0.118, 0.162, 0.289]  eta 32m
+step    2800  loss 0.7355  bpc 1.0612 (plain 1.1212)  lr 4.60e-04  |g| 0.27  rate [0.207, 0.115, 0.164, 0.287]  eta 32m
+step    2900  loss 0.6989  bpc 1.0082 (plain 1.0802)  lr 4.57e-04  |g| 0.26  rate [0.206, 0.116, 0.165, 0.288]  eta 31m
+step    3000  loss 0.7015  bpc 1.0121 (plain 1.0954)  lr 4.53e-04  |g| 0.26  rate [0.206, 0.118, 0.164, 0.290]  eta 31m
+step    3100  loss 0.7124  bpc 1.0278 (plain 1.0891)  lr 4.50e-04  |g| 0.27  rate [0.205, 0.117, 0.164, 0.293]  eta 31m
+step    3200  loss 0.7423  bpc 1.0709 (plain 1.1287)  lr 4.47e-04  |g| 0.28  rate [0.205, 0.116, 0.164, 0.285]  eta 31m
+step    3300  loss 0.7396  bpc 1.0671 (plain 1.1254)  lr 4.43e-04  |g| 0.29  rate [0.207, 0.116, 0.164, 0.290]  eta 30m
+step    3400  loss 0.7866  bpc 1.1348 (plain 1.1797)  lr 4.40e-04  |g| 0.29  rate [0.206, 0.116, 0.164, 0.285]  eta 30m
+step    3500  loss 0.7223  bpc 1.0420 (plain 1.0935)  lr 4.36e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.292]  eta 30m
+step    3600  loss 0.7529  bpc 1.0862 (plain 1.1408)  lr 4.32e-04  |g| 0.26  rate [0.206, 0.116, 0.163, 0.286]  eta 29m
+step    3700  loss 0.7304  bpc 1.0537 (plain 1.1242)  lr 4.29e-04  |g| 0.27  rate [0.206, 0.117, 0.163, 0.287]  eta 29m
+step    3800  loss 0.7279  bpc 1.0501 (plain 1.1083)  lr 4.25e-04  |g| 0.28  rate [0.205, 0.117, 0.165, 0.288]  eta 29m
+step    3900  loss 0.7332  bpc 1.0577 (plain 1.1240)  lr 4.21e-04  |g| 0.27  rate [0.206, 0.117, 0.166, 0.291]  eta 29m
+  eval step    4000  alpaca 1.7431  dolly 2.0217  oasst1 1.9592  persona 0.2586  soda 1.2874  soda_narrative 1.6184  stories_topic 1.1019  tinystories 1.1106  weighted 1.2739
+    ['hello'] -> 'Hi there. What shall we talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, in a small house, there lived a girl named Lily. She had a toy cat that she loved very much. One day, Lily wanted to play with her toys. She put the cake in her h'
+step    4000  loss 0.6755  bpc 0.9745 (plain 1.0609)  lr 4.17e-04  |g| 0.25  rate [0.206, 0.118, 0.163, 0.292]  eta 28m
+step    4100  loss 0.7271  bpc 1.0490 (plain 1.1198)  lr 4.12e-04  |g| 0.33  rate [0.205, 0.117, 0.164, 0.288]  eta 28m
+step    4200  loss 0.7125  bpc 1.0279 (plain 1.1007)  lr 4.08e-04  |g| 0.28  rate [0.206, 0.117, 0.165, 0.286]  eta 28m
+step    4300  loss 0.7353  bpc 1.0608 (plain 1.1060)  lr 4.04e-04  |g| 0.30  rate [0.205, 0.117, 0.163, 0.285]  eta 28m
+step    4400  loss 0.7458  bpc 1.0760 (plain 1.1527)  lr 3.99e-04  |g| 0.28  rate [0.205, 0.117, 0.164, 0.287]  eta 27m
+step    4500  loss 0.7531  bpc 1.0864 (plain 1.1657)  lr 3.95e-04  |g| 0.26  rate [0.206, 0.117, 0.165, 0.284]  eta 27m
+step    4600  loss 0.7777  bpc 1.1220 (plain 1.1736)  lr 3.90e-04  |g| 0.29  rate [0.205, 0.118, 0.165, 0.290]  eta 27m
+step    4700  loss 0.7518  bpc 1.0846 (plain 1.1425)  lr 3.86e-04  |g| 0.30  rate [0.205, 0.117, 0.165, 0.289]  eta 26m
+step    4800  loss 0.7432  bpc 1.0722 (plain 1.1314)  lr 3.81e-04  |g| 0.31  rate [0.206, 0.117, 0.164, 0.285]  eta 26m
+step    4900  loss 0.7607  bpc 1.0974 (plain 1.1437)  lr 3.77e-04  |g| 0.29  rate [0.205, 0.117, 0.165, 0.286]  eta 26m
+step    5000  loss 0.6980  bpc 1.0070 (plain 1.0873)  lr 3.72e-04  |g| 0.24  rate [0.206, 0.117, 0.163, 0.288]  eta 26m
+step    5100  loss 0.7118  bpc 1.0269 (plain 1.0918)  lr 3.67e-04  |g| 0.24  rate [0.206, 0.117, 0.165, 0.293]  eta 25m
+step    5200  loss 0.7559  bpc 1.0906 (plain 1.1721)  lr 3.62e-04  |g| 0.30  rate [0.206, 0.117, 0.164, 0.286]  eta 25m
+step    5300  loss 0.7095  bpc 1.0236 (plain 1.0966)  lr 3.57e-04  |g| 0.24  rate [0.206, 0.117, 0.164, 0.286]  eta 25m
+step    5400  loss 0.6941  bpc 1.0014 (plain 1.1038)  lr 3.52e-04  |g| 0.28  rate [0.207, 0.118, 0.165, 0.287]  eta 24m
+step    5500  loss 0.6872  bpc 0.9914 (plain 1.0694)  lr 3.47e-04  |g| 0.30  rate [0.206, 0.117, 0.164, 0.290]  eta 24m
+step    5600  loss 0.7145  bpc 1.0309 (plain 1.0965)  lr 3.42e-04  |g| 0.28  rate [0.206, 0.118, 0.164, 0.291]  eta 24m
+step    5700  loss 0.6942  bpc 1.0016 (plain 1.0716)  lr 3.37e-04  |g| 0.25  rate [0.207, 0.118, 0.166, 0.290]  eta 24m
+step    5800  loss 0.7296  bpc 1.0526 (plain 1.1121)  lr 3.32e-04  |g| 0.26  rate [0.206, 0.118, 0.165, 0.289]  eta 23m
+step    5900  loss 0.7467  bpc 1.0773 (plain 1.1222)  lr 3.27e-04  |g| 0.25  rate [0.206, 0.117, 0.165, 0.285]  eta 23m
+  eval step    6000  alpaca 1.7269  dolly 2.0077  oasst1 1.9150  persona 0.2527  soda 1.2890  soda_narrative 1.6060  stories_topic 1.0855  tinystories 1.0942  weighted 1.2602
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little boy named Tim. He loved to ride his bike all day long. One day, he went to the park with his mom. Tim was sad and decided to go to the deep pla'
+step    6000  loss 0.6917  bpc 0.9978 (plain 1.0706)  lr 3.21e-04  |g| 0.25  rate [0.207, 0.117, 0.165, 0.289]  eta 23m
+step    6100  loss 0.6842  bpc 0.9871 (plain 1.0547)  lr 3.16e-04  |g| 0.25  rate [0.206, 0.118, 0.165, 0.290]  eta 23m
+step    6200  loss 0.7409  bpc 1.0689 (plain 1.1333)  lr 3.11e-04  |g| 0.29  rate [0.206, 0.118, 0.165, 0.291]  eta 22m
+step    6300  loss 0.6968  bpc 1.0053 (plain 1.0925)  lr 3.06e-04  |g| 0.24  rate [0.207, 0.118, 0.165, 0.291]  eta 22m
+step    6400  loss 0.6525  bpc 0.9414 (plain 1.0320)  lr 3.00e-04  |g| 0.27  rate [0.206, 0.118, 0.165, 0.291]  eta 22m
+step    6500  loss 0.7184  bpc 1.0365 (plain 1.1084)  lr 2.95e-04  |g| 0.25  rate [0.207, 0.118, 0.166, 0.291]  eta 21m
+step    6600  loss 0.6648  bpc 0.9591 (plain 1.0620)  lr 2.89e-04  |g| 0.25  rate [0.206, 0.117, 0.166, 0.291]  eta 21m
+step    6700  loss 0.7339  bpc 1.0588 (plain 1.0991)  lr 2.84e-04  |g| 0.30  rate [0.206, 0.118, 0.166, 0.289]  eta 21m
+step    6800  loss 0.7321  bpc 1.0562 (plain 1.1379)  lr 2.79e-04  |g| 0.27  rate [0.206, 0.119, 0.166, 0.291]  eta 20m
+step    6900  loss 0.7225  bpc 1.0424 (plain 1.1210)  lr 2.73e-04  |g| 0.25  rate [0.206, 0.119, 0.167, 0.288]  eta 20m
+step    7000  loss 0.6533  bpc 0.9425 (plain 1.0116)  lr 2.68e-04  |g| 0.26  rate [0.207, 0.119, 0.167, 0.292]  eta 20m
+step    7100  loss 0.7253  bpc 1.0463 (plain 1.1162)  lr 2.63e-04  |g| 0.29  rate [0.206, 0.118, 0.166, 0.285]  eta 20m
+step    7200  loss 0.7331  bpc 1.0576 (plain 1.1086)  lr 2.57e-04  |g| 0.26  rate [0.207, 0.119, 0.167, 0.288]  eta 19m
+step    7300  loss 0.6374  bpc 0.9196 (plain 1.0193)  lr 2.52e-04  |g| 0.23  rate [0.206, 0.118, 0.165, 0.294]  eta 19m
+step    7400  loss 0.7265  bpc 1.0481 (plain 1.0952)  lr 2.46e-04  |g| 0.27  rate [0.206, 0.118, 0.166, 0.287]  eta 19m
+step    7500  loss 0.6801  bpc 0.9811 (plain 1.0452)  lr 2.41e-04  |g| 0.24  rate [0.207, 0.118, 0.167, 0.294]  eta 18m
+step    7600  loss 0.6807  bpc 0.9820 (plain 1.0737)  lr 2.36e-04  |g| 0.23  rate [0.206, 0.118, 0.166, 0.289]  eta 18m
+step    7700  loss 0.7523  bpc 1.0853 (plain 1.1269)  lr 2.30e-04  |g| 0.27  rate [0.207, 0.119, 0.167, 0.289]  eta 18m
+step    7800  loss 0.7348  bpc 1.0601 (plain 1.1177)  lr 2.25e-04  |g| 0.28  rate [0.207, 0.118, 0.168, 0.290]  eta 18m
+step    7900  loss 0.6908  bpc 0.9966 (plain 1.0879)  lr 2.19e-04  |g| 0.26  rate [0.207, 0.118, 0.167, 0.290]  eta 17m
+  eval step    8000  alpaca 1.7070  dolly 1.9771  oasst1 1.8758  persona 0.2456  soda 1.2693  soda_narrative 1.5827  stories_topic 1.0738  tinystories 1.0823  weighted 1.2440
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a fast pink dog named Spot. Spot loved to play with his friends. One sunny day, Spot saw a big tree with a lot of perfume.\nSpot went to the park with hi'
+step    8000  loss 0.6859  bpc 0.9896 (plain 1.0734)  lr 2.14e-04  |g| 0.24  rate [0.207, 0.118, 0.167, 0.292]  eta 17m
+step    8100  loss 0.7490  bpc 1.0806 (plain 1.1351)  lr 2.09e-04  |g| 0.27  rate [0.206, 0.119, 0.167, 0.289]  eta 17m
+step    8200  loss 0.6126  bpc 0.8838 (plain 0.9639)  lr 2.04e-04  |g| 0.23  rate [0.207, 0.119, 0.167, 0.295]  eta 17m
+step    8300  loss 0.7000  bpc 1.0098 (plain 1.0824)  lr 1.98e-04  |g| 0.27  rate [0.206, 0.119, 0.167, 0.290]  eta 16m
+step    8400  loss 0.6342  bpc 0.9150 (plain 0.9631)  lr 1.93e-04  |g| 0.24  rate [0.206, 0.119, 0.167, 0.295]  eta 16m
+step    8500  loss 0.6656  bpc 0.9602 (plain 1.0385)  lr 1.88e-04  |g| 0.23  rate [0.207, 0.119, 0.168, 0.293]  eta 16m
+step    8600  loss 0.6865  bpc 0.9904 (plain 1.0301)  lr 1.83e-04  |g| 0.27  rate [0.207, 0.119, 0.166, 0.293]  eta 15m
+step    8700  loss 0.6734  bpc 0.9715 (plain 1.0438)  lr 1.78e-04  |g| 0.23  rate [0.206, 0.119, 0.167, 0.291]  eta 15m
+step    8800  loss 0.6984  bpc 1.0076 (plain 1.0834)  lr 1.73e-04  |g| 0.24  rate [0.207, 0.119, 0.168, 0.290]  eta 15m
+step    8900  loss 0.6912  bpc 0.9972 (plain 1.0954)  lr 1.68e-04  |g| 0.25  rate [0.207, 0.119, 0.167, 0.289]  eta 14m
+step    9000  loss 0.7431  bpc 1.0721 (plain 1.1250)  lr 1.63e-04  |g| 0.26  rate [0.207, 0.119, 0.168, 0.288]  eta 14m
+step    9100  loss 0.7028  bpc 1.0139 (plain 1.0849)  lr 1.58e-04  |g| 0.24  rate [0.206, 0.119, 0.167, 0.289]  eta 14m
+step    9200  loss 0.6655  bpc 0.9602 (plain 1.0460)  lr 1.53e-04  |g| 0.25  rate [0.207, 0.119, 0.167, 0.292]  eta 14m
+step    9300  loss 0.7265  bpc 1.0482 (plain 1.0852)  lr 1.48e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.291]  eta 13m
+step    9400  loss 0.6440  bpc 0.9291 (plain 1.0002)  lr 1.44e-04  |g| 0.22  rate [0.207, 0.119, 0.168, 0.295]  eta 13m
+step    9500  loss 0.6865  bpc 0.9905 (plain 1.0679)  lr 1.39e-04  |g| 0.25  rate [0.207, 0.120, 0.168, 0.290]  eta 13m
+step    9600  loss 0.6573  bpc 0.9482 (plain 1.0280)  lr 1.35e-04  |g| 0.26  rate [0.207, 0.119, 0.168, 0.293]  eta 12m
+step    9700  loss 0.6564  bpc 0.9470 (plain 1.0203)  lr 1.30e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.295]  eta 12m
+step    9800  loss 0.7066  bpc 1.0195 (plain 1.0924)  lr 1.26e-04  |g| 0.25  rate [0.207, 0.119, 0.169, 0.290]  eta 12m
+step    9900  loss 0.7155  bpc 1.0322 (plain 1.0900)  lr 1.21e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.291]  eta 12m
+  eval step   10000  alpaca 1.6821  dolly 1.9634  oasst1 1.9010  persona 0.2376  soda 1.2555  soda_narrative 1.5635  stories_topic 1.0592  tinystories 1.0680  weighted 1.2289
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time there was a big, loud soar high in the sky. The dragon was very happy and loved to sit on it.\nOne day, the little girl saw the looking for a big tree in the pond.'
+step   10000  loss 0.6842  bpc 0.9871 (plain 1.0566)  lr 1.17e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.292]  eta 11m
+step   10100  loss 0.6897  bpc 0.9951 (plain 1.0539)  lr 1.13e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.288]  eta 11m
+step   10200  loss 0.6893  bpc 0.9945 (plain 1.0704)  lr 1.08e-04  |g| 0.23  rate [0.207, 0.120, 0.170, 0.291]  eta 11m
+step   10300  loss 0.6926  bpc 0.9992 (plain 1.0841)  lr 1.04e-04  |g| 0.23  rate [0.207, 0.120, 0.170, 0.292]  eta 11m
+step   10400  loss 0.6881  bpc 0.9927 (plain 1.0600)  lr 1.00e-04  |g| 0.23  rate [0.208, 0.120, 0.169, 0.291]  eta 10m
+step   10500  loss 0.7144  bpc 1.0306 (plain 1.1028)  lr 9.65e-05  |g| 0.26  rate [0.207, 0.120, 0.170, 0.292]  eta 10m
+step   10600  loss 0.5976  bpc 0.8622 (plain 0.9346)  lr 9.27e-05  |g| 0.21  rate [0.207, 0.120, 0.169, 0.297]  eta 10m
+step   10700  loss 0.7035  bpc 1.0150 (plain 1.0877)  lr 8.89e-05  |g| 0.25  rate [0.207, 0.120, 0.170, 0.292]  eta 9m
+step   10800  loss 0.7151  bpc 1.0316 (plain 1.0952)  lr 8.53e-05  |g| 0.26  rate [0.208, 0.120, 0.169, 0.292]  eta 9m
+step   10900  loss 0.6917  bpc 0.9979 (plain 1.0699)  lr 8.17e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 9m
+step   11000  loss 0.6835  bpc 0.9861 (plain 1.0513)  lr 7.83e-05  |g| 0.22  rate [0.208, 0.120, 0.171, 0.292]  eta 9m
+step   11100  loss 0.6652  bpc 0.9597 (plain 1.0320)  lr 7.49e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 8m
+step   11200  loss 0.7021  bpc 1.0129 (plain 1.0973)  lr 7.16e-05  |g| 0.25  rate [0.207, 0.120, 0.170, 0.290]  eta 8m
+step   11300  loss 0.6561  bpc 0.9466 (plain 1.0146)  lr 6.85e-05  |g| 0.22  rate [0.208, 0.120, 0.171, 0.293]  eta 8m
+step   11400  loss 0.6950  bpc 1.0027 (plain 1.0637)  lr 6.54e-05  |g| 0.24  rate [0.208, 0.120, 0.171, 0.294]  eta 7m
+step   11500  loss 0.6929  bpc 0.9996 (plain 1.0768)  lr 6.24e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.291]  eta 7m
+step   11600  loss 0.6135  bpc 0.8851 (plain 0.9712)  lr 5.96e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.296]  eta 7m
+step   11700  loss 0.6406  bpc 0.9243 (plain 1.0070)  lr 5.68e-05  |g| 0.23  rate [0.208, 0.120, 0.170, 0.293]  eta 7m
+step   11800  loss 0.6608  bpc 0.9534 (plain 1.0485)  lr 5.42e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.290]  eta 6m
+step   11900  loss 0.7008  bpc 1.0110 (plain 1.0767)  lr 5.16e-05  |g| 0.22  rate [0.208, 0.120, 0.172, 0.293]  eta 6m
+  eval step   12000  alpaca 1.6669  dolly 1.9455  oasst1 1.8790  persona 0.2297  soda 1.2397  soda_narrative 1.5501  stories_topic 1.0481  tinystories 1.0573  weighted 1.2161
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a cat and a dog were in the yard. They were going to the store. They wanted to wear the big red balloon. They did not want to play with the other birds.\nThe rabbit said, "'
+step   12000  loss 0.7352  bpc 1.0606 (plain 1.1284)  lr 4.92e-05  |g| 0.24  rate [0.207, 0.120, 0.170, 0.290]  eta 6m
+step   12100  loss 0.6843  bpc 0.9873 (plain 1.0570)  lr 4.69e-05  |g| 0.22  rate [0.207, 0.120, 0.171, 0.292]  eta 5m
+step   12200  loss 0.7271  bpc 1.0490 (plain 1.1157)  lr 4.47e-05  |g| 0.22  rate [0.208, 0.121, 0.171, 0.291]  eta 5m
+step   12300  loss 0.6903  bpc 0.9959 (plain 1.0861)  lr 4.26e-05  |g| 0.23  rate [0.208, 0.121, 0.170, 0.292]  eta 5m
+step   12400  loss 0.6690  bpc 0.9651 (plain 1.0268)  lr 4.06e-05  |g| 0.22  rate [0.208, 0.120, 0.171, 0.292]  eta 5m
+step   12500  loss 0.7106  bpc 1.0252 (plain 1.1016)  lr 3.87e-05  |g| 0.22  rate [0.207, 0.120, 0.171, 0.290]  eta 4m
+step   12600  loss 0.6801  bpc 0.9811 (plain 1.0772)  lr 3.70e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.290]  eta 4m
+step   12700  loss 0.7299  bpc 1.0530 (plain 1.1184)  lr 3.53e-05  |g| 0.25  rate [0.208, 0.121, 0.172, 0.290]  eta 4m
+step   12800  loss 0.6997  bpc 1.0095 (plain 1.0823)  lr 3.38e-05  |g| 0.23  rate [0.207, 0.120, 0.171, 0.292]  eta 3m
+step   12900  loss 0.6746  bpc 0.9732 (plain 1.0509)  lr 3.24e-05  |g| 0.21  rate [0.208, 0.121, 0.171, 0.292]  eta 3m
+step   13000  loss 0.6036  bpc 0.8708 (plain 0.9728)  lr 3.11e-05  |g| 1.06  rate [0.207, 0.121, 0.170, 0.296]  eta 3m
+step   13100  loss 0.6860  bpc 0.9896 (plain 1.0566)  lr 3.00e-05  |g| 0.22  rate [0.208, 0.121, 0.172, 0.293]  eta 3m
+step   13200  loss 0.7017  bpc 1.0123 (plain 1.0671)  lr 2.89e-05  |g| 0.23  rate [0.207, 0.120, 0.171, 0.291]  eta 2m
+step   13300  loss 0.6731  bpc 0.9710 (plain 1.0498)  lr 2.80e-05  |g| 0.22  rate [0.207, 0.121, 0.170, 0.292]  eta 2m
+step   13400  loss 0.6762  bpc 0.9756 (plain 1.0314)  lr 2.72e-05  |g| 0.21  rate [0.207, 0.120, 0.171, 0.293]  eta 2m
+step   13500  loss 0.6970  bpc 1.0056 (plain 1.0681)  lr 2.65e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.292]  eta 1m
+step   13600  loss 0.6932  bpc 1.0000 (plain 1.0704)  lr 2.60e-05  |g| 0.24  rate [0.207, 0.121, 0.171, 0.292]  eta 1m
+step   13700  loss 0.6779  bpc 0.9780 (plain 1.0460)  lr 2.56e-05  |g| 0.22  rate [0.208, 0.121, 0.172, 0.292]  eta 1m
+step   13800  loss 0.6521  bpc 0.9408 (plain 0.9963)  lr 2.52e-05  |g| 0.21  rate [0.207, 0.121, 0.171, 0.293]  eta 1m
+step   13900  loss 0.6545  bpc 0.9442 (plain 1.0403)  lr 2.51e-05  |g| 0.21  rate [0.208, 0.121, 0.171, 0.293]  eta 0m
+  eval step   14000  alpaca 1.6556  dolly 1.9382  oasst1 1.8994  persona 0.2328  soda 1.2362  soda_narrative 1.5450  stories_topic 1.0422  tinystories 1.0520  weighted 1.2109
+    ['hello'] -> 'Hello there. What can I help you with?'
+    ['tell me a story about a dog'] -> 'One day, a little dog named Max went to the park. Max saw a little girl named Lily. Lily loved to play with Max and he was in a red ball. The pink ball was very happy.\nMax took a b'
+  eval step   14000  alpaca 1.6556  dolly 1.9382  oasst1 1.8994  persona 0.2328  soda 1.2362  soda_narrative 1.5450  stories_topic 1.0422  tinystories 1.0520  weighted 1.2109
+chat run 'chat-v9-narrative-s2'
+  arch twocomp_threshold, d=1024, K=4, V=101 -> 4,417,637 parameters
+  B=160, L=256, 14,000 steps = 0.57 G characters
+  mix {'stories_topic': 0.4, 'soda': 0.1, 'soda_narrative': 0.1, 'alpaca': 0.15, 'tinystories': 0.09, 'persona': 0.08, 'dolly': 0.06, 'oasst1': 0.02}
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 3, 75% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 10%, soda_narrative 10%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  initialised weights from experiments/chat/chat-v2-anneal/ckpt_best.pt (step 7874); optimiser and step start fresh
+  graph captured in 0.30s
+step       0  loss 0.7409  bpc 1.0689 (plain 1.1355)  lr 2.50e-06  |g| 0.26  rate [0.208, 0.119, 0.167, 0.288]
+step     100  loss 0.7386  bpc 1.0656 (plain 1.1192)  lr 2.53e-04  |g| 0.27  rate [0.208, 0.119, 0.167, 0.287]  eta 39m
+step     200  loss 0.7699  bpc 1.1108 (plain 1.1696)  lr 5.00e-04  |g| 0.34  rate [0.207, 0.118, 0.165, 0.287]  eta 38m
+step     300  loss 0.7138  bpc 1.0298 (plain 1.1011)  lr 5.00e-04  |g| 0.32  rate [0.207, 0.117, 0.163, 0.290]  eta 38m
+step     400  loss 0.7394  bpc 1.0667 (plain 1.1142)  lr 5.00e-04  |g| 0.31  rate [0.206, 0.116, 0.164, 0.284]  eta 38m
+step     500  loss 0.7544  bpc 1.0884 (plain 1.1365)  lr 4.99e-04  |g| 0.33  rate [0.205, 0.116, 0.163, 0.286]  eta 38m
+step     600  loss 0.7565  bpc 1.0914 (plain 1.1533)  lr 4.99e-04  |g| 0.28  rate [0.206, 0.116, 0.162, 0.285]  eta 37m
+step     700  loss 0.7302  bpc 1.0535 (plain 1.1122)  lr 4.98e-04  |g| 0.30  rate [0.206, 0.118, 0.163, 0.291]  eta 37m
+step     800  loss 0.7520  bpc 1.0849 (plain 1.1376)  lr 4.98e-04  |g| 0.30  rate [0.206, 0.116, 0.164, 0.287]  eta 37m
+step     900  loss 0.7742  bpc 1.1169 (plain 1.1624)  lr 4.97e-04  |g| 0.33  rate [0.206, 0.116, 0.162, 0.287]  eta 37m
+step    1000  loss 0.7373  bpc 1.0637 (plain 1.1050)  lr 4.96e-04  |g| 0.30  rate [0.207, 0.116, 0.163, 0.282]  eta 36m
+step    1100  loss 0.7128  bpc 1.0283 (plain 1.0920)  lr 4.95e-04  |g| 0.27  rate [0.206, 0.117, 0.163, 0.286]  eta 36m
+step    1200  loss 0.7826  bpc 1.1291 (plain 1.1800)  lr 4.94e-04  |g| 0.28  rate [0.205, 0.116, 0.162, 0.282]  eta 36m
+step    1300  loss 0.7217  bpc 1.0413 (plain 1.1136)  lr 4.93e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.292]  eta 35m
+step    1400  loss 0.7486  bpc 1.0800 (plain 1.1455)  lr 4.91e-04  |g| 0.34  rate [0.205, 0.115, 0.162, 0.283]  eta 35m
+step    1500  loss 0.6826  bpc 0.9847 (plain 1.0804)  lr 4.90e-04  |g| 0.31  rate [0.206, 0.117, 0.164, 0.292]  eta 35m
+step    1600  loss 0.7000  bpc 1.0099 (plain 1.0659)  lr 4.88e-04  |g| 0.25  rate [0.206, 0.117, 0.163, 0.288]  eta 35m
+step    1700  loss 0.7870  bpc 1.1354 (plain 1.1906)  lr 4.86e-04  |g| 0.33  rate [0.206, 0.118, 0.163, 0.286]  eta 34m
+step    1800  loss 0.7413  bpc 1.0694 (plain 1.1542)  lr 4.84e-04  |g| 0.27  rate [0.207, 0.117, 0.163, 0.288]  eta 34m
+step    1900  loss 0.7652  bpc 1.1039 (plain 1.1468)  lr 4.82e-04  |g| 0.30  rate [0.206, 0.117, 0.165, 0.287]  eta 34m
+  eval step    2000  alpaca 1.7573  dolly 2.0224  oasst1 1.9366  persona 0.2808  soda 1.2903  soda_narrative 1.6489  stories_topic 1.1064  tinystories 1.1140  weighted 1.2829
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Sue. Sue loved to play outside and play. One day, she saw a big scardble and wanted to see who could find something strange. She put'
+step    2000  loss 0.7860  bpc 1.1340 (plain 1.1959)  lr 4.80e-04  |g| 0.29  rate [0.206, 0.116, 0.162, 0.285]  eta 34m
+step    2100  loss 0.6897  bpc 0.9951 (plain 1.0626)  lr 4.78e-04  |g| 0.25  rate [0.206, 0.117, 0.162, 0.290]  eta 34m
+step    2200  loss 0.7203  bpc 1.0392 (plain 1.0999)  lr 4.76e-04  |g| 0.26  rate [0.206, 0.117, 0.164, 0.290]  eta 33m
+step    2300  loss 0.7039  bpc 1.0154 (plain 1.0748)  lr 4.73e-04  |g| 11.13  rate [0.206, 0.117, 0.162, 0.289]  eta 33m
+step    2400  loss 0.7440  bpc 1.0734 (plain 1.1343)  lr 4.71e-04  |g| 0.28  rate [0.207, 0.116, 0.163, 0.285]  eta 33m
+step    2500  loss 0.7632  bpc 1.1011 (plain 1.1300)  lr 4.68e-04  |g| 0.30  rate [0.206, 0.117, 0.164, 0.285]  eta 33m
+step    2600  loss 0.7373  bpc 1.0637 (plain 1.1239)  lr 4.65e-04  |g| 0.34  rate [0.206, 0.116, 0.163, 0.292]  eta 32m
+step    2700  loss 0.7477  bpc 1.0787 (plain 1.1268)  lr 4.63e-04  |g| 0.30  rate [0.206, 0.115, 0.162, 0.284]  eta 32m
+step    2800  loss 0.7352  bpc 1.0607 (plain 1.1216)  lr 4.60e-04  |g| 0.27  rate [0.207, 0.117, 0.165, 0.290]  eta 32m
+step    2900  loss 0.7667  bpc 1.1061 (plain 1.1475)  lr 4.57e-04  |g| 0.39  rate [0.206, 0.117, 0.163, 0.293]  eta 31m
+step    3000  loss 0.7122  bpc 1.0275 (plain 1.1141)  lr 4.53e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.288]  eta 31m
+step    3100  loss 0.7473  bpc 1.0781 (plain 1.1361)  lr 4.50e-04  |g| 0.26  rate [0.206, 0.117, 0.164, 0.289]  eta 31m
+step    3200  loss 0.7754  bpc 1.1187 (plain 1.1789)  lr 4.47e-04  |g| 0.32  rate [0.206, 0.117, 0.165, 0.289]  eta 30m
+step    3300  loss 0.7524  bpc 1.0856 (plain 1.1389)  lr 4.43e-04  |g| 0.30  rate [0.207, 0.117, 0.164, 0.287]  eta 30m
+step    3400  loss 0.7421  bpc 1.0706 (plain 1.1197)  lr 4.40e-04  |g| 0.26  rate [0.206, 0.118, 0.163, 0.290]  eta 30m
+step    3500  loss 0.7409  bpc 1.0689 (plain 1.1256)  lr 4.36e-04  |g| 0.27  rate [0.206, 0.117, 0.164, 0.287]  eta 30m
+step    3600  loss 0.7039  bpc 1.0154 (plain 1.0782)  lr 4.32e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.291]  eta 29m
+step    3700  loss 0.6963  bpc 1.0046 (plain 1.0886)  lr 4.29e-04  |g| 0.26  rate [0.206, 0.116, 0.164, 0.287]  eta 29m
+step    3800  loss 0.7481  bpc 1.0792 (plain 1.1330)  lr 4.25e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.289]  eta 29m
+step    3900  loss 0.7631  bpc 1.1008 (plain 1.1660)  lr 4.21e-04  |g| 0.30  rate [0.206, 0.117, 0.164, 0.288]  eta 28m
+  eval step    4000  alpaca 1.7382  dolly 1.9937  oasst1 1.9424  persona 0.2609  soda 1.2909  soda_narrative 1.6254  stories_topic 1.0993  tinystories 1.1101  weighted 1.2713
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, in a charming little house, there was a pink dog named Spot. Spot liked to play with his friends, the cow and had a big rock. They played with the diamond all day'
+step    4000  loss 0.7412  bpc 1.0693 (plain 1.1581)  lr 4.17e-04  |g| 0.26  rate [0.206, 0.116, 0.164, 0.285]  eta 28m
+step    4100  loss 0.7152  bpc 1.0318 (plain 1.0867)  lr 4.12e-04  |g| 0.24  rate [0.206, 0.117, 0.166, 0.291]  eta 28m
+step    4200  loss 0.6948  bpc 1.0024 (plain 1.1029)  lr 4.08e-04  |g| 0.28  rate [0.206, 0.117, 0.165, 0.289]  eta 28m
+step    4300  loss 0.7796  bpc 1.1248 (plain 1.1746)  lr 4.04e-04  |g| 0.25  rate [0.206, 0.117, 0.165, 0.287]  eta 28m
+step    4400  loss 0.7609  bpc 1.0978 (plain 1.1572)  lr 3.99e-04  |g| 0.28  rate [0.206, 0.116, 0.164, 0.287]  eta 27m
+step    4500  loss 0.7917  bpc 1.1422 (plain 1.1856)  lr 3.95e-04  |g| 0.28  rate [0.207, 0.117, 0.165, 0.283]  eta 27m
+step    4600  loss 0.7679  bpc 1.1079 (plain 1.1527)  lr 3.90e-04  |g| 0.26  rate [0.206, 0.117, 0.165, 0.288]  eta 27m
+step    4700  loss 0.7287  bpc 1.0512 (plain 1.1059)  lr 3.86e-04  |g| 0.27  rate [0.206, 0.117, 0.163, 0.288]  eta 26m
+step    4800  loss 0.7264  bpc 1.0479 (plain 1.1195)  lr 3.81e-04  |g| 0.29  rate [0.205, 0.116, 0.163, 0.290]  eta 26m
+step    4900  loss 0.7444  bpc 1.0739 (plain 1.1644)  lr 3.77e-04  |g| 0.26  rate [0.206, 0.118, 0.164, 0.288]  eta 26m
+step    5000  loss 0.7100  bpc 1.0243 (plain 1.0868)  lr 3.72e-04  |g| 0.32  rate [0.206, 0.117, 0.163, 0.290]  eta 25m
+step    5100  loss 0.7416  bpc 1.0699 (plain 1.1412)  lr 3.67e-04  |g| 0.26  rate [0.206, 0.118, 0.164, 0.286]  eta 25m
+step    5200  loss 0.7753  bpc 1.1186 (plain 1.1708)  lr 3.62e-04  |g| 0.33  rate [0.206, 0.118, 0.165, 0.287]  eta 25m
+step    5300  loss 0.7397  bpc 1.0671 (plain 1.1449)  lr 3.57e-04  |g| 0.28  rate [0.206, 0.118, 0.166, 0.289]  eta 25m
+step    5400  loss 0.7139  bpc 1.0299 (plain 1.0685)  lr 3.52e-04  |g| 0.26  rate [0.206, 0.118, 0.165, 0.291]  eta 24m
+step    5500  loss 0.7328  bpc 1.0573 (plain 1.1151)  lr 3.47e-04  |g| 0.25  rate [0.205, 0.118, 0.163, 0.288]  eta 24m
+step    5600  loss 0.6760  bpc 0.9753 (plain 1.0519)  lr 3.42e-04  |g| 0.26  rate [0.206, 0.117, 0.164, 0.292]  eta 24m
+step    5700  loss 0.6790  bpc 0.9796 (plain 1.0618)  lr 3.37e-04  |g| 0.25  rate [0.206, 0.117, 0.165, 0.288]  eta 23m
+step    5800  loss 0.7557  bpc 1.0902 (plain 1.1397)  lr 3.32e-04  |g| 0.27  rate [0.207, 0.118, 0.165, 0.288]  eta 23m
+step    5900  loss 0.6979  bpc 1.0068 (plain 1.0833)  lr 3.27e-04  |g| 0.27  rate [0.206, 0.117, 0.164, 0.289]  eta 23m
+  eval step    6000  alpaca 1.7297  dolly 2.0125  oasst1 1.8924  persona 0.2497  soda 1.2821  soda_narrative 1.6038  stories_topic 1.0871  tinystories 1.0954  weighted 1.2600
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Sue. Sue had a toy car to make her favorite toy. One day, Sue found a big sight shirt in the ground. She picked it up and tried to p'
+step    6000  loss 0.6624  bpc 0.9556 (plain 1.0136)  lr 3.21e-04  |g| 0.25  rate [0.206, 0.118, 0.165, 0.292]  eta 23m
+step    6100  loss 0.6650  bpc 0.9594 (plain 1.0299)  lr 3.16e-04  |g| 0.24  rate [0.206, 0.117, 0.165, 0.291]  eta 22m
+step    6200  loss 0.7244  bpc 1.0450 (plain 1.1126)  lr 3.11e-04  |g| 0.28  rate [0.206, 0.118, 0.164, 0.288]  eta 22m
+step    6300  loss 0.7479  bpc 1.0790 (plain 1.1583)  lr 3.06e-04  |g| 0.26  rate [0.207, 0.118, 0.166, 0.288]  eta 22m
+step    6400  loss 0.7533  bpc 1.0867 (plain 1.1470)  lr 3.00e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.288]  eta 22m
+step    6500  loss 0.7334  bpc 1.0581 (plain 1.1230)  lr 2.95e-04  |g| 0.26  rate [0.206, 0.117, 0.166, 0.292]  eta 21m
+step    6600  loss 0.7539  bpc 1.0876 (plain 1.1557)  lr 2.89e-04  |g| 0.28  rate [0.206, 0.118, 0.167, 0.288]  eta 21m
+step    6700  loss 0.6466  bpc 0.9329 (plain 1.0177)  lr 2.84e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.289]  eta 21m
+step    6800  loss 0.7553  bpc 1.0897 (plain 1.1390)  lr 2.79e-04  |g| 0.28  rate [0.206, 0.119, 0.166, 0.289]  eta 20m
+step    6900  loss 0.6894  bpc 0.9946 (plain 1.0663)  lr 2.73e-04  |g| 0.27  rate [0.206, 0.118, 0.166, 0.292]  eta 20m
+step    7000  loss 0.7477  bpc 1.0787 (plain 1.1545)  lr 2.68e-04  |g| 0.26  rate [0.206, 0.119, 0.167, 0.288]  eta 20m
+step    7100  loss 0.7101  bpc 1.0245 (plain 1.0803)  lr 2.63e-04  |g| 0.25  rate [0.206, 0.118, 0.166, 0.292]  eta 20m
+step    7200  loss 0.6666  bpc 0.9616 (plain 1.0586)  lr 2.57e-04  |g| 0.23  rate [0.206, 0.118, 0.166, 0.292]  eta 19m
+step    7300  loss 0.7037  bpc 1.0152 (plain 1.0799)  lr 2.52e-04  |g| 0.28  rate [0.206, 0.118, 0.166, 0.289]  eta 19m
+step    7400  loss 0.7690  bpc 1.1094 (plain 1.1695)  lr 2.46e-04  |g| 0.25  rate [0.206, 0.118, 0.167, 0.289]  eta 19m
+step    7500  loss 0.7132  bpc 1.0289 (plain 1.1086)  lr 2.41e-04  |g| 0.26  rate [0.207, 0.118, 0.168, 0.288]  eta 18m
+step    7600  loss 0.6816  bpc 0.9834 (plain 1.0326)  lr 2.36e-04  |g| 0.26  rate [0.206, 0.118, 0.167, 0.290]  eta 18m
+step    7700  loss 0.7150  bpc 1.0316 (plain 1.1067)  lr 2.30e-04  |g| 0.25  rate [0.206, 0.119, 0.167, 0.287]  eta 18m
+step    7800  loss 0.6879  bpc 0.9924 (plain 1.0778)  lr 2.25e-04  |g| 0.28  rate [0.206, 0.119, 0.167, 0.292]  eta 18m
+step    7900  loss 0.6928  bpc 0.9996 (plain 1.0633)  lr 2.19e-04  |g| 0.25  rate [0.206, 0.119, 0.166, 0.295]  eta 17m
+  eval step    8000  alpaca 1.6953  dolly 1.9765  oasst1 1.8959  persona 0.2436  soda 1.2732  soda_narrative 1.5862  stories_topic 1.0769  tinystories 1.0848  weighted 1.2446
+    ['hello'] -> 'Hi! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a fast dog named Spot. Spot was very happy. He liked to play with his ball and run all day. He would run and jump all day long and having fun.\nOne day,'
+step    8000  loss 0.7744  bpc 1.1173 (plain 1.1650)  lr 2.14e-04  |g| 0.29  rate [0.206, 0.118, 0.168, 0.285]  eta 17m
+step    8100  loss 0.6806  bpc 0.9820 (plain 1.0472)  lr 2.09e-04  |g| 0.25  rate [0.207, 0.119, 0.167, 0.293]  eta 17m
+step    8200  loss 0.7285  bpc 1.0510 (plain 1.1201)  lr 2.04e-04  |g| 0.25  rate [0.207, 0.118, 0.168, 0.290]  eta 16m
+step    8300  loss 0.6939  bpc 1.0011 (plain 1.0714)  lr 1.98e-04  |g| 0.26  rate [0.207, 0.119, 0.168, 0.294]  eta 16m
+step    8400  loss 0.6690  bpc 0.9652 (plain 1.0553)  lr 1.93e-04  |g| 0.27  rate [0.207, 0.119, 0.168, 0.290]  eta 16m
+step    8500  loss 0.6780  bpc 0.9782 (plain 1.0380)  lr 1.88e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.291]  eta 16m
+step    8600  loss 0.6943  bpc 1.0017 (plain 1.0685)  lr 1.83e-04  |g| 0.26  rate [0.207, 0.119, 0.167, 0.291]  eta 15m
+step    8700  loss 0.6981  bpc 1.0072 (plain 1.0504)  lr 1.78e-04  |g| 0.24  rate [0.207, 0.120, 0.168, 0.295]  eta 15m
+step    8800  loss 0.7187  bpc 1.0369 (plain 1.1039)  lr 1.73e-04  |g| 0.26  rate [0.207, 0.119, 0.167, 0.291]  eta 15m
+step    8900  loss 0.7031  bpc 1.0144 (plain 1.0838)  lr 1.68e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.290]  eta 14m
+step    9000  loss 0.7179  bpc 1.0357 (plain 1.0969)  lr 1.63e-04  |g| 0.26  rate [0.207, 0.119, 0.168, 0.291]  eta 14m
+step    9100  loss 0.7249  bpc 1.0458 (plain 1.1246)  lr 1.58e-04  |g| 0.27  rate [0.207, 0.119, 0.168, 0.290]  eta 14m
+step    9200  loss 0.7038  bpc 1.0154 (plain 1.0935)  lr 1.53e-04  |g| 0.26  rate [0.207, 0.119, 0.169, 0.292]  eta 14m
+step    9300  loss 0.6926  bpc 0.9992 (plain 1.0405)  lr 1.48e-04  |g| 0.25  rate [0.206, 0.119, 0.168, 0.292]  eta 13m
+step    9400  loss 0.6673  bpc 0.9627 (plain 1.0472)  lr 1.44e-04  |g| 0.23  rate [0.207, 0.120, 0.168, 0.294]  eta 13m
+step    9500  loss 0.7101  bpc 1.0245 (plain 1.0743)  lr 1.39e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.293]  eta 13m
+step    9600  loss 0.6496  bpc 0.9371 (plain 1.0245)  lr 1.35e-04  |g| 0.25  rate [0.207, 0.120, 0.168, 0.291]  eta 12m
+step    9700  loss 0.7052  bpc 1.0174 (plain 1.0748)  lr 1.30e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.292]  eta 12m
+step    9800  loss 0.7138  bpc 1.0298 (plain 1.0874)  lr 1.26e-04  |g| 0.25  rate [0.207, 0.120, 0.169, 0.291]  eta 12m
+step    9900  loss 0.7126  bpc 1.0281 (plain 1.0903)  lr 1.21e-04  |g| 0.27  rate [0.207, 0.120, 0.170, 0.292]  eta 12m
+  eval step   10000  alpaca 1.6772  dolly 1.9557  oasst1 1.8948  persona 0.2387  soda 1.2536  soda_narrative 1.5624  stories_topic 1.0566  tinystories 1.0669  weighted 1.2262
+    ['hello'] -> 'Hello! How are you doing today?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little dog named Spot. Spot loved to play outside in the sun. One day, Spot went for a walk in the woods. He saw a big red ball with a long rope. Spot'
+step   10000  loss 0.7199  bpc 1.0386 (plain 1.1056)  lr 1.17e-04  |g| 0.23  rate [0.207, 0.120, 0.170, 0.291]  eta 11m
+step   10100  loss 0.6839  bpc 0.9866 (plain 1.0539)  lr 1.13e-04  |g| 0.23  rate [0.207, 0.120, 0.171, 0.292]  eta 11m
+step   10200  loss 0.7598  bpc 1.0962 (plain 1.1520)  lr 1.08e-04  |g| 0.26  rate [0.207, 0.119, 0.170, 0.289]  eta 11m
+step   10300  loss 0.6779  bpc 0.9780 (plain 1.0448)  lr 1.04e-04  |g| 0.22  rate [0.207, 0.119, 0.169, 0.293]  eta 10m
+step   10400  loss 0.7067  bpc 1.0195 (plain 1.0802)  lr 1.00e-04  |g| 0.23  rate [0.207, 0.120, 0.169, 0.291]  eta 10m
+step   10500  loss 0.6991  bpc 1.0086 (plain 1.0732)  lr 9.65e-05  |g| 0.24  rate [0.207, 0.120, 0.169, 0.293]  eta 10m
+step   10600  loss 0.7111  bpc 1.0258 (plain 1.1130)  lr 9.27e-05  |g| 0.25  rate [0.207, 0.119, 0.170, 0.289]  eta 10m
+step   10700  loss 0.7454  bpc 1.0754 (plain 1.1200)  lr 8.89e-05  |g| 0.25  rate [0.207, 0.120, 0.170, 0.286]  eta 9m
+step   10800  loss 0.6926  bpc 0.9992 (plain 1.0733)  lr 8.53e-05  |g| 0.22  rate [0.207, 0.119, 0.169, 0.290]  eta 9m
+step   10900  loss 0.6231  bpc 0.8989 (plain 0.9691)  lr 8.17e-05  |g| 0.21  rate [0.207, 0.120, 0.169, 0.296]  eta 9m
+step   11000  loss 0.6596  bpc 0.9517 (plain 1.0197)  lr 7.83e-05  |g| 0.24  rate [0.207, 0.120, 0.168, 0.294]  eta 9m
+step   11100  loss 0.6490  bpc 0.9362 (plain 1.0156)  lr 7.49e-05  |g| 0.23  rate [0.207, 0.120, 0.169, 0.292]  eta 8m
+step   11200  loss 0.6477  bpc 0.9344 (plain 0.9954)  lr 7.16e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.293]  eta 8m
+step   11300  loss 0.6984  bpc 1.0075 (plain 1.0990)  lr 6.85e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.292]  eta 8m
+step   11400  loss 0.5827  bpc 0.8407 (plain 0.9361)  lr 6.54e-05  |g| 0.20  rate [0.208, 0.120, 0.169, 0.299]  eta 7m
+step   11500  loss 0.6827  bpc 0.9849 (plain 1.0609)  lr 6.24e-05  |g| 0.25  rate [0.208, 0.120, 0.170, 0.292]  eta 7m
+step   11600  loss 0.6767  bpc 0.9762 (plain 1.0496)  lr 5.96e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 7m
+step   11700  loss 0.6582  bpc 0.9497 (plain 1.0101)  lr 5.68e-05  |g| 0.22  rate [0.207, 0.120, 0.169, 0.294]  eta 7m
+step   11800  loss 0.7414  bpc 1.0695 (plain 1.1483)  lr 5.42e-05  |g| 0.25  rate [0.207, 0.120, 0.171, 0.290]  eta 6m
+step   11900  loss 0.7348  bpc 1.0601 (plain 1.1116)  lr 5.16e-05  |g| 0.25  rate [0.208, 0.120, 0.171, 0.290]  eta 6m
+  eval step   12000  alpaca 1.6671  dolly 1.9376  oasst1 1.8754  persona 0.2327  soda 1.2413  soda_narrative 1.5522  stories_topic 1.0465  tinystories 1.0560  weighted 1.2154
+    ['hello'] -> 'Hi there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a cat and a dog were playing in the park. They were good friends. They were all very careful. They did not want to discuss where the little goat.\nSally said, "I will still'
+step   12000  loss 0.6940  bpc 1.0012 (plain 1.0674)  lr 4.92e-05  |g| 0.23  rate [0.207, 0.120, 0.171, 0.293]  eta 6m
+step   12100  loss 0.6893  bpc 0.9944 (plain 1.0716)  lr 4.69e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 5m
+step   12200  loss 0.7276  bpc 1.0497 (plain 1.0991)  lr 4.47e-05  |g| 0.25  rate [0.208, 0.121, 0.171, 0.288]  eta 5m
+step   12300  loss 0.6773  bpc 0.9771 (plain 1.0451)  lr 4.26e-05  |g| 0.23  rate [0.207, 0.120, 0.171, 0.293]  eta 5m
+step   12400  loss 0.6933  bpc 1.0003 (plain 1.0581)  lr 4.06e-05  |g| 0.22  rate [0.207, 0.120, 0.171, 0.292]  eta 5m
+step   12500  loss 0.6529  bpc 0.9419 (plain 0.9952)  lr 3.87e-05  |g| 0.21  rate [0.207, 0.120, 0.171, 0.295]  eta 4m
+step   12600  loss 0.6975  bpc 1.0062 (plain 1.0656)  lr 3.70e-05  |g| 0.23  rate [0.208, 0.121, 0.171, 0.291]  eta 4m
+step   12700  loss 0.6891  bpc 0.9941 (plain 1.0214)  lr 3.53e-05  |g| 0.23  rate [0.208, 0.121, 0.171, 0.296]  eta 4m
+step   12800  loss 0.6574  bpc 0.9484 (plain 1.0229)  lr 3.38e-05  |g| 0.23  rate [0.208, 0.121, 0.170, 0.295]  eta 3m
+step   12900  loss 0.6429  bpc 0.9275 (plain 0.9993)  lr 3.24e-05  |g| 0.23  rate [0.208, 0.121, 0.170, 0.295]  eta 3m
+step   13000  loss 0.6939  bpc 1.0011 (plain 1.0701)  lr 3.11e-05  |g| 0.25  rate [0.207, 0.121, 0.171, 0.293]  eta 3m
+step   13100  loss 0.6563  bpc 0.9469 (plain 1.0322)  lr 3.00e-05  |g| 0.21  rate [0.208, 0.121, 0.170, 0.293]  eta 3m
+step   13200  loss 0.6176  bpc 0.8910 (plain 0.9750)  lr 2.89e-05  |g| 0.20  rate [0.207, 0.121, 0.170, 0.297]  eta 2m
+step   13300  loss 0.6806  bpc 0.9818 (plain 1.0275)  lr 2.80e-05  |g| 0.22  rate [0.208, 0.121, 0.171, 0.293]  eta 2m
+step   13400  loss 0.6996  bpc 1.0093 (plain 1.0779)  lr 2.72e-05  |g| 0.23  rate [0.208, 0.121, 0.172, 0.292]  eta 2m
+step   13500  loss 0.6602  bpc 0.9524 (plain 1.0587)  lr 2.65e-05  |g| 0.22  rate [0.207, 0.120, 0.171, 0.293]  eta 1m
+step   13600  loss 0.6566  bpc 0.9473 (plain 1.0142)  lr 2.60e-05  |g| 0.22  rate [0.207, 0.121, 0.171, 0.294]  eta 1m
+step   13700  loss 0.6940  bpc 1.0012 (plain 1.0745)  lr 2.56e-05  |g| 0.22  rate [0.208, 0.121, 0.171, 0.292]  eta 1m
+step   13800  loss 0.6843  bpc 0.9873 (plain 1.0614)  lr 2.52e-05  |g| 0.24  rate [0.207, 0.120, 0.170, 0.290]  eta 1m
+step   13900  loss 0.6758  bpc 0.9750 (plain 1.0250)  lr 2.51e-05  |g| 0.24  rate [0.207, 0.121, 0.171, 0.295]  eta 0m
+  eval step   14000  alpaca 1.6622  dolly 1.9526  oasst1 1.8783  persona 0.2302  soda 1.2353  soda_narrative 1.5466  stories_topic 1.0429  tinystories 1.0535  weighted 1.2126
+    ['hello'] -> 'Hello there! How can I assist you?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a big fish named Fin. Fin lived in a big city with his family. One day, they were playing outside in the park. They were playing and having fun.\nBut the'
+  eval step   14000  alpaca 1.6622  dolly 1.9526  oasst1 1.8783  persona 0.2302  soda 1.2353  soda_narrative 1.5466  stories_topic 1.0429  tinystories 1.0535  weighted 1.2126
+chat run 'chat-v9-narrative-s3'
+  arch twocomp_threshold, d=1024, K=4, V=101 -> 4,417,637 parameters
+  B=160, L=256, 14,000 steps = 0.57 G characters
+  mix {'stories_topic': 0.4, 'soda': 0.1, 'soda_narrative': 0.1, 'alpaca': 0.15, 'tinystories': 0.09, 'persona': 0.08, 'dolly': 0.06, 'oasst1': 0.02}
+  4,417,637 params, d=1024, K=4, V=101
+  weight decay 0.1 on all but 16,485 neuron parameters (beta_s_raw, w, thr_log, biases)
+  bot loss weight 3, 75% of windows aligned to a conversation start
+  mix: alpaca 15%, dolly 6%, oasst1 2%, persona 8%, soda 10%, soda_narrative 10%, stories_topic 40%, tinystories 9%
+  slow-pole tau: 3.0 .. 600.0 (median 42.3) characters
+  initialised weights from experiments/chat/chat-v2-anneal/ckpt_best.pt (step 7874); optimiser and step start fresh
+  graph captured in 0.32s
+step       0  loss 0.7603  bpc 1.0969 (plain 1.1643)  lr 2.50e-06  |g| 0.25  rate [0.209, 0.119, 0.168, 0.288]
+step     100  loss 0.7162  bpc 1.0333 (plain 1.1014)  lr 2.53e-04  |g| 0.26  rate [0.208, 0.119, 0.167, 0.290]  eta 39m
+step     200  loss 0.7379  bpc 1.0646 (plain 1.1183)  lr 5.00e-04  |g| 0.35  rate [0.206, 0.117, 0.162, 0.290]  eta 39m
+step     300  loss 0.7384  bpc 1.0652 (plain 1.1425)  lr 5.00e-04  |g| 0.35  rate [0.207, 0.116, 0.163, 0.286]  eta 38m
+step     400  loss 0.7810  bpc 1.1268 (plain 1.1750)  lr 5.00e-04  |g| 0.35  rate [0.207, 0.117, 0.164, 0.283]  eta 38m
+step     500  loss 0.7347  bpc 1.0599 (plain 1.1303)  lr 4.99e-04  |g| 0.33  rate [0.207, 0.116, 0.163, 0.287]  eta 38m
+step     600  loss 0.7495  bpc 1.0814 (plain 1.1392)  lr 4.99e-04  |g| 0.37  rate [0.206, 0.117, 0.164, 0.288]  eta 38m
+step     700  loss 0.7949  bpc 1.1468 (plain 1.1869)  lr 4.98e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.284]  eta 37m
+step     800  loss 0.7603  bpc 1.0969 (plain 1.1598)  lr 4.98e-04  |g| 0.28  rate [0.206, 0.116, 0.162, 0.284]  eta 37m
+step     900  loss 0.7559  bpc 1.0906 (plain 1.1582)  lr 4.97e-04  |g| 0.32  rate [0.206, 0.116, 0.162, 0.283]  eta 37m
+step    1000  loss 0.8106  bpc 1.1695 (plain 1.2502)  lr 4.96e-04  |g| 0.27  rate [0.206, 0.116, 0.164, 0.283]  eta 36m
+step    1100  loss 0.8049  bpc 1.1612 (plain 1.1930)  lr 4.95e-04  |g| 0.32  rate [0.206, 0.117, 0.164, 0.285]  eta 36m
+step    1200  loss 0.7006  bpc 1.0107 (plain 1.0959)  lr 4.94e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.289]  eta 36m
+step    1300  loss 0.7187  bpc 1.0369 (plain 1.1099)  lr 4.93e-04  |g| 0.27  rate [0.206, 0.117, 0.163, 0.286]  eta 36m
+step    1400  loss 0.7316  bpc 1.0555 (plain 1.1162)  lr 4.91e-04  |g| 0.28  rate [0.206, 0.116, 0.163, 0.288]  eta 35m
+step    1500  loss 0.7221  bpc 1.0417 (plain 1.1145)  lr 4.90e-04  |g| 0.35  rate [0.206, 0.116, 0.163, 0.286]  eta 35m
+step    1600  loss 0.7796  bpc 1.1247 (plain 1.1800)  lr 4.88e-04  |g| 0.33  rate [0.206, 0.116, 0.162, 0.285]  eta 35m
+step    1700  loss 0.6987  bpc 1.0081 (plain 1.1003)  lr 4.86e-04  |g| 0.32  rate [0.206, 0.117, 0.164, 0.292]  eta 34m
+step    1800  loss 0.6872  bpc 0.9914 (plain 1.0807)  lr 4.84e-04  |g| 0.31  rate [0.206, 0.117, 0.162, 0.287]  eta 34m
+step    1900  loss 0.7153  bpc 1.0320 (plain 1.1203)  lr 4.82e-04  |g| 0.28  rate [0.206, 0.116, 0.162, 0.290]  eta 34m
+  eval step    2000  alpaca 1.7502  dolly 1.9936  oasst1 1.9373  persona 0.2653  soda 1.2936  soda_narrative 1.6585  stories_topic 1.1113  tinystories 1.1165  weighted 1.2823
+    ['hello'] -> "Hey! I'm here. What's on your mind?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a powerful dog named Spot. Tim loved to play in the park with his mom. One day, Tom saw a big piece of meat in his car. Tom wanted to help the cat to pl'
+step    2000  loss 0.7470  bpc 1.0777 (plain 1.1318)  lr 4.80e-04  |g| 0.30  rate [0.206, 0.116, 0.163, 0.290]  eta 34m
+step    2100  loss 0.7698  bpc 1.1105 (plain 1.1747)  lr 4.78e-04  |g| 0.25  rate [0.206, 0.116, 0.164, 0.286]  eta 34m
+step    2200  loss 0.7473  bpc 1.0781 (plain 1.1272)  lr 4.76e-04  |g| 0.33  rate [0.206, 0.116, 0.165, 0.283]  eta 34m
+step    2300  loss 0.7619  bpc 1.0992 (plain 1.1531)  lr 4.73e-04  |g| 0.30  rate [0.205, 0.117, 0.161, 0.284]  eta 33m
+step    2400  loss 0.7534  bpc 1.0869 (plain 1.1619)  lr 4.71e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.286]  eta 33m
+step    2500  loss 0.6784  bpc 0.9787 (plain 1.0693)  lr 4.68e-04  |g| 0.29  rate [0.206, 0.117, 0.163, 0.292]  eta 33m
+step    2600  loss 0.6927  bpc 0.9994 (plain 1.0788)  lr 4.65e-04  |g| 0.29  rate [0.206, 0.116, 0.163, 0.289]  eta 32m
+step    2700  loss 0.7497  bpc 1.0816 (plain 1.1636)  lr 4.63e-04  |g| 0.32  rate [0.206, 0.117, 0.164, 0.287]  eta 32m
+step    2800  loss 0.7700  bpc 1.1109 (plain 1.1553)  lr 4.60e-04  |g| 0.28  rate [0.206, 0.117, 0.165, 0.286]  eta 32m
+step    2900  loss 0.6943  bpc 1.0016 (plain 1.0723)  lr 4.57e-04  |g| 0.27  rate [0.206, 0.116, 0.163, 0.291]  eta 31m
+step    3000  loss 0.7963  bpc 1.1488 (plain 1.1934)  lr 4.53e-04  |g| 0.28  rate [0.206, 0.117, 0.164, 0.282]  eta 31m
+step    3100  loss 0.7017  bpc 1.0123 (plain 1.0969)  lr 4.50e-04  |g| 0.26  rate [0.206, 0.117, 0.165, 0.292]  eta 31m
+step    3200  loss 0.7239  bpc 1.0443 (plain 1.1112)  lr 4.47e-04  |g| 0.27  rate [0.207, 0.116, 0.164, 0.290]  eta 31m
+step    3300  loss 0.7500  bpc 1.0820 (plain 1.1500)  lr 4.43e-04  |g| 0.26  rate [0.206, 0.116, 0.163, 0.292]  eta 30m
+step    3400  loss 0.7335  bpc 1.0582 (plain 1.1161)  lr 4.40e-04  |g| 0.26  rate [0.206, 0.117, 0.162, 0.286]  eta 30m
+step    3500  loss 0.7420  bpc 1.0705 (plain 1.1564)  lr 4.36e-04  |g| 0.26  rate [0.206, 0.117, 0.164, 0.289]  eta 30m
+step    3600  loss 0.6805  bpc 0.9817 (plain 1.0640)  lr 4.32e-04  |g| 0.30  rate [0.206, 0.117, 0.163, 0.289]  eta 29m
+step    3700  loss 0.7556  bpc 1.0901 (plain 1.1359)  lr 4.29e-04  |g| 0.30  rate [0.205, 0.117, 0.165, 0.293]  eta 29m
+step    3800  loss 0.7164  bpc 1.0336 (plain 1.1047)  lr 4.25e-04  |g| 0.28  rate [0.206, 0.117, 0.163, 0.286]  eta 29m
+step    3900  loss 0.7059  bpc 1.0184 (plain 1.0899)  lr 4.21e-04  |g| 0.28  rate [0.205, 0.117, 0.164, 0.286]  eta 28m
+  eval step    4000  alpaca 1.7546  dolly 2.0166  oasst1 1.9605  persona 0.2502  soda 1.2967  soda_narrative 1.6323  stories_topic 1.1030  tinystories 1.1107  weighted 1.2775
+    ['hello'] -> 'Hello there. What would you like to know?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a poor little dog named Spot. Spot loved to play with his friends. One day, Spot saw a big cat. The cat was strong and dangerous. The ball was very prou'
+step    4000  loss 0.7932  bpc 1.1443 (plain 1.1981)  lr 4.17e-04  |g| 0.35  rate [0.207, 0.117, 0.164, 0.287]  eta 28m
+step    4100  loss 0.7475  bpc 1.0784 (plain 1.1187)  lr 4.12e-04  |g| 0.27  rate [0.207, 0.118, 0.164, 0.289]  eta 28m
+step    4200  loss 0.7701  bpc 1.1110 (plain 1.1779)  lr 4.08e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.287]  eta 28m
+step    4300  loss 0.7630  bpc 1.1008 (plain 1.1674)  lr 4.04e-04  |g| 0.29  rate [0.206, 0.118, 0.164, 0.288]  eta 28m
+step    4400  loss 0.7667  bpc 1.1061 (plain 1.1642)  lr 3.99e-04  |g| 0.28  rate [0.206, 0.117, 0.163, 0.288]  eta 27m
+step    4500  loss 0.7264  bpc 1.0480 (plain 1.0940)  lr 3.95e-04  |g| 0.31  rate [0.206, 0.117, 0.165, 0.291]  eta 27m
+step    4600  loss 0.7439  bpc 1.0732 (plain 1.1383)  lr 3.90e-04  |g| 0.24  rate [0.207, 0.117, 0.164, 0.289]  eta 27m
+step    4700  loss 0.7793  bpc 1.1243 (plain 1.1772)  lr 3.86e-04  |g| 0.31  rate [0.206, 0.117, 0.165, 0.287]  eta 26m
+step    4800  loss 0.7060  bpc 1.0185 (plain 1.0583)  lr 3.81e-04  |g| 0.30  rate [0.206, 0.117, 0.164, 0.292]  eta 26m
+step    4900  loss 0.7676  bpc 1.1074 (plain 1.1639)  lr 3.77e-04  |g| 0.32  rate [0.206, 0.118, 0.165, 0.292]  eta 26m
+step    5000  loss 0.7885  bpc 1.1375 (plain 1.1746)  lr 3.72e-04  |g| 0.31  rate [0.206, 0.117, 0.166, 0.283]  eta 26m
+step    5100  loss 0.7210  bpc 1.0402 (plain 1.1036)  lr 3.67e-04  |g| 0.29  rate [0.206, 0.118, 0.165, 0.288]  eta 25m
+step    5200  loss 0.6868  bpc 0.9909 (plain 1.0777)  lr 3.62e-04  |g| 0.26  rate [0.206, 0.118, 0.164, 0.289]  eta 25m
+step    5300  loss 0.7247  bpc 1.0455 (plain 1.0990)  lr 3.57e-04  |g| 0.27  rate [0.206, 0.117, 0.164, 0.288]  eta 25m
+step    5400  loss 0.7066  bpc 1.0194 (plain 1.1056)  lr 3.52e-04  |g| 0.24  rate [0.206, 0.117, 0.164, 0.289]  eta 24m
+step    5500  loss 0.6887  bpc 0.9936 (plain 1.0719)  lr 3.47e-04  |g| 0.25  rate [0.207, 0.117, 0.166, 0.291]  eta 24m
+step    5600  loss 0.6787  bpc 0.9792 (plain 1.0476)  lr 3.42e-04  |g| 0.27  rate [0.206, 0.118, 0.164, 0.292]  eta 24m
+step    5700  loss 0.6578  bpc 0.9491 (plain 1.0191)  lr 3.37e-04  |g| 0.24  rate [0.206, 0.118, 0.165, 0.294]  eta 23m
+step    5800  loss 0.7606  bpc 1.0973 (plain 1.1357)  lr 3.32e-04  |g| 0.28  rate [0.205, 0.118, 0.165, 0.289]  eta 23m
+step    5900  loss 0.6888  bpc 0.9937 (plain 1.0614)  lr 3.27e-04  |g| 0.26  rate [0.206, 0.118, 0.164, 0.292]  eta 23m
+  eval step    6000  alpaca 1.7271  dolly 1.9904  oasst1 1.9192  persona 0.2567  soda 1.2894  soda_narrative 1.6112  stories_topic 1.0803  tinystories 1.0904  weighted 1.2577
+    ['hello'] -> "Hello there! How are you doing that something you've been acting in not the pot?"
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. Lily had a dog named Max. Max was sad because he loved to play with Lily. They played together every day in the garden.\nOne da'
+step    6000  loss 0.7547  bpc 1.0889 (plain 1.1666)  lr 3.21e-04  |g| 0.25  rate [0.207, 0.117, 0.166, 0.283]  eta 23m
+step    6100  loss 0.6887  bpc 0.9936 (plain 1.0742)  lr 3.16e-04  |g| 0.24  rate [0.206, 0.117, 0.164, 0.291]  eta 22m
+step    6200  loss 0.7105  bpc 1.0250 (plain 1.1076)  lr 3.11e-04  |g| 0.26  rate [0.206, 0.117, 0.165, 0.286]  eta 22m
+step    6300  loss 0.6974  bpc 1.0061 (plain 1.0498)  lr 3.06e-04  |g| 0.27  rate [0.206, 0.117, 0.166, 0.290]  eta 22m
+step    6400  loss 0.7496  bpc 1.0815 (plain 1.1501)  lr 3.00e-04  |g| 0.28  rate [0.206, 0.118, 0.165, 0.285]  eta 22m
+step    6500  loss 0.7053  bpc 1.0175 (plain 1.1080)  lr 2.95e-04  |g| 0.25  rate [0.206, 0.118, 0.166, 0.290]  eta 21m
+step    6600  loss 0.7169  bpc 1.0343 (plain 1.1123)  lr 2.89e-04  |g| 0.26  rate [0.206, 0.119, 0.166, 0.286]  eta 21m
+step    6700  loss 0.7737  bpc 1.1162 (plain 1.1952)  lr 2.84e-04  |g| 0.30  rate [0.207, 0.118, 0.167, 0.287]  eta 21m
+step    6800  loss 0.7049  bpc 1.0169 (plain 1.0874)  lr 2.79e-04  |g| 0.27  rate [0.206, 0.118, 0.167, 0.291]  eta 20m
+step    6900  loss 0.6658  bpc 0.9605 (plain 1.0371)  lr 2.73e-04  |g| 0.25  rate [0.206, 0.118, 0.165, 0.288]  eta 20m
+step    7000  loss 0.6860  bpc 0.9897 (plain 1.0648)  lr 2.68e-04  |g| 0.26  rate [0.206, 0.118, 0.165, 0.291]  eta 20m
+step    7100  loss 0.7245  bpc 1.0452 (plain 1.1126)  lr 2.63e-04  |g| 0.26  rate [0.207, 0.118, 0.167, 0.288]  eta 20m
+step    7200  loss 0.6916  bpc 0.9978 (plain 1.0925)  lr 2.57e-04  |g| 0.24  rate [0.207, 0.118, 0.166, 0.288]  eta 19m
+step    7300  loss 0.6809  bpc 0.9823 (plain 1.0705)  lr 2.52e-04  |g| 0.22  rate [0.206, 0.118, 0.166, 0.291]  eta 19m
+step    7400  loss 0.6619  bpc 0.9550 (plain 1.0428)  lr 2.46e-04  |g| 0.25  rate [0.206, 0.118, 0.167, 0.291]  eta 19m
+step    7500  loss 0.7218  bpc 1.0413 (plain 1.1250)  lr 2.41e-04  |g| 0.27  rate [0.206, 0.118, 0.167, 0.290]  eta 18m
+step    7600  loss 0.6584  bpc 0.9498 (plain 1.0277)  lr 2.36e-04  |g| 0.27  rate [0.206, 0.119, 0.166, 0.289]  eta 18m
+step    7700  loss 0.6639  bpc 0.9578 (plain 1.0254)  lr 2.30e-04  |g| 0.25  rate [0.206, 0.119, 0.167, 0.295]  eta 18m
+step    7800  loss 0.7447  bpc 1.0743 (plain 1.1394)  lr 2.25e-04  |g| 0.27  rate [0.206, 0.119, 0.168, 0.287]  eta 18m
+step    7900  loss 0.6742  bpc 0.9727 (plain 1.0448)  lr 2.19e-04  |g| 0.25  rate [0.207, 0.119, 0.167, 0.293]  eta 17m
+  eval step    8000  alpaca 1.7078  dolly 1.9972  oasst1 1.9035  persona 0.2347  soda 1.2709  soda_narrative 1.5839  stories_topic 1.0753  tinystories 1.0836  weighted 1.2460
+    ['hello'] -> 'Hello. Ask me something, or ask me for a story.'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a big dog named Max. Max liked to play and have fun together. One day, Max saw a big puddle on the ground. He picked it up and started to read a spear.'
+step    8000  loss 0.7338  bpc 1.0586 (plain 1.1411)  lr 2.14e-04  |g| 0.23  rate [0.207, 0.118, 0.168, 0.290]  eta 17m
+step    8100  loss 0.7125  bpc 1.0279 (plain 1.0800)  lr 2.09e-04  |g| 0.26  rate [0.206, 0.118, 0.168, 0.289]  eta 17m
+step    8200  loss 0.7197  bpc 1.0383 (plain 1.0861)  lr 2.04e-04  |g| 0.29  rate [0.207, 0.119, 0.167, 0.289]  eta 16m
+step    8300  loss 0.7152  bpc 1.0317 (plain 1.0965)  lr 1.98e-04  |g| 0.25  rate [0.206, 0.118, 0.168, 0.291]  eta 16m
+step    8400  loss 0.6408  bpc 0.9245 (plain 0.9905)  lr 1.93e-04  |g| 0.25  rate [0.207, 0.119, 0.166, 0.294]  eta 16m
+step    8500  loss 0.6851  bpc 0.9883 (plain 1.0520)  lr 1.88e-04  |g| 0.22  rate [0.207, 0.119, 0.168, 0.291]  eta 16m
+step    8600  loss 0.6852  bpc 0.9886 (plain 1.0483)  lr 1.83e-04  |g| 0.25  rate [0.206, 0.119, 0.169, 0.291]  eta 15m
+step    8700  loss 0.6875  bpc 0.9919 (plain 1.0585)  lr 1.78e-04  |g| 0.26  rate [0.207, 0.119, 0.167, 0.294]  eta 15m
+step    8800  loss 0.6920  bpc 0.9984 (plain 1.0653)  lr 1.73e-04  |g| 0.25  rate [0.207, 0.119, 0.168, 0.290]  eta 15m
+step    8900  loss 0.6522  bpc 0.9409 (plain 1.0264)  lr 1.68e-04  |g| 0.24  rate [0.207, 0.119, 0.168, 0.294]  eta 14m
+step    9000  loss 0.6716  bpc 0.9689 (plain 1.0502)  lr 1.63e-04  |g| 0.28  rate [0.207, 0.119, 0.167, 0.288]  eta 14m
+step    9100  loss 0.6985  bpc 1.0077 (plain 1.0907)  lr 1.58e-04  |g| 0.28  rate [0.207, 0.119, 0.168, 0.289]  eta 14m
+step    9200  loss 0.6762  bpc 0.9755 (plain 1.0561)  lr 1.53e-04  |g| 0.26  rate [0.207, 0.119, 0.169, 0.295]  eta 14m
+step    9300  loss 0.7548  bpc 1.0890 (plain 1.1252)  lr 1.48e-04  |g| 0.26  rate [0.208, 0.119, 0.169, 0.287]  eta 13m
+step    9400  loss 0.7004  bpc 1.0104 (plain 1.0686)  lr 1.44e-04  |g| 0.27  rate [0.207, 0.119, 0.169, 0.291]  eta 13m
+step    9500  loss 0.6704  bpc 0.9671 (plain 1.0435)  lr 1.39e-04  |g| 0.24  rate [0.207, 0.120, 0.167, 0.292]  eta 13m
+step    9600  loss 0.6770  bpc 0.9768 (plain 1.0533)  lr 1.35e-04  |g| 0.23  rate [0.207, 0.120, 0.169, 0.291]  eta 12m
+step    9700  loss 0.6262  bpc 0.9035 (plain 1.0094)  lr 1.30e-04  |g| 0.23  rate [0.207, 0.120, 0.168, 0.296]  eta 12m
+step    9800  loss 0.6902  bpc 0.9958 (plain 1.0883)  lr 1.26e-04  |g| 0.24  rate [0.207, 0.119, 0.169, 0.293]  eta 12m
+step    9900  loss 0.7121  bpc 1.0273 (plain 1.0885)  lr 1.21e-04  |g| 0.24  rate [0.207, 0.120, 0.169, 0.290]  eta 12m
+  eval step   10000  alpaca 1.6822  dolly 1.9732  oasst1 1.8768  persona 0.2409  soda 1.2564  soda_narrative 1.5663  stories_topic 1.0584  tinystories 1.0672  weighted 1.2292
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'Once upon a time, there was a little girl named Lily. She loved to draw with her toys and share her toys in her house. One day, she found a pair of shiny rock on the floor. She tho'
+step   10000  loss 0.7256  bpc 1.0469 (plain 1.1141)  lr 1.17e-04  |g| 0.26  rate [0.207, 0.120, 0.170, 0.292]  eta 11m
+step   10100  loss 0.6797  bpc 0.9806 (plain 1.0814)  lr 1.13e-04  |g| 0.22  rate [0.207, 0.120, 0.169, 0.292]  eta 11m
+step   10200  loss 0.6795  bpc 0.9803 (plain 1.0421)  lr 1.08e-04  |g| 0.23  rate [0.207, 0.120, 0.169, 0.294]  eta 11m
+step   10300  loss 0.6740  bpc 0.9724 (plain 1.0213)  lr 1.04e-04  |g| 0.25  rate [0.207, 0.120, 0.168, 0.295]  eta 11m
+step   10400  loss 0.6850  bpc 0.9883 (plain 1.0615)  lr 1.00e-04  |g| 0.24  rate [0.208, 0.120, 0.170, 0.293]  eta 10m
+step   10500  loss 0.6083  bpc 0.8776 (plain 0.9871)  lr 9.65e-05  |g| 0.21  rate [0.208, 0.120, 0.169, 0.292]  eta 10m
+step   10600  loss 0.6695  bpc 0.9659 (plain 1.0541)  lr 9.27e-05  |g| 0.21  rate [0.208, 0.120, 0.170, 0.290]  eta 10m
+step   10700  loss 0.6949  bpc 1.0026 (plain 1.0570)  lr 8.89e-05  |g| 0.25  rate [0.207, 0.120, 0.170, 0.292]  eta 9m
+step   10800  loss 0.6899  bpc 0.9953 (plain 1.0601)  lr 8.53e-05  |g| 0.21  rate [0.207, 0.120, 0.169, 0.291]  eta 9m
+step   10900  loss 0.6444  bpc 0.9297 (plain 1.0220)  lr 8.17e-05  |g| 0.23  rate [0.208, 0.119, 0.169, 0.293]  eta 9m
+step   11000  loss 0.6896  bpc 0.9949 (plain 1.0545)  lr 7.83e-05  |g| 0.22  rate [0.207, 0.120, 0.170, 0.293]  eta 9m
+step   11100  loss 0.6557  bpc 0.9460 (plain 1.0273)  lr 7.49e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.293]  eta 8m
+step   11200  loss 0.7124  bpc 1.0278 (plain 1.0932)  lr 7.16e-05  |g| 0.26  rate [0.207, 0.120, 0.170, 0.291]  eta 8m
+step   11300  loss 0.6557  bpc 0.9460 (plain 1.0250)  lr 6.85e-05  |g| 0.22  rate [0.207, 0.120, 0.169, 0.294]  eta 8m
+step   11400  loss 0.6966  bpc 1.0050 (plain 1.0761)  lr 6.54e-05  |g| 0.24  rate [0.208, 0.120, 0.170, 0.290]  eta 7m
+step   11500  loss 0.6666  bpc 0.9616 (plain 1.0180)  lr 6.24e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.292]  eta 7m
+step   11600  loss 0.6797  bpc 0.9807 (plain 1.0657)  lr 5.96e-05  |g| 0.23  rate [0.208, 0.121, 0.170, 0.292]  eta 7m
+step   11700  loss 0.6749  bpc 0.9737 (plain 1.0593)  lr 5.68e-05  |g| 0.23  rate [0.208, 0.120, 0.171, 0.292]  eta 7m
+step   11800  loss 0.7008  bpc 1.0110 (plain 1.0801)  lr 5.42e-05  |g| 0.23  rate [0.207, 0.120, 0.170, 0.291]  eta 6m
+step   11900  loss 0.7274  bpc 1.0495 (plain 1.0946)  lr 5.16e-05  |g| 0.24  rate [0.207, 0.120, 0.171, 0.290]  eta 6m
+  eval step   12000  alpaca 1.6651  dolly 1.9504  oasst1 1.8683  persona 0.2324  soda 1.2415  soda_narrative 1.5529  stories_topic 1.0481  tinystories 1.0559  weighted 1.2165
+    ['hello'] -> 'Hello! What would you like to talk about?'
+    ['tell me a story about a dog'] -> 'One day, a cat and a dog were playing in the park. They were very happy. They wanted to play together. They did not want to do well.\nThey said, "I want to make this pillow to see i'
+step   12000  loss 0.6815  bpc 0.9832 (plain 1.0801)  lr 4.92e-05  |g| 0.23  rate [0.208, 0.120, 0.171, 0.290]  eta 6m
+step   12100  loss 0.6437  bpc 0.9287 (plain 1.0268)  lr 4.69e-05  |g| 0.22  rate [0.207, 0.120, 0.169, 0.294]  eta 5m
+step   12200  loss 0.6636  bpc 0.9574 (plain 1.0295)  lr 4.47e-05  |g| 0.21  rate [0.207, 0.121, 0.170, 0.292]  eta 5m
+step   12300  loss 0.6199  bpc 0.8943 (plain 0.9803)  lr 4.26e-05  |g| 0.22  rate [0.208, 0.120, 0.170, 0.295]  eta 5m
+step   12400  loss 0.6334  bpc 0.9138 (plain 0.9905)  lr 4.06e-05  |g| 0.21  rate [0.208, 0.120, 0.170, 0.293]  eta 5m
+step   12500  loss 0.7286  bpc 1.0511 (plain 1.1125)  lr 3.87e-05  |g| 0.26  rate [0.208, 0.120, 0.171, 0.290]  eta 4m
+step   12600  loss 0.7067  bpc 1.0196 (plain 1.1009)  lr 3.70e-05  |g| 0.22  rate [0.207, 0.120, 0.172, 0.291]  eta 4m
+step   12700  loss 0.6665  bpc 0.9616 (plain 1.0405)  lr 3.53e-05  |g| 0.23  rate [0.208, 0.121, 0.171, 0.293]  eta 4m
+step   12800  loss 0.6952  bpc 1.0029 (plain 1.0834)  lr 3.38e-05  |g| 0.24  rate [0.207, 0.120, 0.172, 0.290]  eta 3m
+step   12900  loss 0.7087  bpc 1.0225 (plain 1.1102)  lr 3.24e-05  |g| 0.23  rate [0.208, 0.120, 0.171, 0.290]  eta 3m
+step   13000  loss 0.6213  bpc 0.8964 (plain 0.9739)  lr 3.11e-05  |g| 0.21  rate [0.207, 0.121, 0.171, 0.296]  eta 3m
+step   13100  loss 0.6410  bpc 0.9247 (plain 1.0223)  lr 3.00e-05  |g| 0.22  rate [0.207, 0.120, 0.171, 0.295]  eta 3m
+step   13200  loss 0.7013  bpc 1.0117 (plain 1.0795)  lr 2.89e-05  |g| 0.24  rate [0.208, 0.120, 0.172, 0.291]  eta 2m
+step   13300  loss 0.7028  bpc 1.0139 (plain 1.0781)  lr 2.80e-05  |g| 0.26  rate [0.208, 0.120, 0.172, 0.289]  eta 2m
+step   13400  loss 0.6655  bpc 0.9601 (plain 1.0557)  lr 2.72e-05  |g| 0.21  rate [0.208, 0.121, 0.171, 0.291]  eta 2m
+step   13500  loss 0.7027  bpc 1.0137 (plain 1.0845)  lr 2.65e-05  |g| 0.22  rate [0.208, 0.121, 0.172, 0.290]  eta 1m
+step   13600  loss 0.6219  bpc 0.8972 (plain 0.9757)  lr 2.60e-05  |g| 0.21  rate [0.207, 0.120, 0.170, 0.296]  eta 1m
+step   13700  loss 0.6930  bpc 0.9998 (plain 1.1036)  lr 2.56e-05  |g| 0.24  rate [0.208, 0.121, 0.171, 0.291]  eta 1m
+step   13800  loss 0.7013  bpc 1.0118 (plain 1.1004)  lr 2.52e-05  |g| 0.23  rate [0.208, 0.121, 0.171, 0.291]  eta 1m
+step   13900  loss 0.7200  bpc 1.0387 (plain 1.0803)  lr 2.51e-05  |g| 0.22  rate [0.207, 0.121, 0.172, 0.293]  eta 0m
+  eval step   14000  alpaca 1.6645  dolly 1.9555  oasst1 1.8612  persona 0.2270  soda 1.2363  soda_narrative 1.5450  stories_topic 1.0435  tinystories 1.0523  weighted 1.2126
+    ['hello'] -> 'Hello there. What can I do for you?'
+    ['tell me a story about a dog'] -> 'One day, a little dog named Max saw a big tree. Max was a note on the ground. Max wanted to play with the fan, but he was too small. He looked everywhere. He wanted to eat the meta'
+  eval step   14000  alpaca 1.6645  dolly 1.9555  oasst1 1.8612  persona 0.2270  soda 1.2363  soda_narrative 1.5450  stories_topic 1.0435  tinystories 1.0523  weighted 1.2126
+[A12] done in 160.7 min
+
+all requested stages complete
