@@ -74,13 +74,21 @@ VAL_FRACTION = 0.004
 #: passes over 796 examples, which is not training on assistant register, it is
 #: memorising 796 answers. 0.02 keeps the register signal at a repetition count
 #: closer to the rest of the mix.
+#: UPDATED 2026-08-11 to the shipped recipe. It previously named the `chat-v1`
+#: mixture, which predates `stories_topic` entirely -- so any run launched
+#: without an explicit `--mix` silently trained on a corpus with no
+#: subject-conditioned story source in it at all, which is the single change
+#: `docs/chat/QUALITY.md` attributes the responsiveness gain to. The values below
+#: are `experiments/chat/chat-v3d-aligned`'s own `chat_config["mix"]`, read out
+#: of the shipped checkpoint.
 DEFAULT_MIX: dict[str, float] = {
-    "tinystories": 0.32,
-    "soda": 0.36,
-    "alpaca": 0.14,
+    "stories_topic": 0.40,
+    "soda": 0.20,
+    "alpaca": 0.15,
+    "tinystories": 0.09,
+    "persona": 0.08,
     "dolly": 0.06,
     "oasst1": 0.02,
-    "persona": 0.10,
 }
 
 #: Prompts that a TinyStories narrative is presented as the answer to, so that

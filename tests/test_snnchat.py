@@ -757,6 +757,156 @@ def test_min_chars_stops_the_empty_reply_from_winning():
     assert max(pool, key=lambda c: c.score) is real
 
 
+def test_content_words_drop_the_frame_and_keep_the_subject():
+    """The prompt's subject matter, with the request frame removed.
+
+    The list is closed-class English only, so "tell", "story" and "three"
+    survive as content words. That is deliberate and it is what makes the list
+    defensible: none of it was chosen by looking at the probe battery.
+    """
+    from snnchat.rerank import prompt_content_words
+
+    # "about" is a preposition and is dropped; "tell" and "story" are not in the
+    # list and are kept, which is the untuned behaviour the docstring claims.
+    assert prompt_content_words("tell me a story about a rabbit") == [
+        "rabbit", "story", "tell",
+    ]
+    # Pure function words leave nothing, and nothing means the partition is off
+    # for that turn rather than matching everything.
+    assert prompt_content_words("what is it?") == []
+    assert prompt_content_words("") == []
+
+
+def test_echo_counts_distinct_words_not_repetitions():
+    """A reply that says "boat" nine times is not nine times about a boat.
+
+    Counting repeats would hand the tier to whichever candidate looped, which is
+    the failure `_loop_penalty` already exists to suppress.
+    """
+    from snnchat.rerank import echo_count
+
+    words = ["boat", "river"]
+    assert echo_count("the boat boat boat boat", words) == 1
+    assert echo_count("the boat on the river", words) == 2
+    assert echo_count("nothing relevant here", words) == 0
+    # A crude singular stem, so a plural reply still counts.
+    assert echo_count("two boats went by", ["boat"]) == 1
+    assert echo_count("the rabbits ran", ["rabbits"]) == 1
+
+
+def test_echo_partition_is_the_identity_when_nothing_echoes():
+    """The guarantee that makes this safe to turn on by default.
+
+    If no candidate mentions anything from the prompt, the turn must be decided
+    exactly as it was before the partition existed. Otherwise every draw whose
+    pool contains no on-topic reply -- still the majority of them -- would
+    silently change.
+    """
+    from snnchat.rerank import Candidate, RerankParams
+
+    rp = RerankParams(n=3, lam=0.6, min_chars=12)
+    cands = [
+        Candidate(ids=[9] * 40, scored=[9] * 40, logp_cond=-40.0, logp_null=-60.0),
+        Candidate(ids=[9] * 40, scored=[9] * 40, logp_cond=-70.0, logp_null=-90.0),
+        Candidate(ids=[9] * 40, scored=[9] * 40, logp_cond=-55.0, logp_null=-70.0),
+    ]
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / len(c.scored)
+    by_score = max(cands, key=lambda c: c.score)
+
+    pool = [c for c in cands if c.n_chars >= rp.min_chars] or cands
+    best = max((c.echo for c in pool), default=0)   # all zero: nothing echoed
+    assert best == 0
+    if best > 0:
+        pool = [c for c in pool if c.echo == best]
+    assert max(pool, key=lambda c: c.score) is by_score
+
+
+def test_echo_partition_beats_the_score_but_only_inside_the_length_guard():
+    """The tier wins; a fragment that names the topic still does not.
+
+    The echo partition is applied INSIDE `min_chars`, so a nine-character
+    fragment that happens to say "rabbit" must not beat a whole reply. The other
+    order reintroduces the length pathology one level up.
+    """
+    from snnchat.rerank import Candidate, RerankParams
+
+    rp = RerankParams(n=3, lam=0.6, min_chars=12)
+    best_score = Candidate(ids=[9] * 40, scored=[9] * 40, logp_cond=-40.0, logp_null=-60.0)
+    on_topic = Candidate(ids=[9] * 40, scored=[9] * 40, logp_cond=-70.0, logp_null=-90.0)
+    fragment = Candidate(ids=[9] * 8, scored=[9] * 8, logp_cond=-4.0, logp_null=-9.0)
+    on_topic.echo = 1
+    fragment.echo = 2                      # names more of the prompt, and is junk
+    cands = [best_score, on_topic, fragment]
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / len(c.scored)
+    assert best_score.score > on_topic.score, "the score disagrees, which is the point"
+
+    pool = [c for c in cands if c.n_chars >= rp.min_chars] or cands
+    assert fragment not in pool, "the length guard runs first"
+    best = max((c.echo for c in pool), default=0)
+    if best > 0:
+        pool = [c for c in pool if c.echo == best]
+    assert max(pool, key=lambda c: c.score) is on_topic
+
+
+def test_the_recorded_winner_is_what_rerank_returned(tiny_model):
+    """`/candidates` must star the reply the user actually read.
+
+    It used to recompute the winner from `last_candidates`, which dropped the
+    `min_chars` partition -- on 4.8 % of the committed draws that starred a
+    draft `rerank` could never return -- and read the CURRENT settings against a
+    pool drawn under the old ones, so `/echo off` moved the star onto the very
+    draft the partition had just rejected. The decision is now recorded.
+    """
+    from snnchat.rerank import RerankParams
+
+    tok = ChatTokenizer()
+    session = ChatSession(tiny_model, tok, device="cpu",
+                          params=SamplingParams(seed=5, max_new=40),
+                          rerank=RerankParams(n=4, lam=0.6))
+    reply = session.send("tell me a story about a rabbit")
+
+    assert session.last_winner is not None
+    assert session.last_winner in session.last_candidates
+    # The recorded winner is the text that was actually returned, up to the
+    # sentence trim `_reranked` applies after selection.
+    winner_text = tok.decode_visible(session.last_winner.ids).strip()
+    assert winner_text.startswith(reply[:20]) or reply.startswith(winner_text[:20])
+
+    # Turning the partition off afterwards must not retroactively move the star.
+    was = session.last_winner
+    session.rerank.echo = False
+    assert session.last_winner is was
+
+    session.reset()
+    assert session.last_winner is None and session.last_candidates == []
+
+
+def test_regenerate_under_a_fixed_seed_draws_something_new(tiny_model):
+    """`/again` was a silent no-op for anyone who had set `/seed`.
+
+    `send` seeds a fresh generator from `params.seed` every turn, so replaying
+    the same user text at the same seed reproduced the reply the user had just
+    rejected -- the one case `/again` exists for. The offset is a count, so the
+    sequence stays reproducible.
+    """
+    tok = ChatTokenizer()
+    params = SamplingParams(seed=7, max_new=40)
+
+    def run():
+        s = ChatSession(tiny_model, tok, device="cpu", params=params)
+        first = s.send("tell me a story about a rabbit")
+        return first, s.regenerate(), s.regenerate()
+
+    first, again, again2 = run()
+    assert again != first, "regenerating reproduced the rejected reply"
+    assert again2 != again, "a second /again repeated the first one"
+
+    # Reproducible, not random: the same conversation replays identically.
+    assert run() == (first, again, again2)
+
+
 def test_topic_prefers_the_repeated_noun_over_the_character_name():
     """Why the shipped corpus taught the wrong thing.
 
@@ -820,6 +970,51 @@ def test_probe_hits_allow_a_plural_but_not_a_substring():
     assert _word_hit("two rabbits hopped", ("rabbit",)) == ["rabbit"]
     assert _word_hit("he was grabbity", ("rabbit",)) == []
     assert _word_hit("Rabbit!", ("rabbit",)) == ["rabbit"]
+
+
+def test_canned_catches_persona_recitation_that_fallback_misses():
+    """The gap `fallback_rate` leaves, and the reason it matters.
+
+    `_is_fallback` is five hand-picked phrases. The model's actual recitations
+    are drawn from all ~104 of persona's non-story replies, and at the shipped
+    arm's reading row 8 of the 20 `list` picks are persona text while
+    `fallback_rate` reads 0.0000.
+    """
+    from snnchat.quality import _is_canned, _is_fallback
+
+    # Real picks, from experiments/chat/_quality/chat-v3d-aligned.json.
+    for text in ("That's beyond me, I'm afraid.",
+                 "I don't really have opinions - I just predict likely text.",
+                 "No - there's nobody in here. Just weights and spikes.",
+                 "You can call me SNN. That's what I am."):
+        assert _is_canned(text), text
+        assert not _is_fallback(text), f"{text!r} is exactly what fallback misses"
+
+    # A real answer is not recitation.
+    assert not _is_canned("A dog, a cat and a bird.")
+    assert not _is_canned("Red, blue and green.")
+    # Too short to be evidence either way.
+    assert not _is_canned("I'm sorry.")
+
+
+def test_canned_does_not_fire_on_an_ordinary_story():
+    """The calibration that keeps this from being the metric it replaces.
+
+    persona's `story_request` replies are written-out narratives, so at a
+    15-character threshold "once upon a time" matched them and the detector
+    fired on 53 of 64 `topic` picks. Story replies are excluded (that failure is
+    `story_dodge`'s job) and the threshold is 20.
+    """
+    from snnchat.quality import _CANNED_MIN_CHARS, _is_canned, _PERSONA_REPLIES
+
+    assert _CANNED_MIN_CHARS >= 20
+    assert not any(r.startswith("once upon a time") for r in _PERSONA_REPLIES)
+    for story in (
+        "Once upon a time, there was a clumsy boy named Tim. Tim had a big bag of rocks.",
+        "Once upon a time, there was a little girl named Lily. She liked to play.",
+        "One day, a boy named Tim went to the park to play with his favourite toy.",
+    ):
+        assert not _is_canned(story), story
 
 
 def test_fallback_detects_the_evasion_but_not_a_greeting_inside_a_story():

@@ -147,6 +147,29 @@ class MixtureSampler:
                 f"no source in {corpus.available} has a positive weight and enough "
                 f"characters for seq_len={seq_len}"
             )
+
+        # Renormalising over the sources that are PRESENT is deliberate and
+        # tested (`test_weights_renormalise_over_present_sources_only`) -- it is
+        # what lets one mixture be evaluated against a partial corpus. Doing it
+        # SILENTLY is not: a requested source that was never packed then trains a
+        # mixture that appears nowhere in the repository, inflating every
+        # survivor, and the only symptom is a worse model.
+        #
+        # `DEFAULT_MIX` names `stories_topic`, which `scripts/chat/build_data.py`
+        # does not produce -- it comes from `build_topic_stories.py` -- so this
+        # warning fires on exactly the path that used to be quiet.
+        missing = {n for n, w in weights.items() if w > 0.0} - set(names)
+        if missing:
+            lost = sum(float(weights[n]) for n in missing)
+            print(
+                f"  WARNING: {len(missing)} requested source(s) not in the corpus: "
+                f"{', '.join(sorted(missing))}\n"
+                f"           they carried {lost:.3f} of the requested weight; the "
+                f"rest is renormalised by {1.0 / max(1.0 - lost, 1e-9):.3f}x.\n"
+                f"           available: {', '.join(sorted(corpus.available))}",
+                flush=True,
+            )
+
         total = sum(ws)
         self.names: list[str] = names
         self.arrays: list[np.ndarray] = arrays
