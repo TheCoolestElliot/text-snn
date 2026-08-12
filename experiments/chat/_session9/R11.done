@@ -1,0 +1,20 @@
+{
+  "stage": "R11",
+  "desc": "repack alpaca/dolly/oasst1 at MAX_TURN_CHARS 600",
+  "cmds": [
+    [
+      "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "scripts/chat/build_data.py",
+      "--only",
+      "alpaca",
+      "dolly",
+      "oasst1",
+      "--max-turn-chars",
+      "600",
+      "--suffix",
+      "_t600"
+    ]
+  ],
+  "seconds": 10.5,
+  "finished": "2026-08-12T10:05:46"
+}
