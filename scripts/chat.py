@@ -29,6 +29,7 @@ import torch  # noqa: E402
 
 from snnchat.generate import (ChatSampler, ChatSession, SamplingParams,  # noqa: E402
                               load_chat_checkpoint)
+from snnchat.prime import story_prime  # noqa: E402
 from snnchat.tokenizer import ChatTokenizer, normalise_text  # noqa: E402
 
 
@@ -93,6 +94,7 @@ commands
   /lambda <x>           how hard reranking punishes a generic reply (0..1.5)
   /spread <x>           draw the drafts over a range of temperatures (0 = off)
   /echo [on|off]        prefer drafts that mention what you asked about
+  /prime [on|off]       start a story reply with your topic (WE write that bit)
   /candidates           show what the last reply was chosen from
   /seed <n|off>         fix the sampler's seed for reproducible replies
   /params               show the current sampling settings
@@ -134,7 +136,34 @@ _SCRATCH_PREFIX = "_"
 #: `1` restores the pre-reranking behaviour exactly --
 #: `tests/test_snnchat.py::test_a_single_candidate_rerank_is_the_ordinary_sampler`
 #: is what makes that a guarantee rather than an intention.
-DEFAULT_RERANK_N = 8
+#:
+#: N RAISED 8 -> 32 ON 2026-08-11, AND THE OLD REASON FOR 8 NEVER APPLIED TO N
+#: ---------------------------------------------------------------------------
+#: The paragraphs above are about `lambda`. `n = 8` was never chosen by a
+#: measurement at all; the sweep's own argmax was n = 16, and 8 came along with
+#: the lambda row. Once the echo partition could actually FIND an on-topic draft
+#: (`QUALITY_v8.md` §2), the size of the pool became the binding constraint, and
+#: it turns out to pay for a long way. Held-out topic hit rate, 20 nouns the
+#: probe battery has never contained x 6 seeds (`QUALITY_v8.md` §13):
+#:
+#:     n      4      8     16     32     64    128
+#:   echo  .033   .083   .142   .200   .300   .300
+#: oracle  .033   .092   .158   .250   .367   .450
+#:  score  .000   .008   .000   .017   .025   .017     <- more drafts buy it NOTHING
+#:
+#: Measured cost on this box, median over 4 turns at `--max-new 300`:
+#: n=8 1.05 s / 0.13 GiB, n=32 1.72 s / 0.38 GiB, n=64 2.55 s / 0.72 GiB,
+#: n=128 4.21 s / 1.39 GiB. Batch is nearly free on this scan
+#: (`BUILD_NOTES.md` §1), which is why 4x the drafts costs 1.6x the wall clock.
+#:
+#: **32 rather than 64** trades 0.100 of held-out topicality for 0.83 s a turn,
+#: on the judgement that a REPL should answer in under two seconds. `/rerank 64`
+#: is the measured optimum for topicality and is one command away.
+#: **Not more than 64**: the partition saturates at 0.300 while the oracle keeps
+#: rising to 0.450, because a large pool fills the top tier with drafts echoing
+#: the request FRAME ("tell", "story") rather than the subject. That gap is the
+#: next thing worth attacking and it is a selector problem, not a pool problem.
+DEFAULT_RERANK_N = 32
 DEFAULT_RERANK_LAMBDA = 0.6
 
 #: How wide a range of temperatures the drafts are proposed over. See
@@ -227,6 +256,12 @@ def build_parser() -> argparse.ArgumentParser:
                    metavar="X",
                    help="propose the drafts over temperatures spanning "
                         "+/- X of --temperature; 0 draws them all at one")
+    p.add_argument("--prime", action="store_true",
+                   help="begin a story reply with the corpus's own opening clause "
+                        "naming your topic (\"Once upon a time, there was a little "
+                        "penguin\"). THIS PROGRAM writes those characters, not the "
+                        "model; they are shown dimmed. Off by default. See "
+                        "docs/chat/QUALITY_v8.md section 14")
     p.add_argument("--no-echo", dest="rerank_echo", action="store_false",
                    help="rank drafts by the likelihood score alone, without first "
                         "preferring the ones that mention what you asked about "
@@ -385,7 +420,13 @@ def run_chat(model, cfg, ck, args) -> int:
                           rerank=rerank)
 
     if args.prompt is not None:
-        print(session.send(args.prompt))
+        # The one-shot path is what gets piped into other tools, so it must
+        # honour `--prime` exactly as the REPL does. It prints the prime as part
+        # of the reply without dimming, because a redirected stdout gets no
+        # escapes at all -- the caller is told which characters are theirs by
+        # the flag they passed, not by colour they will not receive.
+        print(session.send(args.prompt,
+                           prime=story_prime(args.prompt) if args.prime else None))
         return 0
 
     n_params = sum(p.numel() for p in model.parameters())
@@ -433,8 +474,16 @@ def run_chat(model, cfg, ck, args) -> int:
 
         sys.stdout.write(c("snn", "1") + " > ")
         sys.stdout.flush()
+        # A prime is text THIS PROGRAM wrote, so it is echoed dimmed and before
+        # the stream starts. A reader must be able to see which characters the
+        # model did not produce; printing it in the same colour as the reply
+        # would make the transcript a claim about the model that is not true.
+        prime = story_prime(cleaned) if getattr(args, "prime", False) else None
+        if prime:
+            sys.stdout.write(c(prime, "2"))
+            sys.stdout.flush()
         t0 = time.perf_counter()
-        reply = session.send(cleaned, on_char=write)
+        reply = session.send(cleaned, on_char=write, prime=prime)
         dt = time.perf_counter() - t0
         if args.no_stream:
             sys.stdout.write(reply)
@@ -574,6 +623,15 @@ def _command(line: str, session: ChatSession, args) -> bool:
             print("  echo off; drafts are ranked by the likelihood score alone")
         if session.rerank is None:
             print("  (reranking is off, so this takes effect at /rerank <n>)")
+    elif cmd == "/prime":
+        on = not (rest and rest[0] in ("off", "no", "0"))
+        args.prime = on
+        if on:
+            print("  prime on; story replies begin with a clause THIS PROGRAM writes,")
+            print("  shown dimmed. The model continues from it. Recurrence of your")
+            print("  topic beyond that clause is 0.358 against 0.200 unprimed.")
+        else:
+            print("  prime off; every character of the reply is the model's")
     elif cmd == "/candidates":
         cands = session.last_candidates
         if not cands:

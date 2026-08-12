@@ -972,6 +972,48 @@ def test_probe_hits_allow_a_plural_but_not_a_substring():
     assert _word_hit("Rabbit!", ("rabbit",)) == ["rabbit"]
 
 
+def test_prime_fires_on_a_story_request_and_is_silent_otherwise():
+    """A prime that fires on "hello" would put words in the model's mouth for
+    a turn where nothing was asked for."""
+    from snnchat.prime import prime_topic, story_prime
+
+    assert prime_topic("tell me a story about a penguin") == "penguin"
+    assert prime_topic("write me a little story about a butterfly") == "butterfly"
+    # The head of an English noun phrase is its last word.
+    assert prime_topic("tell me a story about a boy and his kite") == "kite"
+    assert story_prime("tell me a story about a turtle") == (
+        "Once upon a time, there was a little turtle")
+
+    for negative in ("hello", "what are you?", "name three animals",
+                     "list three fruits", "what is the capital of France?",
+                     "how are you?", "tell me a story", "what colour is the sky?"):
+        assert story_prime(negative) is None, negative
+
+
+def test_a_primed_turn_leaves_the_state_a_replay_would_reach(tiny_model):
+    """The primed characters must reach the membrane, not just the screen.
+
+    Priming the display alone would leave the session carrying a turn nobody
+    saw -- the same incoherence `rewind` exists to avoid -- and `rewind` replays
+    `_fed`, so the prime has to be in it.
+    """
+    tok = ChatTokenizer()
+    params = SamplingParams(seed=3, max_new=20)
+    prime = "Once upon a time, there was a little turtle"
+
+    s = ChatSession(tiny_model, tok, device="cpu", params=params)
+    reply = s.send("tell me a story about a turtle", prime=prime)
+    assert reply.startswith(prime), "the prime is part of the reply the caller sees"
+
+    fed = tok.decode_visible(s._fed)
+    assert prime in fed, "the prime never reached the membrane"
+
+    # A rewind-and-replay reaches the same place, which is what makes `/back`
+    # correct after a primed turn.
+    s.rewind(1)
+    assert len(s.turns) == 0
+
+
 def test_canned_catches_persona_recitation_that_fallback_misses():
     """The gap `fallback_rate` leaves, and the reason it matters.
 
