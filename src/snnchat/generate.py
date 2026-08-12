@@ -369,17 +369,39 @@ class ChatSession:
         *,
         on_char: Callable[[str], None] | None = None,
         params: SamplingParams | None = None,
+        prime: str | None = None,
     ) -> str:
         """Append a user turn, generate the reply, return it.
 
         `on_char` is called with each character as it is produced, which is what
         makes the REPL stream. Special ids are never passed to it -- a turn
         marker is a control signal, not something to print.
+
+        `prime` begins the model's turn with text the CALLER supplies, and the
+        model continues from there. See `snnchat.prime` for what that is for and
+        for the honesty problem it creates: the primed characters are part of
+        the returned reply, so any metric that asks whether the reply contains
+        the requested word is answering a question about the caller.
+
+        The prime is appended to `self._fed` and fed through the membrane like
+        any other characters, so `rewind` replays it and the session's state is
+        the state a transcript containing it would reach. Priming only the
+        display would leave the model carrying a turn nobody saw -- the
+        incoherence `rewind` exists to avoid.
         """
         self._prime()
         params = params or self.params
         self._marks.append(len(self._fed))
         prefix = self.tok.render_turn("user", text) + [BOT]
+        primed_ids: list[int] = []
+        if prime:
+            # Encoded, so it cannot forge a turn marker -- `encode` is incapable
+            # of producing one (`test_encode_cannot_forge_a_turn_marker`), which
+            # is what makes it safe to accept caller text here at all.
+            # `list(...)`: `encode` returns an ndarray and `prefix` is a list,
+            # so `+` would broadcast rather than concatenate.
+            primed_ids = [int(i) for i in self.tok.encode(prime)]
+            prefix = list(prefix) + primed_ids
         self._fed.extend(prefix)
         self.chars_fed += len(prefix)
 
@@ -420,7 +442,11 @@ class ChatSession:
         _, self._state = self.sampler._feed([EOT], self._state)
         self._fed.append(EOT)
 
-        reply = self.tok.decode_visible(out).strip()
+        # The primed characters ARE part of the reply -- they were fed to the
+        # membrane and they are what the reader sees on the screen. Prepending
+        # them here rather than at display time keeps `turns`, `_fed` and the
+        # returned string describing the same utterance.
+        reply = self.tok.decode_visible(primed_ids + out).strip()
         self.turns.append(("user", text))
         self.turns.append(("bot", reply))
         return reply

@@ -1,0 +1,1712 @@
+{
+  "ckpt": "experiments/chat/chat-v3d-aligned/ckpt_best.pt",
+  "seeds": 6,
+  "n": 32,
+  "negatives_misfired": [],
+  "heldout_missed": [],
+  "recurrence": {
+    "unprimed": [
+      24,
+      120
+    ],
+    "primed": [
+      43,
+      120
+    ],
+    "mcnemar_p": 0.00015652179718017578
+  },
+  "rows": [
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 286,
+      "primed_chars": 310,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived in a small house with her mom and dad. They liked to play together and laughed. One day, Lily saw a big box in the park. The box had a long time on the ground. She picked it up and showed it to her friend, Tom.\n\"Look, Mom!",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippin was very excited to play and run in the water. She loved to eat all day.\nOne day, a big pillow went to find a fun place to play. Amy loved to slide down on the road with her. She saw a picture of a big slide. She wanted to play with i"
+    },
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 291,
+      "primed_chars": 341,
+      "base_text": "Once upon a time, in a small house, there lived a little girl named Lily. She had a brilliant doll that she loved very much. One day, Lily went to the park to play with her toy snack.\nAs Lucy was playing, she saw a big church spinny box. Lily wanted to tell her toys, but she could not move.",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippin lived in the park with his family and friends. They liked to play with their big arms every day. They would swim together and have fun.\nOne day, a big wind came to the window. They were very scared for him. The woman thought and thoug"
+    },
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 295,
+      "primed_chars": 323,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived in a small house with her mom, dad, and her dog, Max. They liked to play with their toys and have fun.\nOne day, Lily's mom told her to go to the park to play. She saw a big tree with a big smile on the floor. It was a very selfish.",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippa lived in a big park with his family with a big tree. The penguin was a big, red ball. He liked the belt and the bird vest.\nOne day, a little bug came to see all the friends in the park. They liked to play together. They saw a little bi"
+    },
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 289,
+      "primed_chars": 311,
+      "base_text": "Once upon a time, there was a pretty girl named Lucy. She lived in a small house with her mom and dad. They would play in the sun all day, and Lily loved to play with her toys.\nOne day, Lily and her friends decided to play in the park. They were happy and did not know where they told her.",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippin lived in the woods with her family. Pippin loved to play outside with her friends, the fish and had fun all day long.\nOne day, Dino was playing with his friend, Daisy and the ball took the blue plant. The sun was shining, and the bird"
+    },
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 277,
+      "primed_chars": 299,
+      "base_text": "One day, a girl named Lucy went to the park. She saw a small pill in the park. She was very happy. She wanted to show it to her friends.\nLily throws her friend, Tom. Tom wanted to be rich. Lily asked her mom, \"Can I have some cheese?\" Tom said, \"No, you can't make the problem.",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippin loved to watch the birds and the birds fly in the sky. One day, as she was playing, she saw a small snake near the sea. She was very happy and thought it was fun.\nKitty said to him to touch the bird, \"Can you tell me more about you?\""
+    },
+    {
+      "prompt": "tell me a story about a penguin",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little penguin",
+      "targets": [
+        "penguin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 286,
+      "primed_chars": 320,
+      "base_text": "Once upon a time, in a small house, there lived a little girl named Lily. Lily loved to play with her toys. One day, she saw a big, dark room with a big sheet. Lily was happy and wanted to play too.\nLily asked her friend, Tom, and said, \"Look, I found a small box!\" Lily was very happy.",
+      "primed_text": "Once upon a time, there was a little penguin named Pippin. Pippin loved to play with his friend, Bunny. They would swing outside and talk to his friends and they all lived happily ever after.\nOne day, Polly was playing in the park with his friend, a little girl named Sally. They were spoiled and lov"
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 272,
+      "primed_chars": 320,
+      "base_text": "Once upon a time, there was a little girl named Amy. She loved to play in her room. One day, she was playing in the park when she saw a little boy. The boy was outside and showed it to his friend, Tom.\n\"Can I hop and play with it?\" The old man said, \"Yes, I can help you.\"",
+      "primed_text": "Once upon a time, there was a little lighthouse named Lily. She lived in a small house with her mom and dad, and they all worked hard to make a big scary nose. One day, Lily found a bottle of the mountain and wanted to take a look.\nThe moral of the story is that there is one of the days and took the"
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 262,
+      "primed_chars": 314,
+      "base_text": "Once upon a time, there was a little girl named Mia. She loved to play outside with her friends. One day, she found a big, round ball in her yard. She was very happy.\nMia went to the beach and saw a big, red ball. Mia was very curious and asked her mom for help.",
+      "primed_text": "Once upon a time, there was a little lighthouse who loved to share. Every day, the big cookie would show the sky to have fun and bring it. Everyone in the town loved the handle box to chew and sing.\nOne sunny day, a little girl named Lily came to the park. She saw a little bird who was sitting in th"
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 300,
+      "primed_chars": 316,
+      "base_text": "Once upon a time, there was a little girl named Lily. She loved to draw with her mom and dad. One day, she saw a big dog near the park. The dog was very dark and cold into a story. Lily was an old dog, but he did not like the dog for him on the ground.\n\"Let's go on the frog!\" Lily said, \"Thank you!\"",
+      "primed_text": "Once upon a time, there was a little lighthouse named Jessing. He lived in a big forest with his friend, a little girl named Sue. Sue was a good dog who liked to play with them.\nOne day, Sue and her friends down the road. They were very pretty and they played together every day. The dog and the dog "
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 277,
+      "primed_chars": 314,
+      "base_text": "Once upon a time, there was a little girl named Mia. Mia lived in a small house with her mom and dad, they were all happy. She had a big hammer that she loved her mom. One day, Mia's mom was broken. She wanted to make something with her friend, Tom.\n\"Mom, can I take the desk?\"",
+      "primed_text": "Once upon a time, there was a little lighthouse with a girl. The girl was very pretty and liked to play with her friends. One day, her friend Tom came to visit him. They wanted to see who could restore the door to her friends.\nAmy walked up to the room and saw a boy named Tim. Tim was sad because he"
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 276,
+      "primed_chars": 307,
+      "base_text": "Once upon a time, there was a little girl named Lily. She loved to play in the park. One day, she was playing with her friends in the park. The sun was happy and started to play with them.\nLily saw a big slide and wanted to play with it. She wanted to help her friend anymore.",
+      "primed_text": "Once upon a time, there was a little lighthouse who wanted to have fun. She asked her friend to tell her to buy her friends to help. The butterfly saw a little bird named Billy. The bird liked to sing with a snack. She was very happy.\nOne day, a big dog came to the garden. The bird wanted to help th"
+    },
+    {
+      "prompt": "tell me a story about a lighthouse",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little lighthouse",
+      "targets": [
+        "lighthouse"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 274,
+      "primed_chars": 315,
+      "base_text": "Once upon a time, in a big forest, there was a wealthy man named Bob. Bob loved to fly and eat yummy food. One day, he met a big fish named Bob. Bob was sad and was always always big and lonely.\nOne day, Bob found a sandwich in the forest. He was so happy to help the story.",
+      "primed_text": "Once upon a time, there was a little lighthouse named Ollie. Ollie liked to play in the garden. One day, her mom gave her a big friend. She wanted to run and play all day long.\nAs Lucy felt embarrassed. She asked, \"Do you want to play with me?\"\nThe sun was shining, and she saw a little girl named Su"
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 289,
+      "primed_chars": 330,
+      "base_text": "Once upon a time, in a small house, there lived a friendly cat named Fluffy. Fluffy liked to play with her friends in the park. One day, Fred saw a big, round ball on the ground. The rabbit looked for his home to make a big cake. Fluffy wanted to help the bug.\nFrog said, \"Okay, be my car.",
+      "primed_text": "Once upon a time, there was a little wizard. The bird lived in a big tree in the woods. The bird liked to help the bird. The bird loved to fly and clean to the wise place to sing with the bird's hands one.\nOne day, a big wind came and blew away from the field. The bird was very sad because the bird "
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 295,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, in a small house, there lived a little boy named Tim. Tim had a toy bear named Spot. They were all very happy. They liked to play together every day.\nOne day, Tim saw a big tree and started to rope. Tim was very happy. He said, \"Hi Tom, do you want to play with me?\" Tim asked.",
+      "primed_text": "Once upon a time, there was a little wizard who lived in a big forest. The tree had many friends who liked to play together. One day, the bird found a big piece of water from the sun.\nAs the big red ball met a little bird. The bird said, \"Why are you sad, little bird? Do you want to play with me?\"\nT"
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 269,
+      "primed_chars": 285,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived in a small house with her mom, dad, and her dog, Max. They liked to play with Lily every day. Lily always started to play with her toys and wanted to fly on it.\nOne day, Lily went to the park with her mom.",
+      "primed_text": "Once upon a time, there was a little wizard. The little boy was always happy. He had a fancy food to play. He liked to play with his ball and run around it.\nOne day, the ball met a big bear. The ball was so bright and happy. The ball said, \"Maybe we will play with you for your story?\""
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 295,
+      "primed_chars": 317,
+      "base_text": "Once upon a time, there was a pretty raven. The raven was sad. The animals lived near a big tree. The raven was far away. The sun was shining and the sky was grey.\nOne day, the bird flew fast and wanted to take the bird. The fish fished for a story. The farmer said, \"Why are you sad, big fish?\"",
+      "primed_text": "Once upon a time, there was a little wizard named Pippin. Pippin lived in the woods with her family. Pip loved to play in the water and smiled in the garden.\nOne day, while Zoomy found a big, red ball. She wanted to pick some tasty cake with her friends. She played with the delay dress, and they saw"
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 265,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim had a big, red ball. He loved to run and play with it every day. One day, Tim was playing with his ball with his ball. He was very happy.\nWhile playing, Tim saw a big balloon in the ground. It was a tiny ball.",
+      "primed_text": "Once upon a time, there was a little wizard named Molly. She was very hungry and had liked to sit in the sand. She liked to listen to make new friends.\nOne day, Mia went to the park to play outside. She saw a big tree with her belt. She wanted to find some food. She was very stubborn and started to "
+    },
+    {
+      "prompt": "tell me a story about a wizard",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little wizard",
+      "targets": [
+        "wizard"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 260,
+      "primed_chars": 306,
+      "base_text": "Once upon a time, there was a little bunny named Bob. Bob was very happy and loved to play with his friends. One day, Bob met a big bird named Blue. Blue and Bob were so excited to fly high in the sky. The boy wanted to eat it, but he was too lazy to climb it.",
+      "primed_text": "Once upon a time, there was a little wizard named Lucy. She lived in a small house near the farm. One day, she went to the store to buy a big roar. The sun was shining, and the birds were singing.\nLily saw a big bear named Ben. Ben was a happy but the bird said, \"Hello, bird. Can you teach me my bro"
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 285,
+      "primed_chars": 340,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim had a toy car that he loved to play with. One day, he found a big, round ball in his yard. He was very happy and excited to see what was inside. Tim was very happy and sat under a tree.\nAs Tim climbed the tree, he saw a big tree.",
+      "primed_text": "Once upon a time, there was a little turtle named Tim. Tim had a small mushroom in her hand. Tim loved to play with his toy car. He would run around the house, mum, and dad. Tim was very happy.\nOne day, Tim found a cave. He wanted to sit on the couch. He rug heard a sound. Tim was happy and wanted t"
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 281,
+      "primed_chars": 313,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She lived in a big house with her mom and dad. Lucy loved to play outside with her friends. One day, she found a big box in the kitchen. She saw a big ball that she loved to make it.\nLucy's mom said, \"You are too hot and paint.",
+      "primed_text": "Once upon a time, there was a little turtle. The turtle was very strong and curious. He was a very good cat.\nOne day, the duck saw a big tree with a big inside. The car wanted to grow in the water. The car was very proud of his mom with the dragon. The dog did not listen to the top.\nThe dog did not "
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 272,
+      "primed_chars": 287,
+      "base_text": "Once upon a time, in a small town, there was a brilliant stuck in a tree. The tree was very lonely and was very high. Every day, the sun would bring a big red ball that he loved to play with.\nOne day, a little girl came to the big tree and saw the bird wanted to help her.",
+      "primed_text": "Once upon a time, there was a little turtle. The butterfly was very curious. He liked to look for furniture. He would get the bug every day. He felt sad and lonely.\nOne day, a big cat came into the forest. The dog saw the magazine and said, \"Hi, dog! Can you tell me more about the toy?\""
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 294,
+      "primed_chars": 302,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to play with his toy gun. He would have more fun eating the box with his toys. One day, Tim's friend, Sue, came to play. Tim was very happy. She wanted to tell Sue to pick it up.\nTim took the mud apple and started to build the past.",
+      "primed_text": "Once upon a time, there was a little turtle named Sue. Sue had a small, community to play with her friends. One day, Sue went to the park to play.\nAt the park, Sue saw a big tree. She thought it would be fun to sit on the wall. Sue was very happy to be happy.\nSue went to the park to play with her mo"
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 281,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, there was a smart dog named Tim. Tim had a friend named Sam. They liked to play and have fun together. Tim was very happy.\nOne day, Sam and Spot went out to play. They saw a big box. They walked and walked until they saw a small bug. They wanted to play together.",
+      "primed_text": "Once upon a time, there was a little turtle named Tim. Tim had a toy car that he loved to play with. One day, he saw a big dog in the park. The dog was very curious and wanted to show his friends.\nTim ran to the car and said, \"Hi Tim, can I have some food to play with the car?\" Tim asked. The turtle"
+    },
+    {
+      "prompt": "tell me a story about a turtle",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little turtle",
+      "targets": [
+        "turtle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 292,
+      "primed_chars": 327,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to play with his toy cars. He was very impatient. He would play outside with his friends all day.\nOne day, Tim met a big friend named Sue. They were backyard on the big blue sea. Tim wanted to play with the ball and be very happy.",
+      "primed_text": "Once upon a time, there was a little turtle. The big blue truck was very old. It looked for brown and tall and strong. The rabbit loved to decorate the rail and try to deliver from the story. The boy would walk in the big park and play with a big red ball.\nOne day, the big red ball was very happy. I"
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 287,
+      "primed_chars": 328,
+      "base_text": "Once upon a time, there was a little boy named Tim. He loved to play outside. One sunny day, he went to the park with his mom.\nAt the park, Tim saw a big box on the ground. He was very excited. He sat on the slide and told him to come with him. Tim saw a big tree and wanted to climb it.",
+      "primed_text": "Once upon a time, there was a little violin named Pip. Pippin was a very impressive dog. He loved to play outside in the sun. One day, his mom made a big party with his friends. They were big and had lots of fun.\nAs they went to the park, they saw a big piece of paper on the ground. The toy was big "
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 292,
+      "primed_chars": 343,
+      "base_text": "Once upon a time, in a small house, lived a boy named Tim and his dog, Spot. They loved to play outside in the sun. One day, Tim found a camera in the kitchen. It was a big, yummy treat. Tim wanted to see what was inside the box.\nIn the store, Tim found a new fork. It was a big, yummy treat!",
+      "primed_text": "Once upon a time, there was a little violin named Pippin. Pippin lived in the forest with her mom and dad. They were very happy when they were going to play together.\nOne day, Lily and her friends went to the park with her mom. They all played with their cars and share their water. They wanted to pl"
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 293,
+      "primed_chars": 332,
+      "base_text": "Once upon a time, there was a girl named Lily. Lily was a very impressive boy. She loved to play outside with her friends. One day, she went to the park to play with her friends.\nWhile playing with her friend, Tim and his friend, a little girl named Sue. They were both very happy to have fun.",
+      "primed_text": "Once upon a time, there was a little violin named Pip. Pip lived in a big tree in the park. One day, Pene was playing in the park near the woods.\nIn the little girl, Sally saw her friend Tim. They wanted to be delivery tight blueberries. Sara saw a big box in the garage. She thought it was pretty, b"
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 262,
+      "primed_chars": 340,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to walk and play with his friends. They would run and jump all day long. Tim was sad because he was very happy.\nOne day, Tim went to the park to play. He saw a big red ball. He wanted to play with it.",
+      "primed_text": "Once upon a time, there was a little violin named Pippin. Pippin lived in the woods with her family. Pippin loved to play on the big fields with her family. She had many friends who liked to play with her friends.\nOne day, Polly and her friends were playing a game. They were very excited to see what"
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 294,
+      "primed_chars": 312,
+      "base_text": "One day, a little boy named Tim found a toy shield in the park. He wanted to examine it all the time. He went to the mailbox with a big tree with the world. All the kids loved Tim in the big smile. He would pick one and wanted to take a story.\nTim asked his mom, \"Can I have the stair, please?\"",
+      "primed_text": "Once upon a time, there was a little violin. The mill was very far away. It wanted to have fun and play with its friends. They lived in a big tree with many trees.\nOne day, the fish was in the ground. He wanted to tell the tree to his friends. He saw a bird truck on the tree. \"Do you want to join me"
+    },
+    {
+      "prompt": "tell me a story about a violin",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little violin",
+      "targets": [
+        "violin"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 278,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, there was a small cat named Tom. Tom lived in a small house with his mom and dad. They were all different from his favorite story. Tom loved to watch the trumpet all day.\nOne day, Tom saw a big ball in the sky. He thought it would be fun to play with the ball.",
+      "primed_text": "Once upon a time, there was a little violin. The raven loved to go fast. It was very pretty and had many colors. One day, the firework saw a big tree. The tree was very pretty. The robot was very obedient. The stone was soft and pretty. The people in the town was big and fast.\nThe bird saw a tree. T"
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 286,
+      "primed_chars": 312,
+      "base_text": "Once upon a time, in a small house, there lived a friendly bear. The bear loved to play and have fun together. One day, the ball met a friendly fish named Sue. They liked to play and run around the tree. They had many friends in the sun.\nOne day, Tim and Sue were playing in the garden.",
+      "primed_text": "Once upon a time, there was a little castle named Lucy. She loved to play with her toys and eat it. One day, Lily went to the park with her ball with her block.\nShe was so happy to see the ball. She thought, \"I can tell me a lot!\" Her mum smiled and said, \"That's a lot of tour! Let's play with it an"
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 252,
+      "primed_chars": 324,
+      "base_text": "One day, a little girl named Sally was very curious. She wanted to play with her toys. She wanted to tell stories to buy the bookcase. She saw a big cake and opened the tree. She picked it up and took it home.\nThe sky said, \"Mom, that's a strong beach.",
+      "primed_text": "Once upon a time, there was a little castle in a small town. The clock was very small and made of the car's home. The cat looked sad and says, \"What do you think is the story in the dirt?\"\nThe cat looked at the cat and said, \"Yes, come back from a room. I will help you.\" The cat and the dog saw the "
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 0.0,
+      "base_chars": 260,
+      "primed_chars": 327,
+      "base_text": "One day, a little boy named Tim was playing in his room. He liked to design songs and be very successful. He saw a big tree and wanted to eat it. But he was too small to reach the ladder and climbed up the castle.\nAs Tim looked at the lion, she saw a big tree.",
+      "primed_text": "Once upon a time, there was a little castle. The cat loved to play with his friend, a big cat. They liked to play together.\nOne day, the cat wanted to decorate the cat. The cat wanted to catch the cat, but it was too high. The cat said, \"I will try to fly!\" The cat agreed. The cat did not like the c"
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 293,
+      "primed_chars": 294,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to play outside with his friends. They liked to play and run in the park. One day, while playing, Tim saw a small suit on the ground. It was a little curtain.\nTim asked his mom, \"Mom, what is this?\" Tim said. \"Yes, but be careful.\"",
+      "primed_text": "Once upon a time, there was a little castle. The crab loved to slide down and play with his friends. One day, the cat saw a big cat. The cat wanted to try a new cat. The cat was sad and could not hear the cat.\nThe cat said, \"Don't be scared, cat. I can help you with your cat. I will help you.\""
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 286,
+      "primed_chars": 314,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived in a small house with her mom and dad. Lily loved to play outside with her toys and learn new things.\nOne day, Lily went to the park with her mom. She saw her mom said, \"I will became best for you, but I can't do anything.",
+      "primed_text": "Once upon a time, there was a little castle. He loved to study his toys and the card had soft full of things. Every day, he would try to create things and eat his trustent and fall. One day, he felt very smart. He was sad and wanted to find something new for him.\nThe moral of the story is that it co"
+    },
+    {
+      "prompt": "tell me a story about a castle",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little castle",
+      "targets": [
+        "castle"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 279,
+      "primed_chars": 324,
+      "base_text": "Once upon a time, there was a little girl named Lily. She loved to play with her toys and share with her toys. One day, she found a big, red ball in the park. She thought it would be a good friend to play with.\nLucy wanted to help the bird with her friend, Tim. The bird was sad.",
+      "primed_text": "Once upon a time, there was a little castle named Lucy. She had a big castle to do. It was a hot day. Lucy had a toy car that she loved very much. One day, she wanted to play with the dog too.\nThe cat was not a big box. The dog was not scared. The dog wanted to get the ball. The dog agreed and the b"
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 287,
+      "primed_chars": 344,
+      "base_text": "Once upon a time, in a small village, there was a sheep in the forest. It lived in a small house near the farm. One day, the car felt very hot. He did not like the shirt on the ground. The squirrel was very happy.\nThe bird saw the little bird named Sue. Sue was sad. She said, \"Hi, bird!",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam loved to race. One day, he was playing with his friends, the birds, and the squirrels. But they liked to sail and play with him.\nWhile they were walking, they saw a big red ball. The bird wanted to play with the ball too. He said, \"Hi, rac"
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 291,
+      "primed_chars": 314,
+      "base_text": "Once upon a time, in a big forest, there lived a little squirrel. The little bee loved to roar very fast. The tree was very friendly and loved to play together.\nOne day, the little bird was sad because he could not fly. The bird saw a big tree and sat on a tree. The tree had a big building.",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam was a sad bird should be friends with him. The squirrel was small and not nervous. The sun was shining and the birds were singing.\nTim said to Sam, \"Let's sort your skin and play with your game. Can you please play with the rock, they made"
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 285,
+      "primed_chars": 327,
+      "base_text": "Once upon a time, in a small village, there lived a little bird named Blue. Blue loved to go fast and seven to make a big party for the kids. One day, Billy was playing with her toy board go fast. She saw a small bird named Tom.\n\"Hi, I am Finny!\" said Bob. \"Why are you sad?\" the bird.",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam lived in a small house with a nice family. They would tell him about a carrot noise.\nOne day, Sam was near the rest of the lion. Sam wanted to help the bird who knew it became best friends. So, the owl and the birds were singing. They had "
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 268,
+      "primed_chars": 344,
+      "base_text": "Once upon a time, there was a big library. Sue loved to fly around her eyes and squirrels. One day, she found a big ball in her room. She did not know where it came from behind her.\n\"Hi, fly!\" said Dad. \"Do you want to play with me?\" The little bird was very confused.",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam loved to eat yummy food. He had a big sigh tree and float all day long. So, he spun to him and saw a big bowl of colors. The bird had a big smile and a small stable. They were best friends and watched the squirrels and were all happy.\nOne "
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 281,
+      "primed_chars": 317,
+      "base_text": "Once upon a time, in a lively little town, there was a little boy named Tim. Tim loved to play outside in the warm sun. One day, while playing in the park, he saw a big tree and he was scared.\nTim said to his friend, Sue, \"What is this?\" Tim said, \"I will help you find your water.",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam lived in a small house with his friends, Sam and Sam. One day, they went for a walk with the park.\nAs they were playing, they saw a big boy. The bird said, \"I have a sand outside! The squirrel tried to reach the leaves, but it was too high"
+    },
+    {
+      "prompt": "tell me a story about a squirrel",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little squirrel",
+      "targets": [
+        "squirrel"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 285,
+      "primed_chars": 319,
+      "base_text": "One day, a small bird named Tim was for a walk. He saw a big friendly bird with lots of fruit. The squirrel loved to play with it. The bird said, \"Oh, please share the wallet, you can fly!\"\nThe bird wanted the fruit to reach the bird. The bird said, \"Hello, bird! Why are you reading?\"",
+      "primed_text": "Once upon a time, there was a little squirrel named Sam. Sam lived in a big tree with his bear. The squirrel loved to read books. Every day, Tim would complain that he would give it to him from the tree to help others.\nOne day, Tim saw a big book. He was sitting on a tree. He thought it would be fun"
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 298,
+      "primed_chars": 324,
+      "base_text": "Once upon a time, there was a gray bear. The bear lived in a small house with a little boy. The bear loved to play with the ball and ball all day. One day, the ball saw a big tree with a tap on it.\nThe cat wanted to play with the ball, but it was too small. The ball started to show it to the ball.",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon was very big and could not fly. All the other animals liked to listen. They would play and have fun together.\nOne day, a little bird came to the forest. The bird saw the bird and said, \"Hello, trip! What can I do for you?\" The little girl sai"
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 285,
+      "primed_chars": 338,
+      "base_text": "Once upon a time, in a little house, there lived a cheerful cat named Tom. Tom loved to eat balloons. One day, he saw a shiny car on the ground. He wanted to climb it, but it was not easy. Tom felt sad because he could not hear.\nTom helped his friend Tom and said, \"Look what I found!\"",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon was rare and strong. It wanted to balance on it. The people were very happy.\nOne day, the balloons went to the store to see what was on the boat. It sailed in the water. The boat saw a boat and wanted to play with it.\nThe baby wanted to help "
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 264,
+      "primed_chars": 341,
+      "base_text": "Once upon a time, there was a girl named Lily. Lily was very independent. She had never been to think of her best friend. Lily liked to walk in the park every day.\nOne sunny day, Lily and her friends went to the park. They saw a big tree and wanted to play a game.",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon was very blocked. It was a million, so she started to run and play. The boat saw a big bowl of yarn on the floor. The boat was very pretty.\nThe boy saw a boy named Tim. Tim asked, \"Why are you sad, this toy?\" The boy said, \"I am sorry, but I "
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 285,
+      "primed_chars": 316,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to play ball. One day, he went to the park with his mom. They saw a big tree near the tree.\nTim wanted to play with the ball. He told the bug, \"Hi, I am the big pig. Can you tell me a time?\" The bee said, \"Yes, let's play!\"",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon lived in a big house. The boat was very happy. It wanted to see the bear feel better.\nOne day, a big boy came to the boat. The boy was playing with a big ball. The bug wanted to play too. The boy said, \"Bob, but you can go to the boat.\" The b"
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 281,
+      "primed_chars": 327,
+      "base_text": "Once upon a time, there was a small boy named Tim. Tim loved to play with his toy ball. He would ride it every day with his friends on the park.\nOne sunny day, Tim went to play outside. He saw a long stick on the ground. It was shiny and shiny. Tim was very excited to see the bug.",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon was very cold. It had a ball. The ball was big and tall. The ball loved to play with the ball.\nOne day, a little bunny came into the road. The ball said, \"Hello, little bug! Do you want to play with me?\" The bug said, \"Yes, I can help you!\" T"
+    },
+    {
+      "prompt": "tell me a story about a balloon",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little balloon",
+      "targets": [
+        "balloon"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 283,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a compassionate boy named Tom. Tom loved to take places with his mom and dad. One day, Tom was playing in the park. He was very careful and a little story in the warm house.\nAs Tom felt careful, a big dog came to the market. The man had a big, round tail.",
+      "primed_text": "Once upon a time, there was a little balloon. The balloon was very big and had many colorful toys. One day, a little boy named Tim found a box of clothes in the garden. He picked it up and put it on the tree. The box was very happy to see it.\nTim wanted to see what was inside the box. He took the bo"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 272,
+      "primed_chars": 328,
+      "base_text": "Once upon a time, in a small town, there lived a silly girl named Lily. She liked to play outside with her friends. One day, she was very happy and could not fly high in the sky. Lily was sad and scared.\nLily wanted to help the bird. She saw her friend Tom with a big box.",
+      "primed_text": "Once upon a time, there was a little whale who lived in a small house. He had a shiny toy that was big and had many friends. He loved to play with his friends in the forest.\nOne day, a little girl named Sally came to the yard. She saw a big tree and wanted to climb it. So, she took the bird to the t"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 294,
+      "primed_chars": 307,
+      "base_text": "Once upon a time, in a small house, there lived a little boy named Tim. Tim had a toy bear named Tim. Tim was a good boy. They loved to play all day.\nOne day, Tim and Tim went to the park. The barrel was happy. They played together and had fun. But then they got too close to the grocery store.",
+      "primed_text": "Once upon a time, there was a little whale who lived in a big garden. Every day, he would sit and sing a lot of wood for his friends. One day, he saw a big tree with lots of bears. The sun was shining, and the birds were singing.\nThe bird saw a big tree and wanted to climb it. But the bird could not"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 292,
+      "primed_chars": 310,
+      "base_text": "Once upon a time, in a big forest, there lived a little dog named Max. Max loved to play and run in the park. One sunny day, Max was in the park with his friend, a little girl named Lily. Lily loved to run and jump in the garden.\nWhile they were playing, Max saw a green bug. The bug was sad.",
+      "primed_text": "Once upon a time, there was a little whale named Fin. Fin loved to swim in the water and blue sea. One day, while playing with his ball, he found a big ball of steel in the forest. He wanted to show his friends in the water, so he asked his friend, a little bird named Bob. Bob was very happy to help"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 286,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She lived in a small house with her mom, dad, and her dog, Max. They liked to play together every day.\nOne day, Max and Lily were playing in the park. They were having so much fun playing together. Lily said, \"Let's go on the park!\"",
+      "primed_text": "Once upon a time, there was a little whale named Tim. Tim loved to tell his friends in the water all day. He liked to play in the water and catch it. His favorite toy was a nice place. He loved his toy cars and pretend the sun would take his bag and talk to another spin.\nOne day, Tim's friend, a dog"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 264,
+      "primed_chars": 310,
+      "base_text": "Once upon a time, in a big forest, there was a white cat named Lily. Lily loved to run and play in the big green trees. Lucy was a little girl who loved to play on the swing.\nOne day, Lily was playing with her toy car because she lost her toy. Lily was very happy.",
+      "primed_text": "Once upon a time, there was a little whale named Lily. She lived in a small house with her mom and dad. They were very happy.\nOne day, Lily was playing with her toys in the yard. She saw a dream of cloths on top. Lily was sad because she could not have fun. Lily wanted to tell her mom and dad it wit"
+    },
+    {
+      "prompt": "tell me a story about a whale",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little whale",
+      "targets": [
+        "whale"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 259,
+      "primed_chars": 318,
+      "base_text": "Once upon a time, there was a little girl named Mia. Mia had a special said, she wore her hair to play. One day, a man asked Max to help her help the butterfly. She said, \"Okay, but be careful not to tell the truck because I'm coming to get some toys to play.",
+      "primed_text": "Once upon a time, there was a little whale named Bella. Gile was very sad because she wanted to have fun. All the other dog were making new friends.\nOne day, a little girl named Lily came to the owner. She saw Bobo and said, \"Hi Fluffy! Do you want to play with me?\"\nHer mom said, \"Yes, you can tell "
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 273,
+      "primed_chars": 328,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim had a toy car that he loved to play with. He would run and jump with his friends, a girl named Sue, who had a lot of fun toy.\nOne day, Tim saw a big cat named Mittens. She asked Tim, \"Can I play the girl in the park?\"",
+      "primed_text": "Once upon a time, there was a little mountain. The mop was very hot. He wanted to explore the store. He asked his mom, \"What is this?\" His mom said, \"You can tell me a story, we can make a difference.\"\nThe smooth soup said, \"Of course, meaning that could be some shape and shine in the mud.\" He asked"
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 258,
+      "primed_chars": 323,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She loved to dance and play all day. One day, she found a pretty brack with many other dogs. Lucy was very happy.\nAs Lucy played with her friend, Tom. Tom thought it would be fun to play with his friends.",
+      "primed_text": "Once upon a time, there was a little mountain named Mimi. Mimi was a big, red room. Mimi loved to play with her friends in the park. One day, Mia wanted to find out too.\n\"Mum, I was playing with you with my friend, Sam. I wanted to see the mountain me.\" The mom said, \"Yes, I can help you.\" They said"
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 274,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, there was a girl named Lily. She lived in a small house with her mom and dad. Lily loved to play outside and have fun with her friends. One day, Lily found a big box in her yard. She was scared of it to her friend, Tim.\nLily was so excited to see the race.",
+      "primed_text": "Once upon a time, there was a little mountain. The mountain was very bossy. The big blue bear was full of fun. The mouse was very hungry.\nOne day, the small bug went to the park. It was a very big and talking and started to make a small flower. The bug was sad and cried.\nThe big fish said, \"Don't wo"
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 270,
+      "primed_chars": 338,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim had a toy that he loved very much. He wore it every day. Tim liked to tell his birthday place in his yard.\nOne sunny day, Tim's friend, Sam, came over to play. Sam saw the girl named Sue and said, \"Look at my box!\"",
+      "primed_text": "Once upon a time, there was a little mountain. The mountain was very special. It was a small bug on the big green tree. The tree was very persisty. It had so many colors and colors.\nOne day, the robot met a little girl named Sue. Sue saw the boy and asked, \"Why are you sad?\"\nThe big dog said, \"I los"
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 282,
+      "primed_chars": 332,
+      "base_text": "Once upon a time, there was a stubborn little girl named Sue. She had a friend, a little boy named Tim. They liked to play together. They had a lot of fun.\nOne day, Tim and Sue went to play in the park. They played with their mom and said, \"Let's play hide and seek with your best.\"",
+      "primed_text": "Once upon a time, there was a little mountain. The man had a big onion. The man had a big, pretty little girl named Lily. She had a big smile on her family.\nOne day, Lily found a pencil. She wanted to tell Tom to help. She wanted to help the girl could find her friends. She saw the girl took the fro"
+    },
+    {
+      "prompt": "tell me a story about a mountain",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little mountain",
+      "targets": [
+        "mountain"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 284,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, in a small house, there was a boy named Tim. Tim had a big, ugly chair that he loved to play with his friends. One day, Tim found a big box in the sock. He wanted to play with it.\nAt the park, Tim met a girl named Sue. Sue said, \"Hi, Mia! Can I play with your ball?\"",
+      "primed_text": "Once upon a time, there was a little mountain. The mole lived in a tiny garden. He liked to run and jump all day.\nOne day, the man found a mask. He wanted to take a nap. He tried to open it. He saw the frog and said, \"I hate you, but not it had to scare you.\" The man thought of a smart dog.\nThe mous"
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 272,
+      "primed_chars": 281,
+      "base_text": "Once upon a time, there was a gentle boy named Tim. Tim had a red ball. He liked to play with it every day. He would go to the big barrel and had lots of fun things to play with.\nOne day, Tim wanted to play a game with his toys. He threw the ball and ran to the butterfly.",
+      "primed_text": "Once upon a time, there was a little bakery named Bobo. Bobo loved to hop around the town. One day, he met a big dog named Bobo. Bobo loved to jump and swim in the sun.\nOne day, Bobo saw a little bird in the woods. The bird said, \"I can try it in the toy bear. It is big and soft.\""
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 290,
+      "primed_chars": 325,
+      "base_text": "Once upon a time, there was a big, red ball. The ball lived in a ladder with a big smile. The cat loved to play with the ball.\nOne day, the ball saw a ball. The cat was so happy. It wanted to be brave. The baby bird looked up and saw the ball. The ball was very happy to play with the ball.",
+      "primed_text": "Once upon a time, there was a little bakery who lived in a big forest. The bee liked to play with his friends, the birds, and the birds. They were very happy and excited.\nOne day, the boat met a big boy named Tim. Tim was envious because he wanted to see what was inside the box. He walked and walked"
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 293,
+      "primed_chars": 339,
+      "base_text": "Once upon a time, in a big bear, there was a little boy named Tim. Tim had a toy ball that he loved very much. One day, he took his ball at the park to see it. He was very happy and wanted to play with it.\nTim saw his friend, Sue, sitting unexpected happened. Suddenly, Tim saw a big red ball.",
+      "primed_text": "Once upon a time, there was a little bakery. The boat had a small spade. The baby was very frightened in the town. The ball loved to go on the ground.\nOne day, the squirrel played with the ball. The raven was difficult. The ball saw a ball near the tree. The ball was very sleepy.\nThe baby boy wanted"
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 299,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She lived in a small house with her mom, dad, and her dog, Max. Lily liked to play with her toys and enjoy them.\nOne day, Mia went outside to play with her friends. Lucy saw a little bird named Tim. Tim said, \"Lily, do you want to play with me?\"",
+      "primed_text": "Once upon a time, there was a little bakery bird. The bird lived in a small house with a big room near the sea. The bird was sad because it could not fly around and shine in the sun.\nOne day, the bird saw a shiny thing in the woods. The bird saw a little bird flying by. The bird said, \"Hi, little bi"
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 285,
+      "primed_chars": 311,
+      "base_text": "Once upon a time, in a big forest, there was a little bunny named Bob. Bob was very strong and scared of big food. One day, he found a small ball in the ground. He wanted to play with it, so he wanted to find out who was to help his friends.\nBilly tried to tell me the work to buy met.",
+      "primed_text": "Once upon a time, there was a little bakery who liked to sleep all day. He had many friends, like birds, and saved to look at the birds on the swings. One day, a little bird saw a big frog named Sam. Sam was a tall bird in the tree.\nSam said, \"Why are you sad?\" Sam asked. Sue said, \"I can't find my "
+    },
+    {
+      "prompt": "tell me a story about a bakery",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little bakery",
+      "targets": [
+        "bakery",
+        "baker"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 271,
+      "primed_chars": 314,
+      "base_text": "Once upon a time, there was a big black bird. The bird liked to fly high in the sky. It was harmless and a red bird. The bird had a bell to reach it. The bird was sad because it could not go far away.\nOne day, the bird saw a big bird. The bird was sad. The bird was safe.",
+      "primed_text": "Once upon a time, there was a little bakery. The bear lived in a big house. The show was big and loved to play with her friends. One sunny day, the big blue sun was very heavy.\nThe seed was very pretty and wanted to grab it to the garden. So, he got into a fire for a story. He saw a big tree with a "
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 255,
+      "primed_chars": 298,
+      "base_text": "One day, a little girl named Lucy went to the park. She wore her daddy with her mom and dad. They were having success to play.\nAt the park, Lily saw a girl named Lily. Lily was playing with her toys and wanted to play with her toy car. She was very happy.",
+      "primed_text": "Once upon a time, there was a little mermaid. The mud was made of pretty laughed. It loved to eat pasta. One day, the purple bug did not know how to start. It wanted to be big and have fun together.\nThe next day, a little boy named Tim came to the tree. The big bird was happy and thanked the bird."
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 300,
+      "primed_chars": 312,
+      "base_text": "Once upon a time, in a big forest, there lived a boy named Tim. Tim loved to play outside in the sun. One day, he went outside to find some water.\nAs Tim walked, he saw a little bird. The bird was sad. The bird said, \"Hi, Tom! What can I do? What do you are?\" The bird said, \"I am looking at a lemon.",
+      "primed_text": "Once upon a time, there was a little mermaid who loved to jump. Every day, she would drive around her favourite colourful parts.\nOne day, a little girl came to the park. She saw the clay and smiled. She wanted to help her mom and dad. They were happy.\nAt the park, they saw a big pile of chair. The b"
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 279,
+      "primed_chars": 325,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She lived in a small house with her mommy and dad. They were very happy with her toys and made sure them happy.\nOne day, Lily found a big, mean boy. The fruit was blue and strong. Lucy was sad. She wanted to tell her friends.",
+      "primed_text": "Once upon a time, there was a little mermaid of many friends. They all played together every day. The sun was shining, and the birds were singing. They were very happy together.\nThe moral of the story is that it would be fun to go home. The deer and the bird loved the wind. They tried to find a colo"
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 287,
+      "primed_chars": 319,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to walk and play with his friends. They would run, jump, and laugh together. Tim was very happy when he went on.\nOne day, Tim went to the park to play. He saw a big red ball. Tim wanted to climb the tree with his mom and dad.",
+      "primed_text": "Once upon a time, there was a little mermaid named Jack. Sally wanted to go to the park. Every day he would spin around and pick some friends to play with her. She would tell the kids about the store and heard a noise. \nOne day, Daisy saw a little bird sitting under a big tree. \"Max, some broccoli a"
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 274,
+      "primed_chars": 331,
+      "base_text": "Once upon a time, there was a gray cat named Tom. Tom loved to speed all day. He liked to spin around in the dirt and put his friends. One day, Tom met a big boy named Tim. Tim looked at the dog and said, \"Why are you sad?\" Tim said, \"I don't know, Tim! I will take my toy.\"",
+      "primed_text": "Once upon a time, there was a little mermaid. This tree was very fast and always wanted to find out what to play with. One day, a little boy named Tim was playing near the pond. He wanted to find a beautiful place to find some food.\nTim said to his friend, Sam, so help her friends. Tim told Sue the "
+    },
+    {
+      "prompt": "tell me a story about a mermaid",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little mermaid",
+      "targets": [
+        "mermaid"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 241,
+      "primed_chars": 297,
+      "base_text": "Once upon a time, in a big green park, there was a little bird. The bird loved to sit on the water and look at it. As the bird wanted to see where it could fly, but the big cat was very happy.\nOne day, the bird saw a shiny bug on the ground.",
+      "primed_text": "Once upon a time, there was a little mermaid. The sun was shining and the kitchen was so happy. The sun was very competitive. \nThe new little pumpkin was a very sad. He wanted to tell the thing where he was going. He asked his mom to do something unusual. He was so excited to explore the new day."
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 296,
+      "primed_chars": 319,
+      "base_text": "Once upon a time, there was a big, high called a dog named Max. Max loved to dig in the park with his best friend, a little girl named Lily. They liked to play together all day long.\nOne day, Lily and Max went to the park. Max and Lily went to the park. They saw a big store that said \"Mom, look!",
+      "primed_text": "Once upon a time, there was a little clock. The clock was very happy and loved. It wanted to fly high in the sky and play with its friends. One day, the lion was very hungry. He lived near a big tree and wanted to climb it.\nAs they walked, he saw a little bird. The bird looked at the car and said, \""
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 295,
+      "primed_chars": 312,
+      "base_text": "One day, a boy named Tim found a big clock in his room. He was scared outside the car. He started to cry. He took the toy to his toy car. \"Hello, little red car,\" said the mouse. \"Don't worry, I should try and be bad.\"\nThe crane looked at the car and finished. \"We can help me find some fruits.\"",
+      "primed_text": "Once upon a time, there was a little clock. The clock lived in a big forest. One day, the cricket saw a little girl. The truck was sad and asked, \"Why are you sad, sweet?\"\nThe cret looked sad.\nThen, the car could close the cow. The crane had a pet. The chair was from the rock. The driver tried to ca"
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 300,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, in a big forest, there lived a little frog named Momo. Mom loved to play outside all day long. One day, Molly saw a big building in the garden. She wanted to eat the flowers with them.\nMia saw a lot of flowers and birds. She wanted to play with the big fish. She said, \"Hello, bird!",
+      "primed_text": "Once upon a time, there was a little clock. The clock lived in a big forest. In the house, there lived a cat named Tom and a girl named Mia. They loved to play and have fun together.\nOne day, Max found a big carrot on the tree. He was scared of the dog looking at the cake. The cat was brave and star"
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 233,
+      "primed_chars": 333,
+      "base_text": "Once upon a time, in a small village, there lived a clumsy cat named Tom. Tom loved to eat all the club. One day, he found a microscope on the ground. He wanted to give it to solve the clock.\nTom thought of a plan to get his toy car.",
+      "primed_text": "Once upon a time, there was a little clock. The clock had a friend named Sam. Sam lived in a castle. The crab had a cold that he loved to play with Sue. They had a friend named Sue.\nOne day, Tim and Sam went to play together. They saw a small, fright ball in the sky. The cat was bright and dirty. Th"
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 0.0,
+      "base_chars": 277,
+      "primed_chars": 317,
+      "base_text": "Once upon a time, there was a small boy named Tim. He had a toy mill. It was a magic clock. Tim loved his soft colorful ball. He would eat his velvet very much.\nOne day, Tim saw a big tree in the tree. He wanted to play with it. So, he ran up to the pond. \"Yum, dog!\" said Tim.",
+      "primed_text": "Once upon a time, there was a little clock. The cow was not very smart. It was a little scared. The cat liked to tell her teddy bears and tell her friends to play with her. She told her to be careful when her family.\nOne day, the cat met a fish. The frog came to the tree. The frog saw the dog. The d"
+    },
+    {
+      "prompt": "tell me a story about a clock",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little clock",
+      "targets": [
+        "clock"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 263,
+      "primed_chars": 317,
+      "base_text": "One day, a cat and a dog went to the store to book. They saw a big hole in the ground. The dog was glad to do some food. The cat wanted to help the cat. They went to the kitchen and started to stir the door. A dirty fish from the dog's name.\nThe dog was so happy.",
+      "primed_text": "Once upon a time, there was a little clock. The clock had a picture of a cat. The cat loved to play and run around the cave. One day, the cat could not find its face. The cat saw a shiny goat and caught the cat to ride it.\nThe cat put on her toy car and went outside. The cat saw the cat and the sat "
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 0.0,
+      "base_chars": 265,
+      "primed_chars": 282,
+      "base_text": "Once upon a time, in a small town, there lived a small girl named Lily. She liked to play outside with her friends. One day, she wanted to go out and play with her friends.\nAs they walked, Lily saw a big red ball. The bear was sad because she had never seen before.",
+      "primed_text": "Once upon a time, there was a little bear named Ben. Ben was a nice and lived in a big forest. He had a big nose fish and a lot of sugar. They loved the food very much.\nOne day, Ben saw a big hill and a big building. The bird saw the bird and said, \"Hello! Can I see your birthday?\""
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 279,
+      "primed_chars": 308,
+      "base_text": "Once upon a time, there was a famous bear who wanted to be the best of friends. One day, the boat was on the beach with a long big ball. He wanted to eat it, but he was scared that he saw the bread. He thought it would be fun to try to comb it. So he said, \"Can I play with you?\"",
+      "primed_text": "Once upon a time, there was a little bear who lived on a big farm. The bee was very small and had many chairs. The bear was his favorite dress who liked to fly high in the sky.\nOne day, a big wind came and blew high in the water. The boy saw a big dog. The dog said, \"Hi dog! Can you help me make a b"
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 297,
+      "primed_chars": 305,
+      "base_text": "Once upon a time, there was a big, cold bear. The bear had a friend, a big, strong bird. They all had fun. The bird liked to sail on the table.\nOne day, a little bird came into the room. The bird saw the bus and wanted to catch the bird. The bird was sad because it could not fly and sit and weak.",
+      "primed_text": "Once upon a time, there was a little bear. The bee was blue and round. It was a dark bear and all by himself. The boy loved to play with the ball all day long.\nOne day, the ball saw a big ball. The ball was sad because it could not fly. The ball was very happy. The ball wanted to splash in it and sp"
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 300,
+      "primed_chars": 332,
+      "base_text": "Once upon a time, there was a big bear. The bear lived in a big tree. The tree was very deep. The bird had a pretty boat. The boat looked sad.\nOne day, the barrel saw a big tree. It was sad. The bird said, \"I can help you with it too.\"\nThe ball said, \"I can bring the ball. Can you give me the ball?\"",
+      "primed_text": "Once upon a time, there was a little bear. The bear loved to sleep all day. He had many friends, like a big tree and liked to play with his friends.\nOne day, while playing with his toy ball, he heard something fun. He thought there was a strong story about a book and said, \"You can have some post ba"
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 279,
+      "primed_chars": 301,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She loved to play with her toy bear, and they were very happy. One day, Lucy went to the park to play with her friends.\nAt the park, Lucy saw a boy named Tom. Tom was sad because he did not know how to tell Lister to her boy.",
+      "primed_text": "Once upon a time, there was a little bear. The bear lived in a small house. The bear had many friends and fish. They all lived there lived and his friends. They all liked to play together.\nOne day, the bird saw a big, red ball. The bird had a big fire. The bird said, \"Why are you sad, little friend?"
+    },
+    {
+      "prompt": "tell me a story about a bear",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little bear",
+      "targets": [
+        "bear"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 291,
+      "primed_chars": 316,
+      "base_text": "One day, a girl named Mia went to the park. She saw a big tree and wanted to play with it. Mia loved to read books. She saw a big ball and her ball was too hard.\nMia wanted to play with the ball, but it was not happy. She looked sad. She decided to take a story and did not want to be there.",
+      "primed_text": "Once upon a time, there was a little bear. The bee was bright and strong. All the animals loved the teacher. One day, the bear took a big red ball. The baby was very happy.\nBut then, a big dog named Tim came to the tree. The bird wanted to play with the ball, but it was too high. The rabbit said, \"W"
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 287,
+      "primed_chars": 295,
+      "base_text": "Once upon a time, there was a little girl named Lucy. She loved to play with her toys. One day, Lucy was playing in the garden with her friends. They were very happy.\nLucy saw a friendly bug who was curious and wanted to see what was inside. Her mom told her to be careful with the cord.",
+      "primed_text": "Once upon a time, there was a little garden. The green lion lived in a big garden. The sun was shining and the birds were singing. The birds and the birds were singing.\nOne day, the bird saw a big tree. It was very happy. The squirrel wanted to show it to the right tree. But the bear was stuck."
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 227,
+      "primed_chars": 303,
+      "base_text": "Once upon a time, in a big forest, there lived a little boy named Tim. Tim loved to play with his toys all day long. One day, Tim found a big tree to find a ball in the garden. He was very happy.\nAt the park, he saw a big tree.",
+      "primed_text": "Once upon a time, there was a little garden. The green grass lived in a big garden. The green bird liked to climb and play all day.\nOne day, a little boy named Tim went to the park to play. He saw the bear and the little girl named Lily. Lily loved the birds on the swings. Lily wanted to help the bi"
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 249,
+      "primed_chars": 307,
+      "base_text": "Once upon a time, in a big forest, there lived a little red bird. This bird loved to go fast in the garden. One day, the grass was far away from the sea. The friend was very happy.\nOne day, the bird met a new friend. The bird said, \"Hello, red bird!",
+      "primed_text": "Once upon a time, there was a little garden. In the garden, there were many trees and green leaves. The goat liked to sit on the water and share its friends.\nOne sunny day, the two friends went outside to play. They saw a big tree and wanted to climb it. They started to shake their hands and find a "
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 281,
+      "primed_chars": 312,
+      "base_text": "Once upon a time, there was a big palace. In the attractive train, there was a small plant. The train liked to play with a ball. The garden was very cold and always crawled to drive fast and slow people.\nOne day, the duck went to the park to play. It was a big tree with red balls.",
+      "primed_text": "Once upon a time, there was a little garden because it had big shapes. The snake was so long and shiny. Everyone in the garden was so shiny. \nOne day, the little girl saw the little bird. She was sad because she lost her toy. The little girl was sad. She wanted to help the fish. She told her friend "
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 297,
+      "primed_chars": 290,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived with her mom and dad. Lily loved to play in the garden with her friends.\nOne day, Lily saw a new friend named Tom. Tom said, \"Lily, I will sort you on your paper. Can I play with your friend?\" Lily and Tom said, \"Yes, I can help you.",
+      "primed_text": "Once upon a time, there was a little garden. The giant liked to go fast. Every day, the garden would sing a log nation. He was happy and loved to play with the birds.\nOne day, the lion saw a big tree. He wanted to see what was on the sky. It was a toy car. He thought the crayon was scared."
+    },
+    {
+      "prompt": "tell me a story about a garden",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little garden",
+      "targets": [
+        "garden"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 260,
+      "primed_chars": 333,
+      "base_text": "Once upon a time, there was a big garden. It was the pale, warm cookie. Everyone was very happy. It liked to play and run around the yard.\nOne day, a little girl named Lucy went to the park. She saw a big bowl on the ground. Lucy tried to pick up the big boot.",
+      "primed_text": "Once upon a time, there was a little garden. The garden was very sad and he liked to go for a walk. One day, a little girl named Lily found the red ball in the park. She wanted to play with the ball, but it was too hard for help.\nLucy wanted to help the bug. She had to help the bug. He looked everyw"
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 289,
+      "primed_chars": 344,
+      "base_text": "Once upon a time, in a small house, there was a little girl named Lily. She liked to swing on the swings and slide down the side of the yard. She was very happy and the sun was bright. The sky was gloomy and happy.\nOne day, Lily met a girl named Lily. She was very sad. She wanted to help.",
+      "primed_text": "Once upon a time, there was a little firefighter. He was three years old and loved to play in the wild forest.\nOne day, the fish was playing in the garden was something special treats he found in the car. He thought it was a fast ash that the sea was whisper. It said, \"Wow, mom! Would you want to be"
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 271,
+      "primed_chars": 342,
+      "base_text": "Once upon a time, there was a little girl named Mia. Mia was very enthusiastic. Every day, she would sit and play with her friends. They all liked to play together.\nOne sunny day, Mia and Mr. Whiskers went to the park. She saw a big dog on the ground. Mia was very happy.",
+      "primed_text": "Once upon a time, there was a little firefighter named Freddy. She loved to play outside with her friends. One day, while she was playing, she saw a big tree and wanted to climb it. As she climbed, she said, \"Be careful, little birds!\"\nAmy said the squirrel saw the bird and wanted to help. He said, "
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 292,
+      "primed_chars": 322,
+      "base_text": "Once upon a time, there was a little girl named Lily. She lived in a small house with her mom, dad, and her dog, Max. They liked to play and have fun together. One day, Max was very sad. He wanted to help his friends.\nAt the park, Lily saw a little girl. The girl looked up and said, \"Hi Mia!",
+      "primed_text": "Once upon a time, there was a little firefighter named Fred. Freddy lived in a tree with his friend, a little girl named Lily. They were all played together all day.\nOne day, Lily's friend, a cat named Fluffy. Fluffy was sad. She wanted to help the bird fly. She had a big tree in her hand and picked"
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 262,
+      "primed_chars": 340,
+      "base_text": "Once upon a time, there was a big cat named Tom. Tom liked to play with his best friend, a little girl named Lily. They would walk and play outside in the sun. One day, they found a big bookcase in his towel and went outside.\nAs they walked, Tim found a big box.",
+      "primed_text": "Once upon a time, there was a little firefighter named Fred. Freddy liked to play with his friends and eat yummy food. One day, Fin saw a big fish in the park.\n\"Hi Sally, do you want to play with me?\"\nSam said, \"Yes, I want to stay fast. Fin and your favorite toy is good!\" Fred was happy and wagged "
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 269,
+      "primed_chars": 340,
+      "base_text": "Once upon a time, there was a big red barn. It lived in a small town with many animals. The squirrel was very big and blue. They liked to play and have fun together.\nOne day, the lion saw a big stage in the tree. He wanted to touch the storm to kick the bird by itself.",
+      "primed_text": "Once upon a time, there was a little firefighter. This seal was furry. He did not like his soft juice. He thought it would forget things. One day, he found a big wheel for his friend, the cat.\n\"Hi, bird!\" said the frog. \"Do you want to ride it?\" The dog was scared. He thought, \"I found a whistle!\"\nT"
+    },
+    {
+      "prompt": "tell me a story about a firefighter",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little firefighter",
+      "targets": [
+        "firefighter",
+        "fireman"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 225,
+      "primed_chars": 334,
+      "base_text": "One day, a girl named Lily went to the forest. The farmer was sad because she had no friends. She wanted to tell her friends, but she knew her mom told her that she had to come out and make sure everyone was shake on her war.",
+      "primed_text": "Once upon a time, there was a little firefighter. This truck lived on a farm with many original flowers. One day, a big dog came to the pond too. The little boy and decided to go for a walk in the water.\nAs they were playing, the leopard saw a shiny meal. The dog wanted to take a walk to the airport"
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 284,
+      "primed_chars": 327,
+      "base_text": "Once upon a time, there was a club who loved to sing. He would play with his ball every day. One day, he found a bright shell in the woods. He was very happy.\nA little boy named Tim and his friend, a little boy named Tim, the butterfly. Sue said, \"I like your shield to me,\" Tim said.",
+      "primed_text": "Once upon a time, there was a little butterfly. The bunny loved to fly high in the sky. One day, he saw a little bird on the tree. The bird was happy and wanted to sing in the water.\nBut one day, the bird saw a big bird. The bird could not like the butterfly. The bird wanted to come back with the bi"
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 278,
+      "primed_chars": 306,
+      "base_text": "Once upon a time, there was a small boy. The bug liked to play with his friends in the park. One day, the bear went to the park to play with his friends.\nThe next day, the sky was blue. The bee saw a big tree. The bug wanted to help the bird. The bird said, \"Hello, little bird!",
+      "primed_text": "Once upon a time, there was a little butterfly. The bunny lived in a tall tree with lots of toys. The laser thought the butterfly flew around it and round. The bug had many friends, but she was very happy with her friends.\nOne day, a little bird came to the big field. The bug wanted to play with the"
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 278,
+      "primed_chars": 333,
+      "base_text": "Once upon a time, there was a little bunny. The bunny liked to play with his friends. They liked to run and jump in the water. The bull had a big red ball that he liked to play with. The butterfly had many true everywhere but could not fly.\nOne day, the bug saw a big gray cake.",
+      "primed_text": "Once upon a time, there was a little butterfly. The butterfly was very sad. It wanted to be like the bus. One day, the butterfly wanted to go too. The butterfly took the butterfly in the tree.\nAs the bug lived, there was a little girl with a big red ball. She said, \"I can help you solve this ball in"
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 283,
+      "primed_chars": 291,
+      "base_text": "Once upon a time, there was a sleepy cat named Tom. Tom lived in a small house with his friend, a little girl named Lucy. They loved to play together in the park. One day, they went to the park to play with their friends.\nWhile they were playing, a girl named Lily came to the couch.",
+      "primed_text": "Once upon a time, there was a little butterfly. The butterfly lived by the forest. The turkey loved to play on the bugs.\nOne day, the bee found a big tree. The big bird could help the clever little squirrel. The bird flew away from the sky and saw the bird. The bird was scared and sat down."
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 270,
+      "primed_chars": 325,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim loved to play with his toy pistol every day. He would run and jump in it. He would go to the park to play with his ball.\nOne sunny day, Tim saw a truby butterfly in the kitchen. He picked it up and started to rest.",
+      "primed_text": "Once upon a time, there was a little butterfly. The butterfly loved to fly around the lake. One day, he wanted to find a sweet flag and she wanted to make him even more fun.\nA little bird came to his friend, a bird named Ben. The bird said, \"Hi, little bird! Let's play together.\" The big bell and th"
+    },
+    {
+      "prompt": "write me a little story about a butterfly",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little butterfly",
+      "targets": [
+        "butterfly"
+      ],
+      "base_recur": 1.0,
+      "primed_recur": 1.0,
+      "base_chars": 292,
+      "primed_chars": 345,
+      "base_text": "One day, a little boy named Tim went to the park. He saw a toy bunny named Max. Max wanted to play with the butterfly. He thought, \"Maybe where it came from?\" Max looked at the bug.\nThen, the bug was not a toy. He wanted to unpack his toys. He tried to clap and share the cat. Max was scared.",
+      "primed_text": "Once upon a time, there was a little butterfly. The butterfly was hungry. It liked to fly high in the sky. The little bear loved to sleep on the floor.\nOne day, the bee saw a small bird outside. The bird saw the bird and said, \"Do not worry. I want to take a nap.\" The bird looked at the bug and said"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 271,
+      "primed_chars": 304,
+      "base_text": "One day, a girl named Sue went to the park with her mom. They were so happy to find some milk. They were going to the park with her mom. They wanted to show her mom the country.\nAt the park, they saw a big room. The dragon was very smart. She saw that it was from a tree.",
+      "primed_text": "Once upon a time, there was a little snail. She lived in a big forest. All the other animals liked to play near the tower. One day, a girl named Lily came to the hospital. She was sad because she lost her toy and always came to her friends.\nThe moral of the story is that it is mad and like a nice dr"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 257,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a small cat named Max. Max lived in a small house with a nice family. They liked to play and run all day long. Max liked to play and run all day.\nOne day, the cat saw a big tree and wanted to play with it. Max wanted to rest too.",
+      "primed_text": "Once upon a time, there was a little snail. The shy bird was very pretty and loved to play with the other bunny. The bird loved to eat all the other birds in the tree.\nOne day, the bird saw a big tree and saw a big tree. The tree was stuck in a tree. The tree was blue and she could not climb. The bi"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 300,
+      "primed_chars": 315,
+      "base_text": "One day, a boy named Tim wanted to be a new toy. It was a food with many red toys. He wanted to see what was inside the house. Tim wanted to play with the subway. He wanted to know how to buy the present.\nTim wanted to show his mom the powder. His mom said, \"Okay, Sue. Let's tell mom a spoiled doll.",
+      "primed_text": "Once upon a time, there was a little snail. The seal was sad because it could not fly. A little boy named Tim saw the ball. Tim said, \"Hi, friend! Do you want to play with me?\"\nThe boy said, \"Yes, let's play a game. It's not in the ball.\"\nThe ball was so happy. They liked the ball. They took the bal"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 289,
+      "primed_chars": 325,
+      "base_text": "Once upon a time, there was a little girl named Lily. She loved to skip and play with her friends. One day, she saw a big wave on the floor. She picked it up and shared it with a big smile. She wanted to eat the seed, but it was full of toys.\nLucy saw her friend, a little girl named Lily.",
+      "primed_text": "Once upon a time, there was a little snail named Sue. Sue had a small, comet with a poor toy cat. The cat had a difficult time for the sound of animals. They would clap himself and stay close to the top.\nOne day, Sam was playing with his ball at the park. She saw a little boy named Tim climb the tre"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 287,
+      "primed_chars": 304,
+      "base_text": "Once upon a time, there was a gray cat named Tom. He lived in a small house with his family. They liked to play and have fun together. One day, Tom and his friends were playing near a big tree.\nTom saw a little bird stuck in a tree. Tom said, \"Hi, Tim! What can you help me see the bug?\"",
+      "primed_text": "Once upon a time, there was a little snail. The silver bird had a loud noise. It had a big lion, and he liked to play with it. The mailbox lived in a big story.\nOne day, the bird saw a little bird on a big tree. The bird was sad because it looked sad. The bird said, \"I want to read the books of my h"
+    },
+    {
+      "prompt": "can you tell me a story about a snail",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little snail",
+      "targets": [
+        "snail"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 279,
+      "primed_chars": 320,
+      "base_text": "Once upon a time, there was a cute little dog named Spot. Spot liked to sleep all day and walk with his friends. One day, Spot saw a big red ball. He was very sad and wanted to help.\nSpot asked his friend, Cat, \"Do you want to break the ball first?\" Spot said, \"Yes, let's play!\"",
+      "primed_text": "Once upon a time, there was a little snail. The sun was shining, and the birds were singing. The sun was shining and the birds were singing. The sun was shining and the birds were singing.\nThe squirrel said, \"Stop singing under the bugs. It could not find its way. The bird saw a big butterfly. The b"
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 285,
+      "primed_chars": 327,
+      "base_text": "Once upon a time, there was a little boy named Tim. He had a toy named Mr. Bunny loved to play with his ball. One day, Tim and his friends were playing with their toy cars. Tim was happy to be fixed.\nWhile they were playing, Mia saw a big box of toys in the park. They were very happy.",
+      "primed_text": "Once upon a time, there was a little rainbow. The rabbit was very happy. It wanted to go on adventure. One day, the boat saw a big ball. The ball was full of toys. The ball wanted to get it, but it was too heavy. The ball thought it was fun to play.\nThe boy wanted to play with the ball, but it was t"
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 291,
+      "primed_chars": 334,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim liked to play ball with his toys in the yard. One day, Tim saw a big ball in the park. He wanted to play with it, but his mom said, \"Tim, it will be because his favorite thing to do with it.\nOne day, Tim saw a big red ball in the park.",
+      "primed_text": "Once upon a time, there was a little rainbow. The red bird loved to read on the wall. One day, the bear saw a little girl named Lily her up like the rock. She wanted to know what was inside the box.\nLily wanted to help the ball. She was very happy. She tried to start the big blue car. Mia was very h"
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 280,
+      "primed_chars": 328,
+      "base_text": "Once upon a time, there was a big race. The rock liked to run and play all day. One day, a little girl came to the floor. The boy saw the bird and wanted to help.\nThe crab went to her friend, a little bird named Lily. They were very happy. Lily wanted to be friends with the bird.",
+      "primed_text": "Once upon a time, there was a little rainbow. The robot loved to go fast. It was a big, strong bracelet. One day, the boy went to the beach to play.\nIn the park, there was a pink bowl. The ball was sad. The bell wanted to play with the ball. The ball was very pretty. It was very happy.\nThe boy and t"
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 271,
+      "primed_chars": 325,
+      "base_text": "Once upon a time, there was a little boy named Tim. Tim had a big box of pretty toys. Tim loved to play in the sun. One day, Tim went to the park to play with his friends. They were having a great day together.\nAt the park, Tim saw a big butterfly. He wanted to climb it.",
+      "primed_text": "Once upon a time, there was a little rainbow. This chain was very long. The robot wanted to have fun things. One day, the robot saw a big rock. The rock was rude and flew around the tower. It was a small from other day.\nThe cat wanted to see what was inside. The rain thought the story was wrong. It "
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 276,
+      "primed_chars": 336,
+      "base_text": "Once upon a time, there was a little girl named Mia. Mia loved to play outside in the sun. One day, Mia went to the park to play with her friends. She played with the weather and the rod. Mia was so happy and excited.\nAs they walked, Mia saw a sad dog. The dog said, \"Hi, dog!",
+      "primed_text": "Once upon a time, there was a little rainbow. The rocket was a red box with a long red thing on its cold outside. The box was red and shiny. He was very happy.\nThe day to the room and saw the sound and wanted to go to the park. The moral of the story is that the bird was near a big snow. The bird sa"
+    },
+    {
+      "prompt": "i want a story about a rainbow",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little rainbow",
+      "targets": [
+        "rainbow"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 277,
+      "primed_chars": 337,
+      "base_text": "Once upon a time, there was a little boy named Tim. He loved to play with his ball. One day, he found a big box in his yard. The box was very high, but it was too hot out to play with. Tim wanted to make a new friend to play with.\nTim went to the park to play with his friends.",
+      "primed_text": "Once upon a time, there was a little rainbow. It was a very soft bed. Every morning would make a rainbow flow around the flowers. \nOne day, the fish saw a big stage under a tree. It was a little bird with a little girl with it. The bird wanted to help the bird feel better.\nThe bird said, \"I want to "
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 0,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 283,
+      "primed_chars": 343,
+      "base_text": "Once upon a time there was a girl named Lily. She was very intelligent. She liked to teach her mom and dad. One day, Lily found a magic box in her room. She did not know what it was, so she decided to make a cocoa for her picnic.\nLily went to her mom and said, \"Look, I found a soft!",
+      "primed_text": "Once upon a time, there was a little elephant named Ellia. Ella loved to go fast. She would fly high in the sky and fast all day. One day, her friends were playing in the park. She wanted to make something special for a way to find her friends for the lake.\nWhen they arrived on the corner, Daisy saw"
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 1,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 300,
+      "primed_chars": 318,
+      "base_text": "Once upon a time, there was a little girl named Mia. Mia loved to play outside with her friends. One day, she found a big box of cooking shoes in the kitchen. Mia thought it was a nice place to see what was inside.\nMia saw a small dog named Max. Max was sad. She said, \"Max, can you tell me a story?\"",
+      "primed_text": "Once upon a time, there was a little elephant. The king loved to draw and make all her grandma little girl. The little girl had many friends, like the sun, the sun, and the pencil.\nOne day, the little girl wanted to show her friend, Tom. They played and had fun together. So, the towel said, \"Let's g"
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 2,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 1.0,
+      "base_chars": 272,
+      "primed_chars": 304,
+      "base_text": "Once upon a time, in a big forest, there lived a little girl named Mia. Mia was very obedient. She loved to eat the leaves to grands and play with her friends.\nOne day, Mia wanted to make a cozy pink pictures. She put in her bedroom and went outside to play on the swings.",
+      "primed_text": "Once upon a time, there was a little elephant. The elephant was very big and had many friends. They liked to play together and have fun.\nOne day, a new friend named Tim saw the fish. The fish said, \"Hi, little bird. Why are you sad?\" The little bird said, \"I can't find my toy. I want to find a new t"
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 3,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 275,
+      "primed_chars": 341,
+      "base_text": "Once upon a time, in a small house, there was a mighty cat named Tom. Tom lived in a small house with a big field. Tom was a shy dog named Max. Max loved to play with his toys and make people happy.\nOne day, Tom saw a little girl named Sue. Sue had a new friend to play with.",
+      "primed_text": "Once upon a time, there was a little elephant. The people in the forest liked to wear people and make fun shapes. They would play and splash in the sun and slide.\nOne day, a little girl named Lily was playing in the park. She saw a big tree with a hurt wing. The rabbit was very excited. Her mom said"
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 4,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 276,
+      "primed_chars": 342,
+      "base_text": "Once upon a time, in a small town, there was a cheerful cat named Tom. Tom loved to make puppy very careful with his friends. One day, Tom and his friends were playing near a tree.\nAt the park, there was a boy named Tim. Tim looked at the macket and saw the tree in the grass.",
+      "primed_text": "Once upon a time, there was a little elephant. This farmer lived in a small house with a hurricane. The cat was very happy. The fish loved to play with his friends in the park.\nOne day, the squirrel went on a story and saw a big bird. The bird was sad because he had no friends. The one said, \"I am a"
+    },
+    {
+      "prompt": "make up a story about an elephant",
+      "seed": 5,
+      "prime": "Once upon a time, there was a little elephant",
+      "targets": [
+        "elephant"
+      ],
+      "base_recur": 0.0,
+      "primed_recur": 0.0,
+      "base_chars": 297,
+      "primed_chars": 302,
+      "base_text": "Once upon a time, there was a little boy named Tim. He loved to draw and make his red birds and pretty flowers. One day, Tim's friend, Tim, came to visit him. They wanted to build a big fish in the sky.\nAs they played in the songs, the bird was happy. Tim wanted to help the bird. He said, \"Oh no!",
+      "primed_text": "Once upon a time, there was a little elephant named Ella. Ella liked to clean her home. Every day, she would have each other and make music. One day, while she was walking, she saw a small fauckle on the floor. She thought it was very pretty.\nBut her mom wanted to pick the prune to find something fu"
+    }
+  ]
+}
