@@ -1,0 +1,16 @@
+{
+  "pid": 17876,
+  "command": [
+    "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+    "-u",
+    "C:\\Elliot's Stuff\\SNN\\Text SNN\\scripts\\chat\\session12_driver.py"
+  ],
+  "cwd": "C:\\Elliot's Stuff\\SNN\\Text SNN",
+  "run_name": "session12-driver",
+  "run_name_generated": false,
+  "out_dir": "experiments/chat",
+  "log": "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\session12-driver\\stdout.log",
+  "started": "2026-08-13T14:35:34-04:00",
+  "started_unix": 1786646134.8880599,
+  "detached": true
+}
