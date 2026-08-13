@@ -119,7 +119,114 @@ FRESH: list[tuple[str, tuple[str, ...]]] = [
     ("tell me a story about a raccoon", ("raccoon",)),
 ]
 
-SETS = {"heldout": HELDOUT, "fresh": FRESH}
+#: A THIRD list, sixty nouns, written before it was ever scored.
+#:
+#: WHY A WIDER LIST EXISTS, AND WHY IT HAD TO
+#: -------------------------------------------
+#: `PREDICTION_v12.md` §1 fixes a gate on a corpus change whose predicted effect
+#: is a handful of nouns crossing a dose threshold. Twenty prompts cannot resolve
+#: that: the per-prompt sign test's smallest attainable two-sided p is
+#: `2^-(k-1)` on `k` discordant prompts, so with two or three prompts moving it
+#: cannot reach 0.05 however many sampler seeds are drawn. More seeds shrink
+#: draw noise; only more PROMPTS shrink prompt-set noise. Sixty is what the
+#: power calculation in `PREDICTION_v12.md` §1 asks for and it is fixed here.
+#:
+#: THE SELECTION RULE, STATED BECAUSE IT IS THE PART THAT COULD BE RIGGED
+#: ----------------------------------------------------------------------
+#: 1. Candidates are the corpus's own eligible subjects
+#:    (`src/snnchat/subject_freq.json`, built by `topic_of` over the raw file).
+#: 2. Kept if the INCUMBENT rule requests them 20..400 times over the full scan
+#:    -- roughly 10..200 times in the pack, the band where the incumbent's
+#:    measured hit rate is ~0.04 and where an intervention on the request slot
+#:    has room to act. **This is a pre-treatment covariate.** It is the
+#:    incumbent's own distribution; the flattened corpus's counts were not
+#:    consulted at any point in choosing these words, which is what stops the
+#:    list being selected for nouns the treatment happens to help.
+#: 3. Disjoint from `quality.PROBES`, `HELDOUT` and `FRESH` including plural and
+#:    singular variants, so no number already published shares a noun with it.
+#: 4. Singular, four characters or more, not in `topics.STOP_WORDS`.
+#: 5. Then filtered by hand on ONE criterion -- whether "a story about a X" is
+#:    grammatical English. The mechanical rule alone yields "a story about a
+#:    wealthy" and "a story about a matches", which test the model's handling of
+#:    malformed input rather than its topicality. Twenty were kept from each
+#:    third of the band so the list spans it evenly.
+#:
+#: A finding that fell out of step 5 and is worth recording: `topic_of` admits
+#: adjectives, because "a wealthy man" satisfies its determiner test. So the
+#: SHIPPED corpus contains requests of the form "tell me a story about a
+#: wealthy". That is a real defect in the subject extractor, it predates this
+#: round, and it is documented rather than fixed here -- fixing it would change
+#: the corpus under a comparison this round is in the middle of running.
+#:
+#: The trailing comment on each line is the incumbent's request count, kept so a
+#: reader can check rule 2 without rebuilding the table.
+WIDE: list[tuple[str, tuple[str, ...]]] = [
+    # --- incumbent request count 300-399 ---
+    ("tell me a story about a palace", ("palace",)),    # 399
+    ("tell me a story about a reindeer", ("reindeer",)),# 399
+    ("tell me a story about a billboard", ("billboard",)),# 398
+    ("tell me a story about a buckle", ("buckle",)),    # 398
+    ("tell me a story about a sunrise", ("sunrise",)),  # 398
+    ("tell me a story about a zipper", ("zipper",)),    # 395
+    ("tell me a story about an oven", ("oven",)),       # 390
+    ("tell me a story about an alarm", ("alarm",)),     # 386
+    ("tell me a story about a brick", ("brick",)),      # 385
+    ("tell me a story about an apron", ("apron",)),     # 383
+    ("tell me a story about a mustache", ("mustache",)),# 377
+    ("tell me a story about a napkin", ("napkin",)),    # 375
+    ("tell me a story about a shampoo", ("shampoo",)),  # 375
+    ("tell me a story about a garage", ("garage",)),    # 373
+    ("tell me a story about a feather", ("feather",)),  # 364
+    ("tell me a story about a trunk", ("trunk",)),      # 356
+    ("tell me a story about a leash", ("leash",)),      # 354
+    ("tell me a story about a teaspoon", ("teaspoon",)),# 354
+    ("tell me a story about a drawer", ("drawer",)),    # 352
+    ("tell me a story about a sunset", ("sunset",)),    # 351
+    # --- incumbent request count 150-299 ---
+    ("tell me a story about a shelter", ("shelter",)),  # 298
+    ("tell me a story about an ostrich", ("ostrich",)), # 290
+    ("tell me a story about a poppy", ("poppy",)),      # 286
+    ("tell me a story about a pocket", ("pocket",)),    # 282
+    ("tell me a story about a battery", ("battery",)),  # 281
+    ("tell me a story about an anchor", ("anchor",)),   # 278
+    ("tell me a story about a lightning", ("lightning",)),# 273
+    ("tell me a story about a veterinarian", ("veterinarian",)),# 271
+    ("tell me a story about a dessert", ("dessert",)),  # 266
+    ("tell me a story about a birdcage", ("birdcage",)),# 256
+    ("tell me a story about a knob", ("knob",)),        # 253
+    ("tell me a story about a ceiling", ("ceiling",)),  # 246
+    ("tell me a story about a menu", ("menu",)),        # 244
+    ("tell me a story about a daisy", ("daisy",)),      # 235
+    ("tell me a story about a blueberry", ("blueberry",)),# 218
+    ("tell me a story about a meadow", ("meadow",)),    # 213
+    ("tell me a story about a necklace", ("necklace",)),# 213
+    ("tell me a story about a mechanic", ("mechanic",)),# 183
+    ("tell me a story about a creature", ("creature",)),# 173
+    ("tell me a story about a playground", ("playground",)),# 173
+    # --- incumbent request count 20-149 ---
+    ("tell me a story about a sandcastle", ("sandcastle",)),# 145
+    ("tell me a story about a fort", ("fort",)),        # 137
+    ("tell me a story about a ribbon", ("ribbon",)),    # 131
+    ("tell me a story about an invitation", ("invitation",)),# 128
+    ("tell me a story about a printer", ("printer",)),  # 123
+    ("tell me a story about a mailman", ("mailman",)),  # 122
+    ("tell me a story about a bandage", ("bandage",)),  # 113
+    ("tell me a story about a kitty", ("kitty",)),      # 106
+    ("tell me a story about a superhero", ("superhero",)),# 101
+    ("tell me a story about a grandmother", ("grandmother",)),# 87
+    ("tell me a story about a sandbox", ("sandbox",)),  # 53
+    ("tell me a story about a captain", ("captain",)),  # 50
+    ("tell me a story about a surfboard", ("surfboard",)),# 48
+    ("tell me a story about an airplane", ("airplane",)),# 45
+    ("tell me a story about a sailboat", ("sailboat",)),# 45
+    ("tell me a story about a spaceship", ("spaceship",)),# 39
+    ("tell me a story about a tricycle", ("tricycle",)),# 37
+    ("tell me a story about a trampoline", ("trampoline",)),# 36
+    ("tell me a story about an eagle", ("eagle",)),     # 35
+    ("tell me a story about a unicorn", ("unicorn",)), # 33
+]
+
+SETS = {"heldout": HELDOUT, "fresh": FRESH, "wide": WIDE}
 
 
 def hit(text: str, words) -> float:
