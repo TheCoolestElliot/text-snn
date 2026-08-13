@@ -429,8 +429,13 @@ docs/chat/BUILD_NOTES.md   what was measured, what was guessed, what broke
 docs/chat/RESULTS.md       the trained model's numbers
 docs/chat/QUALITY.md       the responsiveness gap: measuring it, and closing it
 docs/chat/QUALITY_v8.md    the echo partition, lambda after it, canned_rate, memory
+docs/chat/QUALITY_v10.md   the decoder made 7x cheaper, n 32->128, steering rejected
+docs/chat/QUALITY_v11.md   coverage is conditioning; 3x less memory, n->256; echo bug
 docs/chat/transcript.md    the demo battery's output
 scripts/chat/echo_holdout.py  the held-out paired comparison       (QUALITY_v8 §4)
+scripts/chat/compare_holdout.py  two POOLS, paired per (prompt,seed) (QUALITY_v10 §3)
+scripts/chat/subject_frequency.py asked vs seen, per noun         (QUALITY_v11 §1)
+scripts/chat/lambda_dodge.py   does lambda still pay for itself   (QUALITY_v11 §3)
 scripts/chat/lambda_sweep.py  what lambda does now                 (QUALITY_v8 §8)
 scripts/chat/canned_rate.py   how much of a score is persona text  (QUALITY_v8 §9)
 scripts/chat/memory_probe.py  cross-turn recall, with a control    (QUALITY_v8 §10)

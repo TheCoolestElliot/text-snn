@@ -94,6 +94,7 @@ commands
   /lambda <x>           how hard reranking punishes a generic reply (0..1.5)
   /spread <x>           draw the drafts over a range of temperatures (0 = off)
   /echo [on|off]        prefer drafts that mention what you asked about
+  /steer <n|off>        resample the drafts toward your subject every n chars
   /prime [on|off]       start a story reply with your topic (WE write that bit)
   /candidates           show what the last reply was chosen from
   /seed <n|off>         fix the sampler's seed for reproducible replies
@@ -163,7 +164,59 @@ _SCRATCH_PREFIX = "_"
 #: rising to 0.450, because a large pool fills the top tier with drafts echoing
 #: the request FRAME ("tell", "story") rather than the subject. That gap is the
 #: next thing worth attacking and it is a selector problem, not a pool problem.
-DEFAULT_RERANK_N = 32
+#:
+#: N RAISED 32 -> 128 ON 2026-08-12, BECAUSE THE COST TABLE ABOVE IS NO LONGER TRUE
+#: ---------------------------------------------------------------------------------
+#: Every sentence above about the trade is sound and every *number* in it has
+#: been superseded. The costs it quotes were ~97 % dispatch overhead, not work:
+#: the draw paid `2n` device reads per character to ask which rows were still
+#: alive, which is why it scaled with the pool at all, and the single-character
+#: forward issued its jiterator kernels one per layer with nothing to amortise
+#: them against. `snnchat.stepper` captures the step as a CUDA graph and
+#: `sample_candidates` now reads back one tensor per character instead of `2n`.
+#: Both are bit-identical -- `docs/chat/QUALITY_v10.md` §1, and the held-out
+#: oracle reproduces the committed 0.0917 / 0.2500 / 0.4500 exactly at n = 8,
+#: 32 and 128, which is the end-to-end check that the pool did not change.
+#:
+#: Re-measured, median over 4 turns at `--max-new 400` (the REPL default, which
+#: is *longer* than the 300 the old table used):
+#:
+#:      n         8      32      64     128     256
+#:   s/turn    0.32    0.33    0.40    0.57    0.67
+#:      GiB    0.22    0.59    1.04    1.96    3.78
+#:
+#: n = 128 answers in 0.57 s, which is a third of what the old n = 32 cost, so
+#: the under-two-seconds rule that picked 32 now picks 128 with room to spare.
+#: Held-out topicality 0.2500 -> 0.3917, and on the SECOND, disjoint noun list
+#: (`echo_holdout.py --set fresh`, never used to choose anything) 0.0583 ->
+#: 0.1333 with nine draws better, none worse, and no prompt worse.
+#:
+#: **Not 256**, though it measured better still (0.2000 on the fresh list):
+#: 3.78 GiB. `ChatConfig.eval_batch_size`'s docstring records what happens on
+#: this 8 GiB card when a resident graph and a large batch meet -- WDDM does not
+#: fail the spill, it makes it ~50x slower. 1.96 GiB leaves that margin and
+#: 3.78 GiB does not. `/rerank 256` is one command away for anyone who wants it.
+#:
+#: N RAISED 128 -> 256 ON 2026-08-13, BECAUSE THE MEMORY OBJECTION WENT AWAY
+#: --------------------------------------------------------------------------
+#: The paragraph above rejects 256 on 3.78 GiB and nothing else -- it agrees 256
+#: is better. `snn.twocomp.twocomp_scan_inference` removed the two `[B, L, d]`
+#: tensors the autograd Function stacks for a backward that inference never
+#: runs, which is a **3x** cut to the scan's peak (1861 -> 623 MiB at
+#: B x L x d = 256 x 310 x 1024) and bit-identical. A turn at n = 256 is now
+#: **2.21 GiB and 0.70 s**, inside the margin 128 used to need.
+#:
+#:      n         8      32      64     128     256     512
+#:   s/turn    0.29    0.31    0.39    0.55    0.70    1.15
+#:      GiB    0.17    0.39    0.65    1.17    2.21    4.24
+#:
+#: And 256 is the first pool size to come back **`above` rather than merely
+#: directional, on BOTH noun lists at once** (`QUALITY_v10.md` §5):
+#: heldout 0.4167 -> 0.5000 (+11/-1 draws, +6/-0 prompts), fresh 0.1333 ->
+#: 0.2083 (+9/-0 draws, +6/-0 prompts), McNemar p < 0.01 and sign test p = 0.031
+#: on each. **512 is the new cliff**, at 4.24 GiB, and is not measured for
+#: quality.
+DEFAULT_RERANK_N = 256
 DEFAULT_RERANK_LAMBDA = 0.6
 
 #: How wide a range of temperatures the drafts are proposed over. See
@@ -256,6 +309,11 @@ def build_parser() -> argparse.ArgumentParser:
                    metavar="X",
                    help="propose the drafts over temperatures spanning "
                         "+/- X of --temperature; 0 draws them all at one")
+    p.add_argument("--steer-every", type=int, default=0, metavar="N",
+                   help="every N characters, copy drafts the requested subject is "
+                        "about to appear in over drafts it is not. Measured and "
+                        "UNRESOLVED on held-out prompts (docs/chat/QUALITY_v10.md "
+                        "section 3); 0, the default, is n independent draws")
     p.add_argument("--prime", action="store_true",
                    help="begin a story reply with the corpus's own opening clause "
                         "naming your topic (\"Once upon a time, there was a little "
@@ -415,6 +473,7 @@ def run_chat(model, cfg, ck, args) -> int:
         rerank = RerankParams(n=args.rerank, lam=args.rerank_lambda,
                               min_chars=args.rerank_min_chars,
                               temperature_spread=args.rerank_spread,
+                              steer_every=args.steer_every,
                               echo=bool(args.rerank_echo))
     session = ChatSession(model, tok, device=cfg.device, params=params,
                           rerank=rerank)
@@ -568,7 +627,7 @@ def _command(line: str, session: ChatSession, args) -> bool:
                 p.seed = v
                 print(f"  seed = {v}; replies are now reproducible")
     elif cmd == "/rerank":
-        v = _num(int, 1, 64, "candidates")
+        v = _num(int, 1, 512, "candidates")
         if v is not None:
             from snnchat.rerank import RerankParams
 
@@ -584,9 +643,14 @@ def _command(line: str, session: ChatSession, args) -> bool:
                 # on, because rebuilding the object re-defaults it.
                 echo = (session.rerank.echo if session.rerank
                         else bool(getattr(args, "rerank_echo", True)))
+                # Carried for the same reason as `echo`: rebuilding the
+                # object re-defaults every field that is not named here.
+                steer = (session.rerank.steer_every if session.rerank
+                         else int(getattr(args, "steer_every", 0)))
                 session.rerank = RerankParams(n=v, lam=lam, echo=echo,
                                               min_chars=args.rerank_min_chars,
-                                              temperature_spread=spread)
+                                              temperature_spread=spread,
+                                              steer_every=steer)
                 print(f"  reranking {session.rerank.describe()}")
     elif cmd == "/lambda":
         v = _num(float, 0.0, 1.5, "lambda")
@@ -623,6 +687,21 @@ def _command(line: str, session: ChatSession, args) -> bool:
             print("  echo off; drafts are ranked by the likelihood score alone")
         if session.rerank is None:
             print("  (reranking is off, so this takes effect at /rerank <n>)")
+    elif cmd == "/steer":
+        off = bool(rest) and rest[0] in ("off", "no")
+        v = 0 if off else _num(int, 0, 200, "steer")
+        if v is not None:
+            args.steer_every = v
+            if session.rerank is not None:
+                session.rerank.steer_every = v
+            if v:
+                print(f"  steering on, every {v} characters: drafts the subject is")
+                print("  about to appear in are copied over drafts it is not.")
+                print("  UNRESOLVED on held-out prompts -- QUALITY_v10.md §3.")
+            else:
+                print("  steering off; the pool is n independent draws")
+            if session.rerank is None:
+                print("  (reranking is off, so this takes effect at /rerank <n>)")
     elif cmd == "/prime":
         on = not (rest and rest[0] in ("off", "no", "0"))
         args.prime = on
@@ -637,6 +716,21 @@ def _command(line: str, session: ChatSession, args) -> bool:
         if not cands:
             print("  nothing to show -- reranking is off, or nothing has been said yet")
         else:
+            # The turn may have skipped the anti-LM pass because the echo tier
+            # already held exactly one draft, in which case `logp_null` is
+            # unmeasured rather than zero and every `score` below it is a
+            # different number from the one the selector saw. Measured now: the
+            # term is conditioned on a fixed four-id prefix and on nothing about
+            # the session, so it is as computable after the turn as during it.
+            #
+            # Scored under the params the pool was DRAWN under, recorded on the
+            # session, not under `session.rerank`, which `/lambda` may have
+            # changed since.
+            if session.last_rerank is not None:
+                from snnchat.rerank import fill_null_scores
+
+                fill_null_scores(session.sampler.model, cands, session.last_rerank,
+                                 session.sampler.device)
             # The star marks the RECORDED winner, never a recomputed one. Two
             # separate things made recomputing wrong: it dropped the `min_chars`
             # partition, which starred a draft the selector could never return

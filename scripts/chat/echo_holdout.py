@@ -43,9 +43,9 @@ from snnchat.rerank import (  # noqa: E402
     RerankParams,
     echo_count,
     echo_weight,
+    final_ids,
     prompt_content_words,
     rerank,
-    trim_to_sentence,
 )
 from snnchat.tokenizer import BOS, BOT, ChatTokenizer  # noqa: E402
 
@@ -73,6 +73,53 @@ HELDOUT: list[tuple[str, tuple[str, ...]]] = [
     ("i want a story about a rainbow", ("rainbow",)),
     ("make up a story about an elephant", ("elephant",)),
 ]
+
+#: ONE EXCEPTION TO THE CLAIM ABOVE, FOUND 2026-08-12 AND LEFT IN PLACE.
+#: "garden" *is* in `quality.PROBES` -- `src/snnchat/quality.py:270`, as one of
+#: the accepted words of the autumn-haiku `fact` probe. So 19 of the 20 nouns
+#: are held out and one is not. It is left alone rather than swapped, because
+#: every committed number in `QUALITY_v8.md` and `QUALITY_v9.md` was measured on
+#: this exact list and changing it would make them incomparable with each other.
+#: `FRESH` below is disjoint from both lists and is the clean set.
+_HELDOUT_PROBE_OVERLAP = ("garden",)
+
+#: A SECOND held-out set, written before it was ever run.
+#:
+#: `QUALITY_v9.md` §2 named the outstanding weakness in the package's own
+#: evidence: the inverse-document-frequency tier is the SECOND selection rule
+#: chosen by comparing candidates on the 120 draws above, so those draws have
+#: been used for model selection and are no longer fully held out for it. The
+#: document says a fresh noun list is the clean test and that it had not been
+#: run.
+#:
+#: This is that list. Disjoint from `HELDOUT` and from every word in
+#: `quality.PROBES`, same twenty-prompt shape, same spread of request frames,
+#: and a deliberate mix of nouns the corpus will have seen often (drum, pumpkin)
+#: and hardly at all (igloo, seashell).
+FRESH: list[tuple[str, tuple[str, ...]]] = [
+    ("tell me a story about a dolphin", ("dolphin",)),
+    ("tell me a story about a windmill", ("windmill",)),
+    ("tell me a story about a hedgehog", ("hedgehog",)),
+    ("tell me a story about a trumpet", ("trumpet",)),
+    ("tell me a story about a volcano", ("volcano",)),
+    ("tell me a story about a scarecrow", ("scarecrow",)),
+    ("tell me a story about a kangaroo", ("kangaroo",)),
+    ("tell me a story about a teapot", ("teapot",)),
+    ("tell me a story about an igloo", ("igloo",)),
+    ("tell me a story about a peacock", ("peacock",)),
+    ("tell me a story about a drum", ("drum",)),
+    ("tell me a story about a campfire", ("campfire",)),
+    ("tell me a story about a beaver", ("beaver",)),
+    ("tell me a story about a seashell", ("seashell",)),
+    ("tell me a story about a giraffe", ("giraffe",)),
+    ("write me a little story about a pumpkin", ("pumpkin",)),
+    ("can you tell me a story about a submarine", ("submarine",)),
+    ("i want a story about a crocodile", ("crocodile",)),
+    ("make up a story about a telescope", ("telescope",)),
+    ("tell me a story about a raccoon", ("raccoon",)),
+]
+
+SETS = {"heldout": HELDOUT, "fresh": FRESH}
 
 
 def hit(text: str, words) -> float:
@@ -121,6 +168,15 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=8, help="candidates per draw")
     ap.add_argument("--lam", type=float, default=0.6)
     ap.add_argument("--max-new", type=int, default=300)
+    ap.add_argument("--steer-every", type=int, default=0,
+                    help="resample the pool toward the subject every N characters "
+                         "(0 = off, the pool as every earlier round drew it)")
+    ap.add_argument("--steer-frac", type=float, default=0.25)
+    ap.add_argument("--set", dest="probe_set", default="heldout", choices=sorted(SETS),
+                    help="'heldout' is the list every committed number used; "
+                         "'fresh' is the disjoint second list")
+    ap.add_argument("--no-graph", action="store_true",
+                    help="disable the captured-graph stepper; same draws, slower")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default="experiments/chat/_quality/echo_holdout.json")
     args = ap.parse_args()
@@ -128,10 +184,12 @@ def main() -> int:
     model, _cfg, _ck = load_chat_checkpoint(ROOT / args.ckpt, device=args.device)
     model.eval()
     tok = ChatTokenizer()
-    rp = RerankParams(n=args.n, lam=args.lam)
+    rp = RerankParams(n=args.n, lam=args.lam, graph=not args.no_graph,
+                      steer_every=args.steer_every, steer_frac=args.steer_frac)
 
+    probes = SETS[args.probe_set]
     rows = []
-    for prompt, words in HELDOUT:
+    for prompt, words in probes:
         echo_words = prompt_content_words(prompt)
         for seed in range(args.seeds):
             params = SamplingParams(seed=seed, max_new=args.max_new)
@@ -145,7 +203,11 @@ def main() -> int:
             _, cands = rerank(model, logits[:, -1, :].float(), state, params, rp,
                               device=args.device, tok=tok, echo_words=echo_words)
             for c in cands:
-                text = tok.decode_visible(c.ids)
+                # The returned text, matching `rerank.final_ids`. Scoring the
+                # untrimmed draft here is what made QUALITY_v9's n=128 row
+                # (0.4167, replayed off the stored trimmed text) disagree with
+                # the shipped selector (0.3917).
+                text = tok.decode_visible(final_ids(c, tok, rp))
                 c.echo = echo_count(text, echo_words)
                 c.echo_weight = echo_weight(text, echo_words)
 
@@ -160,10 +222,7 @@ def main() -> int:
             picked = max(tier, key=lambda c: c.score)
 
             def text_of(c):
-                out = list(c.ids)
-                if rp.trim_to_sentence and not c.closed:
-                    out = trim_to_sentence(out, tok, min_keep=rp.min_chars)
-                return tok.decode_visible(out).strip()
+                return tok.decode_visible(final_ids(c, tok, rp)).strip()
 
             tb, tp = text_of(base), text_of(picked)
             rows.append({
@@ -201,8 +260,10 @@ def main() -> int:
     lo_b, hi_b = wilson(int(nb), n)
     lo_e, hi_e = wilson(int(ne), n)
 
+    steer_note = (f" steer={args.steer_every}/{args.steer_frac:g}"
+                  if args.steer_every else "")
     print(f"\nheld-out topics, {len(HELDOUT)} prompts x {args.seeds} seeds = {n} draws, "
-          f"n={args.n} lambda={args.lam}")
+          f"n={args.n} lambda={args.lam}{steer_note}")
     print(f"  shipped selector : {nb/n:.4f}  ({int(nb)}/{n})  95% CI [{lo_b:.4f}, {hi_b:.4f}]")
     print(f"  + echo partition : {ne/n:.4f}  ({int(ne)}/{n})  95% CI [{lo_e:.4f}, {hi_e:.4f}]")
     print(f"  oracle over pool : {no/n:.4f}  ({int(no)}/{n})")
@@ -216,7 +277,9 @@ def main() -> int:
     out = ROOT / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({
-        "ckpt": args.ckpt, "seeds": args.seeds, "n": args.n, "lam": args.lam,
+        "ckpt": args.ckpt, "probe_set": args.probe_set,
+        "seeds": args.seeds, "n": args.n, "lam": args.lam,
+        "steer_every": args.steer_every, "steer_frac": args.steer_frac,
         "draws": n,
         "base_rate": nb / n, "echo_rate": ne / n, "oracle_rate": no / n,
         "base_ci": [lo_b, hi_b], "echo_ci": [lo_e, hi_e],

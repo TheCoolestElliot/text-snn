@@ -334,6 +334,55 @@ def twocomp_scan_eager(cur: Tensor, v0: Tensor, w: Tensor, beta_s: Tensor,
 # fused path
 # --------------------------------------------------------------------------
 
+@torch.no_grad()
+def twocomp_scan_inference(cur: Tensor, v0: Tensor, w: Tensor, beta_s: Tensor,
+                           beta_f: float, thr: float) -> tuple[Tensor, Tensor]:
+    """The fused forward without the two tensors only the backward ever reads.
+
+    WHY THIS IS A SEPARATE FUNCTION AND NOT A FLAG
+    ----------------------------------------------
+    `FusedTwoCompartmentScan.forward` stacks three `[B, L, d]` tensors: the
+    spikes, which are the output, plus `v_pre` and `vs_seq`, which exist solely
+    so `backward` can recover the fast compartment and the slow trajectory. Under
+    inference the last two are built, saved and immediately dropped -- **three
+    times the transient memory for one tensor's worth of result.**
+
+    It cannot be conditioned on inside the autograd Function. `ctx.needs_input_grad`
+    reports whether the *parameters* require grad, which they do in `eval()` just
+    as much as in training, and `torch.is_grad_enabled()` is always False inside a
+    `forward`. The only place the question can be answered is the dispatcher, so
+    the dispatcher answers it and calls this.
+
+    Separate rather than a branch inside `forward` for a second reason: the
+    autograd Function is mutation-tested and R10-gated, and this change adds no
+    line to it. What it does add is an obligation -- a third path that must agree
+    with the other two bit for bit --
+    `tests/test_twocomp_equivalence.py::test_the_inference_path_is_bit_identical`
+    is that gate. It runs the same kernel with the same arguments in the same
+    order, so agreement is by construction, and the test is what keeps it so.
+
+    Capture-safe on the same terms as the Function: the checks are host-side and
+    sync nothing, so this is what a `snnchat.stepper` graph actually records.
+    """
+    _check_fp32(cur, v0, w, beta_s)
+    d = _check(cur, v0, w, beta_s)
+    fwd = twocomp_forward_kernel()
+
+    vf = v0[:, :d]
+    vs = v0[:, d:]
+    spikes: list[Tensor] = []
+    for t in range(cur.shape[1]):
+        # The kernel emits four outputs whichever path calls it; the difference
+        # is that `v_pre` is dropped here per step instead of being retained for
+        # the whole sequence.
+        vf, vs, s, _v_pre = fwd(vf, vs, cur[:, t], w, beta_s,
+                                beta_f=beta_f, thr=thr)
+        spikes.append(s)
+    out_spikes = torch.stack(spikes, dim=1)
+    spikes.clear()
+    return out_spikes, torch.cat([vf, vs], dim=1)
+
+
 class FusedTwoCompartmentScan(torch.autograd.Function):
     """One jiterator kernel per timestep forward, one per timestep backward.
 
@@ -462,5 +511,10 @@ def twocomp_scan(cur: Tensor, v0: Tensor, w: Tensor, beta_s: Tensor,
     _check(cur, v0, w, beta_s)
     _check_fp32(cur, v0, w, beta_s)
     if fused and cur.is_cuda and jiterator_available():
+        if not torch.is_grad_enabled():
+            # Nothing downstream can ask for a gradient, so the two [B, L, d]
+            # tensors the backward would need are pure cost. See
+            # `twocomp_scan_inference` -- same kernel, same order, same bits.
+            return twocomp_scan_inference(cur, v0, w, beta_s, beta_f, thr)
         return FusedTwoCompartmentScan.apply(cur, v0, w, beta_s, beta_f, thr, alpha)
     return twocomp_scan_eager(cur, v0, w, beta_s, beta_f, thr, alpha)
