@@ -1997,3 +1997,137 @@ def test_a_request_verb_is_not_echoed_by_an_unrelated_inflection():
     assert echo_weight(text, words) == pytest.approx(
         sum(__import__("snnchat.rerank", fromlist=["x"]).word_weight(w)
             for w in ("three", "animals")))
+
+
+# --------------------------------------------------------------------------
+# the subject-selection policy (PREDICTION_v12 A16)
+#
+# The load-bearing property is the NEGATIVE one: the shipped default must be
+# untouched, in output and in RNG consumption, because `build_topic_stories.py`
+# threads one generator through every request and eight committed checkpoints
+# were trained on the bytes it produces.
+# --------------------------------------------------------------------------
+
+
+def test_the_head_policy_draws_no_random_numbers():
+    """`stories_topic.bin` must still rebuild to the same bytes.
+
+    One generator is threaded through the raw-narrative gate and every request,
+    so a single extra draw here shifts the whole downstream stream. Asserted on
+    the generator's state, not just on the returned order."""
+    import random
+
+    from snnchat.topics import POLICIES, order_subjects
+
+    topics = ["bird", "nest", "egg"]
+    for policy in (None, POLICIES["head"]):
+        rng = random.Random(0)
+        before = rng.getstate()
+        assert order_subjects(topics, rng, policy) == topics
+        assert rng.getstate() == before, policy
+
+
+def test_the_default_story_request_is_byte_identical_to_the_shipped_one():
+    """`policy=None` and the explicit `head` policy are the same function, and
+    both are what the corpus on disk was packed with."""
+    import random
+
+    from snnchat.topics import POLICIES, story_request
+
+    story = ("Once upon a time there was a little bird. The bird had a nest in "
+             "a tall tree. Every day the bird sat in the nest and looked at the "
+             "egg. The egg was warm. The bird loved the nest and the egg.")
+    a = story_request(story, random.Random(3))
+    b = story_request(story, random.Random(3), policy=None)
+    c = story_request(story, random.Random(3), policy=POLICIES["head"])
+    assert a == b == c
+
+
+def test_rarest_is_deterministic_and_orders_by_availability():
+    """No RNG, ascending corpus availability, ties on `topic_of`'s own order."""
+    import random
+
+    from snnchat.topics import POLICIES, order_subjects
+
+    rarest = POLICIES["rarest"]
+    topics = ["bird", "nest", "egg"]
+    rng = random.Random(0)
+    before = rng.getstate()
+    out = order_subjects(topics, rng, rarest)
+    assert rng.getstate() == before, "rarest must not consume the stream"
+    counts = [rarest.count(w) for w in out]
+    assert counts == sorted(counts), (out, counts)
+    # and it is a pure function of the input
+    assert out == order_subjects(topics, random.Random(99), rarest)
+
+
+def test_inverse_prefers_the_rarer_subject_without_excluding_the_common_one():
+    """Weighted, not deterministic -- the head keeps a small share, which is the
+    whole difference between this policy and `rarest`."""
+    import random
+    from collections import Counter
+
+    from snnchat.topics import POLICIES, order_subjects
+
+    rng = random.Random(0)
+    first = Counter(order_subjects(["bird", "nest", "egg"], rng,
+                                   POLICIES["inverse"])[0] for _ in range(2000))
+    assert first["egg"] > first["nest"] > first["bird"], first
+    assert first["bird"] > 0, "a weighted policy must not be deterministic"
+
+
+def test_a_policy_pack_cannot_overwrite_the_shipped_corpus():
+    """The guard that protects `stories_topic.bin`, same shape as the one
+    `--raw-fraction` already has."""
+    import importlib.util
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    root = _Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "_bts", root / "scripts" / "chat" / "build_topic_stories.py")
+    mod = importlib.util.module_from_spec(spec)
+    _sys.modules["_bts"] = mod
+    spec.loader.exec_module(mod)
+
+    with pytest.raises(SystemExit) as exc:
+        mod.main(["--subject-policy", "rarest", "--name", "stories_topic"])
+    assert "not the shipped rule" in str(exc.value)
+    with pytest.raises(SystemExit) as exc:
+        mod.main(["--raw-fraction", "0.05", "--name", "stories_topic"])
+    assert "differs from the shipped" in str(exc.value)
+
+
+def test_the_wide_list_is_disjoint_from_every_published_list():
+    """`WIDE` may share no noun with anything already scored, or the round's
+    primary gate is partly a rerun of a number already published."""
+    import importlib.util
+    import re as _re
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    from snnchat.quality import PROBES
+
+    root = _Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "_eh", root / "scripts" / "chat" / "echo_holdout.py")
+    mod = importlib.util.module_from_spec(spec)
+    _sys.modules["_eh"] = mod
+    spec.loader.exec_module(mod)
+
+    used = set()
+    for p in PROBES:
+        used |= set(_re.findall(r"[a-z]+", p.prompt.lower()))
+        used |= {w.lower() for w in p.expect}
+    for lst in (mod.HELDOUT, mod.FRESH):
+        for _prompt, words in lst:
+            used |= {w.lower() for w in words}
+
+    assert len(mod.WIDE) == 60
+    for _prompt, words in mod.WIDE:
+        for w in words:
+            assert w not in used and w.rstrip("s") not in used, w
+    # every prompt must be well-formed: the article agrees with the noun
+    for prompt, words in mod.WIDE:
+        assert prompt.endswith(words[0]), prompt
+    assert sorted(mod.SETS) == ["fresh", "heldout", "wide"]

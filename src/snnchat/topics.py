@@ -48,10 +48,14 @@ common in it.
 
 from __future__ import annotations
 
+import json
 import random
 import re
+from dataclasses import dataclass
+from pathlib import Path
 
-__all__ = ["topic_of", "story_request", "STOP_WORDS"]
+__all__ = ["topic_of", "story_request", "STOP_WORDS",
+           "SubjectPolicy", "POLICIES", "order_subjects"]
 
 #: Function words, plus the verbs and adjectives TinyStories uses in almost
 #: every story. Without the second group the most frequent content word in a
@@ -195,7 +199,134 @@ def topic_of(story: str, *, min_count: int = 2, window: int = 220,
     return eligible[:max_rank]
 
 
-def story_request(story: str, rng: random.Random) -> str | None:
+#: How often each word is available as a subject, and how often the shipped rule
+#: actually requests it. Built by `scripts/chat/subject_table.py` over the raw
+#: corpus with `topic_of` itself, so the counts describe exactly the candidates
+#: a packer chooses among. Absent file degrades every policy to `head`, which is
+#: the shipped behaviour, rather than to nothing.
+_FREQ_PATH = Path(__file__).with_name("subject_freq.json")
+try:
+    _blob = json.loads(_FREQ_PATH.read_text(encoding="utf-8"))
+    _SUBJECT_COUNTS: dict[str, int] = _blob["counts"]
+except (OSError, ValueError, KeyError):       # pragma: no cover - packaging guard
+    _SUBJECT_COUNTS = {}
+
+
+@dataclass(frozen=True)
+class SubjectPolicy:
+    """Which of a story's eligible subjects goes into the request.
+
+    THE PROBLEM THIS EXISTS FOR
+    ---------------------------
+    `topic_of` returns up to three eligible subjects -- each already in-window,
+    used as a noun, and not a character name -- and `story_request` has always
+    taken `topics[0]`, the most frequent. TinyStories is about balls, birds and
+    cats, so that is what the request slot fills with: measured over the raw
+    corpus, **140 subjects carry 49.3 % of all requests**, and "penguin" is
+    asked 151 times against "bird"'s 31,076.
+
+    `QUALITY_v11.md` §1 measured why that matters. Whether this model can draft
+    a reply about a noun is predicted by how often it was ASKED for the noun
+    (partial rho +0.328, p = 0.042) and not at all by how often it has READ it
+    (partial rho -0.027, p = 0.87). So the request slot is the lever, and its
+    distribution is a choice this file makes rather than a property of the data.
+
+    `alpha` is the exponent on inverse availability: a candidate is drawn with
+    weight `1 / (1 + count)**alpha`. **`alpha = 0` is the shipped rule exactly**
+    -- equal weights, and `order_subjects` short-circuits to the identity
+    without drawing at all, so `stories_topic.bin` stays reproducible character
+    for character.
+
+    WHAT THIS CANNOT BREAK, AND WHY THAT IS THE SAFETY PROPERTY
+    -----------------------------------------------------------
+    Every candidate it chooses among has already passed `topic_of`'s filters, so
+    a flattened request still names something the story is genuinely about --
+    just less centrally. The arm's failure mode is therefore a *weaker*
+    request-to-story correspondence, not a wrong one, and that is the thing to
+    watch in the held-out numbers rather than nonsense requests.
+    """
+
+    name: str
+    alpha: float = 0.0
+    #: "head" keeps `topic_of`'s own order; "weighted" samples by
+    #: `1/(1+count)**alpha`; "rarest" sorts ascending by availability and draws
+    #: nothing. Only the middle one is stochastic.
+    mode: str = "head"
+
+    def weight(self, word: str) -> float:
+        if self.alpha == 0.0:
+            return 1.0
+        return 1.0 / (1.0 + _SUBJECT_COUNTS.get(word, 0)) ** self.alpha
+
+    def count(self, word: str) -> int:
+        return _SUBJECT_COUNTS.get(word, 0)
+
+
+#: Named rather than loose floats, for the reason `shortform._TARGETS` is named:
+#: a packed corpus's manifest entry then records which pre-registered policy it
+#: was built under, and a later reader does not have to infer it.
+#:
+#: BOTH NON-DEFAULT POLICIES ARE PARAMETER-FREE, WHICH IS WHY THERE ARE TWO
+#: -----------------------------------------------------------------------
+#: `inverse` is the gentler reading of "flatten": every candidate keeps some
+#: chance, in proportion to how rare it is. `rarest` is the extreme: the least
+#: available eligible subject always wins. There is a continuum between them
+#: (`alpha = 2`, `alpha = 3`, ...) and it is deliberately not exposed, because
+#: picking a value off it would be fitting a constant to the corpus.
+POLICIES: dict[str, SubjectPolicy] = {
+    "head": SubjectPolicy("head", 0.0, "head"),
+    "inverse": SubjectPolicy("inverse", 1.0, "weighted"),
+    "rarest": SubjectPolicy("rarest", 0.0, "rarest"),
+}
+
+
+def order_subjects(topics: list[str], rng: random.Random,
+                   policy: SubjectPolicy | None = None) -> list[str]:
+    """Reorder a story's eligible subjects under `policy`. Best first.
+
+    `None` and `alpha = 0` both return the input unchanged **and draw no random
+    numbers**. That is not an optimisation: `build_topic_stories.py` threads one
+    generator through the raw-narrative gate and every request, so an extra draw
+    here would shift the whole downstream stream and `stories_topic.bin` would
+    no longer rebuild to the bytes eight committed checkpoints were trained on.
+    `tests/test_snnchat.py::test_the_head_policy_draws_no_random_numbers` holds
+    that.
+
+    Weighted sampling WITHOUT replacement, so the two-topic branch still gets
+    two distinct subjects and gets them under the same policy as the one-topic
+    branch. Under a policy the draw count is `len(topics) - 1`, which is
+    data-dependent -- expected, since a policy pack is a new corpus by
+    construction and is packed under a new name.
+    """
+    if policy is None or policy.mode == "head" or len(topics) < 2:
+        return list(topics)
+    if policy.mode == "rarest":
+        # Ascending availability, ties broken by `topic_of`'s own order so the
+        # result is a pure function of the story. Draws nothing.
+        order = sorted(range(len(topics)), key=lambda i: (policy.count(topics[i]), i))
+        return [topics[i] for i in order]
+    remaining = list(topics)
+    out: list[str] = []
+    while len(remaining) > 1:
+        weights = [policy.weight(w) for w in remaining]
+        total = sum(weights)
+        if total <= 0.0:                       # every candidate unknown: keep order
+            break
+        target = rng.random() * total
+        acc = 0.0
+        idx = len(remaining) - 1
+        for i, w in enumerate(weights):
+            acc += w
+            if target < acc:
+                idx = i
+                break
+        out.append(remaining.pop(idx))
+    out.extend(remaining)
+    return out
+
+
+def story_request(story: str, rng: random.Random, *,
+                  policy: SubjectPolicy | None = None) -> str | None:
     """A user turn this story is a plausible answer to. None = leave it raw.
 
     The mixture of phrasings is a judgement and is recorded as one:
@@ -207,8 +338,16 @@ def story_request(story: str, rng: random.Random) -> str | None:
       unseen shape;
     * the rest stay generic, because "tell me a story" with no topic must keep
       working and is what most users type first.
+
+    Read those percentages as the nominal reading of one `rng.random()` against
+    cumulative thresholds, not as independent probabilities: the 0.85-0.90 slice
+    is a *second* single-topic branch, so the realised noun share is **60 %**
+    when a name is available and higher when one is not.
+
+    `policy` chooses WHICH eligible subject fills the slot; the default is the
+    shipped behaviour and is bit-reproducible. See `SubjectPolicy`.
     """
-    topics = topic_of(story)
+    topics = order_subjects(topic_of(story), rng, policy)
     names = _MIDSENTENCE_CAP.findall(story[:200])
     r = rng.random()
 

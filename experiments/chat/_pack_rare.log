@@ -1,0 +1,9 @@
+packing stories_topic_rare from data/chat_raw\tinystories.txt (limit 400 M chars, raw fraction 0.15)
+    stories_topic_rare: 84,676 conversations, 64.1 M chars
+    stories_topic_rare: 170,061 conversations, 128.8 M chars
+    stories_topic_rare: 257,029 conversations, 194.5 M chars
+    stories_topic_rare: 342,241 conversations, 259.0 M chars
+    stories_topic_rare: 427,782 conversations, 323.8 M chars
+    stories_topic_rare: 514,598 conversations, 389.5 M chars
+  stories_topic_rare: 528,465 conversations, 400.0 M chars (398.4 train / 1.60 val) in 124s
+registered stories_topic_rare in data/chat\manifest.json
