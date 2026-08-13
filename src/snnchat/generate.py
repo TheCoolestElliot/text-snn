@@ -42,7 +42,13 @@ import torch.nn.functional as F
 
 from snnchat.tokenizer import BOS, BOT, EOT, USER, ChatTokenizer
 
-__all__ = ["SamplingParams", "ChatSampler", "ChatSession", "load_chat_checkpoint"]
+__all__ = [
+    "SamplingParams",
+    "ChatSampler",
+    "ChatSession",
+    "load_chat_checkpoint",
+    "loop_penalty_target",
+]
 
 
 class SamplingParams:
@@ -98,24 +104,42 @@ class SamplingParams:
         )
 
 
-def _loop_penalty(recent: list[int], logits: torch.Tensor, params: SamplingParams) -> None:
-    """Suppress the character that would extend a just-repeated block. In place.
+def loop_penalty_target(recent: list[int], params: SamplingParams) -> int | None:
+    """The one character a just-repeated block would extend, or None.
 
     For each block length `n`, if `recent[-n:] == recent[-2n:-n]` then the tail
     has already been said twice, and `recent[-n]` is the character that starts
-    the third copy. Only that one id is penalised.
+    the third copy. Only that one id is reported.
 
-    Shortest block first, and return after the first hit: a cycle of period 2 is
+    Shortest block first, and return at the first hit: a cycle of period 2 is
     also a cycle of period 4, 6, 8..., and penalising all of them would suppress
     several distinct characters on the strength of one repetition.
+
+    The `recent[-n - 1] != last` line is an exact early-out, not an
+    approximation. Taking `i = n - 1` in the element-wise reading of the slice
+    comparison gives `recent[-1] == recent[-n - 1]` as a *necessary* condition,
+    so a block length that fails it cannot match and the slice never has to be
+    built. That matters at the batch sizes `rerank` now draws: the naive form
+    builds two slices per block length per row per character, which is ~10^6
+    list copies for one turn at n = 128 and was a measurable share of the loop.
     """
     if params.loop_penalty <= 0.0 or len(recent) < 4:
-        return
+        return None
     limit = min(params.loop_max_block, len(recent) // 2)
+    last = recent[-1]
     for n in range(2, limit + 1):
+        if recent[-n - 1] != last:
+            continue
         if recent[-n:] == recent[-2 * n:-n]:
-            logits[recent[-n]] -= params.loop_penalty
-            return
+            return recent[-n]
+    return None
+
+
+def _loop_penalty(recent: list[int], logits: torch.Tensor, params: SamplingParams) -> None:
+    """Suppress the character that would extend a just-repeated block. In place."""
+    target = loop_penalty_target(recent, params)
+    if target is not None:
+        logits[target] -= params.loop_penalty
 
 
 def _filter(
@@ -334,6 +358,12 @@ class ChatSession:
         #: committed draws.
         self.last_winner = None
         self.last_echo_on = False
+        #: A COPY of the `RerankParams` the last pool was drawn under. Recorded
+        #: for the same reason `last_winner` is: `/candidates` renders a decision
+        #: already taken, and `self.rerank` is a live object that `/lambda` and
+        #: `/rerank` mutate. Scoring a stored pool with a lambda it was never
+        #: ranked under prints numbers no selector ever saw.
+        self.last_rerank = None
         self.turns: list[tuple[str, str]] = []
         self._state = None
         self._primed = False
@@ -469,9 +499,10 @@ class ChatSession:
         few hundred characters and is exact by construction, which is the same
         reason `rewind` replays ids rather than re-rendering text.
         """
-        from snnchat.rerank import prompt_content_words
+        import dataclasses
+
+        from snnchat.rerank import final_ids, prompt_content_words
         from snnchat.rerank import rerank as _rerank
-        from snnchat.rerank import trim_to_sentence
 
         recording = self.sampler.record_spikes
         # Spike recording traces ONE reply, and the candidate pass is N replies
@@ -491,10 +522,12 @@ class ChatSession:
         self.last_candidates = cands
         self.last_winner = winner
         self.last_echo_on = bool(rp.echo and echo_words)
+        self.last_rerank = dataclasses.replace(rp)
 
-        out = list(winner.ids)
-        if rp.trim_to_sentence and not winner.closed:
-            out = trim_to_sentence(out, self.tok, min_keep=rp.min_chars)
+        # `final_ids` and not an inline trim: the echo tier ranks candidates by
+        # this exact string, and two copies of the rule that drifted apart would
+        # mean the selector ranked one reply and the session fed another.
+        out = final_ids(winner, self.tok, rp)
         if out:
             if recording:
                 self.sampler.start_recording()
@@ -560,6 +593,7 @@ class ChatSession:
         self.last_candidates = []
         self.last_winner = None
         self.last_echo_on = False
+        self.last_rerank = None
 
     @torch.no_grad()
     def rewind(self, n_exchanges: int = 1) -> None:

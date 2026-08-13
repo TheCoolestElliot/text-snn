@@ -36,6 +36,15 @@ size up to `B*d ~ 200k`. At d=1024 that leaves a factor of ~200 of unused batch.
 measurement in `docs/chat/QUALITY.md` bears that out. A transformer would pay N
 times for this; a recurrent spiking net at this width very nearly does not.
 
+That was true of the SCAN and false of this module, until 2026-08-12. The loop
+around the scan read `2n` values back from the device per character to ask which
+rows had finished, at 36 us each, so the cost of a pool grew linearly in the
+pool -- the one axis the argument above says is free. It has been paid off
+(`docs/chat/QUALITY_v10.md` §1): one device read per character, and the whole
+step captured as a CUDA graph in `snnchat.stepper`. A turn at n = 128 went from
+4.21 s to 0.57 s with **bit-identical** output, which is what made 128 the
+default rather than 32.
+
 THE ECHO PARTITION, AND WHY THE SCORE ALONE LEAVES MOST OF THE POOL ON THE FLOOR
 --------------------------------------------------------------------------------
 The score above ranks by log-probability and nothing else, and measured on the
@@ -103,20 +112,25 @@ import torch.nn.functional as F
 # drawn from the identical distribution the single-candidate path uses -- two
 # copies of a nucleus filter that disagree by one index would make every
 # comparison in docs/chat/QUALITY.md meaningless.
-from snnchat.generate import SamplingParams, _filter, _loop_penalty
+from snnchat.generate import SamplingParams, _filter, loop_penalty_target
 from snnchat.tokenizer import BOS, BOT, EOT, USER
 
 __all__ = [
     "RerankParams",
     "Candidate",
+    "Steering",
     "sample_candidates",
     "score_under_prefix",
+    "fill_null_scores",
     "null_prefix_ids",
     "trim_to_sentence",
+    "final_ids",
     "prompt_content_words",
     "echo_count",
+    "echoes",
     "echo_weight",
     "word_weight",
+    "steer_word",
     "rerank",
 ]
 
@@ -214,22 +228,50 @@ def word_weight(word: str) -> float:
     return _math.log(_WORD_TOTAL / (1 + _WORD_COUNTS.get(word, 0)))
 
 
+def echoes(word: str, lowered: str) -> bool:
+    """Does `lowered` use `word`? Whole word, plural tolerated either way.
+
+    ONE FUNCTION, BECAUSE TWO COPIES OF THIS DRIFTED ONCE ALREADY
+    -------------------------------------------------------------
+    `echo_count` and `echo_weight` must agree about WHICH words were echoed and
+    differ only in what each is worth. They used to say so in a docstring and
+    implement it twice.
+
+    WHOLE WORD, NOT A PREFIX -- MEASURED, 2026-08-13
+    ------------------------------------------------
+    This was `re.search(r"\\b" + stem, ...)`, a prefix match, and the prefix was
+    doing real damage on any prompt that is not a story request. `"name three
+    animals"` has `name` as a content word, `\\bname` matches **"named"**, and
+    `" named "` is the literal signature of the register this decoder is
+    supposed to be avoiding -- `snnchat.quality._is_story` keys on that exact
+    substring. So the echo tier promoted "Three years old girl named Emma" over
+    "A dog, a cat, and a bird", because the story echoed the request verb and
+    the correct answer echoed nothing.
+
+    Measured on 72 non-narrative draws (`scripts/chat/lambda_dodge.py`): the
+    partition took `story_dodge` from 0.0000 to 0.2778, and `name` was the
+    echoed word in **16 of the 20 dodges**, at an IDF weight of 8.66 -- which
+    puts a request verb in the same weight band as a subject noun.
+
+    The `(s|es)?` suffix keeps every behaviour the prefix rule was documented
+    for: "rabbit" is still found in "rabbits" and "dragon" in "dragons". What it
+    stops is an unrelated inflection of a request verb counting as subject
+    matter. No constant was tuned to get this.
+    """
+    stem = word[:-1] if len(word) > 4 and word.endswith("s") else word
+    return _re.search(r"\b" + _re.escape(stem) + r"(s|es)?\b", lowered) is not None
+
+
 def echo_weight(text: str, words) -> float:
     """Summed `word_weight` of the DISTINCT prompt words the reply uses.
 
     The weighted counterpart of `echo_count`, and the quantity the tier is
-    actually built on. Same matching rule, so the two agree on WHICH words were
-    echoed and differ only in what each one is worth.
+    actually built on.
     """
     if not words:
         return 0.0
     lowered = text.lower()
-    total = 0.0
-    for w in words:
-        stem = w[:-1] if len(w) > 4 and w.endswith("s") else w
-        if _re.search(r"\b" + _re.escape(stem), lowered):
-            total += word_weight(w)
-    return total
+    return sum(word_weight(w) for w in words if echoes(w, lowered))
 
 
 def echo_count(text: str, words) -> int:
@@ -240,21 +282,15 @@ def echo_count(text: str, words) -> int:
     the tier to whichever candidate looped -- the failure `_loop_penalty`
     already exists to suppress.
 
-    Matching is prefix-on-a-word-boundary with a crude singular stem, so
-    "rabbit" is found in "rabbits" and "dragon" in "dragons". It deliberately
-    does not go the other way: this is a selector among candidates the model
-    already produced, and a false match costs one tier place rather than a wrong
-    answer, so the cheap rule is the right one.
+    Matching is `echoes` -- whole word with a crude plural stem, so "rabbit" is
+    found in "rabbits" and "dragon" in "dragons". A false match is not as cheap
+    as it looks and the docstring used to say it was; see `echoes` for the one
+    that cost 0.2778 of `story_dodge`.
     """
     if not words:
         return 0
     lowered = text.lower()
-    n = 0
-    for w in words:
-        stem = w[:-1] if len(w) > 4 and w.endswith("s") else w
-        if re.search(r"\b" + re.escape(stem), lowered):
-            n += 1
-    return n
+    return sum(1 for w in words if echoes(w, lowered))
 
 
 def temperature_ladder(base: float, n: int, spread: float) -> list[float] | None:
@@ -389,10 +425,24 @@ class RerankParams:
     #: the scored word is "paris") is the one battery column that is not
     #: circular, and it is a single arm at 28 draws.
     echo: bool = True
+    #: Route the per-character forward through a captured CUDA graph. Pure
+    #: speedup, asserted identical, and silently ignored where a graph cannot be
+    #: captured -- see `snnchat.stepper`. Off is the old code path, kept because
+    #: "turn the optimisation off and see" is the first thing anyone wants when a
+    #: number looks wrong.
+    graph: bool = True
+    #: Resample the pool toward drafts the subject is imminent in, every this
+    #: many characters. 0 is off and off is the identity. See `Steering` for the
+    #: mechanism, and for why the candidates stop being independent when it is on.
+    steer_every: int = 0
+    #: Fraction of live rows replaced at each steering checkpoint.
+    steer_frac: float = 0.25
 
     def __post_init__(self) -> None:
         if self.n < 1:
             raise ValueError(f"n must be >= 1, got {self.n}")
+        if self.steer_every < 0:
+            raise ValueError(f"steer_every must be >= 0, got {self.steer_every}")
         if self.null not in ("empty_user", "bot_only"):
             raise ValueError(f"null must be 'empty_user' or 'bot_only', got {self.null!r}")
         if not 0.0 <= self.temperature_spread < 1.0:
@@ -411,6 +461,8 @@ class RerankParams:
         if self.temperature_spread > 0.0:
             out += f" spread={self.temperature_spread:g}"
         out += f" echo={'on' if self.echo else 'off'}"
+        if self.steer_every:
+            out += f" steer={self.steer_every}/{self.steer_frac:g}"
         return out
 
 
@@ -427,6 +479,16 @@ class Candidate:
     #: is off, which is why `/candidates` labels the column rather than printing
     #: a bare number.
     echo: int = 0
+    #: The inverse-document-frequency sum of those words, and the quantity the
+    #: tier is actually built on. A field rather than an attribute assigned from
+    #: outside, so a candidate that was never scored reads 0.0 instead of
+    #: raising on access.
+    echo_weight: float = 0.0
+    #: False when the null-context pass was skipped because it could not change
+    #: the winner. `logp_null` is then 0.0 because it was not measured, not
+    #: because it was measured to be zero -- `fill_null_scores` is what turns
+    #: one into the other, and `/candidates` calls it before displaying.
+    null_scored: bool = True
 
     @property
     def n_chars(self) -> int:
@@ -471,6 +533,35 @@ def trim_to_sentence(ids: list[int], tok, *, min_keep: int = 12) -> list[int]:
     return ids[:cut + 1]
 
 
+def final_ids(cand: "Candidate", tok, rp: "RerankParams") -> list[int]:
+    """The ids this candidate will actually be returned as.
+
+    THE SELECTOR MUST RANK THE REPLY, NOT THE DRAFT
+    -----------------------------------------------
+    `trim_to_sentence` cuts an unclosed draft back to its last complete
+    sentence, and it runs *after* selection. So for the first four rounds of
+    this work the echo tier read `c.ids` -- text including a tail that the
+    reader never sees. A draft whose only mention of the subject was in that
+    tail won the tier for a word its reply does not contain.
+
+    Measured 2026-08-12 on the committed pools at n = 128: 0.7 % of drafts lose
+    echo weight to trimming, and tiering on the returned text instead is
+    **+3 / -0** on the twenty held-out nouns and **0 / 0** on the twenty fresh
+    ones. Small, and one-directional by construction rather than by luck --
+    ranking the string you return cannot be worse than ranking one you discard.
+
+    It also settles a disagreement rather than creating one. `QUALITY_v9.md`
+    §2's n = 128 row reports 0.4167, which was replayed off the *stored* pool
+    text and is therefore the trimmed reading; the shipped code scored 0.3917.
+    Both numbers were right about different selectors. This is the one function
+    both now use, which is what stops that recurring.
+    """
+    ids = list(cand.ids)
+    if rp.trim_to_sentence and not cand.closed:
+        ids = trim_to_sentence(ids, tok, min_keep=rp.min_chars)
+    return ids
+
+
 def null_prefix_ids(kind: str = "empty_user") -> list[int]:
     """The id sequence the anti-LM term is conditioned on.
 
@@ -503,6 +594,181 @@ def _expand_state(state, n: int):
     return [s.repeat(n, *([1] * (s.dim() - 1))) if s.shape[0] == 1 else s for s in state]
 
 
+# ---------------------------------------------------------------------------
+# steering the pool: resampling toward drafts the subject is imminent in
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Steering:
+    """Reallocate the candidate pool mid-draft toward drafts about the subject.
+
+    WHY A DECODER CAN DO THIS AT ALL, AND WHY THIS MODEL ESPECIALLY
+    ---------------------------------------------------------------
+    Best-of-N spends its whole budget before it learns anything: `n` drafts are
+    run to completion and only then compared. Every draft that went off topic in
+    its first clause consumed a full reply's worth of scan anyway.
+
+    The alternative is the standard sequential-Monte-Carlo move -- periodically
+    score the partial drafts, then copy promising ones over unpromising ones and
+    let them diverge. On a transformer that copy means duplicating a KV cache
+    that grows with the reply; here a draft's entire history is `[2d]` of
+    membrane per layer, so cloning one is an `index_select` over a fixed-size
+    tensor and costs the same at character 300 as at character 3. This is the
+    same O(1)-state property `snnchat.generate`'s docstring opens with, spent on
+    search instead of on session length.
+
+    THE POTENTIAL IS A LOOKAHEAD, NOT AN ECHO COUNT
+    -----------------------------------------------
+    The obvious score is the one the selector already uses -- how much of the
+    prompt the draft has echoed so far. It is useless here, and the reason is
+    worth stating: over 4,319 topic conversations the corpus puts the subject
+    noun a median of **81 characters** into the reply, so a draft that has
+    already said "penguin" has already succeeded and one that has not carries no
+    lexical evidence either way. Resampling on it would be a no-op until the
+    moment it stopped mattering.
+
+    So the potential is `log P(" penguin" | draft so far)` -- one teacher-forced
+    pass over the word from each row's current membrane, which asks the model
+    itself whether the subject is *about to* arrive. A draft that has just
+    written "Once upon a time, there was a little " scores high on it before
+    committing to any animal at all.
+
+    Rows that have already said the word are given `0.0`, the top of the scale:
+    the quantity is "will this reply be about the subject", and for them the
+    answer is settled. That also stops the pressure from compounding into a row
+    that says the word over and over.
+
+    AND IT IS AIMED AT A MEASURED FAILURE, NOT A GUESSED ONE
+    --------------------------------------------------------
+    Phase 4 measured this neuron's memory horizon at **47-48 characters**. The
+    corpus's own subject position is 81. The model is therefore being asked to
+    recall the requested noun from *beyond its own reach* at exactly the moment
+    the story form demands it, which is a mechanism for the topic failure that
+    no amount of reranking at the end can repair. Resampling every `every`
+    characters -- comfortably inside the horizon -- is an external memory of the
+    prompt, applied while the draft can still act on it.
+
+    WHAT IT COSTS AND WHAT IT BREAKS
+    --------------------------------
+    One forward over `len(ids) - 1` characters per checkpoint, from a cloned
+    state, plus an `index_select`. Nothing per character.
+
+    What it breaks is independence: with steering on, the returned candidates
+    are a resampled particle system, not `n` i.i.d. draws. `snnchat.quality`'s
+    `score` takes the first `n` rows of a larger pool and calls that a sample of
+    size `n` -- sound for independent draws and NOT sound for these. Steering is
+    off by default partly for that reason.
+    """
+
+    #: The subject word, lowercased, as it is searched for in a draft.
+    word: str
+    #: Ids of the continuation whose log-probability is the potential -- the
+    #: word with a leading space, so the model is asked about a word boundary
+    #: rather than about a suffix it might be in the middle of.
+    ids: list[int]
+    #: Characters between resampling checkpoints. Below the 47-48 character
+    #: horizon by construction; see above.
+    every: int = 32
+    #: Fraction of the live rows replaced at a checkpoint. The rest are left
+    #: alone, which is what keeps the pool from collapsing onto one lineage.
+    frac: float = 0.25
+
+    def __post_init__(self) -> None:
+        if self.every < 1:
+            raise ValueError(f"every must be >= 1, got {self.every}")
+        if not 0.0 <= self.frac < 0.5:
+            # At frac >= 0.5 the donor and victim halves meet and a row can be
+            # asked to clone itself; below it the two are always disjoint.
+            raise ValueError(f"frac must be in [0, 0.5), got {self.frac}")
+
+
+def steer_word(
+    words, tok, *, every: int = 32, frac: float = 0.25, min_weight: float = 0.0
+) -> Steering | None:
+    """Build a `Steering` for the rarest content word of a prompt, or None.
+
+    Rarest by the same inverse-document-frequency table the echo tier is built
+    on, so the two agree about which word of "tell me a story about a penguin"
+    is the subject -- penguin at 10.34 against tell at 5.93 -- without a second
+    notion of subjecthood to keep in step.
+
+    `min_weight` is 0 by default, i.e. no threshold. A cut somewhere around 7
+    would separate the request frame from the subject on the words measured in
+    `docs/chat/QUALITY_v9.md` §2, but that is a constant fitted to twenty
+    prompts and this file has been careful not to acquire any. Without it the
+    rule on a subject-less prompt ("hello") is to steer toward the model
+    answering in kind, which is harmless.
+    """
+    if not words:
+        return None
+    word = max(words, key=word_weight)
+    if word_weight(word) < min_weight:
+        return None
+    ids = [int(i) for i in tok.encode(" " + word)]
+    if not ids:
+        return None
+    return Steering(word=word, ids=ids, every=every, frac=frac)
+
+
+@torch.no_grad()
+def _topic_imminence(model, stepper, state, logprobs, steer, out, tok, device) -> list[float]:
+    """Per row, `log P(steer.ids | draft so far)`, or 0.0 if it is already there.
+
+    The first character is scored from `logprobs`, which the caller already has,
+    so the forward pass covers only the remaining `len(ids) - 1`.
+    """
+    n = len(out)
+    total = logprobs[:, steer.ids[0]]
+    if len(steer.ids) > 1:
+        # A CLONE of the state: this is a question about a hypothetical
+        # continuation, and the drafts must go on from where they actually are.
+        st = stepper.read_state() if stepper is not None else [s.clone() for s in state]
+        feed = torch.tensor(steer.ids[:-1], dtype=torch.int64, device=device)
+        feed = feed.unsqueeze(0).expand(n, -1).contiguous()
+        lg, _, _ = model(feed, state=st)
+        lp = F.log_softmax(lg.float(), dim=-1)
+        tgt = torch.tensor(steer.ids[1:], dtype=torch.int64, device=device)
+        tgt = tgt.unsqueeze(0).expand(n, -1)
+        total = total + lp.gather(2, tgt[:, :, None]).squeeze(2).sum(dim=1)
+
+    vals = total.tolist()
+    if tok is not None:
+        for r in range(n):
+            if steer.word in tok.decode_visible(out[r]).lower():
+                vals[r] = 0.0
+    return vals
+
+
+@torch.no_grad()
+def _steer_indices(model, stepper, state, logprobs, steer, out, alive_cpu, tok, device):
+    """The row permutation a resampling checkpoint asks for, or None for none.
+
+    Only LIVE rows take part. A finished draft is a completed candidate and
+    overwriting it would throw away a reply the pool has already paid for --
+    including, quite possibly, the one the selector was going to return.
+    """
+    n = len(out)
+    rows = [r for r in range(n) if alive_cpu[r]]
+    k = int(len(rows) * steer.frac)
+    if k < 1:
+        return None
+    pot = _topic_imminence(model, stepper, state, logprobs, steer, out, tok, device)
+    order = sorted(rows, key=lambda r: pot[r], reverse=True)
+
+    idx = list(range(n))
+    changed = False
+    for i in range(k):
+        donor, victim = order[i], order[-1 - i]
+        # Strictly worse, not merely lower: at the start of a reply every row
+        # scores the same and a tie-broken permutation would churn the pool for
+        # nothing.
+        if pot[victim] < pot[donor] - 1e-4:
+            idx[victim] = donor
+            changed = True
+    return torch.tensor(idx, dtype=torch.int64, device=device) if changed else None
+
+
 @torch.no_grad()
 def sample_candidates(
     model,
@@ -513,8 +779,11 @@ def sample_candidates(
     *,
     stop_ids=_STOP_IDS,
     temperatures: list[float] | None = None,
+    graph: bool = True,
+    steer: "Steering | None" = None,
+    tok=None,
 ) -> list[Candidate]:
-    """Draw `n` independent replies from one context, in one batch.
+    """Draw `n` replies from one context, in one batch.
 
     `logits` is the model's distribution over the first character of the reply
     ([V] or [n, V]); `state` is the membrane state that produced it (B=1 or
@@ -532,6 +801,30 @@ def sample_candidates(
     `temperatures`, when given, is one temperature per row and replaces
     `params.temperature` for the proposal distribution only. `None` runs the
     scalar path unchanged.
+
+    ONE HOST SYNCHRONISATION PER CHARACTER, NOT `2n`
+    ------------------------------------------------
+    Only `nxt` is read back. Liveness is tracked in a plain Python list derived
+    from the same ids and the same stop set, so it cannot disagree with the
+    device-side `alive` mask that the arithmetic uses.
+
+    The version this replaced asked `bool(just_stopped[r])` and `bool(alive[r])`
+    per row per character. Each of those is a device read, measured at 36 us on
+    this box, so a 300-character turn at n = 128 paid ~2.8 s to learn what it
+    already knew -- and it grew *linearly in the pool size*, which is precisely
+    the axis `docs/chat/QUALITY_v9.md` §3 identifies as the one worth spending
+    on. Draw cost is now flat in `n` up to the batch where the scan itself
+    stops being latency-bound.
+
+    `graph` routes the forward, the truncation and both softmaxes through a
+    captured CUDA graph (`snnchat.stepper`) when one can be captured. It is a
+    pure speedup: `tests/test_snnchat.py::test_graph_and_eager_draw_the_same_text`
+    asserts the two paths produce identical ids.
+
+    `steer` turns the pool from `n` independent draws into a resampled particle
+    system -- see `Steering`. It is off unless asked for, and when it is on the
+    returned candidates are **no longer independent**, which matters to any
+    caller that treats a prefix of them as a smaller pool.
     """
     device = logits.device
     if logits.dim() == 1:
@@ -549,6 +842,14 @@ def sample_candidates(
             [max(float(t), 1e-6) for t in temperatures], device=device, dtype=logits.dtype
         )[:, None]
 
+    stepper = None
+    if graph:
+        from snnchat.stepper import stepper_for
+
+        stepper = stepper_for(model, n, params, temps=temps, device=device)
+        if stepper is not None:
+            stepper.prime(state)
+
     gen = None
     if params.seed is not None:
         gen = torch.Generator(device=device)
@@ -559,39 +860,74 @@ def sample_candidates(
     stopped: list[int | None] = [None] * n
     logp = torch.zeros(n, device=device, dtype=torch.float32)
     alive = torch.ones(n, dtype=torch.bool, device=device)
+    alive_cpu = [True] * n
+    n_alive = n
     stop_set = set(stop_ids)
     stop_t = torch.tensor(sorted(stop_set), device=device)
+    zero = torch.zeros(n, device=device, dtype=torch.float32)
+    eot = torch.full((n,), EOT, dtype=torch.int64, device=device)
 
-    for _ in range(params.max_new):
-        work = logits.clone()
-        if params.loop_penalty > 0.0:
-            for r in range(n):
-                if recent[r]:
-                    _loop_penalty(recent[r], work[r], params)
-        probs = F.softmax(_filter(work, params, temps), dim=-1)
+    # The first distribution comes from the caller's logits rather than from a
+    # step, so it is built here with the identical arithmetic the loop uses
+    # below. `recent` is empty at this point, so there is no penalty to apply.
+    probs = F.softmax(_filter(logits.clone(), params, temps), dim=-1)
+    logprobs = F.log_softmax(logits, dim=-1)
+
+    for t in range(params.max_new):
+        if steer is not None and t and t % steer.every == 0 and n_alive > 1:
+            idx = _steer_indices(
+                model, stepper, state, logprobs, steer, out, alive_cpu, tok, device
+            )
+            if idx is not None:
+                probs = probs.index_select(0, idx)
+                logprobs = logprobs.index_select(0, idx)
+                logp = logp.index_select(0, idx)
+                if stepper is not None:
+                    stepper.permute(idx)
+                else:
+                    state = [s.index_select(0, idx) for s in state]
+                order = idx.tolist()
+                out = [list(out[s]) for s in order]
+                recent = [list(recent[s]) for s in order]
+
         nxt = torch.multinomial(probs, 1, generator=gen).squeeze(-1)      # [n]
-        raw = F.log_softmax(logits, dim=-1).gather(1, nxt[:, None]).squeeze(1)
-        logp = logp + torch.where(alive, raw, torch.zeros_like(raw))
+        raw = logprobs.gather(1, nxt[:, None]).squeeze(1)
+        logp = logp + torch.where(alive, raw, zero)
 
         is_stop = (nxt[:, None] == stop_t[None, :]).any(dim=1)
-        just_stopped = alive & is_stop
         alive = alive & ~is_stop
 
-        nxt_cpu = nxt.tolist()
+        nxt_cpu = nxt.tolist()                     # THE ONE SYNC PER CHARACTER
         for r in range(n):
-            if bool(just_stopped[r]):
-                stopped[r] = nxt_cpu[r]
-            elif bool(alive[r]):
-                out[r].append(nxt_cpu[r])
-                recent[r].append(nxt_cpu[r])
-                if len(recent[r]) > 2 * params.loop_max_block:
-                    del recent[r][0]
-        if not bool(alive.any()):
+            if not alive_cpu[r]:
+                continue
+            c = nxt_cpu[r]
+            if c in stop_set:
+                stopped[r] = c
+                alive_cpu[r] = False
+                n_alive -= 1
+                continue
+            out[r].append(c)
+            recent[r].append(c)
+            if len(recent[r]) > 2 * params.loop_max_block:
+                del recent[r][0]
+        if n_alive == 0:
             break
+
         # Dead rows are fed EOT: harmless, since their state is never read
         # again, and it keeps the batch rectangular so the scan stays one call.
-        feed = torch.where(alive, nxt, torch.full_like(nxt, EOT))
-        logits, state = _feed(model, feed[:, None], state)
+        feed = torch.where(alive, nxt, eot)
+        pairs = _penalty_pairs(recent, params) if params.loop_penalty > 0.0 else []
+        if stepper is not None:
+            stepper.penalise(pairs, params.loop_penalty)
+            probs, logprobs = stepper.step(feed)
+        else:
+            logits, state = _feed(model, feed[:, None], state)
+            work = logits.clone()
+            for r, tok_id in pairs:
+                work[r, tok_id] -= params.loop_penalty
+            probs = F.softmax(_filter(work, params, temps), dim=-1)
+            logprobs = F.log_softmax(logits, dim=-1)
 
     lp = logp.tolist()
     return [
@@ -602,6 +938,22 @@ def sample_candidates(
         )
         for r in range(n)
     ]
+
+
+def _penalty_pairs(recent: list[list[int]], params: SamplingParams):
+    """`[(row, token_id), ...]` the loop breaker wants suppressed next character.
+
+    A list rather than a tensor write per row: in non-degenerate text it is
+    empty, which is the property `snnchat.generate`'s module docstring claims
+    for the loop breaker and which a per-row device write would have quietly
+    cost anyway.
+    """
+    pairs = []
+    for r, rec in enumerate(recent):
+        target = loop_penalty_target(rec, params)
+        if target is not None:
+            pairs.append((r, target))
+    return pairs
 
 
 @torch.no_grad()
@@ -670,29 +1022,25 @@ def rerank(
     before the partition existed, which is what makes every caller that has not
     been updated behave identically rather than subtly differently.
     """
+    steer = None
+    if rp.steer_every and echo_words and tok is not None:
+        steer = steer_word(echo_words, tok, every=rp.steer_every, frac=rp.steer_frac)
+
     cands = sample_candidates(
         model, logits, state, params, rp.n, stop_ids=stop_ids,
         temperatures=rp.temperature_ladder(params.temperature),
+        graph=rp.graph, steer=steer, tok=tok,
     )
     if len(cands) == 1:
         cands[0].score = cands[0].logp_cond / max(cands[0].n_chars, 1)
         return cands[0], cands
 
     device = device or logits.device
-    if rp.lam != 0.0:
-        nulls = score_under_prefix(
-            model, null_prefix_ids(rp.null), [c.scored for c in cands], device
-        )
-        for c, v in zip(cands, nulls):
-            c.logp_null = float(v)
-
-    for c in cands:
-        n_scored = max(len(c.scored), 1)
-        c.score = (c.logp_cond - rp.lam * c.logp_null) / n_scored
 
     if rp.echo and echo_words and tok is not None:
         for c in cands:
-            text = tok.decode_visible(c.ids)
+            # The text this draft BECOMES, not the draft. See `final_ids`.
+            text = tok.decode_visible(final_ids(c, tok, rp))
             c.echo = echo_count(text, echo_words)
             c.echo_weight = echo_weight(text, echo_words)
 
@@ -718,5 +1066,51 @@ def rerank(
     if best > 0.0:
         pool = [c for c in pool if c.echo_weight >= best - 1e-9]
 
+    # THE PARTITIONS ARE RESOLVED BEFORE THE NULL PASS, AND SOMETIMES INSTEAD OF IT
+    # -----------------------------------------------------------------------------
+    # `score` only ever decides between members of the surviving tier, so when
+    # the tier holds one candidate the anti-LM term cannot change the answer --
+    # and it is the second-largest cost in a turn, a teacher-forced pass over
+    # the full pool that runs the scan once per character all over again. Skipped
+    # rather than computed and discarded.
+    #
+    # This is an ordering change and not a behavioural one: the tier is built
+    # from lengths and echo weights, neither of which has ever read `score`.
+    # `test_skipping_the_null_pass_picks_the_same_winner` holds that.
+    decided = len(pool) == 1
+    if rp.lam != 0.0 and not decided:
+        _score_null(model, cands, rp, device)
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
+        # At lambda = 0 the term is not part of the score and was never measured
+        # before this change either, so there is nothing outstanding to fill.
+        c.null_scored = rp.lam == 0.0 or not decided
+
     winner = max(pool, key=lambda c: c.score)
     return winner, cands
+
+
+def _score_null(model, cands, rp: RerankParams, device) -> None:
+    """Fill `logp_null` for every candidate, in one batched pass."""
+    nulls = score_under_prefix(
+        model, null_prefix_ids(rp.null), [c.scored for c in cands], device
+    )
+    for c, v in zip(cands, nulls):
+        c.logp_null = float(v)
+
+
+@torch.no_grad()
+def fill_null_scores(model, cands, rp: RerankParams, device) -> None:
+    """Measure `logp_null` for candidates whose turn skipped it, and rescore.
+
+    Exists so `/candidates` can print a real number instead of a zero that looks
+    like one. Safe to call at any time and from any state: the anti-LM term is
+    conditioned on a fixed four-id prefix and on nothing about the session, so
+    it is as computable after the turn as during it.
+    """
+    if not cands or all(c.null_scored for c in cands):
+        return
+    _score_null(model, cands, rp, device)
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
+        c.null_scored = True

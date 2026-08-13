@@ -38,6 +38,16 @@ per-timestep cost here is ~26 µs and does **not** fall with graph capture. The
 scan is bound by something other than launch overhead at these shapes. It was not
 chased further, because nothing in this deliverable depends on knowing what.
 
+**Addendum 2026-08-12: this paragraph is right, and it was read too widely.**
+Everything above was measured on the TRAINING step, where the scan loops over
+L = 384 timesteps inside one captured graph. Decoding calls the same scan with
+L = 1 and, until v10, captured nothing at all -- so the four jiterator launches
+per character had nothing to amortise against and the REPL was paying ~1580 us
+per character where the arithmetic is ~50. Capturing the decode step brings it
+to ~205 us, i.e. ~51 us per timestep per layer, which is the same order as the
+26 us floor above: the floor is real, and the decoder simply was not standing on
+it. See `QUALITY_v10.md` §1 and `src/snnchat/stepper.py`.
+
 ## 2. Choosing the size
 
 `scripts/chat/size_probe.py`, four arms, five minutes each, constant learning

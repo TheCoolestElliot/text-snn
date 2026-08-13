@@ -1693,3 +1693,307 @@ def test_probe_index_defaults_to_the_original_behaviour(tiny_model):
     with pytest.raises(ValueError):
         collect(tiny_model, probes=PROBES[:3], seeds=(0,), n=2, params=params,
                 progress=False, probe_index=(0, 1))
+
+
+# --------------------------------------------------------------------------
+# the fast decode path (snnchat.stepper) and the pool steering it enables
+#
+# The speed change is only allowed to be a speed change. Everything below is
+# either an identity assertion against the path it replaced, or a statement
+# about a knob that is off by default.
+# --------------------------------------------------------------------------
+
+
+def test_the_loop_breaker_reports_the_same_target_it_used_to_subtract():
+    """`loop_penalty_target` and `_loop_penalty` are one rule, not two.
+
+    The batched path needs the id rather than the write, so the rule was split
+    in two. If the split ever drifts, the pool is drawn from a different
+    distribution than the single-candidate path and every comparison in
+    docs/chat/ is between two different samplers.
+    """
+    from snnchat.generate import _loop_penalty, loop_penalty_target
+
+    params = SamplingParams(loop_penalty=6.0, loop_max_block=24)
+    cases = [
+        [7, 8, 7, 8],                       # period 2, twice
+        [1, 2, 3, 1, 2, 3],                 # period 3, twice
+        [5, 5, 5, 5],                       # every period divides this one
+        [1, 2, 3, 4, 5, 6],                 # nothing repeats
+        [9, 9],                             # too short to judge
+        [4, 1, 2, 3, 1, 2, 3],              # the repeat is at the tail
+    ]
+    for recent in cases:
+        want = loop_penalty_target(recent, params)
+        before = torch.zeros(64)
+        after = before.clone()
+        _loop_penalty(recent, after, params)
+        moved = (after != before).nonzero().flatten().tolist()
+        assert moved == ([] if want is None else [want]), recent
+        if want is not None:
+            assert after[want].item() == pytest.approx(-6.0)
+
+
+def test_the_early_out_does_not_change_which_block_is_found():
+    """The `recent[-n - 1] != last` skip is a NECESSARY condition, so it can only
+    skip block lengths that could not have matched. Checked by brute force
+    against the unguarded rule on random sequences."""
+    from snnchat.generate import loop_penalty_target
+
+    params = SamplingParams(loop_penalty=6.0, loop_max_block=24)
+    rng = np.random.default_rng(0)
+    for _ in range(400):
+        # A small alphabet, so that repeats actually happen often enough to test.
+        length = int(rng.integers(4, 60))
+        recent = rng.integers(0, 4, size=length).tolist()
+        want = None
+        for n in range(2, min(params.loop_max_block, len(recent) // 2) + 1):
+            if recent[-n:] == recent[-2 * n:-n]:
+                want = recent[-n]
+                break
+        assert loop_penalty_target(recent, params) == want
+
+
+def test_steering_is_off_by_default_and_off_is_the_identity(tiny_model):
+    """`steer_every = 0` must be the code path that existed before steering did,
+    not a steering pass that happens to move nothing."""
+    from snnchat.rerank import RerankParams, rerank
+
+    assert RerankParams().steer_every == 0
+
+    tok = ChatTokenizer()
+    prefix = [BOS, *tok.render_turn("user", "tell me about a rabbit"), BOT]
+    logits, state, _ = tiny_model(torch.tensor([prefix]), state=None)
+    last = logits[:, -1, :].float()
+    params = SamplingParams(seed=3, max_new=24)
+
+    a, _ = rerank(tiny_model, last, state, params, RerankParams(n=4),
+                  tok=tok, echo_words=["rabbit"])
+    b, _ = rerank(tiny_model, last, state, params,
+                  RerankParams(n=4, steer_every=0), tok=tok, echo_words=["rabbit"])
+    assert a.ids == b.ids
+
+
+def test_steering_rejects_a_fraction_that_would_clone_a_row_onto_itself():
+    """At frac >= 0.5 the donor and victim halves of the ordering overlap."""
+    from snnchat.rerank import Steering
+
+    Steering(word="x", ids=[5], frac=0.49)
+    with pytest.raises(ValueError):
+        Steering(word="x", ids=[5], frac=0.5)
+    with pytest.raises(ValueError):
+        Steering(word="x", ids=[5], every=0)
+
+
+def test_the_steered_word_is_the_rarest_one_not_the_first():
+    """The subject, by the same frequency table the echo tier is built on."""
+    from snnchat.rerank import steer_word
+
+    tok = ChatTokenizer()
+    s = steer_word(["tell", "story", "penguin"], tok)
+    assert s is not None and s.word == "penguin"
+    assert tok.decode_visible(s.ids) == " penguin"
+    assert steer_word([], tok) is None
+    # A threshold is available and unset by default; when set it must bite.
+    assert steer_word(["tell", "story"], tok, min_weight=99.0) is None
+
+
+def _rerank_with_full_null(model, logits, state, params, rp, tok, words):
+    """`rerank`'s selection with the null pass ALWAYS run: the old ordering."""
+    from snnchat.rerank import _score_null, echo_weight, sample_candidates
+
+    cands = sample_candidates(model, logits, state, params, rp.n,
+                              temperatures=rp.temperature_ladder(params.temperature))
+    _score_null(model, cands, rp, logits.device)
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
+        c.echo_weight = echo_weight(tok.decode_visible(c.ids), words)
+    pool = [c for c in cands if c.n_chars >= rp.min_chars] or cands
+    best = max((c.echo_weight for c in pool), default=0.0)
+    if best > 0.0:
+        pool = [c for c in pool if c.echo_weight >= best - 1e-9]
+    return max(pool, key=lambda c: c.score)
+
+
+def test_skipping_the_null_pass_picks_the_same_winner(tiny_model):
+    """The anti-LM term only ever decides between members of the surviving tier,
+    so a one-member tier can skip measuring it. That is an ordering change and
+    must not be a behavioural one."""
+    from snnchat.rerank import (RerankParams, fill_null_scores, null_prefix_ids,
+                                rerank, score_under_prefix)
+
+    tok = ChatTokenizer()
+    words = ["rabbit"]
+    prefix = [BOS, *tok.render_turn("user", "tell me about a rabbit"), BOT]
+    logits, state, _ = tiny_model(torch.tensor([prefix]), state=None)
+    last = logits[:, -1, :].float()
+    rp = RerankParams(n=6, lam=0.6)
+
+    for seed in range(6):
+        params = SamplingParams(seed=seed, max_new=32)
+        slow = _rerank_with_full_null(tiny_model, last, state, params, rp, tok, words)
+        fast, _ = rerank(tiny_model, last, state, params, rp, tok=tok,
+                         echo_words=words)
+        assert fast.ids == slow.ids, seed
+
+    # And whatever was skipped can still be recovered afterwards, exactly.
+    params = SamplingParams(seed=0, max_new=32)
+    _fast, cands = rerank(tiny_model, last, state, params, rp, tok=tok,
+                          echo_words=words)
+    fill_null_scores(tiny_model, cands, rp, torch.device("cpu"))
+    truth = score_under_prefix(tiny_model, null_prefix_ids(rp.null),
+                               [c.scored for c in cands], torch.device("cpu"))
+    assert all(c.null_scored for c in cands)
+    for c, v in zip(cands, truth):
+        assert c.logp_null == pytest.approx(v, abs=1e-4)
+
+
+def test_the_stepper_is_optional_and_absent_on_cpu(tiny_model):
+    """`graph=True` on a CPU model must fall through to the eager loop rather
+    than raising, because that is what makes the whole module optional."""
+    from snnchat.rerank import sample_candidates
+    from snnchat.stepper import graph_capture_available, stepper_for
+
+    assert not graph_capture_available("cpu")
+    assert stepper_for(tiny_model, 4, SamplingParams()) is None
+
+    tok = ChatTokenizer()
+    prefix = [BOS, *tok.render_turn("user", "hello"), BOT]
+    logits, state, _ = tiny_model(torch.tensor([prefix]), state=None)
+    params = SamplingParams(seed=1, max_new=24)
+    a = sample_candidates(tiny_model, logits[:, -1, :].float(), state, params, 4,
+                          graph=True)
+    b = sample_candidates(tiny_model, logits[:, -1, :].float(), state, params, 4,
+                          graph=False)
+    assert [c.ids for c in a] == [c.ids for c in b]
+
+
+@pytest.mark.cuda
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="needs a CUDA device")
+def test_graph_and_eager_draw_the_same_text():
+    """THE load-bearing assertion of `snnchat.stepper`.
+
+    A captured replay issues the same kernels with the same arguments, so it
+    must return the same bits -- and the one place the two paths differ on
+    purpose (a zero penalty bias added, rather than nothing subtracted) cannot
+    change a probability, because `exp(-0.0) == exp(0.0)`. Asserted on ids AND
+    on `logp_cond`, since a score that drifted would re-rank a pool that had
+    not moved.
+    """
+    from snnchat.rerank import sample_candidates
+    from snnchat.stepper import clear_stepper_cache, stepper_for
+
+    torch.manual_seed(0)
+    cfg = ChatConfig(d_model=64, n_layers=2, vocab_size=ChatTokenizer().vocab_size,
+                     device="cuda", spread_tau=True, seed=0)
+    model = build_chat_model(cfg)
+    model.eval()
+    clear_stepper_cache()
+
+    tok = ChatTokenizer()
+    prefix = [BOS, *tok.render_turn("user", "tell me a story about a rabbit"), BOT]
+    with torch.no_grad():
+        logits, state, _ = model(torch.tensor([prefix], device="cuda"), state=None)
+    last = logits[:, -1, :].float()
+
+    assert stepper_for(model, 4, SamplingParams()) is not None
+    for n in (1, 4, 16):
+        for seed in (0, 5):
+            params = SamplingParams(seed=seed, max_new=64)
+            with torch.no_grad():
+                slow = sample_candidates(model, last, state, params, n, graph=False)
+                fast = sample_candidates(model, last, state, params, n, graph=True)
+            assert [c.ids for c in slow] == [c.ids for c in fast], (n, seed)
+            assert [c.scored for c in slow] == [c.scored for c in fast], (n, seed)
+            for a, b in zip(slow, fast):
+                assert a.logp_cond == b.logp_cond, (n, seed)
+    clear_stepper_cache()
+
+
+@pytest.mark.cuda
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="needs a CUDA device")
+def test_a_stepper_is_not_reused_under_different_sampling_settings():
+    """The truncation is baked into the capture, so a cached graph handed to a
+    caller who has since changed `top_p` would silently ignore them."""
+    from snnchat.stepper import clear_stepper_cache, stepper_for
+
+    torch.manual_seed(0)
+    cfg = ChatConfig(d_model=32, n_layers=1, vocab_size=ChatTokenizer().vocab_size,
+                     device="cuda", spread_tau=True, seed=0)
+    model = build_chat_model(cfg)
+    model.eval()
+    clear_stepper_cache()
+
+    a = stepper_for(model, 4, SamplingParams(top_p=0.92))
+    again = stepper_for(model, 4, SamplingParams(top_p=0.92))
+    other = stepper_for(model, 4, SamplingParams(top_p=0.50))
+    wider = stepper_for(model, 8, SamplingParams(top_p=0.92))
+    assert a is again
+    assert other is not a
+    assert wider is not a
+    # The seed is deliberately NOT part of the key: the RNG lives outside the
+    # capture, so two seeds share one graph.
+    assert stepper_for(model, 4, SamplingParams(top_p=0.50, seed=7)) is other
+    clear_stepper_cache()
+
+
+@pytest.mark.cuda
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="needs a CUDA device")
+def test_steering_only_ever_overwrites_a_live_draft():
+    """A finished candidate is a reply the pool has already paid for -- quite
+    possibly the one the selector was going to return. Steering may reallocate
+    the drafts still being written and nothing else."""
+    from snnchat.rerank import RerankParams, prompt_content_words, rerank
+
+    torch.manual_seed(0)
+    cfg = ChatConfig(d_model=64, n_layers=2, vocab_size=ChatTokenizer().vocab_size,
+                     device="cuda", spread_tau=True, seed=0)
+    model = build_chat_model(cfg)
+    model.eval()
+
+    tok = ChatTokenizer()
+    prompt = "tell me a story about a rabbit"
+    prefix = [BOS, *tok.render_turn("user", prompt), BOT]
+    with torch.no_grad():
+        logits, state, _ = model(torch.tensor([prefix], device="cuda"), state=None)
+    last = logits[:, -1, :].float()
+    words = prompt_content_words(prompt)
+
+    params = SamplingParams(seed=0, max_new=96)
+    rp = RerankParams(n=16, steer_every=8, steer_frac=0.25)
+    with torch.no_grad():
+        _w, cands = rerank(model, last, state, params, rp, tok=tok, echo_words=words)
+    assert len(cands) == 16
+    # A closed draft ends where the model ended it; nothing may be appended to
+    # one after the fact, which is what an overwrite of a dead row would look
+    # like.
+    for cnd in cands:
+        if cnd.closed:
+            assert len(cnd.scored) == len(cnd.ids) + 1
+
+
+def test_a_request_verb_is_not_echoed_by_an_unrelated_inflection():
+    """The prefix matcher let "name" match "named", and " named " is the literal
+    signature `snnchat.quality._is_story` uses to detect the register this
+    decoder exists to avoid. Measured cost: story_dodge 0.0972 against 0.2778,
+    14 draws fixed and 1 broken (docs/chat/QUALITY_v11.md section 3)."""
+    from snnchat.rerank import echo_count, echo_weight, echoes
+
+    assert not echoes("name", "three years old girl named emma and jack")
+    assert not echoes("three", "threefold")
+    assert echoes("name", "what is your name?")
+
+    # Everything the prefix rule was documented FOR still holds.
+    assert echoes("rabbit", "two rabbits ran off")
+    assert echoes("rabbits", "one rabbit sat")
+    assert echoes("dragon", "the dragons flew")
+    assert echoes("box", "a pile of boxes")
+
+    # And the two public callers agree about WHICH words matched, which is the
+    # property that stopped being guaranteed when they each had their own copy.
+    words = ["name", "three", "animals"]
+    text = "a girl named lily had three animals"
+    assert echo_count(text, words) == 2                    # three, animals
+    assert echo_weight(text, words) == pytest.approx(
+        sum(__import__("snnchat.rerank", fromlist=["x"]).word_weight(w)
+            for w in ("three", "animals")))

@@ -62,6 +62,7 @@ from snn.twocomp import (  # noqa: E402
     FusedTwoCompartmentScan,
     twocomp_scan,
     twocomp_scan_eager,
+    twocomp_scan_inference,
 )
 
 requires_fused = pytest.mark.skipif(
@@ -791,3 +792,108 @@ def test_one_kernel_per_timestep():
     counts = count_cuda_kernels(scan)
     per_step = counts["total"] / L
     assert per_step < 1.05, f"{per_step:.4f} kernels per timestep"
+
+
+# --------------------------------------------------------------------------
+# leg 6 -- the inference path
+#
+# `twocomp_scan_inference` is a THIRD implementation of the same forward, added
+# because the autograd Function stacks two `[B, L, d]` tensors that only its
+# backward reads and inference pays for them anyway. A third path is a third
+# thing that can drift, so it gets the same treatment as the other two: bit
+# identity against the Function it shortcuts, over the same regime sweep.
+#
+# The routing is tested as well as the arithmetic. A path that is correct and
+# never taken saves nothing, and one that is taken while a gradient is wanted
+# would silently produce a tensor with no `grad_fn` and a loss that never learns.
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.cuda
+@requires_fused
+@pytest.mark.parametrize("shape", SHAPES)
+def test_the_inference_path_is_bit_identical(shape):
+    """Same kernel, same order, same bits -- asserted, not assumed."""
+    B, L, d = shape
+    for beta_f, beta_s, w, thr in REGIMES:
+        cur, v0, ww, bb = _inputs(B, L, d, seed=B * 977 + L * 31 + d,
+                                  thr=thr, beta_s=beta_s, w=w)
+        s_a, v_a = FusedTwoCompartmentScan.apply(cur, v0, ww, bb, beta_f, thr, ALPHA)
+        s_i, v_i = twocomp_scan_inference(cur, v0, ww, bb, beta_f, thr)
+        assert bool((s_a == s_i).all()), (beta_f, beta_s, w, thr)
+        assert float((v_a - v_i).abs().max()) == 0.0, (beta_f, beta_s, w, thr)
+
+
+@pytest.mark.cuda
+@requires_fused
+def test_the_dispatcher_takes_the_inference_path_only_without_grad(monkeypatch):
+    """Correct and never taken saves nothing; taken under grad breaks training."""
+    import snn.twocomp as tc
+
+    calls = {"infer": 0, "apply": 0}
+    real_infer = tc.twocomp_scan_inference
+    real_apply = tc.FusedTwoCompartmentScan.apply
+
+    def counting_infer(*a, **k):
+        calls["infer"] += 1
+        return real_infer(*a, **k)
+
+    def counting_apply(*a, **k):
+        calls["apply"] += 1
+        return real_apply(*a, **k)
+
+    monkeypatch.setattr(tc, "twocomp_scan_inference", counting_infer)
+    monkeypatch.setattr(tc.FusedTwoCompartmentScan, "apply", staticmethod(counting_apply))
+
+    cur, v0, ww, bb = _inputs(2, 16, 32, seed=5)
+    with torch.no_grad():
+        tc.twocomp_scan(cur, v0, ww, bb, 0.5, THR, ALPHA, fused=True)
+    assert calls == {"infer": 1, "apply": 0}
+
+    out, _ = tc.twocomp_scan(cur.requires_grad_(True), v0, ww, bb, 0.5, THR,
+                             ALPHA, fused=True)
+    assert calls == {"infer": 1, "apply": 1}
+    # and the gradient really is reachable, which is the thing that would break
+    assert out.grad_fn is not None
+    out.sum().backward()
+    assert cur.grad is not None
+
+    # The unfused path must not be diverted by grad mode at all.
+    with torch.no_grad():
+        tc.twocomp_scan(cur.detach(), v0, ww, bb, 0.5, THR, ALPHA, fused=False)
+    assert calls == {"infer": 1, "apply": 1}
+
+
+@pytest.mark.cuda
+@requires_fused
+def test_the_inference_path_actually_allocates_less():
+    """The whole point, measured rather than asserted from the source.
+
+    Three `[B, L, d]` tensors become one, so the ceiling is a third plus the
+    per-step transients. The bar is 0.6 rather than 0.34 because the allocator's
+    behaviour is not part of the contract -- what is being caught here is the
+    saving silently disappearing, not its exact size.
+    """
+    B, L, d = 16, 256, 256
+    cur, v0, ww, bb = _inputs(B, L, d, seed=11)
+
+    torch.cuda.synchronize()
+    base = torch.cuda.memory_allocated()
+    torch.cuda.reset_peak_memory_stats()
+    out = FusedTwoCompartmentScan.apply(cur, v0, ww, bb, 0.5, THR, ALPHA)
+    torch.cuda.synchronize()
+    with_backward = torch.cuda.max_memory_allocated() - base
+    del out
+
+    torch.cuda.synchronize()
+    base = torch.cuda.memory_allocated()
+    torch.cuda.reset_peak_memory_stats()
+    out = twocomp_scan_inference(cur, v0, ww, bb, 0.5, THR)
+    torch.cuda.synchronize()
+    inference = torch.cuda.max_memory_allocated() - base
+    del out
+
+    assert inference < 0.6 * with_backward, (
+        f"inference peak {inference / 2**20:.1f} MiB against "
+        f"{with_backward / 2**20:.1f} MiB -- the saving is gone"
+    )
