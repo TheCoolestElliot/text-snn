@@ -178,10 +178,20 @@ def rpe(logits: Tensor, idx: Tensor) -> Tensor:
             f"idx {tuple(idx.shape)} does not match logits {tuple(logits.shape)}"
         )
     if logits.shape[1] < 2:
-        raise ValueError(
-            "the reward prediction error needs at least two positions: entry t is "
-            f"built from the prediction at t-1, and L = {logits.shape[1]}"
-        )
+        # L = 1: every position IS position 0, and position 0 has no preceding
+        # prediction to be in error about. Returning zeros is the consistent
+        # extension of `phi_0 = 0`, not a special case bolted on -- and it is not
+        # hypothetical. `EXP_001`'s horizon probe reshapes `[B, L] -> [B*L//k, k]`
+        # and sweeps k down to 1, so the k = 1 rung of D5 lands here.
+        #
+        # It also states something true about the arm rather than papering over
+        # it: **the dopamine signal is structurally absent at zero context, and
+        # the arm is exactly the Phase-2 baseline there.** Its modulation density
+        # grows with the context length, so any gain it produces must come from
+        # long contexts. `EXP_004` §10.6 found the zero-context component is where
+        # the cheap gains have been; this arm cannot touch it, by construction.
+        return torch.zeros(logits.shape[:2], device=logits.device,
+                           dtype=torch.float32)
 
     logp = F.log_softmax(logits.float(), dim=-1)
     prev = logp[:, :-1]                                        # prediction at t-1
