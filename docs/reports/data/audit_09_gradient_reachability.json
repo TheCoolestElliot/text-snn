@@ -1196,6 +1196,162 @@
       "below_ratio_floor": [],
       "verdict": "PASS",
       "passes_screen": true
+    },
+    {
+      "key": "da_mult",
+      "candidate": "EXP_018 dopamine, multiplicative gain",
+      "init": "k = 0, nests baseline",
+      "derivation": "dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c} * DA_{b,t}. The reset is multiplicative and DA multiplies the current, so at k = 0 the factor (1 + k*DA) is 1 and every downstream adjoint is the BASELINE's -- nonzero. dL/dk therefore vanishes only if DA is identically 0, which needs the model's predictive distribution to be exactly its own entropy at every position. A randomly initialised head is not, so k = 0 is NOT a saddle. Predicted separately, and this is the interesting half: the RATIO will be small, because exp_018_da_calibration.json measures sd(phi) = 0.0245 at initialisation against 1.1291 at convergence -- 46x. A small ratio is not fatal (Adam is scale-free per parameter) and an exactly-zero one would be.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "k"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 5.032212357036769e-06,
+            "rms": 7.575367249046394e-07,
+            "l2": 1.714109930617269e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.010738677535624614,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.764475306728855e-06,
+            "rms": 6.635555109824054e-07,
+            "l2": 1.5014546988822985e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.009406420078608955,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [
+        "layer1.k"
+      ],
+      "verdict": "FAINT",
+      "passes_screen": false
+    },
+    {
+      "key": "da_add",
+      "candidate": "EXP_018 dopamine, additive drive",
+      "init": "k = 0, nests baseline",
+      "derivation": "dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * DA_{b,t}; the current itself drops out of the additive form, so this leg is reachable wherever DA is nonzero even in a channel whose current is 0",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "k"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 2.771470690277056e-06,
+            "rms": 7.09099992945994e-07,
+            "l2": 1.6045101801864803e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.010052048850462382,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.1837317288154736e-05,
+            "rms": 3.202820607839385e-06,
+            "l2": 7.247155735967681e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.04540249545838188,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
     }
   ]
 }
