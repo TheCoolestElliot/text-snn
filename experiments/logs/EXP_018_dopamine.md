@@ -577,6 +577,288 @@ campaign, untouched by this arm.
 
 *(appended after the run — nothing above this line is rewritten)*
 
+**Sixteen runs, sixteen completed, zero diverged.** The pre-registration's
+SHA-256 is unchanged across the ladder (`prereg_unchanged: true`), so the
+experiment stands. Max grad norm over all 16 runs was 0.5398, the clip fired
+**zero** times, and no run tripped the VRAM alarm. Total ladder cost
+**2.63 GPU-hours** against the ~2.9 estimated in §3.
+
+### 9.1 The scoreboard
+
+| bar | verdict | one line |
+|---|---|---|
+| **T1** | **PASS** | `tau` reproduces; C1 at exactly `0.000e+00` on all four checkpoints |
+| **T2** | **PASS** | G1–G12 green before the first training step; 51 gates, full suite 528 |
+| **D1** | **UNRESOLVED** | the CI includes zero **by 3.6e-06 bpc**; the point estimate is *negative* |
+| **D2** | **NOT RUN** | D1 did not fire in the "helps" direction, so there is no gain to attribute |
+| **D3** | **MARKER** | additive lands between the anchor and the multiplicative arm; n = 3 |
+| **D4** | **ENGAGED** | `max|k|` reached 2.32 from `k_init = 0`; the alarm did not fire |
+| **D5** | **MARKER** | see §9.9 |
+
+**The short version: the arm does not help, the pre-registered test could not
+quite say so, the corrected test says it costs 0.0062 bpc on 5/5 seeds — and the
+most interesting number in the experiment is a factor of 26 that has nothing to
+do with bpc.**
+
+### 9.2 D1 — UNRESOLVED by 3.6 millionths of a bpc
+
+| | carried | fresh |
+|---|---:|---:|
+| `da_anchor` n=5 | **2.251210** (sd 0.004748) | **2.267755** (sd 0.004661) |
+| `da_mult` n=5 | **2.257425** (sd 0.003590) | **2.273859** (sd 0.003529) |
+| `Δ` = anchor − arm | **−0.0062148** | −0.0061047 |
+| Welch se / df | 0.0026618 / 7.447 | 0.0026147 / 7.452 |
+| 95 % CI | **[−0.0124333, +0.0000036]** | [−0.0122124, +0.0000029] |
+| t vs t_crit | −2.33480 vs 2.33617 | −2.33480 vs 2.33586 |
+| **verdict** | **UNRESOLVED** | **UNRESOLVED** |
+
+Both absolute means are printed, never the difference alone — `EXP_013`'s N1.
+
+The interval includes zero **by 3.6e-06 bpc** and the statistic misses its
+critical value by **0.0014**. `CONTRIBUTING.md` §3: *"Report a near-miss as a
+miss. The near-ness is worth discussing; the verdict is not negotiable."*
+**D1 is UNRESOLVED and nothing below upgrades it.**
+
+The direction matters: the point estimate is **negative**, so this is a near-miss
+of *harm*. D1's "helps" branch was never close, and the arm's own seed spread
+(0.00359) is **smaller** than the anchor's (0.00475), so the failure to resolve is
+not a noisy arm.
+
+**σ, re-measured and not inherited** (`CONTRIBUTING.md` §4): 0.00475 carried /
+0.00466 fresh on the anchor's five seeds, against the 0.00461 that sized the
+design. The pre-registered power therefore stands with the measured number
+substituted: MDE(D1) = **0.0096** rather than 0.0093.
+
+**A consistency marker for decision #10, and not more than that.** The fresh
+anchor lands 0.00190 bpc below the committed Phase-2 baseline's 2.25311 — the
+same sign and order as the 1.97e-03 `EXP_014` §9.12 measured for decision #7's
+fp64 clip. Against that baseline's own five seeds the Welch se is 0.00296, so
+0.00190 is **0.64 se** and is indistinguishable from zero. It is recorded as a
+consistency marker for the ruling that new experiments anchor on today's tree,
+**not** as a reproduction of the tree effect's size.
+
+### 9.3 The correction, MEASURED because it hurts
+
+**The design used an unpaired Welch test on paired data. That is a defect in the
+pre-registration, not in the arm.** In this project a seed fixes *both* the
+initial weights and the data order, so `da_anchor_s{i}` and `da_mult_s{i}` are
+genuinely paired, and the unpaired test throws that away.
+
+`CONTRIBUTING.md` §3: *"When a correction would flatter the work, refer it; when
+it would hurt, measure it."* This one hurts:
+
+| paired by seed, `anchor − arm` | carried | fresh |
+|---|---:|---:|
+| per seed | −0.00298, −0.00638, −0.00686, −0.00738, −0.00747 | −0.00292, −0.00632, −0.00699, −0.00708, −0.00720 |
+| arm worse on | **5 / 5** | **5 / 5** |
+| mean (sd) | −0.006215 (0.001859) | −0.006105 (0.001811) |
+| t on df 4 | **−7.477** | −7.536 |
+| 95 % CI | **[−0.008523, −0.003907]** | [−0.008354, −0.003856] |
+| two-sided p | **1.7e-03** | 1.7e-03 |
+
+**The dopamine arm costs about 0.0062 bpc, on every seed, and the pre-registered
+instrument was too blunt to say so.** The sd of the paired *difference* is
+0.00186 against a between-seed sd of ~0.0045, which is what pairing is for.
+
+**The corrected RULE is referred, not applied retroactively** (§10 item 6).
+D1's verdict stays UNRESOLVED.
+
+### 9.4 D2 — NOT RUN, and the 26x it bought instead
+
+D1 did not fire in the "helps" direction, so **D2 resolves NOT RUN exactly as §4
+wrote it.** Everything in this subsection is a marker.
+
+| carried, test | n | mean | sd over seeds |
+|---|---:|---:|---:|
+| `da_anchor` | 5 | 2.25121 | 0.00475 |
+| `da_add` | 3 | 2.25479 | 0.00099 |
+| `da_rolled` (control) | 3 | **2.25487** | **0.00059** |
+| `da_mult` (arm) | 5 | **2.25743** | 0.00359 |
+
+The control lands **between** the anchor and the arm. Paired on the three shared
+seeds: anchor − rolled = −0.00242 (p 0.48); rolled − arm = −0.00298 (p 0.23).
+**Neither half resolves at n = 3 and neither is claimed.** The design was powered
+to detect a gain; it cannot split a loss into two halves.
+
+**What the control did decide, and it is the most interesting number here:**
+
+| `rms(k)` at step 20,000, over layers and seeds | mean rms(k) | mean max&#124;k&#124; |
+|---|---:|---:|
+| `da_mult` — the aligned RPE | **0.1950** | 2.32 |
+| `da_rolled` — the same signal, misaligned | **0.0075** | 0.045 |
+
+**A factor of 26, and it is extraordinarily stable**: `da_rolled`'s `k.0` rms is
+0.0021 / 0.0026 / 0.0025 across three seeds against `da_mult`'s 0.104–0.140
+across five.
+
+**The optimiser can tell the aligned signal from the misaligned one, and turns
+the gain up 26x on the real one.** That is a direct, quantitative demonstration
+that the reward prediction error carries information the model can find and wants
+to use. The control was pre-registered to ask whether alignment matters; its most
+decisive answer is not about bpc at all.
+
+**The control's own limitation, discovered after the pre-registration was
+committed and recorded here rather than back-patched into §2.7.** `da_rolled`
+gives row `b` the dopamine of row `b-1`, so its loss for row `b` depends on row
+`b-1`'s data. The arm's does not. That is the same batch-coupling objection §2.6
+used to *reject* batch-normalising `phi`, and the control has it while the arm
+does not. Three things bound it and none removes it: both evaluation protocols
+are deterministic and `batch_size` is frozen at 128, so the control's score is
+well-defined; the neighbouring row is unrelated text under training and a
+different stream or window under evaluation, which is the misalignment the
+control needs; and the control is a **diagnostic**, never a candidate model. What
+it costs is that `da_rolled`'s absolute bpc is not a deployable model's bpc. The
+alternatives were worse — a roll along *time* wraps `da[L-1]` to the front and
+leaks the future, and a causal lag changes the marginal and asks a different
+question ("how stale may the signal be?").
+
+### 9.5 The finding: it fits train identically and generalises worse
+
+Paired by seed, `arm − anchor` (positive = the arm is worse), n = 5:
+
+| | mean | se | t (df 4) | p |
+|---|---:|---:|---:|---:|
+| train bpc, last 8 batches | **+0.00043** | 0.00084 | +0.52 | **0.63** |
+| test bpc, fresh | **+0.00611** | 0.00081 | +7.54 | **0.0017** |
+| test bpc, carried | +0.00622 | 0.00083 | +7.48 | 0.0017 |
+
+**The train→test gap widens by 0.0057 bpc.** The arm extracts **no additional
+training fit** from a signal it has assigned 26x the gain of a control, and pays
+0.0062 bpc at test. For scale, `EXP_013` §2.2 measured this model's entire
+generalisation gap at **0.0059 bpc**: this arm roughly **doubles** it.
+
+**Caveat on the instrument, stated because it is load-bearing.** "train bpc" is
+the mean of the last eight logged single-batch losses; its within-run sd is 0.049
+and its across-seed sd is 0.011, both far larger than the effect. What makes it
+usable is that same-seed runs see **the same final batches** — the sampler is a
+pure function of `(seed, step)` — so the comparison is paired and the paired se
+is 0.00084. It is an indicative marker, **not** `EXP_013`'s instrument, and a
+proper generalisation-gap measurement is referred in §10 item 7.
+
+**A hypothesis, offered as one and not as a finding.** `phi` is computed from the
+model's *own* predictions, so it is a function of the model's parameters and of
+how well it has memorised the text in front of it. Conditioning the forward pass
+on it opens a self-referential channel that can carry training-set-specific
+structure — real at training time, absent at test time. That would explain
+identical train fit with worse test fit, and why the effect is larger for the
+aligned signal than for the misaligned one. **Nothing here establishes it.**
+`CONTRIBUTING.md` §4 requires a direction of causation to be checked before it is
+claimed.
+
+### 9.6 D3 — the additive form, a marker
+
+`da_add` carried **2.25479** (n = 3, sd 0.00099). Paired on shared seeds:
+add − anchor = +0.00235 (p 0.46, 2/3 worse); add − mult = −0.00306 (p 0.20,
+1/3 worse). **No direction was predicted and none is claimed.** At n = 3 the MDE
+is 0.0116 and both comparisons are well inside it.
+
+Its learned sensitivity inverts the multiplicative arm's layer pattern —
+rms(k) 0.175 in layer 0 and 0.104 in layer 1, against `da_mult`'s 0.14 and 0.28.
+Recorded, not interpreted.
+
+### 9.7 D4 — the sensitivity engaged, with structure
+
+From `k_init = 0.0`, `max|k|` over the dopamine runs reached **2.32** mean /
+2.92 max, and the **alarm floor of 1e-3 was never approached**. So D1's verdict is
+a statement about the mechanism and **not** about the optimiser or the
+initialisation. §2.6's 46x init-to-convergence ratio made "the parameter never
+moved" a live possibility, and it is now ruled out — which is what D4 was written
+for, before the run.
+
+`da_mult`, per layer, across five seeds: `k.0` rms 0.104–0.140 with **37 %** of
+channels positive; `k.1` rms 0.239–0.283 with **84 %** positive. In `mult` mode
+`k_c > 0` means *amplify my input when the outcome was better than predicted*, so
+the layer feeding the head gains up on confidence and attenuates on surprise
+while layer 0 mostly does the opposite. **Reported as a measurement, not a
+mechanism** — nothing here shows the sign pattern is what produces the loss.
+
+### 9.8 Cost, measured against a named reference
+
+Realised over the full ladder, against `da_anchor`'s own mean wall clock of
+**396.9 s** on the same box in the same session, nothing else on the GPU:
+
+| arm | mean wall clock | ratio | §2.5's 300-step figure |
+|---|---:|---:|---:|
+| `da_anchor` | 396.9 s | 1.000 | 1.000 |
+| `da_mult` | 677.8 s | **1.708** | 1.640 |
+| `da_rolled` | 690.9 s | 1.741 | 1.644 |
+| `da_add` | 597.7 s | **1.506** | 1.509 |
+
+The additive form reproduces its short-run estimate to 0.2 %; the multiplicative
+forms come in ~4 % *above* theirs, because the full runs include evaluation and
+this arm's evaluation is two-pass as well — an effect §2.5's eval-off measurement
+could not see. **The arm costs 1.71x at training and at inference**, against
+`EXP_008`'s 1.12x and `EXP_007`'s 1.49x; §6.7 item 2 already records token-shift
+as dominated on cost at 1.49x.
+
+
+---
+
+### 9.9 D5 and the decomposition — the mean is two effects of opposite sign
+
+`EXP_001`'s probe, all 16 checkpoints, test split, `--baseline-arm da_anchor`
+(today's tree, never `snn_beta0.5` — decision #10). **F1 held on all sixteen**,
+residuals 2.0e-11 to 1.2e-08 against each run's own committed `final_test.json`.
+
+**Absolute bpc at context `c`:**
+
+| arm | c=0 | c=1 | c=2 | c=3 | c=4 | c=8 | c=16 | c=32 | c=64 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `da_anchor` | 4.1495 | 3.5459 | 2.9649 | 2.5530 | 2.3807 | 2.2707 | 2.2680 | 2.2682 | 2.2677 |
+| `da_mult` | **4.1249** | 3.5531 | 2.9866 | **2.5957** | 2.4129 | 2.2786 | 2.2740 | 2.2731 | 2.2739 |
+| `da_rolled` | 4.1491 | 3.5461 | 2.9481 | 2.5559 | 2.3818 | 2.2736 | 2.2712 | 2.2721 | 2.2708 |
+| `da_add` | 4.1276 | 3.5504 | 2.9785 | 2.5971 | 2.4099 | 2.2740 | 2.2714 | 2.2710 | 2.2711 |
+
+**Δ vs `da_anchor`, positive = worse**, against the per-context 2σ bar measured
+on the anchor's own five seeds:
+
+| | c=0 | c=1 | c=2 | c=3 | c=4 | c=8 | c=16 | c=32 | c=64 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `da_mult` | **−0.0246** | +0.0072 | +0.0217 | **+0.0427** | +0.0322 | +0.0079 | +0.0060 | +0.0050 | +0.0062 |
+| `da_rolled` | −0.0004 | +0.0002 | −0.0168 | +0.0029 | +0.0011 | +0.0029 | +0.0032 | +0.0039 | +0.0031 |
+| `da_add` | −0.0219 | +0.0045 | +0.0136 | +0.0441 | +0.0292 | +0.0033 | +0.0034 | +0.0028 | +0.0034 |
+| **2σ bar** | 0.0296 | 0.0304 | 0.0260 | 0.0144 | 0.0145 | 0.0040 | 0.0019 | 0.0010 | 0.0002 |
+
+**`CONTRIBUTING.md` §3 requires this decomposition before any mean is quoted, and
+here it earns its place: the −0.0062 mean is two effects of opposite sign.**
+
+* **At c = 0 the arm is 0.0246 bpc BETTER** — and the dopamine mechanism is
+  **structurally inactive there**. `phi_0 = 0`, and at one character of context
+  every position *is* position 0, so no modulation is applied at all. Whatever is
+  happening at c = 0 is a property of the **weights training left behind**, not
+  of the signal. It is also **inside the 2σ bar** (0.0296) and is therefore not
+  established.
+* **The damage is concentrated at c = 2–4**, peaking at **+0.0427 at c = 3**
+  against a 0.0144 bar — three times the bar, and **seven times the whole-split
+  mean effect**.
+* **It settles to ~+0.006 for c ≥ 8**, where the bars are 0.0040 down to 0.0002,
+  so it is resolved many times over out there.
+
+`da_mult` is significantly worse at **125 of 128** contexts; `nowhere_worse` is
+**False**. The `EXP_001` dominance criterion — "is the absolute curve nowhere
+worse" — is **failed**, and failed at short contexts, which is the failure mode
+that criterion exists to catch.
+
+**The shape suggests a mechanism and the control supports it.** The signal first
+exists at c = 1 and is computed from the model's predictive distribution; at
+c = 2–4 that distribution is still nearly uninformative, so `phi` there is
+dominated by noise — and the arm has learned a large gain on it. By c ≥ 8 the
+distribution is informative and the damage drops by a factor of five. The
+misaligned control shows **neither** feature: no c = 0 benefit (−0.0004) and no
+short-context cliff (+0.0029 at c = 3, worst-short +0.0029). So both ends of the
+arm's curve track *alignment*, not the perturbation. **This is a reading of the
+shape, not a demonstration**; `CONTRIBUTING.md` §4's direction-of-causation rule
+applies and §10 item 8 carries it.
+
+**D5, the horizon marker, no verdict.** 2σ horizon per seed:
+`da_anchor` **[7, 7, 7, 7, 7]**, `da_mult` **[8, 8, 8, 7, 7]**, `da_rolled`
+[7, 7, 7], `da_add` [7, 8, 8]. The baseline's committed horizon is 7 and the
+adopted two-compartment arm's is 47. **No threshold is placed on this** — the
+horizon is an integer on a dense lattice and `CONTRIBUTING.md` §3 forbids it. A
+median shift of 7 → 8 on three of five seeds, while the absolute curve is worse
+at 125 of 128 contexts, is exactly the pattern `EXP_001` warns about: buying
+nominal reach while degrading the characters the model already sees.
+
 ---
 
 ## 10. Referred to Elliot, and not decided here
@@ -598,3 +880,45 @@ campaign, untouched by this arm.
    needs a new fused kernel, a new hand-written backward, a new R10 gate and a
    new mutation campaign — R10 is the worst bug class in this project — and
    pricing the signal at all should come before paying for that.
+
+### Added after the run — referrals the results created
+
+*(not pre-registered; created by §9 and marked as such)*
+
+6. **A paired test, wherever both arms share a seed set.** §9.3 is the case: this
+   project's seed fixes both the initial weights and the data order, so any two
+   arms run on seeds 0..n are paired, and the unpaired Welch test throws that
+   information away. Here it was the difference between UNRESOLVED and a decisive
+   p = 1.7e-03. **The rule is referred, not applied retroactively** — D1's verdict
+   stands as it fired. What is referred is that the *next* experiment should
+   pre-register a paired comparison, with the unpaired one reported alongside it
+   so both are visible.
+
+7. **Measure the generalisation gap with `EXP_013`'s instrument, not with mine.**
+   §9.5's train-side number is a paired marker built from eight logged
+   single-batch losses. The claim it supports — identical train fit, worse test
+   fit, gap roughly doubled — is the most consequential thing this experiment
+   found and it deserves the committed instrument rather than an indicative one.
+   `scripts/exp/013_generalisation_gap.py` exists and was not run here.
+
+8. **Is the self-referential channel the mechanism?** §9.5's hypothesis: `phi` is
+   a function of the model's own parameters and of how well it has memorised the
+   text in front of it, so conditioning the forward pass on it may carry
+   training-set-specific structure that is absent at test. It predicts something
+   testable and cheap: an RPE computed by a **frozen** copy of the model (or by a
+   different model entirely) should not widen the gap the same way. Nothing here
+   establishes the mechanism and §9.5 does not claim it.
+
+9. **The 26x says the signal is informative; §9.5 says conditioning on it is the
+   wrong way to spend that.** The obvious follow-up is a **training-only** use
+   that leaves the inference model bit-identical to the baseline — weighting the
+   loss by the RPE, for instance — which is `EXP_013`'s shape: no parameter, no
+   inference cost, nothing to fold, and none of the 1.71x. That is a different
+   experiment and is not proposed here as a design, only as the direction the
+   evidence points.
+
+10. **Should a control be required to be a per-example function?** §9.4 records
+    that `da_rolled` couples across the batch while the arm does not. The
+    alternatives were worse, and the asymmetry is bounded, but "a control must
+    not introduce a property the arm lacks" is a rule this project does not
+    currently have and might want.

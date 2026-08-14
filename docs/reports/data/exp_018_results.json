@@ -1,0 +1,918 @@
+{
+  "experiment": "EXP_018",
+  "prereg": "experiments/logs/EXP_018_dopamine.md",
+  "adopts_nothing": true,
+  "ranks_nothing": true,
+  "prereg_unchanged": true,
+  "student_t_selfcheck": {
+    "passed": true,
+    "worst_abs_diff": 4.1352041648679005e-06,
+    "rows": {
+      "2": {
+        "published": 4.30265,
+        "computed": 4.302652729749456,
+        "abs_diff": 2.729749455809838e-06
+      },
+      "6": {
+        "published": 2.44691,
+        "computed": 2.446911851144968,
+        "abs_diff": 1.8511449679792236e-06
+      },
+      "8": {
+        "published": 2.306,
+        "computed": 2.306004135204165,
+        "abs_diff": 4.1352041648679005e-06
+      },
+      "30": {
+        "published": 2.04227,
+        "computed": 2.042272456301233,
+        "abs_diff": 2.456301233078051e-06
+      },
+      "1000": {
+        "published": 1.96234,
+        "computed": 1.9623390808264358,
+        "abs_diff": 9.191735641511656e-07
+      }
+    }
+  },
+  "cost_ratio_measured": {
+    "da_mult": 1.64,
+    "da_rolled": 1.644,
+    "da_add": 1.509
+  },
+  "tau": 1.1291,
+  "runs": {
+    "da_anchor_s0": {
+      "run": "da_anchor_s0",
+      "present": true,
+      "status": "OK",
+      "params": 735437,
+      "wall_clock_s": 406.59,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.257471102255831,
+        "fresh": 2.273872258304913
+      },
+      "firing_rate": {
+        "carried": [
+          0.3392627960757205,
+          0.31987462428055313
+        ],
+        "fresh": [
+          0.33988588930744873,
+          0.3199952766299248
+        ]
+      }
+    },
+    "da_anchor_s1": {
+      "run": "da_anchor_s1",
+      "present": true,
+      "status": "OK",
+      "params": 735437,
+      "wall_clock_s": 404.86,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.251664799374446,
+        "fresh": 2.2680785972798314
+      },
+      "firing_rate": {
+        "carried": [
+          0.35137251372400086,
+          0.3342642474331354
+        ],
+        "fresh": [
+          0.35198051678506953,
+          0.33443007931897517
+        ]
+      }
+    },
+    "da_anchor_s2": {
+      "run": "da_anchor_s2",
+      "present": true,
+      "status": "OK",
+      "params": 735437,
+      "wall_clock_s": 395.65,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.248204388503817,
+        "fresh": 2.2646840308722562
+      },
+      "firing_rate": {
+        "carried": [
+          0.3444167853970277,
+          0.33179808211954015
+        ],
+        "fresh": [
+          0.3450283992447351,
+          0.3319232389330864
+        ]
+      }
+    },
+    "da_anchor_s3": {
+      "run": "da_anchor_s3",
+      "present": true,
+      "status": "OK",
+      "params": 735437,
+      "wall_clock_s": 397.01,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2451818205700587,
+        "fresh": 2.261929842996634
+      },
+      "firing_rate": {
+        "carried": [
+          0.33899409794493723,
+          0.32648195718464096
+        ],
+        "fresh": [
+          0.3396106338814685,
+          0.3266158401966095
+        ]
+      }
+    },
+    "da_anchor_s4": {
+      "run": "da_anchor_s4",
+      "present": true,
+      "status": "OK",
+      "params": 735437,
+      "wall_clock_s": 380.49,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.253530271427594,
+        "fresh": 2.2702086227771336
+      },
+      "firing_rate": {
+        "carried": [
+          0.3490011150899686,
+          0.3197376967260712
+        ],
+        "fresh": [
+          0.3496183286371984,
+          0.31980952424438375
+        ]
+      }
+    },
+    "da_mult_s0": {
+      "run": "da_mult_s0",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 646.63,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2604553293730953,
+        "fresh": 2.2767949789951976
+      },
+      "firing_rate": {
+        "carried": [
+          0.33306038105174113,
+          0.3162028040540846
+        ],
+        "fresh": [
+          0.33368932142069463,
+          0.31626443996241216
+        ]
+      }
+    },
+    "da_mult_s1": {
+      "run": "da_mult_s1",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 671.37,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2580414849803474,
+        "fresh": 2.274401696712411
+      },
+      "firing_rate": {
+        "carried": [
+          0.34857331765325444,
+          0.32726883652963135
+        ],
+        "fresh": [
+          0.34917339604151876,
+          0.3273308386928157
+        ]
+      }
+    },
+    "da_mult_s2": {
+      "run": "da_mult_s2",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 689.65,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2550665573723427,
+        "fresh": 2.271678808547781
+      },
+      "firing_rate": {
+        "carried": [
+          0.3419379838987401,
+          0.3235411244003396
+        ],
+        "fresh": [
+          0.3425483491859938,
+          0.3235281835261144
+        ]
+      }
+    },
+    "da_mult_s3": {
+      "run": "da_mult_s3",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 691.59,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.252563429091571,
+        "fresh": 2.269008569703611
+      },
+      "firing_rate": {
+        "carried": [
+          0.3385580268345381,
+          0.31915950775146484
+        ],
+        "fresh": [
+          0.33919456012939153,
+          0.3192101128791508
+        ]
+      }
+    },
+    "da_mult_s4": {
+      "run": "da_mult_s4",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 689.95,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2609997992905715,
+        "fresh": 2.2774129952566784
+      },
+      "firing_rate": {
+        "carried": [
+          0.3439654868684317,
+          0.31852001814465775
+        ],
+        "fresh": [
+          0.3445836419337674,
+          0.3185584878450946
+        ]
+      }
+    },
+    "da_rolled_s0": {
+      "run": "da_rolled_s0",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 690.26,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2549619647654624,
+        "fresh": 2.271012064622865
+      },
+      "firing_rate": {
+        "carried": [
+          0.33938007840984746,
+          0.32257997283810064
+        ],
+        "fresh": [
+          0.34001329070643377,
+          0.32267188555315923
+        ]
+      }
+    },
+    "da_rolled_s1": {
+      "run": "da_rolled_s1",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 687.56,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2542374686138014,
+        "fresh": 2.270534396387671
+      },
+      "firing_rate": {
+        "carried": [
+          0.35221090128547267,
+          0.3348948041859426
+        ],
+        "fresh": [
+          0.3528263317911248,
+          0.3350572358620794
+        ]
+      }
+    },
+    "da_rolled_s2": {
+      "run": "da_rolled_s2",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 694.83,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.255413883124549,
+        "fresh": 2.2716496484367408
+      },
+      "firing_rate": {
+        "carried": [
+          0.3447942110268693,
+          0.33125392974991547
+        ],
+        "fresh": [
+          0.3454015011850156,
+          0.33135990602405446
+        ]
+      }
+    },
+    "da_add_s0": {
+      "run": "da_add_s0",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 606.42,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.25549285257938,
+        "fresh": 2.2716325587922763
+      },
+      "firing_rate": {
+        "carried": [
+          0.3366185932567245,
+          0.31832487763542877
+        ],
+        "fresh": [
+          0.33723547544918564,
+          0.318406001909783
+        ]
+      }
+    },
+    "da_add_s1": {
+      "run": "da_add_s1",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 593.55,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2536599949993317,
+        "fresh": 2.2699827563777046
+      },
+      "firing_rate": {
+        "carried": [
+          0.3480654813741383,
+          0.3288254349639541
+        ],
+        "fresh": [
+          0.34865771430103404,
+          0.3289349839875573
+        ]
+      }
+    },
+    "da_add_s2": {
+      "run": "da_add_s2",
+      "present": true,
+      "status": "OK",
+      "params": 736461,
+      "wall_clock_s": 593.24,
+      "steps": 20000,
+      "bpc": {
+        "carried": 2.2552303821619377,
+        "fresh": 2.271730069560921
+      },
+      "firing_rate": {
+        "carried": [
+          0.3385543846770337,
+          0.3279565294322215
+        ],
+        "fresh": [
+          0.33915503715213974,
+          0.32802386228975494
+        ]
+      }
+    }
+  },
+  "sigma": {
+    "design_sigma_used_only_for_power": 0.00461,
+    "preregistered_mde": {
+      "D1": 0.0093,
+      "D2": 0.0113
+    },
+    "measured": {
+      "da_anchor/carried": {
+        "sd": 0.004747750783195277,
+        "n": 5,
+        "df": 4,
+        "mean": 2.2512104764263494,
+        "caveat": null
+      },
+      "da_anchor/fresh": {
+        "sd": 0.004661253427335783,
+        "n": 5,
+        "df": 4,
+        "mean": 2.2677546704461538,
+        "caveat": null
+      },
+      "da_mult/carried": {
+        "sd": 0.003589542541253461,
+        "n": 5,
+        "df": 4,
+        "mean": 2.2574253200215857,
+        "caveat": null
+      },
+      "da_mult/fresh": {
+        "sd": 0.0035293513091996702,
+        "n": 5,
+        "df": 4,
+        "mean": 2.2738594098431357,
+        "caveat": null
+      },
+      "da_rolled/carried": {
+        "sd": 0.0005934469897905176,
+        "n": 3,
+        "df": 2,
+        "mean": 2.254871105501271,
+        "caveat": "a 3-seed sigma is a marker quoted with its df and is never promoted"
+      },
+      "da_rolled/fresh": {
+        "sd": 0.000559533614656506,
+        "n": 3,
+        "df": 2,
+        "mean": 2.271065369815759,
+        "caveat": "a 3-seed sigma is a marker quoted with its df and is never promoted"
+      },
+      "da_add/carried": {
+        "sd": 0.0009911587048542416,
+        "n": 3,
+        "df": 2,
+        "mean": 2.2547944099135497,
+        "caveat": "a 3-seed sigma is a marker quoted with its df and is never promoted"
+      },
+      "da_add/fresh": {
+        "sd": 0.0009818740344675345,
+        "n": 3,
+        "df": 2,
+        "mean": 2.271115128243634,
+        "caveat": "a 3-seed sigma is a marker quoted with its df and is never promoted"
+      }
+    }
+  },
+  "bars": {
+    "carried": {
+      "D1": {
+        "bar": "D1",
+        "protocol": "carried",
+        "statement": "delta = mean bpc(anchor) - mean bpc(da_mult) > 0 and the 95% Welch CI on delta excludes 0",
+        "missing": [],
+        "n_preregistered": [
+          5,
+          5
+        ],
+        "mean_a": 2.2512104764263494,
+        "sd_a": 0.004747750783195277,
+        "n_a": 5,
+        "mean_b": 2.2574253200215857,
+        "sd_b": 0.003589542541253461,
+        "n_b": 5,
+        "delta": -0.006214843595236275,
+        "welch_se": 0.0026618021397091006,
+        "df": 7.446719490691675,
+        "t_crit": 2.3361701206608885,
+        "ci95": [
+          -0.012433266221135896,
+          3.5790306633460764e-06
+        ],
+        "excludes_zero": false,
+        "delta_in_se": -2.334825531365556,
+        "resolution_floor_bpc": 0.012436845251799241,
+        "anchor_mean": 2.2512104764263494,
+        "arm_mean": 2.2574253200215857,
+        "verdict": "UNRESOLVED",
+        "provisional": false,
+        "note": "this design resolves 0.01244 bpc and no better; UNRESOLVED means the difference was not established, NOT that it is zero (EXP_018 \u00a74.0)"
+      },
+      "D2": {
+        "bar": "D2",
+        "protocol": "carried",
+        "statement": "D1 fires in the 'helps' direction AND delta_align = mean bpc(rolled) - mean bpc(da_mult) > 0 with a 95% Welch CI excluding 0",
+        "algebra": "delta(A) - delta(S) against a shared anchor IS bpc(S) - bpc(A); the anchor cancels exactly, so this does not inherit its variance",
+        "missing": [],
+        "n_preregistered": [
+          5,
+          3
+        ],
+        "mean_a": 2.254871105501271,
+        "sd_a": 0.0005934469897905176,
+        "n_a": 3,
+        "mean_b": 2.2574253200215857,
+        "sd_b": 0.003589542541253461,
+        "n_b": 5,
+        "delta": -0.0025542145203147903,
+        "welch_se": 0.0016414494329679528,
+        "df": 4.3546656136141095,
+        "t_crit": 2.6894988152566848,
+        "ci95": [
+          -0.006968890825585857,
+          0.001860461784956276
+        ],
+        "excludes_zero": false,
+        "delta_in_se": -1.5560726203404514,
+        "resolution_floor_bpc": 0.008829352610542133,
+        "rolled_mean": 2.254871105501271,
+        "arm_mean": 2.2574253200215857,
+        "d1_verdict": "UNRESOLVED",
+        "verdict": "NOT RUN",
+        "note": "D1 did not fire in the 'helps' direction, so there is no gain to attribute. The alignment comparison is reported below for the record and carries no verdict."
+      },
+      "D3": {
+        "bar": "D3",
+        "protocol": "carried",
+        "type": "MARKER, no verdict",
+        "missing": [],
+        "note": "no direction was predicted and no bar was set; n = 3 is underpowered by construction and EXP_018 \u00a74 says so",
+        "add_mean": 2.2547944099135497,
+        "add_sd": 0.0009911587048542416,
+        "add_n": 3,
+        "vs_anchor": {
+          "mean_a": 2.2512104764263494,
+          "sd_a": 0.004747750783195277,
+          "n_a": 5,
+          "mean_b": 2.2547944099135497,
+          "sd_b": 0.0009911587048542416,
+          "n_b": 3,
+          "delta": -0.0035839334872003192,
+          "welch_se": 0.0021990208486056665,
+          "df": 4.554145696836483,
+          "t_crit": 2.6481522956153523,
+          "ci95": [
+            -0.009407275595541435,
+            0.002239408621140797
+          ],
+          "excludes_zero": false,
+          "delta_in_se": -1.6297860429439697,
+          "resolution_floor_bpc": 0.011646684216682232
+        },
+        "vs_mult": {
+          "mean_a": 2.2574253200215857,
+          "sd_a": 0.003589542541253461,
+          "n_a": 5,
+          "mean_b": 2.2547944099135497,
+          "sd_b": 0.0009911587048542416,
+          "n_b": 3,
+          "delta": 0.0026309101080359554,
+          "welch_se": 0.0017042383412626838,
+          "df": 4.922217672877017,
+          "t_crit": 2.5828479176187846,
+          "ci95": [
+            -0.0017708783428204587,
+            0.0070326985588923694
+          ],
+          "excludes_zero": false,
+          "delta_in_se": 1.5437454048162613,
+          "resolution_floor_bpc": 0.008803576901712828
+        },
+        "verdict": "MARKER"
+      }
+    },
+    "fresh": {
+      "D1": {
+        "bar": "D1",
+        "protocol": "fresh",
+        "statement": "delta = mean bpc(anchor) - mean bpc(da_mult) > 0 and the 95% Welch CI on delta excludes 0",
+        "missing": [],
+        "n_preregistered": [
+          5,
+          5
+        ],
+        "mean_a": 2.2677546704461538,
+        "sd_a": 0.004661253427335783,
+        "n_a": 5,
+        "mean_b": 2.2738594098431357,
+        "sd_b": 0.0035293513091996702,
+        "n_b": 5,
+        "delta": -0.006104739396981973,
+        "welch_se": 0.002614712381031574,
+        "df": 7.451875082076646,
+        "t_crit": 2.3358649245780203,
+        "ci95": [
+          -0.012212354335693506,
+          2.8755417295599217e-06
+        ],
+        "excludes_zero": false,
+        "delta_in_se": -2.334765170069486,
+        "resolution_floor_bpc": 0.012215229877423066,
+        "anchor_mean": 2.2677546704461538,
+        "arm_mean": 2.2738594098431357,
+        "verdict": "UNRESOLVED",
+        "provisional": false,
+        "note": "this design resolves 0.01222 bpc and no better; UNRESOLVED means the difference was not established, NOT that it is zero (EXP_018 \u00a74.0)"
+      },
+      "D2": {
+        "bar": "D2",
+        "protocol": "fresh",
+        "statement": "D1 fires in the 'helps' direction AND delta_align = mean bpc(rolled) - mean bpc(da_mult) > 0 with a 95% Welch CI excluding 0",
+        "algebra": "delta(A) - delta(S) against a shared anchor IS bpc(S) - bpc(A); the anchor cancels exactly, so this does not inherit its variance",
+        "missing": [],
+        "n_preregistered": [
+          5,
+          3
+        ],
+        "mean_a": 2.271065369815759,
+        "sd_a": 0.000559533614656506,
+        "n_a": 3,
+        "mean_b": 2.2738594098431357,
+        "sd_b": 0.0035293513091996702,
+        "n_b": 5,
+        "delta": -0.0027940400273767096,
+        "welch_se": 0.0016110938586542407,
+        "df": 4.3269541666779485,
+        "t_crit": 2.695631698656726,
+        "ci95": [
+          -0.007136955702276259,
+          0.00154887564752284
+        ],
+        "excludes_zero": false,
+        "delta_in_se": -1.7342503122137112,
+        "resolution_floor_bpc": 0.0086858313497991,
+        "rolled_mean": 2.271065369815759,
+        "arm_mean": 2.2738594098431357,
+        "d1_verdict": "UNRESOLVED",
+        "verdict": "NOT RUN",
+        "note": "D1 did not fire in the 'helps' direction, so there is no gain to attribute. The alignment comparison is reported below for the record and carries no verdict."
+      },
+      "D3": {
+        "bar": "D3",
+        "protocol": "fresh",
+        "type": "MARKER, no verdict",
+        "missing": [],
+        "note": "no direction was predicted and no bar was set; n = 3 is underpowered by construction and EXP_018 \u00a74 says so",
+        "add_mean": 2.271115128243634,
+        "add_sd": 0.0009818740344675345,
+        "add_n": 3,
+        "vs_anchor": {
+          "mean_a": 2.2677546704461538,
+          "sd_a": 0.004661253427335783,
+          "n_a": 5,
+          "mean_b": 2.271115128243634,
+          "sd_b": 0.0009818740344675345,
+          "n_b": 3,
+          "delta": -0.0033604577974801764,
+          "welch_se": 0.002160281364997879,
+          "df": 4.563582157638243,
+          "t_crit": 2.646310303821256,
+          "ci95": [
+            -0.009077232632827111,
+            0.0023563170378667585
+          ],
+          "excludes_zero": false,
+          "delta_in_se": -1.5555648685065964,
+          "resolution_floor_bpc": 0.01143354967069387
+        },
+        "vs_mult": {
+          "mean_a": 2.2738594098431357,
+          "sd_a": 0.0035293513091996702,
+          "n_a": 5,
+          "mean_b": 2.271115128243634,
+          "sd_b": 0.0009818740344675345,
+          "n_b": 3,
+          "delta": 0.0027442815995017966,
+          "welch_se": 0.0016770876560087936,
+          "df": 4.934303540447478,
+          "t_crit": 2.580910223432322,
+          "ci95": [
+            -0.0015841310774834475,
+            0.007072694276487041
+          ],
+          "excludes_zero": false,
+          "delta_in_se": 1.636337605651906,
+          "resolution_floor_bpc": 0.008656825353970488
+        },
+        "verdict": "MARKER"
+      }
+    },
+    "D4": {
+      "bar": "D4",
+      "type": "MARKER + ALARM",
+      "floor": 0.001,
+      "statement": "report max|k| per run; if max|k| < 1e-3 the arm never engaged and D1's null is about the optimiser, not the mechanism",
+      "runs": {
+        "da_mult_s0": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 1.6180768013000488,
+              "rms": 0.14013223350048065,
+              "mean": -0.029792478308081627,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 2.918724536895752,
+              "rms": 0.28309375047683716,
+              "mean": 0.15324509143829346,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 2.918724536895752
+        },
+        "da_mult_s1": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 1.9369553327560425,
+              "rms": 0.1395154893398285,
+              "mean": -0.02922888845205307,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 1.7105157375335693,
+              "rms": 0.23861992359161377,
+              "mean": 0.14232736825942993,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 1.9369553327560425
+        },
+        "da_mult_s2": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 1.3053125143051147,
+              "rms": 0.1283199042081833,
+              "mean": -0.024828186258673668,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 2.2999398708343506,
+              "rms": 0.25608521699905396,
+              "mean": 0.1392812281847,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 2.2999398708343506
+        },
+        "da_mult_s3": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.6525251865386963,
+              "rms": 0.10361624509096146,
+              "mean": -0.027386384084820747,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 2.167996644973755,
+              "rms": 0.2667042315006256,
+              "mean": 0.1430852860212326,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 2.167996644973755
+        },
+        "da_mult_s4": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 1.7468101978302002,
+              "rms": 0.13784004747867584,
+              "mean": -0.024053392931818962,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 2.278862953186035,
+              "rms": 0.2557181417942047,
+              "mean": 0.14169789850711823,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 2.278862953186035
+        },
+        "da_rolled_s0": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.021075071766972542,
+              "rms": 0.0024544596672058105,
+              "mean": 0.00036052928771823645,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.04841240867972374,
+              "rms": 0.01260988786816597,
+              "mean": 0.011337650008499622,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.04841240867972374
+        },
+        "da_rolled_s1": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.02596439979970455,
+              "rms": 0.0026495216879993677,
+              "mean": 0.00029652618104591966,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.04720725864171982,
+              "rms": 0.012888127006590366,
+              "mean": 0.011767006479203701,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.04720725864171982
+        },
+        "da_rolled_s2": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.0150197958573699,
+              "rms": 0.0021481486037373543,
+              "mean": 0.00036889658076688647,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.03931403160095215,
+              "rms": 0.012430193834006786,
+              "mean": 0.011174208484590054,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.03931403160095215
+        },
+        "da_add_s0": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.8233228325843811,
+              "rms": 0.17924675345420837,
+              "mean": 0.004253530874848366,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.39629989862442017,
+              "rms": 0.10218670964241028,
+              "mean": 0.016469204798340797,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.8233228325843811
+        },
+        "da_add_s1": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.7029147148132324,
+              "rms": 0.1694568246603012,
+              "mean": 0.009980777278542519,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.47297167778015137,
+              "rms": 0.10368978977203369,
+              "mean": 0.012822641059756279,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.7029147148132324
+        },
+        "da_add_s2": {
+          "present": true,
+          "per_layer": {
+            "k.0": {
+              "abs_max": 0.6769682168960571,
+              "rms": 0.17518486082553864,
+              "mean": 0.008737366646528244,
+              "frac_nonzero": 1.0
+            },
+            "k.1": {
+              "abs_max": 0.3864612281322479,
+              "rms": 0.1038571149110794,
+              "mean": 0.010995404794812202,
+              "frac_nonzero": 1.0
+            }
+          },
+          "max_abs_over_layers": 0.6769682168960571
+        }
+      },
+      "min_max_abs_over_runs": 0.03931403160095215,
+      "verdict": "ENGAGED",
+      "consequence": "a D1 null is about the mechanism, not the optimiser"
+    },
+    "D5": {
+      "bar": "D5",
+      "type": "MARKER, no verdict",
+      "scale_markers": {
+        "lif_horizon": 7,
+        "twocomp_horizon": 47
+      },
+      "note": "the horizon is an integer on a dense lattice, so no threshold is placed on it (CONTRIBUTING.md \u00a73). The continuous per-context bpc curve is the thing a future bar may use.",
+      "verdict": "MARKER",
+      "horizon": null,
+      "per_context": null
+    }
+  }
+}

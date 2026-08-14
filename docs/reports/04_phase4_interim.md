@@ -1,6 +1,6 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 11, 2026-08-11.** Interim, not final: Phase 4 is open and this document
+**Revision 12, 2026-08-14.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
@@ -25,6 +25,25 @@ logs cannot be reviewed as a phase.
 > denominator that was itself a diverged run. **Nothing is adopted, no
 > hyperparameter moved, no §8 row is edited, and Phase 5 is not authorised.**
 > See §17.
+
+> **Rev 12 folds in `EXP_018` as §17: the model can find its own reward
+> prediction error, and conditioning on it costs bits.** A dopamine signal —
+> `phi_t = H(p_{t-1}) + log p_{t-1}(x_t)`, zero-mean under the model's own belief
+> *by construction*, broadcast as one scalar per `(batch, timestep)` with a
+> learned per-channel sensitivity. **D1 is UNRESOLVED by 3.6e-06 bpc**, in the
+> direction of harm; the design used an **unpaired** Welch test on **paired**
+> data, and the corrected test — measured, not referred, because it hurts —
+> says the arm costs **0.0062 bpc on 5/5 seeds** (t = −7.48, p = 1.7e-03).
+> **The reusable result is a factor of 26**: the optimiser assigns the aligned
+> RPE `rms(k) = 0.195` and the same signal misaligned across the batch
+> **0.0075**, so the prediction error *is* information this model can find and
+> wants — it just does not pay. It buys **no** extra training fit (+0.00043,
+> p = 0.63) while losing 0.0061 at test, so the **train→test gap widens by
+> 0.0057**, roughly doubling the 0.0059 §12.2 measured. The per-context
+> decomposition is two effects of opposite sign: **−0.0246 at c = 0, where the
+> mechanism is structurally inactive**, and **+0.0427 at c = 3**, seven times the
+> whole-split mean. Sixteen runs, zero diverged, ~2.9 GPU-hours. **Adopts
+> nothing, ranks nothing, edits no §8 row; raises a fourth I5 boundary case.**
 
 > **Rev 10 folds in `EXP_016` as §15, and it explains rev 9's divergence — then
 > corrects rev 9 for having called it something it was not.** The two neurons'
@@ -189,13 +208,13 @@ unapplied.
 
 | | |
 |---|---|
-| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10**; **`EXP_012` in §11**; **`EXP_013` in §12**; **`EXP_014` in §13**; **`EXP_015` in §14**; **`EXP_016` in §15**; **`EXP_017` in §16** |
-| Ranked candidates closed | **6 of 14** (#1, #14, **#11 at rev 8**, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011`, `EXP_012` and `EXP_013` close no ranked candidate** — the first composes two arms already counted here, the second is a mechanism study and trains nothing, the third is not on the 18-item list at all (`EXP_013` §0). **`EXP_014` does close one — #11, the parameter-scaling pilot** — and closing it is the only sense in which it settles anything: it adopts no size and ranks no arm. **`EXP_017` closes none either** — it is a new arm answering `EXP_016` §10's referral, not an item on the 18-item list |
-| Arms adopted | **2** — the two-compartment neuron (`EXP_004`) and, **at rev 6, the learned per-channel threshold standalone** (`EXP_008`, decision #5). The composed arm (§10) is **not** adopted — provisional at n = 2. **`EXP_014` adopts nothing**: width is not an arm, and n = 1 per rung cannot clear §6.2. **`EXP_015` adopts nothing either, and adds a caveat to both adopted arms**: neither has been shown to train above 735K parameters, and §14 is where both failed to. **`EXP_016` adopts nothing and proposes nothing**; it explains why §14's legs died. **`EXP_017` adopts nothing and is not proposed for adoption**, though it is the first arm this phase has built that trains at 5.0M — and §16.4 puts a caveat on the *adopted* arm rather than lifting one: two of three freshly trained `twocomp` controls diverged at 735K |
-| GPU-hours spent | **~12.9 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9; **`EXP_014` cost ~1.5**; **`EXP_015` cost ~2.1** — 1.79 of ladder training (§14.1), ~0.09 of arch calibration, ~0.08 for the divergence chase, and ~0.1 for the evaluations, horizon, gap and state probes. **~0.7 of `EXP_015`'s training bought no number**: two legs ran 20,000 steps of which ~14,750 and ~18,000 computed NaN, and that is recorded as spent rather than netted off. **`EXP_016` cost ~0.8 and trained nothing** — five forward passes over committed checkpoints and two instrumented replays of one step — of which **~0.37 bought no number**, two aborted Leg B attempts whose defects are recorded in §15.5's source log. **`EXP_017` cost ~2.0** — 1.60 of training across seven runs, ~0.25 of probes and the horizon, and ~0.12 for running the mutation campaign **twice**, which is recorded as spent because the first run is what caught D09) |
+| Experiments closed | `EXP_004`, `EXP_005`, `EXP_006`; `EXP_007`, `EXP_008` and `EXP_009` in §6; **`EXP_011` in §10**; **`EXP_012` in §11**; **`EXP_013` in §12**; **`EXP_014` in §13**; **`EXP_015` in §14**; **`EXP_016` in §15**; **`EXP_017` in §16**; **`EXP_018` in §17** |
+| Ranked candidates closed | **6 of 14** (#1, #14, **#11 at rev 8**, the horizon question §10.5 opened, and two of the three I5 referrals run as diagnostics). **`EXP_011`, `EXP_012` and `EXP_013` close no ranked candidate** — the first composes two arms already counted here, the second is a mechanism study and trains nothing, the third is not on the 18-item list at all (`EXP_013` §0). **`EXP_014` does close one — #11, the parameter-scaling pilot** — and closing it is the only sense in which it settles anything: it adopts no size and ranks no arm. **`EXP_017` closes none either** — it is a new arm answering `EXP_016` §10's referral, not an item on the 18-item list. **`EXP_018` closes none either** and is not on the 18-item list at all, for the same reason `EXP_013` was not |
+| Arms adopted | **2** — the two-compartment neuron (`EXP_004`) and, **at rev 6, the learned per-channel threshold standalone** (`EXP_008`, decision #5). The composed arm (§10) is **not** adopted — provisional at n = 2. **`EXP_014` adopts nothing**: width is not an arm, and n = 1 per rung cannot clear §6.2. **`EXP_015` adopts nothing either, and adds a caveat to both adopted arms**: neither has been shown to train above 735K parameters, and §14 is where both failed to. **`EXP_016` adopts nothing and proposes nothing**; it explains why §14's legs died. **`EXP_017` adopts nothing and is not proposed for adoption**, though it is the first arm this phase has built that trains at 5.0M — and §16.4 puts a caveat on the *adopted* arm rather than lifting one: two of three freshly trained `twocomp` controls diverged at 735K. **`EXP_018` adopts nothing and is the first Phase-4 arm that is worse than its own anchor on every seed** (§17.3) |
+| GPU-hours spent | **~15.8 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9; **`EXP_014` cost ~1.5**; **`EXP_015` cost ~2.1** — 1.79 of ladder training (§14.1), ~0.09 of arch calibration, ~0.08 for the divergence chase, and ~0.1 for the evaluations, horizon, gap and state probes. **~0.7 of `EXP_015`'s training bought no number**: two legs ran 20,000 steps of which ~14,750 and ~18,000 computed NaN, and that is recorded as spent rather than netted off. **`EXP_016` cost ~0.8 and trained nothing** — five forward passes over committed checkpoints and two instrumented replays of one step — of which **~0.37 bought no number**, two aborted Leg B attempts whose defects are recorded in §15.5's source log. **`EXP_017` cost ~2.0** — 1.60 of training across seven runs, ~0.25 of probes and the horizon, and ~0.12 for running the mutation campaign **twice**, which is recorded as spent because the first run is what caught D09); **`EXP_018` cost ~2.9** — 2.63 of ladder training across sixteen runs, none of which diverged, plus ~0.3 of calibration, the systems probe, the §7.2 screen and the horizon sweep) |
 | Unexplained divergences | **4, sharing 2 causes** — `twocomp_distill_s1` (§6.4) has its own; `compose_s0` (§10.4) and **both of `EXP_015`'s dead legs (§14.5)** share a signature: origin in layer 0's backward, forward and loss finite, fp32 and fp64 gradient norms equal, and the eager path producing an identical NaN in identical tensors. **It is now reproducible 138 steps from a committed checkpoint rather than 17,598**, and it blocks scaling the adopted arm. **At rev 10 the shared signature has a mechanism (§15)**: the first non-finite value is made *inside* layer 0's reverse recursion, on both dispatch paths, after an amplification of **10^41.62 within one backward pass** — and the plain LIF's recurrence is provably incapable of it. **At rev 11 there are 6, sharing 2 causes**: two *freshly trained* `twocomp` seeds at `d = 512` (§16.4) joined the shared signature, at the width the arm was adopted at, where the committed record holds seven clean seeds |
 | Phase-3 §9 sign-off | **signed off 2026-08-05** (decision #1), and **recorded as retrospective**: Phase 4 was opened without it on instruction and eight experiments ran before it |
-| Decisions open | **7 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add |
+| Decisions open | **7 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add. **Rev 12 adds none and edits none either**, and hands #3 a **fourth** I5 boundary case: `EXP_018`'s rank-1 broadcast from the head |
 
 The phase has moved the project's answer to its own question twice, and both
 moves were away from the thing the ranking was built around.
@@ -2519,10 +2538,176 @@ A6 means; and what "the adopted arm" now denotes.
 
 ---
 
-## 17. Changelog
+## 17. `EXP_018` — the model can find its own prediction error, and using it costs bits
+
+Pre-registered in [`experiments/logs/EXP_018_dopamine.md`](../../experiments/logs/EXP_018_dopamine.md),
+committed before the first training step; SHA-256 stamped into the run manifest
+and verified unchanged after the last. Sixteen runs, **sixteen completed, zero
+diverged**, ~2.9 GPU-hours.
+
+**This is a negative result and it is reported as one.** The arm adopts nothing,
+ranks nothing, and closes no ranked candidate — it is not on the 18-item list, for
+the same reason `EXP_013` was not.
+
+### 17.1 The arm
+
+A **dopamine signal**: the model's own reward prediction error, broadcast to every
+neuron as one scalar per `(batch, timestep)`, with a learned per-channel
+sensitivity `k` (`[1, d]` per layer, `+K·d` = **+0.14 %**, `k_init = 0`).
+
+```
+S_t   = -log p_{t-1}(x_t)      the surprise                              (nats)
+H_t   =  H(p_{t-1})            the model's OWN expected surprise
+phi_t =  H_t - S_t             the RPE.     DA_t = tanh(phi_t / tau)
+cur'  =  cur * (1 + k_c*DA_t)   [mult]   or   cur + k_c*DA_t   [add]
+```
+
+Three properties decided the design and are worth carrying forward.
+
+**`E_{x~p}[-log p(x)] = H(p)` exactly**, so `phi` is zero-mean under the model's
+own belief *by construction* — no baseline, no EMA, no critic. That is not only
+tidy: an EMA over `t` is a sequential scan, `L` kernels per layer, inside the
+region `snn.train` captures into a CUDA graph. The entropy is one parallel
+reduction. **The derivation removed the arm's only other free hyperparameter.**
+
+**It is not a reparameterisation, and that is the scientific content.** `EXP_008`'s
+constant per-channel gain folds into `layers.k.weight` (§6.3), so its 0.0590 bpc
+is an *optimisation* effect on an unchanged function class. `DA_t` varies with `t`
+and folds into no weight, so this arm's function class is strictly larger. There
+is deliberately no `fold_into_*` method and **decision #6 does not arise for it.**
+
+**It costs two forward passes.** `DA_t` needs the head at `t-1`, and the head is
+downstream of every layer, so the depth-sequential evaluation (§0 of the spec)
+cannot supply it inline. Measured, not estimated: **1.708x** wall clock against a
+same-session anchor, at training **and at inference** — worse than `EXP_007`'s
+1.49x, which §6.7 item 2 already records as dominated on cost.
+
+**I5 is NOT RULED.** The parameters pass §4.6's test (`[1, d]`, channel-diagonal);
+the *pathway* is a rank-1 all-to-one-to-all coupling. It borrows the head, which
+the invariants already exempt, and carries one scalar rather than a learned
+`[d, d]` — arguments, not a ruling. Same posture as token-shift, and a **fourth**
+I5 boundary question for decision #3.
+
+### 17.2 D1 — UNRESOLVED by 3.6 millionths of a bpc, in the direction of harm
+
+| carried, test | n | mean | sd |
+|---|---:|---:|---:|
+| `da_anchor` | 5 | **2.25121** | 0.00475 |
+| `da_mult` | 5 | **2.25743** | 0.00359 |
+
+`Δ = −0.0062148`, Welch 95 % CI **[−0.0124333, +0.0000036]**, t = −2.33480 against
+t_crit = 2.33617. **The interval includes zero by 3.6e-06 bpc and the statistic
+misses by 0.0014.** `CONTRIBUTING.md` §3: report a near-miss as a miss.
+**D1 is UNRESOLVED.**
+
+σ **re-measured** on these seeds: 0.00475 carried, so the pre-registered power
+holds with the measured number substituted — MDE 0.0096 rather than 0.0093.
+
+### 17.3 The correction, measured because it hurts
+
+**The design used an unpaired Welch test on paired data.** A seed in this project
+fixes both the initial weights and the data order, so the two arms are genuinely
+paired. `CONTRIBUTING.md` §3 — *"when a correction would hurt, measure it"*:
+
+> paired, `anchor − arm`, carried: **5 / 5 seeds worse**, mean **−0.006215**
+> (sd 0.001859), t = **−7.477** on df 4, 95 % CI **[−0.008523, −0.003907]**,
+> **p = 1.7e-03**.
+
+**The arm costs ~0.0062 bpc on every seed and the pre-registered instrument was
+too blunt to say so.** D1's verdict stands as it fired; the corrected *rule* is
+referred (`EXP_018` §10 item 6) and is a candidate standing rule for the phase.
+
+### 17.4 The 26x — the finding that is not about bpc
+
+`rms(k)` at step 20,000, over layers and seeds:
+
+| | mean rms(k) | mean max\|k\| |
+|---|---:|---:|
+| `da_mult` — the aligned RPE | **0.1950** | 2.32 |
+| `da_rolled` — the same signal, misaligned across the batch | **0.0075** | 0.045 |
+
+**A factor of 26, stable to three significant figures across seeds.** The
+optimiser can tell the aligned prediction error from a misaligned one and turns
+the gain up 26x on the real one. **The reward prediction error is information this
+model can find and wants to use.**
+
+And it does not help. Paired, `arm − anchor`, n = 5:
+
+| | mean | p |
+|---|---:|---:|
+| train bpc | **+0.00043** | **0.63** |
+| test bpc, fresh | **+0.00611** | **0.0017** |
+
+**Identical training fit, worse test fit: the train→test gap widens by 0.0057
+bpc**, and §12.2 measured this model's *entire* generalisation gap at 0.0059. The
+arm roughly doubles it. (The train side is an indicative paired marker built from
+logged single-batch losses, not §12's instrument; `EXP_018` §10 item 7 refers the
+proper measurement.)
+
+The hypothesis this suggests — **offered as one, not established** — is that `phi`
+is a function of the model's own parameters and of how well it has memorised the
+text in front of it, so conditioning the forward pass on it opens a
+self-referential channel carrying training-set-specific structure. It predicts a
+cheap test: an RPE computed by a **frozen** copy should not widen the gap the same
+way.
+
+### 17.5 The decomposition, which is two effects of opposite sign
+
+`EXP_001`'s probe, all 16 checkpoints, `--baseline-arm da_anchor` (today's tree,
+never `snn_beta0.5` — decision #10). **F1 held on all sixteen**, residuals 2.0e-11
+to 1.2e-08.
+
+| Δ vs anchor, + = worse | c=0 | c=2 | **c=3** | c=4 | c=8 | c=32 |
+|---|---:|---:|---:|---:|---:|---:|
+| `da_mult` | **−0.0246** | +0.0217 | **+0.0427** | +0.0322 | +0.0079 | +0.0050 |
+| `da_rolled` | −0.0004 | −0.0168 | +0.0029 | +0.0011 | +0.0029 | +0.0039 |
+| 2σ bar | 0.0296 | 0.0260 | 0.0144 | 0.0145 | 0.0040 | 0.0010 |
+
+**The −0.0062 mean is two effects of opposite sign**, which is §2's lesson applied
+to a fourth arm.
+
+* **At c = 0 the arm is 0.0246 better — and the mechanism is structurally
+  inactive there.** `phi_0 = 0`, so at one character of context no modulation is
+  applied at all; that difference is what training left in the *weights*. It is
+  also inside the 2σ bar and is not established.
+* **The damage peaks at +0.0427 at c = 3**, three times the local bar and **seven
+  times the whole-split mean**, where the predictive distribution is still nearly
+  uninformative so `phi` is mostly noise — and the arm has learned a large gain
+  on it.
+* **It settles to ~+0.006 for c ≥ 8**, resolved many times over.
+
+`da_mult` is worse at **125 of 128** contexts; `nowhere_worse` is **False**, so the
+`EXP_001` dominance criterion is failed, at short contexts, which is the failure
+mode it exists to catch. The misaligned control shows **neither** end of the
+shape, so both track alignment rather than the perturbation.
+
+**D5, marker, no verdict**: 2σ horizon `da_anchor` [7,7,7,7,7], `da_mult`
+[8,8,8,7,7]. A nominal 7 → 8 on three of five seeds while the absolute curve is
+worse almost everywhere is exactly the trade `EXP_001` was built to expose.
+
+### 17.6 What this changes about the plan
+
+1. **A global broadcast is not free, and this is the first measurement of what it
+   costs here.** §7 has been asking for arms that are not purely architectural;
+   this was one, and it is the first Phase-4 arm to be **worse than its anchor on
+   every seed**.
+2. **The signal is real even though the arm is not.** The 26x is the reusable
+   result: an RPE is findable and usable by this model. §10 item 9 of the
+   experiment log points at the obvious follow-up — spend it **training-only**
+   (weighting the loss, say), which is `EXP_013`'s shape: no parameter, no
+   inference cost, nothing to fold, and none of the 1.71x.
+3. **Short contexts are where a modulation can do damage**, and the per-context
+   bar is what showed it. A whole-split mean would have called this a 0.006 null.
+4. **Nothing here touches decisions #3, #6, #10 or #11**, and no row of §8 is
+   edited. The I5 question this arm raises is a *fourth* boundary case for #3.
+
+---
+
+## 18. Changelog
 
 | Rev | Change |
 |---|---|
+| 12 | 2026-08-14. **`EXP_018` folds in as §17: a broadcast reward prediction error is findable, wanted, and harmful.** (a) **§17 added**, pushing the changelog to §18 — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10 and 11 each record for their own. (b) **The derivation removed a hyperparameter before the arm existed**: `E[-log p] = H(p)` exactly, so the RPE is zero-mean under the model's own belief with no baseline, no EMA and no critic — and, decisively for the implementation, no sequential scan over `t` inside a CUDA-graph capture. (c) **Not a reparameterisation**, unlike `EXP_008`: `DA_t` varies with `t` and folds into no weight, so decision #6 does not arise for it. (d) **D1 UNRESOLVED by 3.6e-06 bpc** and reported as a miss (`CONTRIBUTING.md` §3), in the direction of harm. (e) **The pre-registration's own defect, measured rather than referred because it hurts**: an unpaired Welch test on paired data — a seed here fixes both the initial weights and the data order — and the paired test gives 5/5 seeds worse, −0.006215, t = −7.477, p = 1.7e-03. The verdict still stands as it fired. (f) **The 26x**: `rms(k)` 0.1950 for the aligned RPE against 0.0075 for the same signal rolled across the batch, stable across seeds — the optimiser can tell them apart and wants the real one. (g) **Identical train fit (+0.00043, p 0.63), worse test fit (+0.00611, p 0.0017)**; the gap widens 0.0057, roughly doubling §12.2's 0.0059. Hypothesis offered and not established: `phi` is a function of the model's own parameters, so conditioning on it may open a self-referential channel. (h) **The decomposition is two effects of opposite sign** — −0.0246 at c = 0 where the mechanism is structurally inactive, +0.0427 at c = 3, ~+0.006 asymptotically; worse at 125 of 128 contexts, so `EXP_001`'s dominance criterion fails at short contexts. (i) **Cost 1.708x at training AND inference**, measured against a same-session anchor, against `EXP_007`'s already-dominated 1.49x. (j) **Adopts nothing, ranks nothing, closes no ranked candidate, edits no §8 row**; raises a **fourth** I5 boundary case for #3 and five post-run referrals. |
 | 11 | 2026-08-11. **`EXP_017` folds in as §16: the reset Jacobian can be bounded without changing the forward, the bounded arm trains at 5.0M, and two of three fresh controls died.** (a) **§16 added**, pushing the changelog to §17 — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9 and 10 each record for their own. (b) **The derivation is a stronger theorem than §15's.** Detaching the fast pole's reset sends `∂vf_out/∂v` to zero, which removes `vf` from **both** entries of the 2×2 per-step Jacobian at once, leaving `diag(beta_f·(1−s), beta_s)` — **diagonal**, so no non-normal transient, and bounded by `beta_f = 0.5`, **strictly tighter than the plain LIF's own 0.5123596**. The slow pole's rate is unchanged, so the memory mechanism is untouched. (c) **The forward is the same compiled kernel**, imported rather than re-declared, so the arm is parameter-**identical** to the adopted one and its checkpoint evaluates as `arch="twocomp"` **bit-identically** — asserted at `== 0.0` where §6.3 and §10.1 could only report residuals of 1.9e-03 and 1.05e-06 bpc. **Decision #6's tolerance question does not arise for this arm.** (d) **H1 HELD**: on the batch that killed the run, the adopted rule expands for **85 consecutive timesteps worth 10^16.00** and the detached rule, on the **same membranes from the same forward pass**, gives `max|g| = 0.5` and a longest run of **0** — every leg, every layer, both batches. T1, T1b (10/10 cells against `EXP_016`'s committed artifact), T2 and G4 (200 quantities, 0 differing) all hold. (e) **H2 SURVIVES**: 20,000 steps, **0 non-finite losses**, past step 5138, under the **unchanged** frozen recipe — 24 fields verified per run. Carried **1.86290** at parameter-identical 5,003,023, against the plain LIF's 2.00073 and the GRU's 1.54699; the matched-size gap closes **30.4 %** where §14.2's width closed 6.6 %. **Marker, n = 1, no verdict.** (f) **A6, unpredicted and post-registered as an observation**: this arm's *own* weights would, under the hard rule, expand for **84 steps worth 10^27.58** — worse than the arm that died — with `max|w·vs|` 445.9 against 356.6. **The fix does not avoid the dangerous region of weight space; it is indifferent to it.** (g) **Two of three fresh `twocomp` anchors diverged at `d = 512`**, steps 11500 and 12500, at the width §2's seven-seed evidence comes from. Seeds not replaced. **H3 resolves NOT RUN** by its own guard — the first prospective application of §14's referred DIVERGED/NO RESULT correction. Markers: detach **2.11533 ± 0.00237** (n = 3), **−0.00337** from the committed 2.11869; σ re-measured at 0.00237, 2 df. **The stability difference is NOT established** — 2/3 vs 0/4, Fisher **p = 0.40**, intervals quoted. A post-hoc probe finds the §15 mechanism present at 735K on both dead runs (up to 21 steps, 10^4.21). (h) **H4 REACH REDUCED** on **one** surviving pair at Δh = −2, against a within-arm spread of 3 and no σ_horizon anywhere in this project; median 48 against the committed 47 and the baseline's 7. Reported as it fired. (i) **H5 BREACH at 1.127× — against a denominator that is itself a diverged run**, 14,862 of whose 20,000 steps were non-finite. The bar stands unrepaired; a controlled paired re-measurement gives 1.034×, `d = 512` runs are **faster** than same-session anchors, and VRAM is identical to the byte. **`CONTRIBUTING.md`'s ratio rule needs a second clause: the reference must be a valid measurement.** (j) **D09 escaped the first mutation campaign** — `>` for `>=` in a backward kernel, invisible to a bound because **both branches land inside the bounded set**. Closed with a constructed equality case; **whole campaign re-run at 59/59**. (k) **No row of §8 is edited**, nothing is adopted or ranked, no hyperparameter moved, and Phase 5 is not authorised. ~2.0 GPU-hours; **~12.9 of ~30** spent. |
 | 10 | 2026-08-11. **`EXP_016` folds in as §15: the plain neuron's backward provably cannot explode, the adopted one's demonstrably does, and rev 9's "not a gradient explosion" is corrected.** (a) **§15 added**, pushing the changelog to §16 — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f) and 9 each record for their own, caught in this pass rather than left for a rev 11. (b) **A closed form, derived before any GPU was touched.** Both neurons carry a per-step reverse-recurrence multiplier `beta*dv`. The plain LIF writes `dv = (1 − s) − v_pre·sg(v_pre − thr)` — **the same variable** in the multiplier and inside the surrogate — which is self-limiting, so at the frozen constants `max|beta·dv| = 0.5123596 < 1` **for every finite membrane at every width**. `twocomp` writes `dv = (1 − sh) − vf·sgd(v_pre − thr)` with `vf = v_pre − w·vs`: **different variables**, and the bound breaks at `|w·vs| ≈ 1` because `vs` is never reset. **This is the first explanation this project has had of why the plain LIF trains at 5.0M.** (c) **Measured over 48,529,408 sites per layer on five committed checkpoints**: the three `snn` legs return **0.51236 at every width and every layer** and **not one site exceeds the bound**; `twocomp` reaches **8.95778 at `d = 1481`**, 17.48× that ceiling, with `frac(|g| > 1)` rising **10.3×** with width and `max|w·vs|` reaching 279.66. T1 (the probe validated against the closed form) and T2 (local scans **bitwise** equal to the committed eager references) both hold. (d) **Leg B measured the failing step boundary by boundary, on both dispatch paths, with the loss bit-identical at `1.4197630882263184`**: the cotangent entering layer 1's scan is **1.4639e−04** and the one leaving layer 0's is **6.1173e+37** with 140 NaN + 1 inf — **layer 1's recursion amplifies by 10^18.88, layer 0's by 10^23.03, 10^41.62 end to end inside ONE backward pass**. **P6 = BORN IN THE RECURSION**, and R10 separation now holds one level deeper than `EXP_015` could take it. (e) **CORRECTION to rev 9.** §14.5's *"and not a gradient explosion — the largest gradient in the six steps before death is 2.0e-02 and the clip never fires"* is **wrong**, and rev 9's own committed artifact contained the refutation (`layers.1.weight` at **1.676e+15**, eager `grad_abs_max_finite` at **7.79e+29**, both at step 5138). Both cited facts are true and neither supports the conclusion, because both are measured *between* optimiser steps: the explosion is *inside* the backward, and **"the clip never fires" is a CONSEQUENCE of it** — `clip_grad_norm_` reads a norm that is already NaN. The rev-9 sentence is left standing with the correction beneath it, per `CONTRIBUTING.md` §3 and rev 9 (i)'s precedent. **"Never layer 1" stands about non-finiteness and misleads about magnitude**: layer 1 carries 1.10e+15 where it carried 1.46e−04 one boundary earlier. (f) **A pre-registered bar misfired for the fourth time in this phase, and this one was authored today.** P3 placed its bar on the product over all 256 timesteps and resolved **REFUTED AS SUFFICIENT** — 0 of 189,568 chains expand net — but the adjoint is injected at *every* timestep, so the quantity averages the mechanism away by construction. **`EXP_016` §4.0 and §6 item 4 both say that quantity "is NOT the gradient", and the bar was placed on it anyway.** Reported unrepaired. **P4 also failed**, informatively: layer 1 carries the *heavier* per-step tail, which (d) explains. (g) **POST-HOC, labelled so** (`012_posthoc_pileup.py`'s precedent), amending no bar: replacing the whole-unroll product with the maximum contiguous window, **and re-running on the batch the run actually died on** — Leg A read batch 0, **a defect in its design, not only in P3's quantity**. On the fatal batch layer 0's recurrence **expands for 85 consecutive timesteps** (10^16.00) against 3 steps (10^0.66) for the same arm at 735K, while the plain LIF is at **exactly zero in every cell, both batches, all three widths**. (h) **The residual is stated, not absorbed**: window (10^16.00) plus coupling (≤10^4.4) against a measured 10^23.03 leaves **~2.6 orders of magnitude unresolved**, with three candidates named and none measured. **No claim is made that this is the whole cause.** (i) **§8: no row edited and no row added.** #11's *form* is re-evidenced in prose: `dv` contains **no learning rate, no schedule, no weight decay and no gradient clip**, and §15.4 shows the clip cannot act on this failure — so "may the frozen recipe be re-derived at a new size?" may be the wrong question to rule on. **No term is changed and no remedy is proposed.** Table stays eleven rows, four resolved, seven open. (j) **§7.1 gains a rev-10 note, offered and not applied**: ranks 3–5 are still not demoted; a row that is not on the table has appeared underneath it (anything bounding the recurrence is a **new arm**); and the GPU-h column gains a third measured row at ~0.8, of which ~0.37 bought no number. (k) §1: experiments closed gains `EXP_016`; **GPU-hours ~10.1 → ~10.9**; the divergence row records that the shared signature now has a mechanism. (l) §9 re-run: `ruff` clean, fast subset **277 passed / 1 skipped**, full suite **415 passed** (396 → 415 for `tests/test_reset_jacobian.py` and `EXP_015`'s additions); `README.md` and `CONTRIBUTING.md`'s quoted counts corrected **259 → 278** (fast, which counts the skip) and **396 → 415** (full) — the fast figure had been stale since rev 9, which measured 267/1 and did not propagate it. **Gate rows not re-run**: rev 10 changes no kernel, no captured graph and no numeric path, and G1 (`git diff --stat src/snn/` empty) is checked and recorded. **No earlier number, verdict or threshold changes beyond the correction at (e). No arm is adopted, no size is chosen, no tolerance is set, no phase is authorised, and no recipe term is changed.** |
 | 9 | 2026-08-10. **`EXP_015` folds in as §14: the adopted arm does not train at width, the anchor scales with the spiking model, and the difference between them is reach rather than capacity.** (a) **§14 added**, pushing the changelog to §15. Four legs at `d_model = 1481`, seed 0, `arch` the only variable, all within **0.18 %** of 4,997,099 parameters — width-matching *is* parameter-matching at this width because each arm's extras are `O(d)` against an `O(d²)` stack, and the GRU is matched by construction. **Both arms containing the two-compartment neuron DIVERGED** — `twocomp` at step 5138, `twocomp_threshold` at ~2000 — while the plain LIF and the GRU at the identical width, seed, recipe and tree trained cleanly; at 735K these same arms trained across 7 and 2 seeds. (b) **P3, the leg pre-registered with no bar, is the result.** The anchor at matched size scores **1.54699** carried against the spiking model's 2.00073, so the gap is **0.45374** where at 735K it was 0.48570 — **width closes 6.6 % of it**. Width bought the spiking model −0.25238 and the anchor −0.22042. **Capacity is not what separates this architecture from its anchor.** (c) **§14.3 locates the difference**: with width the anchor's 2σ memory horizon goes 57–60 → **97** and the spiking model's goes 7 → **8**, and the absolute per-context curves say it without any horizon definition — the two 5M models are **0.051 apart at zero context**, 0.152 apart by `c = 8`, and **0.408 apart by `c = 64`**, with the spiking curve flat since `c ≈ 8`. The entire matched-size gap is a failure to *use* context. The one spiking arm that ever bought reach (`twocomp`, horizon 47) is the arm that will not train at width. (d) **P1 and P2 fired and misled, for the third time in this phase.** Both resolve UNRESOLVED — which §3.0 defines as a statement about statistical *power* — for two runs that produced no number at all, with seeds recommended as a remedy that cannot work against a deterministic divergence. Reported unrepaired per `CONTRIBUTING.md` §3; the corrected **DIVERGED / NO RESULT** verdict is referred, and #9's row is left as rev 6 wrote it. (e) **§14.5: the divergence is `compose_s0`'s mechanism**, reproduced deterministically at step 5138 by `011_chase_compose_divergence.py` **reused unchanged** but for a `--tag`. Origin backward; forward and loss finite; fp32 and fp64 norms equal; the eager path producing an **identical** NaN in the **identical** five tensors (R10 clean); always layer 0 and the embedding, never layer 1; largest gradient in the six steps before death **2.0e-02**, and the clip never fires in the whole run. First occurrence on the plain adopted arm rather than the composed one, and now reproducible **138 steps from a committed checkpoint instead of 17,598**. (f) **A hypothesis was stated and falsified in place**: state magnitude is *not* the discriminator — layer 1's state grows **13.30×** for the plain LIF and **14.96×** for `twocomp` across the same width change, the *surviving* arm growing more, and a plain LIF carrying `|state|` up to 556 trains 20,000 steps without incident. What survives is a lead only: at layer 0, `twocomp` is 2.84× the plain LIF, carried by the reset-shielded slow pole. "The slow pole ran away" was separately removed **without spending GPU** — `beta_s = sigmoid(beta_s_raw)` is bounded in (0, 1) and weight decay pulls it toward *more* damping. (g) **§8: no row edited; row #11 added, open** — may the frozen Phase-2 recipe be re-derived at a new size, and how? The recipe was fixed at 735K and has never been re-derived; this blocks Phase 5 as conceived. **No term is changed and no value is proposed**, and the price of the cheapest discriminating measurement is recorded (~11 GPU-minutes per LR probe, because the arm dies at 5138 rather than at 20,000) so the decision is made against a price. **Table now eleven rows, four resolved, seven open.** #4 and #9 are re-evidenced in prose only. (h) **§7.1 gains a rev-9 note, offered and not applied**: three of the remaining rows sit on the two-compartment family or on components width already moved, and a prerequisite has appeared underneath them; the measurement that reorders the table is no longer an arm but reach; and the GPU-h column gains a second measured row, with the calibration method transferring across *arms* (K3 0.926 / 0.915 / 0.972). **~0.7 GPU-hours bought no number** and is recorded as spent rather than netted off. (i) **CORRECTION to rev 8.** §13.6 said width closed *"about a quarter of the remaining gap to the anchor"*. The figure against the 735K anchor is **52.0 %** — the error was reading the absolute 0.25238 bpc gain as a fraction — and the corrected figure is *still the wrong comparison*, because it prices a 5M model against a 738K anchor. §14.2's matched figure, **6.6 %**, supersedes both. The rev-8 sentence is left standing with the correction beneath it. (j) §1: experiments closed gains `EXP_015`; **GPU-hours ~8.0 → ~10.1**; **unexplained divergences 2 → 4, sharing 2 causes**; decisions open **6 of 10 → 7 of 11**; the adopted-arms row gains the caveat that neither adopted arm has been shown to train above 735K. (k) §9 re-run: `ruff` clean, fast subset **267 passed / 1 skipped** (258 → 267 for `tests/test_calibrate_cost.py`), full suite green; **gate rows not re-run**, since no kernel, captured graph or numeric path changed. (l) `EXP_015` §9.10 records **three defects the experiment found in its own instruments** — the driver marked both dead legs `completed: true` (a trainer that goes non-finite exits 0 and writes a checkpoint), the same defect one level down where an absent log read as a clean log, and the resolver crashing on P4 by guessing an artifact's shape. All three fixed with tests; **no threshold, bar or verdict moved**, and the committed manifest still reads `completed: true` because that is what the driver did. (m) `EXP_015` §9.12 records that the pre-registration hash recipe is **CRLF-dependent** — reconstructing with LF gives a different digest, so a future reader checking that way would wrongly conclude the pre-registration had been edited. **No earlier number, verdict or threshold changes beyond the correction at (i). No arm is adopted, no size is chosen, no tolerance is set, no phase is authorised, and no recipe term is changed.** |
