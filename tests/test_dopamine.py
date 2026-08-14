@@ -607,3 +607,53 @@ def test_g7_fused_and_eager_agree():
     a, _, _ = fused(idx, None)
     b, _, _ = eager(idx, None)
     assert torch.equal(a, b)
+
+
+# ---------------------------------------------------------------------------
+# The L = 1 boundary: EXP_001's horizon probe sweeps k down to 1
+# ---------------------------------------------------------------------------
+
+def test_rpe_at_length_one_is_zero_not_an_error():
+    """At L = 1 every position is position 0, which has no preceding prediction.
+
+    Zeros is the consistent extension of `phi_0 = 0`, and it is what makes D5's
+    k = 1 rung computable at all: `EXP_001`'s probe reshapes `[B, L]` to
+    `[B*L//k, k]` and would otherwise hand `rpe` a single position.
+    """
+    torch.manual_seed(0)
+    phi = rpe(torch.randn(B, 1, V), _idx(length=1))
+    assert phi.shape == (B, 1)
+    assert torch.equal(phi, torch.zeros(B, 1))
+
+
+def test_the_arm_is_the_baseline_at_zero_context_by_construction():
+    """A structural property worth guarding, not an accident of the boundary.
+
+    With one character of context the dopamine signal does not exist, so the arm
+    IS `SpikingCharLM` there -- bitwise, at any `k`, including a large one. Any
+    gain this arm produces must therefore come from longer contexts.
+    """
+    arm, plain = _pair("mult", "rpe", k_init=2.0)
+    arm.eval(); plain.eval()
+    one = _idx(b=B, length=1)
+    a, _, _ = arm(one, None)
+    b, _, _ = plain(one, None)
+    assert torch.equal(a, b)
+
+
+def test_the_l1_extension_changes_nothing_at_the_training_length():
+    """The boundary branch must be inert everywhere a run actually lives.
+
+    Training and both evaluation protocols run at L = 256; the branch above is
+    reachable only from the horizon probe. Asserted so that adding it cannot have
+    moved a training run.
+    """
+    torch.manual_seed(0)
+    logits = torch.randn(B, L, V)
+    idx = _idx()
+    phi = rpe(logits, idx)
+    logp = F.log_softmax(logits.float(), dim=-1)
+    prev = logp[:, :-1]
+    expect = F.pad(-(prev.exp() * prev).sum(-1)
+                   + prev.gather(-1, idx[:, 1:].unsqueeze(-1)).squeeze(-1), (1, 0))
+    assert torch.equal(phi, expect)
