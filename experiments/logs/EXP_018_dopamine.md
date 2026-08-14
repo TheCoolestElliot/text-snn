@@ -785,14 +785,39 @@ measurement**, and §10 item 8's frozen-copy test loses the observation that
 motivated it. It is left in §10 because it remains a cheap and well-posed
 question, but it is no longer pointed at by evidence.
 
-**The discrepancy between the two estimators is real and is NOT explained here.**
-§9.5's train side used the mean of the last eight logged single-batch *training*
-losses; this uses a 19,456-window slice of the train split scored in `eval()` by
-`snn.evaluate.evaluate`. They disagree by ~0.005 bpc **and they disagree in
-opposite directions for the two arms**: the anchor's running loss sits 0.0028
-*above* its fresh train-slice bpc while the arm's sits 0.0026 *below* its own.
-That asymmetry is the whole discrepancy and this file does not account for it.
-It is recorded rather than smoothed over, and referred as §10 item 11.
+**The discrepancy between the two estimators is RESOLVED**, by
+`scripts/exp/018_chase_train_estimator.py`
+(`docs/reports/data/exp_018_train_estimator.json`). The sampler is a pure
+function of `(seed, step)`, so the exact eight batches those logged steps trained
+on were regenerated and re-scored at `ckpt_final`, three ways.
+
+| paired, arm − anchor, the SAME eight batches | Δ | t (df 4) | p | arm worse |
+|---|---:|---:|---:|---|
+| as **logged** during training | +0.00043 | +0.52 | 0.63 | 2/5 |
+| re-scored at **final weights** | **+0.00377** | **+4.22** | **0.0135** | **5/5** |
+
+**The cause is stale weights, and the staleness is not symmetric.** A logged
+training loss is computed at the weights *before* that step's update, so it lags;
+over the logged tail the anchor improved by **0.00619** on its own batches while
+the arm improved by only **0.00285** — an asymmetry of **+0.00334 ± 0.00096**
+(t = 3.46, p = 0.026) that is almost exactly the size of the effect and cancelled
+it. §9.5's marker was measuring two arms at different points on their own
+trajectories.
+
+Two things this rules out. **`eval()` and `train()` agree bit-for-bit
+(`0.00e+00`, worst over ten runs)** on identical inputs at identical weights, so
+there is no mode-dependence and no undeclared state in the arm — the one
+candidate that could have borne on the result. And the batches themselves are not
+the issue: re-scored properly they give **+0.00377**, consistent with the
+train-slice's +0.00522 and the test's +0.00621 on different text.
+
+**So the arm is worse on the very batches it was trained on, at the weights it
+finished with** — which is the capability-loss reading, confirmed on a third
+independent slice.
+
+**The standing lesson is methodological and outlives this arm: a running training
+loss is measured at stale weights, the staleness differs between arms, and it is
+not a stand-in for a train-split bpc.**
 
 **What survives §9.5 unchanged:** the 26x (§9.4), the paired loss (§9.3), the
 decomposition (§9.9), and D4's engagement (§9.7). What does not survive is the
@@ -970,14 +995,16 @@ nominal reach while degrading the characters the model already sees.
    experiment and is not proposed here as a design, only as the direction the
    evidence points.
 
-11. **Two estimators of the train-side bpc disagree by ~0.005, in opposite
-    directions for the two arms.** §9.5's correction records it: the anchor's
-    running training loss sits 0.0028 *above* its fresh train-slice bpc while
-    the dopamine arm's sits 0.0026 *below* its own. One of them is measuring
-    something the other is not, and until that is known, a running training loss
-    should not be used as a stand-in for a train-split bpc anywhere in this
-    project. Cheap to chase: score the exact batches the last logged steps used,
-    in `eval()`, and compare.
+11. **RESOLVED before this file was committed, and left here because the rule it
+    produced is worth adopting.** The two train-side estimators disagreed by
+    ~0.005 in opposite directions per arm; §9.5's correction now shows why —
+    **a logged training loss is measured at pre-update weights, and how much the
+    two arms were still improving over the logged tail differed by
+    +0.00334 ± 0.00096**, which is the size of the effect. What is referred is
+    the standing rule: **a running training loss is not a stand-in for a
+    train-split bpc**, and any future experiment that wants a train-side number
+    should score a slice with `snn.evaluate.evaluate` rather than read
+    `log.jsonl`.
 
 10. **Should a control be required to be a per-example function?** §9.4 records
     that `da_rolled` couples across the batch while the arm does not. The
