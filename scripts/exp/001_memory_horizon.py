@@ -218,6 +218,29 @@ ARMS: dict[str, str] = {
     # And the width leg, kept apart from the 735K rows for EXP_015's reason: a
     # mean horizon pooling a 0.735M model with a 5M one describes neither.
     "detach_d1481_s0": "detach_d1481",
+    #
+    # `EXP_018`: the dopamine arm, its batch-roll control, the additive form and
+    # the fresh `snn` anchor all four are measured against. Registry entries and
+    # nothing else, for the eighth time and for the same reason every block above
+    # gives -- the statistic, the k-sweep and the F1 tolerance are untouched, so
+    # these horizons are comparable with every row above, and EXP_018 runs this
+    # file with an explicit `--out`.
+    #
+    # THE THREE DOPAMINE ARMS ARE REGISTERED APART FROM EACH OTHER even though
+    # all three carry `arch="dopamine"`, because they are three different
+    # experiments: `da_mult` is the arm, `da_rolled` is the control that decides
+    # whether it has a mechanism, and `da_add` is a second dopaminergic action.
+    # Pooling them under one label would average the arm with its own control and
+    # destroy D2 before the resolver ever saw it.
+    #
+    # `da_anchor` is registered apart from `snn_beta0.5` for the reason
+    # `anchor_twocomp_d512` is registered apart from `twocomp`: those five seeds
+    # predate decision #7's fp64 clip and these five are the same configuration
+    # retrained on today's tree, which `EXP_014` G1 measured at 1.97e-03 bpc.
+    **{f"da_anchor_s{s}": "da_anchor" for s in range(5)},
+    **{f"da_mult_s{s}": "da_mult" for s in range(5)},
+    **{f"da_rolled_s{s}": "da_rolled" for s in range(3)},
+    **{f"da_add_s{s}": "da_add" for s in range(3)},
 }
 
 # F1: the k = L point must reproduce the committed Phase-2 `fresh` number.
@@ -434,6 +457,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--split", default="test", choices=["val", "test"])
     ap.add_argument("--max-windows", type=int, default=0, help="0 = whole split")
     ap.add_argument("--runs", default="", help="comma-separated subset of run names")
+    ap.add_argument("--baseline-arm", default="snn_beta0.5",
+                    help="arm label the absolute per-context curves are compared "
+                         "against; the default reproduces every committed artifact")
     ap.add_argument("--out", default="docs/reports/data/exp_001_memory_horizon.json")
     args = ap.parse_args(argv)
 
@@ -633,7 +659,14 @@ def main(argv: list[str] | None = None) -> int:
     # test a Phase-4 candidate has to pass is not "is the horizon longer" but
     # "is the absolute curve nowhere worse", and that is computed here rather
     # than asserted in prose.
-    baseline_arm = "snn_beta0.5"
+    # Selectable, defaulting to the Phase-2 baseline so every committed artifact
+    # this file has produced still reproduces bit for bit. `EXP_018` needs it
+    # because decision #10 forbids re-baselining: its per-context curve must be
+    # read against an anchor trained on TODAY's tree (`da_anchor`), not against
+    # the five Phase-2 seeds that predate decision #7's fp64 clip. Comparing
+    # across trees is exactly the confound `anchor_twocomp_d512` was registered
+    # to avoid, one level up.
+    baseline_arm = args.baseline_arm
     if baseline_arm not in agg:
         # A partial run (--runs) that excludes the baseline cannot compute the
         # cross-arm comparison, and silently comparing against whatever arm
