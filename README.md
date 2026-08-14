@@ -22,8 +22,8 @@ mechanisms actually close it?**
 | Phase 4 | **open** — running record in [`docs/reports/04_phase4_interim.md`](docs/reports/04_phase4_interim.md) |
 | Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
 | Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
-| Open decisions | **7 of 11**, all the author's (§8 of the Phase-4 report) |
-| Budget | ~10.9 of ~30 GPU-hours spent |
+| Open decisions | **6 of 11**, all the author's (§8 of the Phase-4 report). #3 — the I5 boundary — was ruled 2026-08-14 |
+| Budget | ~15.8 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
