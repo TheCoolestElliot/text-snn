@@ -745,6 +745,59 @@ aligned signal than for the misaligned one. **Nothing here establishes it.**
 `CONTRIBUTING.md` §4 requires a direction of causation to be checked before it is
 claimed.
 
+
+#### CORRECTION, added after §9.5 was written — §9.5's reading is WRONG
+
+*(The paragraphs above stand as written, per `EXP_015` §14.5's precedent — a
+wrong claim is corrected **beneath** the standing original, not deleted.)*
+
+§10 item 7 referred the proper measurement to a later experiment. It was run
+instead, on this tree, with `scripts/exp/013_generalisation_gap.py` — the
+committed instrument, the one `EXP_013` used, over all sixteen checkpoints
+(`docs/reports/data/exp_018_generalisation_gap.json`). **It does not support
+§9.5, and the correction goes against the reading, so it is made here rather
+than deferred.**
+
+Paired by seed, `arm − anchor`, n = 5:
+
+| carried | anchor | arm | paired Δ | t (df 4) | p | arm worse |
+|---|---:|---:|---:|---:|---:|---|
+| **train slice** | 2.25513 | 2.26034 | **+0.00522** | +7.23 | **0.0019** | **5/5** |
+| test | 2.25121 | 2.25743 | +0.00621 | +7.48 | 0.0017 | 5/5 |
+| **gap** | −0.00391 | −0.00292 | **+0.00100** | +1.71 | **0.16** | 4/5 |
+
+| fresh | anchor | arm | paired Δ | t | p | arm worse |
+|---|---:|---:|---:|---:|---:|---|
+| **train slice** | 2.26338 | 2.26919 | **+0.00581** | +6.57 | **0.0028** | **5/5** |
+| test | 2.26775 | 2.27386 | +0.00610 | +7.54 | 0.0017 | 5/5 |
+| **gap** | +0.00437 | +0.00467 | **+0.00029** | +0.35 | **0.74** | 3/5 |
+
+**The arm is worse on text it was trained on by almost exactly as much as on text
+it was not** — +0.00522 against +0.00621 carried, +0.00581 against +0.00610
+fresh. **The generalisation gap does not widen resolvably** (p = 0.16 carried,
+0.74 fresh), and the "gap roughly doubles" sentence in §9.5 is **withdrawn**.
+
+**This is a capability loss, not a generalisation failure.** The arm is simply a
+worse model, everywhere, on seen and unseen text alike.
+
+**The self-referential-channel hypothesis is therefore NOT supported by this
+measurement**, and §10 item 8's frozen-copy test loses the observation that
+motivated it. It is left in §10 because it remains a cheap and well-posed
+question, but it is no longer pointed at by evidence.
+
+**The discrepancy between the two estimators is real and is NOT explained here.**
+§9.5's train side used the mean of the last eight logged single-batch *training*
+losses; this uses a 19,456-window slice of the train split scored in `eval()` by
+`snn.evaluate.evaluate`. They disagree by ~0.005 bpc **and they disagree in
+opposite directions for the two arms**: the anchor's running loss sits 0.0028
+*above* its fresh train-slice bpc while the arm's sits 0.0026 *below* its own.
+That asymmetry is the whole discrepancy and this file does not account for it.
+It is recorded rather than smoothed over, and referred as §10 item 11.
+
+**What survives §9.5 unchanged:** the 26x (§9.4), the paired loss (§9.3), the
+decomposition (§9.9), and D4's engagement (§9.7). What does not survive is the
+inference drawn from the train side, and the hypothesis built on it.
+
 ### 9.6 D3 — the additive form, a marker
 
 `da_add` carried **2.25479** (n = 3, sd 0.00099). Paired on shared seeds:
@@ -916,6 +969,15 @@ nominal reach while degrading the characters the model already sees.
    inference cost, nothing to fold, and none of the 1.71x. That is a different
    experiment and is not proposed here as a design, only as the direction the
    evidence points.
+
+11. **Two estimators of the train-side bpc disagree by ~0.005, in opposite
+    directions for the two arms.** §9.5's correction records it: the anchor's
+    running training loss sits 0.0028 *above* its fresh train-slice bpc while
+    the dopamine arm's sits 0.0026 *below* its own. One of them is measuring
+    something the other is not, and until that is known, a running training loss
+    should not be used as a stand-in for a train-split bpc anywhere in this
+    project. Cheap to chase: score the exact batches the last logged steps used,
+    in `eval()`, and compare.
 
 10. **Should a control be required to be a per-example function?** §9.4 records
     that `da_rolled` couples across the batch while the arm does not. The
