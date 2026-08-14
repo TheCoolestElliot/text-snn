@@ -50,7 +50,9 @@ import torch  # noqa: E402
 
 CORPUS_CHOICES = ("enwik8", "text8")
 ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "twocomp_detach",
-                "tokenshift", "threshold", "noise", "gru")
+                "tokenshift", "threshold", "noise", "dopamine", "gru")
+DA_MODE_CHOICES = ("mult", "add")
+DA_SOURCE_CHOICES = ("off", "rpe", "rolled")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
 SURROGATE_CHOICES = ("atan",)
 DTYPE_CHOICES = ("fp32", "bf16", "fp16")
@@ -132,6 +134,26 @@ class Config:
     noise_amp: float = 0.0          # noise only: injected current sd; 0.0 nests Phase 2
     noise_p: float = 0.1            # noise only: Bernoulli event rate; held fixed by EXP_013
 
+    # --- dopamine: a broadcast reward prediction error (arch="dopamine"; EXP_018)
+    # Ignored by every other arm, and Config fields rather than constants for the
+    # reason `beta_slow`, `mu_init` and `noise_amp` are: the initialisation and
+    # the squash scale are what the §7.2 screen and the calibration select, and an
+    # unlogged choice there is an unfalsifiable one.
+    #
+    # `da_source="off"` is the value at which the arm IS the Phase-2 baseline --
+    # by code path, not by float identity, so the nesting holds for the additive
+    # mode too (`x + 0.0` is not `x` for `x = -0.0`). It is the default for the
+    # same reason `noise_amp` defaults to 0.0: a run that forgets to set it trains
+    # the baseline rather than something undocumented. The driver sets it
+    # explicitly and G5 in EXP_018 asserts the run's config.json says so.
+    da_mode: str = "mult"           # "mult" (gain) | "add" (excitability)
+    da_source: str = "off"          # "off" nests Phase 2 | "rpe" | "rolled" (the control)
+    # tau, the squash scale. MEASURED, not chosen: the median sd of phi across
+    # four committed checkpoints spanning three architectures, which agree to
+    # 3.1%. Provenance: docs/reports/data/exp_018_da_calibration.json.
+    da_scale: float = 1.1291
+    da_gain_init: float = 0.0       # dopamine only: per-channel sensitivity; 0.0 nests the baseline
+
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
     weight_decay: float = 0.1
@@ -178,6 +200,21 @@ class Config:
             raise ValueError(f"Config.noise_p must be in (0, 1), got {self.noise_p!r}")
         if self.noise_amp < 0.0:
             raise ValueError(f"Config.noise_amp must be >= 0, got {self.noise_amp!r}")
+        self._check_choice("da_mode", DA_MODE_CHOICES)
+        self._check_choice("da_source", DA_SOURCE_CHOICES)
+        # Caught here rather than inside the forward pass: `dopamine()` divides by
+        # tau, and a zero or negative tau would produce an inf or a sign-flipped
+        # neuromodulator three hours into a run instead of at construction.
+        if self.da_scale <= 0.0:
+            raise ValueError(f"Config.da_scale must be > 0, got {self.da_scale!r}")
+        # The rolled control is a roll along the batch axis, which is the identity
+        # at B = 1 -- the control would silently BE the arm. Caught at
+        # construction rather than at the first batch.
+        if self.arch == "dopamine" and self.da_source == "rolled" and self.batch_size < 2:
+            raise ValueError(
+                "da_source='rolled' needs batch_size >= 2; at B = 1 the roll is "
+                f"the identity and the control would be the arm. Got {self.batch_size}"
+            )
 
     def _check_choice(self, name: str, choices: tuple[str, ...]) -> None:
         value = getattr(self, name)
@@ -327,6 +364,14 @@ _HELP: dict[str, str] = {
                  "threshold units; 0.0 nests the Phase-2 baseline",
     "noise_p": "noise only: Bernoulli event rate of the background spike train; "
                "sets sparsity, not variance",
+    "da_mode": "dopamine only: how the broadcast RPE reaches the current -- "
+               "'mult' (gain) or 'add' (excitability)",
+    "da_source": "dopamine only: 'off' nests the Phase-2 baseline by code path; "
+                 "'rpe' is the real signal; 'rolled' is the batch-roll control",
+    "da_scale": "dopamine only: tau, the squash scale in nats; measured, see "
+                "docs/reports/data/exp_018_da_calibration.json",
+    "da_gain_init": "dopamine only: initial per-channel sensitivity k; 0.0 nests "
+                    "the Phase-2 baseline",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",
@@ -356,6 +401,8 @@ _CHOICES: dict[str, tuple[str, ...]] = {
     "surrogate": SURROGATE_CHOICES,
     "dtype": DTYPE_CHOICES,
     "lr_schedule": SCHEDULE_CHOICES,
+    "da_mode": DA_MODE_CHOICES,
+    "da_source": DA_SOURCE_CHOICES,
 }
 
 

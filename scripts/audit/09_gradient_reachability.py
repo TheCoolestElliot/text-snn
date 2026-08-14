@@ -350,6 +350,8 @@ class Candidate:
     def param_names(self) -> tuple:
         if self.arch == "twocomp":
             return ("w", "beta_s_raw")
+        if self.arch == "dopamine":
+            return ("k",)
         return tuple(name for name, _ in self.params)
 
 
@@ -462,6 +464,34 @@ CANDIDATES = [
                    "derivative is nonzero, so an exact-nesting init is reachable "
                    "here even though #1's is not",
     ),
+    # -- EXP_018, through the real arch --------------------------------------
+    Candidate(
+        "da_mult", "EXP_018 dopamine, multiplicative gain", "k = 0, nests baseline",
+        params=(), scan=None, arch="dopamine",
+        cfg_overrides={"da_mode": "mult", "da_source": "rpe",
+                       "da_scale": 1.1291, "da_gain_init": 0.0},
+        derivation="dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c} * DA_{b,t}. "
+                   "The reset is multiplicative and DA multiplies the current, so "
+                   "at k = 0 the factor (1 + k*DA) is 1 and every downstream "
+                   "adjoint is the BASELINE's -- nonzero. dL/dk therefore vanishes "
+                   "only if DA is identically 0, which needs the model's predictive "
+                   "distribution to be exactly its own entropy at every position. A "
+                   "randomly initialised head is not, so k = 0 is NOT a saddle. "
+                   "Predicted separately, and this is the interesting half: the "
+                   "RATIO will be small, because exp_018_da_calibration.json "
+                   "measures sd(phi) = 0.0245 at initialisation against 1.1291 at "
+                   "convergence -- 46x. A small ratio is not fatal (Adam is "
+                   "scale-free per parameter) and an exactly-zero one would be.",
+    ),
+    Candidate(
+        "da_add", "EXP_018 dopamine, additive drive", "k = 0, nests baseline",
+        params=(), scan=None, arch="dopamine",
+        cfg_overrides={"da_mode": "add", "da_source": "rpe",
+                       "da_scale": 1.1291, "da_gain_init": 0.0},
+        derivation="dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * DA_{b,t}; the current "
+                   "itself drops out of the additive form, so this leg is reachable "
+                   "wherever DA is nonzero even in a channel whose current is 0",
+    ),
 ]
 
 #: Ranked candidates the screen does not apply to, listed rather than omitted.
@@ -513,8 +543,8 @@ def build_screen_model(cfg: Config, cand: Candidate) -> nn.Module:
     """
     seed_everything(cfg.seed, cfg.deterministic)
     model = build_model(cfg)
-    if cand.arch == "twocomp":
-        return model              # already owns w / beta_s_raw
+    if cand.arch in ("twocomp", "dopamine"):
+        return model              # already owns w / beta_s_raw, or k
 
     d = cfg.d_model
     for name, init in cand.params:

@@ -83,6 +83,7 @@ if str(_REPO / "src") not in sys.path:
     sys.path.insert(0, str(_REPO / "src"))
 
 from snn.model import (  # noqa: E402
+    dopamine_param_count,
     gru_param_count,
     match_gru_width,
     prescan_param_count,
@@ -134,6 +135,15 @@ def param_count(arch: str, vocab_size: int, d_model: int, n_layers: int) -> int:
         return spiking_param_count(vocab_size, d_model, n_layers)
     if arch in ("threshold", "tokenshift"):
         return prescan_param_count(vocab_size, d_model, n_layers)
+    if arch == "dopamine":
+        # EXP_018's arm adds one `[1, d]` per-channel sensitivity per layer, so
+        # its count is numerically the pre-scan arms'. It gets its OWN closed
+        # form rather than joining that branch, because the two agree by
+        # coincidence of shape and not by construction: the pre-scan arms'
+        # parameter is exactly redundant (it folds into `layers.k.weight`) and
+        # this one is not (it multiplies a signal that varies with `t`). A future
+        # edit to either must not silently move the other.
+        return dopamine_param_count(vocab_size, d_model, n_layers)
     if arch in ("twocomp", "twocomp_detach"):
         # EXP_017's arm adds no parameter of any shape -- it is the adopted arm's
         # forward kernel with a bounded backward -- so it is parameter-IDENTICAL

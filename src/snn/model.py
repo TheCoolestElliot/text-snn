@@ -50,6 +50,8 @@ import torch.nn as nn
 from torch import Tensor
 
 from snn.data import _mix64
+from snn.dopamine import (DA_MODES, DA_SOURCES, apply_dopamine, dopamine,
+                          roll_across_batch, rpe)
 from snn.neuron import lif_scan
 from snn.noise import (NOISE_STREAM_SALT, add_background_noise,
                        fill_background_noise, noise_scale)
@@ -70,6 +72,7 @@ __all__ = [
     "LearnedThresholdCharLM",
     "TwoCompThresholdCharLM",
     "NoisyCharLM",
+    "DopamineCharLM",
     "GRUCharLM",
     "build_model",
     "count_params",
@@ -77,6 +80,7 @@ __all__ = [
     "twocomp_param_count",
     "twocomp_threshold_param_count",
     "prescan_param_count",
+    "dopamine_param_count",
     "gru_param_count",
     "match_gru_width",
     "resolve_gemm_dtype",
@@ -965,6 +969,206 @@ class NoisyCharLM(_CharLMStack):
 
 
 # ---------------------------------------------------------------------------
+# Arm 10: a dopamine signal -- the model's own RPE, broadcast back in (EXP_018)
+# ---------------------------------------------------------------------------
+
+
+def dopamine_param_count(vocab_size: int, d_model: int, n_layers: int) -> int:
+    """Closed form for DopamineCharLM: the spiking count plus one `[1, d]` per layer.
+
+    At V=205, d=512, K=2 this is 735_437 + 1_024 = 736_461 -- **+0.14%** over the
+    Phase-2 baseline, and numerically identical to `prescan_param_count`, because
+    both arms add exactly one per-channel vector per layer.
+
+    EXP_018 §6 names the parameter increase as a limitation rather than
+    correcting for it, for the reason `prescan_param_count` records: shedding
+    1_024 parameters means d = 511, which changes the width -- a second variable
+    introduced to control for a smaller one.
+
+    Unlike the threshold arm, the figure is +0.14% in parameters **and strictly
+    positive in function-space dimension**: `EXP_008`'s gain is constant in `t`
+    and folds into `layers.k.weight`, while this one is multiplied by a signal
+    that varies with `t` and folds into nothing. There is no `fold_into_*` method
+    on this class, and its absence is the claim.
+    """
+    return spiking_param_count(vocab_size, d_model, n_layers) + n_layers * d_model
+
+
+class DopamineCharLM(_CharLMStack):
+    """The Phase-2 baseline, modulated by a broadcast reward prediction error.
+
+    Pre-registered in `experiments/logs/EXP_018_dopamine.md`. The signal, the
+    squash scale and the control live in `snn.dopamine`; this class is only the
+    wiring, exactly as `NoisyCharLM` is only the wiring for `snn.noise`.
+
+    Per layer `k`, per channel `c`, with one scalar `DA_t` shared by every neuron
+    in the model at timestep `t`:
+
+        mult:  cur'_{t,c} = cur_{t,c} * (1 + k_c * DA_t)
+        add:   cur'_{t,c} = cur_{t,c} +       k_c * DA_t
+
+    `k` is `[1, d]` per layer, unconstrained, initialised at 0.0 where the
+    transform is the identity -- the baseline nested in the *interior* of the
+    parameter, the same choice and the same reason as `snn.twocomp`'s additive
+    mix and `EXP_008`'s `thr_log_init = 0.0`.
+
+    THE TWO PASSES, AND WHY THERE IS NO WAY AROUND THEM
+    ----------------------------------------------------
+    `DA_t` is built from the head's distribution at `t-1`, and the head is
+    downstream of every layer. This architecture evaluates sequentially in
+    *depth* -- one GEMM per layer for the whole sequence, then that layer's time
+    loop -- precisely because layer `k` at time `t` depends only on layer `k-1`
+    at time `t` (`model.py`'s module docstring, spec §0). A signal from the head
+    at `t-1` breaks that: layer 0 at `t` would need layer `K-1` at `t-1`, and the
+    time loop would have to contain a GEMM, which is `K*L` GEMMs instead of `K`.
+
+    So the stack runs twice, and the cost is stated rather than hidden:
+
+        pass 1   with no_grad:  logits = stack(idx, unmodulated)
+                 DA = tanh((H(p) - S(p, idx)) / tau),  detached
+        pass 2   stack(idx, modulated by DA)   <- the graph, the loss, the output
+
+    Three consequences, all of them real:
+
+    * **This arm costs at inference too.** `EXP_013`'s noise is absent under
+      `model.eval()`; this is not. Two forward passes is the arm's price and
+      `EXP_018` G11 measures the realised ratio rather than estimating it.
+    * **`DA` is computed by the unmodulated pathway**, which is a different
+      function from the modulated one once `k != 0`. Iterating the two passes to
+      a fixed point is the alternative; it is named in `EXP_018` §2 and not run,
+      on cost. This is the `EXP_017` §2.5 pattern.
+    * **`DA` is detached.** Pass 1 is under `no_grad`, so no gradient flows back
+      through the surrogate a second time. That is deliberate twice over: the
+      fused backward is not twice-differentiable and would be *silently* wrong
+      under `create_graph` (see `snn/neuron.py`'s backward), and a neuromodulator
+      delivered by a separate system rather than backpropagated is the correct
+      biology.
+
+    Everything else about the forward is `_CharLMStack`'s, unchanged, so
+    `train.py`, `evaluate.py`'s carried protocol and `EXP_001`'s horizon probe
+    need no code path for this arm and were not edited for it.
+
+    Invariants: I1 binary spikes between layers, I2 leaky integration, I3 hard
+    threshold, I4 surrogate BPTT -- the scan is the committed
+    `snn.neuron.lif_scan`, driven by a modulated current, so none of the four is
+    in question and no new R10 gate exists to pass.
+
+    **I5 status: NOT RULED.** `k` is `[1, d]` and diagonal in the channel axis,
+    so the *parameters* pass §4.6's "O(1) per neuron, no lateral mixing" test.
+    The *pathway* does not obviously pass its spirit: `DA` is a rank-1 all-to-one-
+    to-all coupling, and although it carries a single scalar rather than a
+    learned `[d, d]`, and although the readout it borrows is the head -- which
+    the invariants already exempt as fp32 and non-spiking -- that is an argument,
+    not a ruling. This class exists so the question can be **priced**, exactly as
+    `TokenShiftCharLM` exists to price token-shift, and every table it appears in
+    labels it a diagnostic. The ruling is Elliot's and `EXP_018` §10 refers it.
+    """
+
+    def __init__(self, *args, da_mode: str = "mult", da_source: str = "rpe",
+                 da_scale: float = 1.1291, da_gain_init: float = 0.0,
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if da_mode not in DA_MODES:
+            raise ValueError(f"da_mode must be one of {DA_MODES}, got {da_mode!r}")
+        if da_source not in DA_SOURCES:
+            raise ValueError(
+                f"da_source must be one of {DA_SOURCES}, got {da_source!r}")
+        if da_scale <= 0.0:
+            raise ValueError(f"da_scale (tau) must be > 0, got {da_scale!r}")
+        self.da_mode = str(da_mode)
+        self.da_source = str(da_source)
+        self.da_scale = float(da_scale)
+        self.da_gain_init = float(da_gain_init)
+
+        d = self.d_model
+        self.k = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(da_gain_init)))
+             for _ in range(self.n_layers)]
+        )
+
+        # Set for the duration of pass 2 only. Not a buffer and not registered:
+        # unlike `NoisyCharLM`'s noise it is *derived* inside the forward from
+        # the batch, so there is no address for a CUDA graph to bake in and
+        # nothing for a checkpoint to carry.
+        self._da: Tensor | None = None
+        self._pass_one = False
+
+    @property
+    def da_active(self) -> bool:
+        """True when this forward pass will modulate anything.
+
+        A property rather than an inline comparison so the model, the tests and
+        the results script agree on what "the dopamine is on" means -- the same
+        reason `NoisyCharLM.noise_active` is one. Note the asymmetry with that
+        arm: there is no `self.training` term here, because this arm exists at
+        inference and `EXP_018` §2 prices it there.
+        """
+        return self.da_source != "off"
+
+    def dopamine_signal(self, idx: Tensor, state: list[Tensor] | None = None) -> Tensor:
+        """`DA` for this batch, `[B, L]` in (-1, 1). Pass 1, exposed for the gates.
+
+        A method rather than an inline block inside `forward` so that the
+        causality gate, the calibration script and any future screen read the
+        quantity the forward pass actually uses instead of each re-deriving it --
+        the same reason `TwoCompartmentCharLM.slow_decay` is a method. The
+        off-by-one this would hide is the one failure of this arm that would
+        still train, so having exactly one implementation of it is not a style
+        preference.
+        """
+        prev_keep, self.keep_spikes = self.keep_spikes, False
+        self._pass_one = True
+        try:
+            with torch.no_grad():
+                logits, _, _ = super().forward(idx, state)
+        finally:
+            self._pass_one = False
+            self.keep_spikes = prev_keep
+        da = dopamine(rpe(logits, idx), self.da_scale)
+        return roll_across_batch(da) if self.da_source == "rolled" else da
+
+    def forward(self, idx: Tensor, state: list[Tensor] | None = None):
+        """`idx` [B, L] -> (logits, new_state, aux), with `aux` from **pass 2**.
+
+        Pass 1 receives the *same* incoming `state` as pass 2 and its returned
+        state is discarded: the two passes are two evaluations of the same window
+        from the same starting membrane, not a two-step recurrence.
+        """
+        if not self.da_active:
+            return super().forward(idx, state)
+        self._da = self.dopamine_signal(idx, state).detach()
+        try:
+            return super().forward(idx, state)
+        finally:
+            # Cleared so that a later call which somehow reaches `_scan` outside
+            # `forward` raises rather than silently reusing a stale batch's
+            # dopamine -- a wrong-but-plausible model, which is the class of bug
+            # this repository treats as the worst one.
+            self._da = None
+
+    def _scan(self, cur: Tensor, v0: Tensor, layer: int) -> tuple[Tensor, Tensor]:
+        if self.da_active and not self._pass_one:
+            if self._da is None:
+                raise RuntimeError(
+                    f"{type(self).__name__} has da_source={self.da_source!r} but "
+                    "no dopamine signal is live. The scan must be reached through "
+                    "forward(), which runs pass 1 first. Training would silently "
+                    "proceed as the Phase-2 baseline and the run would be "
+                    "indistinguishable from a null."
+                )
+            cur = apply_dopamine(cur, self.k[layer], self._da, self.da_mode)
+        return lif_scan(
+            cur,
+            v0,
+            self.beta,
+            self.threshold,
+            self.surrogate_alpha,
+            self.reset,
+            self.fused,
+        )
+
+
+# ---------------------------------------------------------------------------
 # Arm 7: the composition of arms 4 and 6 (EXP_011)
 # ---------------------------------------------------------------------------
 
@@ -1233,7 +1437,7 @@ def build_model(cfg: "Config") -> nn.Module:
 
     arch = cfg.arch
     if arch in ("snn", "analogue", "twocomp", "twocomp_threshold",
-                "twocomp_detach", "tokenshift", "threshold", "noise"):
+                "twocomp_detach", "tokenshift", "threshold", "noise", "dopamine"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -1301,6 +1505,14 @@ def build_model(cfg: "Config") -> nn.Module:
         elif arch == "noise":
             model = NoisyCharLM(noise_amp=cfg.noise_amp, noise_p=cfg.noise_p,
                                 **common)
+        elif arch == "dopamine":
+            # EXP_018. `da_scale` is not re-tuned per arm and `da_gain_init` is
+            # not swept: both are passed through unchanged from the calibration,
+            # which §6 names as a limitation.
+            model = DopamineCharLM(
+                da_mode=cfg.da_mode, da_source=cfg.da_source,
+                da_scale=cfg.da_scale, da_gain_init=cfg.da_gain_init, **common
+            )
         else:
             cls = SpikingCharLM if arch == "snn" else AnalogueCharLM
             model = cls(**common)
@@ -1318,8 +1530,8 @@ def build_model(cfg: "Config") -> nn.Module:
     else:
         raise ValueError(
             "arch must be 'snn', 'analogue', 'twocomp', 'twocomp_threshold', "
-            f"'twocomp_detach', 'tokenshift', 'threshold', 'noise' or 'gru', "
-            f"got {arch!r}"
+            "'twocomp_detach', 'tokenshift', 'threshold', 'noise', 'dopamine' "
+            f"or 'gru', got {arch!r}"
         )
 
     return model.to(cfg.device)
