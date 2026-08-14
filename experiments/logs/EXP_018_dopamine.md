@@ -959,6 +959,40 @@ nominal reach while degrading the characters the model already sees.
    new mutation campaign — R10 is the worst bug class in this project — and
    pricing the signal at all should come before paying for that.
 
+### RULED 2026-08-14 — item 1 is closed
+
+*(Elliot's instruction, after §9 was written and after he had read it. Recorded
+here; the authoritative text is `01_reconnaissance.md` §4.6's extension and
+`04_phase4_interim.md` §8 row 3.)*
+
+**Item 1 — does a rank-1 broadcast from the head violate I5? — is RESOLVED, and
+the answer makes this arm permanently diagnostic.** The boundary is extended
+where the architecture's own cost model already draws the line:
+
+* a modulator driven by the **previous layer's output** is **admitted** — it is
+  computed before that layer's time loop, so it preserves the depth-sequential
+  evaluation and costs O(1) kernels per layer;
+* a modulator driven by the **head** is **not adoptable** — the head is
+  downstream of every layer, so the signal costs a second forward pass. Such arms
+  may still be **built and measured as labelled diagnostics**, which is exactly
+  what this experiment is;
+* a learned `[d, d]` lateral matrix stays forbidden, and §4.6's
+  O(1)-parameters-per-neuron test still applies on top.
+
+**Nothing in this file changes.** §2.4 said "NOT RULED, and this file does not
+rule it", which was true when written and is left standing; §6 item 7 and every
+table's diagnostic label were already correct and are now correct as a matter of
+rule rather than of caution. **The ruling was made after the evidence existed and
+that is stated rather than hidden** — what makes it defensible is that the
+criterion is structural and would read the same had D1 fired the other way.
+
+**What it opens:** a **feedforward** data-dependent modulator — the
+`beta_eff = sigmoid(logit(beta_c) + k_c*g_t)` shape of item 5, driven by layer
+`k-1`'s own spikes rather than by the head — is now a **legal arm** rather than a
+boundary question. `01a_literature_review.md` §4.4 is its standing evidence and
+`EXP_015` says reach is where the gap lives. `snn/dopamine.py`'s
+`apply_dopamine` is written against `cur` and would be reusable unchanged.
+
 ### Added after the run — referrals the results created
 
 *(not pre-registered; created by §9 and marked as such)*

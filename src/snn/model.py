@@ -724,12 +724,15 @@ class TokenShiftCharLM(_CharLMStack):
     the reasons for its shape live in `snn.prescan`; this class is only the
     wiring, exactly as `TwoCompartmentCharLM` is only the wiring for `snn.twocomp`.
 
-    **I5 status: NOT RULED.** Token-shift is one of the three boundary questions
-    `03_phase3_candidates.md` §6.3 referred to Elliot and that remain referred. It
-    passes §4.6's stated O(1)-parameters-per-neuron test and fails its spirit -- an
-    explicit lag index is not neuron state. This class exists so the question can
-    be *priced*; it does not answer it, and every table it appears in labels it a
-    diagnostic.
+    **I5 status: RULED 2026-08-14, and this arm stays DIAGNOSTIC.** Token-shift is
+    one of the boundary questions `03_phase3_candidates.md` §6.3 referred to
+    Elliot; decision #3 was ruled at report rev 12 (`01_reconnaissance.md` §4.6's
+    extension). It passes §4.6's stated O(1)-parameters-per-neuron test and fails
+    its spirit -- an explicit lag index is not neuron state -- and the extension
+    does not rescue it. This class exists so the question could be *priced*, and
+    §6.7 item 2 priced it: dominated by the threshold arm on bits, wall-clock,
+    VRAM and inference cost. Every table it appears in labels it a diagnostic and
+    that is now permanent.
 
     Invariants that are not in question: I1 binary spikes between layers (the scan
     is the committed one), I2 leaky integration, I3 hard threshold, I4 surrogate
@@ -1053,15 +1056,22 @@ class DopamineCharLM(_CharLMStack):
     `snn.neuron.lif_scan`, driven by a modulated current, so none of the four is
     in question and no new R10 gate exists to pass.
 
-    **I5 status: NOT RULED.** `k` is `[1, d]` and diagonal in the channel axis,
-    so the *parameters* pass §4.6's "O(1) per neuron, no lateral mixing" test.
-    The *pathway* does not obviously pass its spirit: `DA` is a rank-1 all-to-one-
-    to-all coupling, and although it carries a single scalar rather than a
-    learned `[d, d]`, and although the readout it borrows is the head -- which
-    the invariants already exempt as fp32 and non-spiking -- that is an argument,
-    not a ruling. This class exists so the question can be **priced**, exactly as
-    `TokenShiftCharLM` exists to price token-shift, and every table it appears in
-    labels it a diagnostic. The ruling is Elliot's and `EXP_018` §10 refers it.
+    **I5 status: RULED 2026-08-14, and this arm is DIAGNOSTIC-ONLY.** `k` is
+    `[1, d]` and diagonal in the channel axis, so the *parameters* pass §4.6's
+    "O(1) per neuron, no lateral mixing" test. The *pathway* is a rank-1
+    all-to-one-to-all coupling, which was the fourth boundary case decision #3
+    had accumulated. Elliot ruled it (`01_reconnaissance.md` §4.6's extension,
+    `04_phase4_interim.md` §8 row 3): a modulator driven by the **previous
+    layer's** output is admitted, because it is computed before that layer's time
+    loop and so preserves the depth-sequential evaluation; one driven by the
+    **head** is **not adoptable**, because the head is downstream of every layer
+    and the signal therefore costs a second forward pass.
+
+    `DA` is head-driven. **So this class may be built and measured -- it is, and
+    `EXP_018` did -- but it is not a candidate for adoption, permanently.** That
+    is the label `EXP_018` gave it in every table before the ruling existed, so
+    nothing about the arm changes; what changed is that the label is now a rule
+    rather than a caution.
     """
 
     def __init__(self, *args, da_mode: str = "mult", da_source: str = "rpe",

@@ -98,6 +98,22 @@ NaN `phi`, hence NaN `DA`, and the NaN propagates into the loss where the run's
 own divergence scan will see it. Clamping it here would hide a divergence behind
 a healthy-looking arm, which is the failure mode `03_phase3_candidates.md` §8
 records.
+
+I5, RULED AFTER THIS FILE WAS WRITTEN
+--------------------------------------
+`EXP_018` pre-registered this arm with I5 **not ruled**, and priced the question
+rather than answering it. Elliot ruled it on 2026-08-14 (`01_reconnaissance.md`
+§4.6's extension, `04_phase4_interim.md` §8 row 3): a modulator driven by the
+**previous layer's** output is admitted, one driven by the **head** is
+**diagnostic-only**, and the line is drawn there because the first preserves the
+depth-sequential evaluation and the second needs a second forward pass.
+
+`DA` is head-driven, so **`DopamineCharLM` is permanently a labelled diagnostic
+and not a candidate for adoption.** Nothing in this file changes as a result --
+it was labelled that way throughout -- and the functions here are deliberately
+written against `cur` rather than against a neuron, so the *admitted* case (a
+per-channel modulator driven by layer `k-1`'s own spikes) could reuse
+`apply_dopamine` unchanged if anyone builds it.
 """
 
 from __future__ import annotations

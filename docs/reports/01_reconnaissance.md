@@ -131,6 +131,39 @@ memory in *state*. It forbids **free-form per-channel FIR kernels over time**
 mixing. This was decided before a line of Phase-2 code was written, precisely so
 it could not be decided by which answer scored better.
 
+**I5 boundary EXTENDED, ratified 2026-08-14 (Elliot's instruction; decision #3 in
+`04_phase4_interim.md` §8).** The 2026-08-01 ruling covers *parameters* and says
+nothing about a modulator whose **driving signal** is a population readout. Four
+arms have since needed that case — token-shift (`EXP_007`), the distilled GRU
+(`EXP_009`), and `EXP_018`'s rank-1 dopamine broadcast — so the boundary is
+extended, and it is drawn where **this architecture's own cost model** already
+draws it rather than on an aesthetic:
+
+* **ADMITTED: a modulator driven by the PREVIOUS LAYER's output.** Layer `k-1`'s
+  activity is already computed before layer `k`'s time loop begins, so such a
+  signal preserves the depth-sequential evaluation (`02a_phase2_spec.md` §0) —
+  `K` GEMMs, one fused kernel per timestep per layer — and costs O(1) kernels per
+  layer. `01a_literature_review.md` §4.4 is the standing evidence: a
+  data-dependent per-neuron leak computed from the feedforward incoming spikes
+  "keeps the state transition diagonal … and introduces no lateral recurrent
+  weight matrix".
+* **FORBIDDEN as an adoptable arm: a modulator driven by the HEAD.** The head is
+  downstream of every layer, so such a signal cannot be supplied inline; it
+  requires a second forward pass, which is a structural cost the architecture was
+  designed to avoid. Arms of this shape may still be **built and measured as
+  labelled diagnostics** — that is what `EXP_018` is — but they are not candidates
+  for adoption.
+* Unchanged: a learned `[d, d]` lateral matrix is forbidden outright, and the
+  O(1)-parameters-per-neuron test still applies on top of this one.
+
+The extension costs the project nothing it wanted: the one head-driven arm ever
+built is **worse than its anchor on every seed at 1.71x the cost** (§17), while
+the feedforward case it admits is the untested lever aimed squarely at the reach
+gap `EXP_015` identified. **It was ruled after those measurements existed and
+that is stated plainly**, unlike the 2026-08-01 boundary; what makes it defensible
+is not blindness to the outcome but that the criterion is structural — it would
+read the same if the dopamine arm had won.
+
 ### 1.4 Corpus decision
 
 **Primary corpus: enwik8, with text8 as a secondary check.** Ratified 2026-08-01.
