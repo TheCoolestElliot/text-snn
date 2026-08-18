@@ -124,6 +124,12 @@ class ChatTrainer:
         self.params = [p for p in self.model.parameters() if p.requires_grad]
         self.description = describe_model(self.model, cfg)
         self.n_params = self.description["params"]
+        #: The timescale profile as BUILT, before any weight is loaded or trained.
+        #: Kept because `_refresh_description` overwrites `slow_pole_tau` in place,
+        #: and "what this run started from" and "what it ended with" are different
+        #: questions -- a run that inherits a parent's spread and one that grew its
+        #: own are indistinguishable from the final profile alone.
+        self.slow_pole_tau_init = self.description.get("slow_pole_tau")
 
         self.lr_tensor: torch.Tensor | None = None
         lr_arg = float(cfg.lr)
@@ -470,6 +476,11 @@ class ChatTrainer:
     def save_checkpoint(self, path) -> None:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
+        # Re-read the timescale profile off the weights being written. Without
+        # this the checkpoint carries the profile from construction or from the
+        # last load -- see `_refresh_description`, which documents the 23
+        # committed artifacts that got this wrong.
+        self._refresh_description()
         ck = {
             "format": 1,
             "kind": "snnchat",
@@ -552,9 +563,26 @@ class ChatTrainer:
         construction, every resumed or `--init-from` checkpoint would carry the
         *initial* spread in its `description` while its weights held a trained
         one, and the artifact would describe a model that never existed.
+
+        THE SAME TRAP, ONE STEP LATER -- fixed 2026-08-17. Until then this was
+        called only from `resume` and `init_from`, i.e. only when weights were
+        *loaded*, and never after they were *trained*. So every `summary.json`
+        and every checkpoint reported the profile at step 0. Measured on the
+        committed tree: 23 chat summaries report their shared parent's step-7,874
+        profile as their own -- identical to two decimals across four training
+        seeds and three corpora, which is the tell -- and `chat-v6-scratch`
+        reports `spread_slow_poles`' pristine 42.32 in all four layers after
+        84,000 steps of training. `save_checkpoint` and the end-of-run summary
+        now call this first, so an artifact describes the weights it ships.
+
+        `slow_pole_tau_init` is carried alongside rather than overwritten:
+        "what it started from" and "what it learned" are both wanted, and the
+        final profile alone cannot separate an inherited spread from a grown one.
         """
         self.description = describe_model(self.model, self.cfg)
         self.n_params = self.description["params"]
+        if getattr(self, "slow_pole_tau_init", None) is not None:
+            self.description["slow_pole_tau_init"] = self.slow_pole_tau_init
 
     def _load_optimizer_state(self, sd: dict) -> None:
         if not self.opt.state:
@@ -641,6 +669,7 @@ class ChatTrainer:
             raise
         self.save_checkpoint(self.run_dir / "ckpt_last.pt")
         final = self._eval_and_report()
+        self._refresh_description()   # the trained profile, not step 0's
         summary = {
             "run_name": cfg.run_name,
             "steps": self.global_step,

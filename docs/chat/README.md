@@ -431,9 +431,12 @@ docs/chat/QUALITY.md       the responsiveness gap: measuring it, and closing it
 docs/chat/QUALITY_v8.md    the echo partition, lambda after it, canned_rate, memory
 docs/chat/QUALITY_v10.md   the decoder made 7x cheaper, n 32->128, steering rejected
 docs/chat/QUALITY_v11.md   coverage is conditioning; 3x less memory, n->256; echo bug
+docs/chat/REGIONAL_NOTE.md where the slow channels are; order vs recency; a fixed defect
 docs/chat/transcript.md    the demo battery's output
 scripts/chat/echo_holdout.py  the held-out paired comparison       (QUALITY_v8 §4)
 scripts/chat/compare_holdout.py  two POOLS, paired per (prompt,seed) (QUALITY_v10 §3)
+scripts/chat/regional_profile.py  per-layer tau and |w|, no GPU    (REGIONAL_NOTE §2)
+scripts/chat/permutation_probe.py order vs recency, no training    (REGIONAL_NOTE §3)
 scripts/chat/subject_frequency.py asked vs seen, per noun         (QUALITY_v11 §1)
 scripts/chat/lambda_dodge.py   does lambda still pay for itself   (QUALITY_v11 §3)
 scripts/chat/lambda_sweep.py  what lambda does now                 (QUALITY_v8 §8)

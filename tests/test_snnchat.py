@@ -517,6 +517,60 @@ def test_neuron_parameters_are_exempt_from_weight_decay(tmp_path, tiny_corpus):
     assert {id(p) for p in trainer.params} == decayed | exempt
 
 
+def test_saved_description_reports_the_weights_it_ships(tmp_path, tiny_corpus):
+    """A checkpoint's `slow_pole_tau` must describe ITS weights, not step 0's.
+
+    The regression this pins, measured on the committed tree 2026-08-17:
+    `_refresh_description` was called only from `resume` and `init_from`, so
+    every `summary.json` and every checkpoint carried the profile from before
+    training. 23 committed chat summaries reported their shared parent's
+    step-7,874 profile as their own -- identical to two decimals across four
+    training seeds and three corpora -- and `chat-v6-scratch` reported
+    `spread_slow_poles`' pristine 42.32 in all four layers after 84,000 steps.
+
+    Written to FAIL against the old code: the mutation below moves the realised
+    tau far outside its initial band, so a stale description cannot coincide
+    with a fresh one.
+    """
+    import math
+
+    import torch
+
+    from snnchat.train import ChatTrainer
+
+    cfg = ChatConfig(
+        data_dir=str(tiny_corpus), d_model=32, n_layers=2, batch_size=4,
+        seq_len=16, device="cpu", cuda_graph=False, out_dir=str(tmp_path),
+        run_name="t", max_steps=1, warmup_steps=1, spread_tau=True,
+        tau_min=3.0, tau_max=600.0,
+    )
+    cfg.mix = {"alpha": 0.5, "beta": 0.5}
+    trainer = ChatTrainer(cfg)
+
+    before = trainer.description["slow_pole_tau"][0]["tau_median"]
+
+    # Drive every slow pole to tau = 1000, which the 3..600 initialisation
+    # cannot produce, so the two profiles are distinguishable by construction.
+    target_tau = 1000.0
+    beta_s = 1.0 - 1.0 / target_tau
+    with torch.no_grad():
+        for raw in trainer.model.beta_s_raw:
+            raw.fill_(math.log(beta_s / (1.0 - beta_s)))
+
+    trainer.save_checkpoint(tmp_path / "ck.pt")
+    ck = torch.load(tmp_path / "ck.pt", map_location="cpu", weights_only=False)
+    after = ck["description"]["slow_pole_tau"][0]["tau_median"]
+
+    assert after == pytest.approx(target_tau, rel=1e-3), (
+        f"checkpoint reports tau_median {after}, but its weights hold "
+        f"{target_tau}. The description was not re-read before saving."
+    )
+    assert after != pytest.approx(before, rel=1e-3)
+
+    # And the run must still be able to say what it started from.
+    assert ck["description"]["slow_pole_tau_init"][0]["tau_median"] == before
+
+
 def test_weight_decay_would_collapse_an_unprotected_slow_pole():
     """The arithmetic, so the claim above is checkable without a training run.
 
