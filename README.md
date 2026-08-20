@@ -23,16 +23,20 @@ mechanisms actually close it?**
 | Arms adopted | **2** — the two-compartment neuron, and the learned per-channel threshold (standalone) |
 | Arms recommended but *not* taken | 1 — the composition, provisional at n = 2 |
 | Open decisions | **6 of 11**, all the author's (§8 of the Phase-4 report). #3 — the I5 boundary — was ruled 2026-08-14 |
-| Budget | ~15.8 of ~30 GPU-hours spent |
+| Budget | ~19.7 of ~30 GPU-hours spent |
 
 Two consequences worth stating before anyone reads a number out of this
 repository:
 
 * **Nothing here is a recommendation to adopt anything you have not been shown
-  the caveats for.** Three arms have beaten the baseline; two are adopted. The
+  the caveats for.** Four arms have beaten the baseline; two are adopted. The
   third — the composition — is provisional and the reports say so in every place
   it appears. The threshold arm's own headline still carries the `W1 fails`
-  caveat until decision #6 is ruled.
+  caveat until decision #6 is ruled. The fourth is `EXP_021`'s feedforward
+  modulator (§19), which beats its anchor by 0.034 bpc on 3 of 3 seeds — and
+  whose own misaligned control beats it by 0.028, so what is established is that
+  a learned rank-1 time-varying gain pays, **not** that a prediction error is
+  why. It is not adopted and not proposed for adoption.
 * **The composition result is provisional at n = 2** of a pre-registered 3. One
   seed diverged, and it was **not** replaced — replacing it would have removed a
   failure from the record.

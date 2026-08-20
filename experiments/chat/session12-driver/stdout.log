@@ -3,3 +3,15 @@
 corpus ok: stories_topic_rare present among 15 sources
 
 [chat-v12-rare] $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v12-rare --out-dir experiments/chat --mix stories_topic_rare=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --eval-every 3500 --sample-every 3500 --log-every 250 --seed 0
+[chat-v12-rare] done in 40.0 min
+
+[chat-v12-rare-s1] $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v12-rare-s1 --out-dir experiments/chat --mix stories_topic_rare=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --eval-every 3500 --sample-every 3500 --log-every 250 --seed 1
+[chat-v12-rare-s1] done in 40.4 min
+
+[chat-v12-rare-s2] $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v12-rare-s2 --out-dir experiments/chat --mix stories_topic_rare=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --eval-every 3500 --sample-every 3500 --log-every 250 --seed 2
+[chat-v12-rare-s2] done in 39.5 min
+
+[chat-v12-rare-s3] $ C:\Users\Ellio\AppData\Local\Programs\Python\Python314\python.exe scripts/chat/train.py --run-name chat-v12-rare-s3 --out-dir experiments/chat --mix stories_topic_rare=0.40 soda=0.20 alpaca=0.15 tinystories=0.09 persona=0.08 dolly=0.06 oasst1=0.02 --init-from experiments/chat/chat-v2-anneal/ckpt_best.pt --max-steps 14000 --bot-loss-weight 3.0 --align-frac 0.75 --align-lookahead 1024 --batch-size 160 --seq-len 256 --lr 0.0005 --warmup-steps 200 --eval-batches 30 --eval-every 3500 --sample-every 3500 --log-every 250 --seed 3
+[chat-v12-rare-s3] done in 39.9 min
+
+all seeds done; score with scripts/chat/score_v12.py

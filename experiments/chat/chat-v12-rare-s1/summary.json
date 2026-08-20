@@ -1,0 +1,50 @@
+{
+  "run_name": "chat-v12-rare-s1",
+  "steps": 14000,
+  "params": 4417637,
+  "wall_clock_s": 2420.44,
+  "peak_vram_gib": 3.831,
+  "val": {
+    "alpaca": 1.6709344207275527,
+    "dolly": 1.9406899411245662,
+    "oasst1": 1.8853690283536257,
+    "persona": 0.2323981209828781,
+    "soda": 1.1951812405120608,
+    "stories_topic_rare": 1.0483467145532994,
+    "tinystories": 1.0545710743458776,
+    "weighted": 1.1766671204371706
+  },
+  "description": {
+    "params": 4417637,
+    "d_model": 1024,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 1.39,
+        "tau_median": 2.7,
+        "tau_max": 8507.72
+      },
+      {
+        "layer": 1,
+        "tau_min": 1.07,
+        "tau_median": 13.21,
+        "tau_max": 2975.74
+      },
+      {
+        "layer": 2,
+        "tau_min": 1.1,
+        "tau_median": 10.05,
+        "tau_max": 428.25
+      },
+      {
+        "layer": 3,
+        "tau_min": 1.01,
+        "tau_median": 7.3,
+        "tau_max": 329.18
+      }
+    ]
+  }
+}

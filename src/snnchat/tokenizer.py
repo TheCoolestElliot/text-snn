@@ -65,7 +65,7 @@ SPECIALS: tuple[str, ...] = ("<|bos|>", "<|user|>", "<|bot|>", "<|eot|>")
 
 #: The character alphabet, in id order after the specials. Printable ASCII from
 #: space to `~`, plus newline and tab. Deliberately closed and deliberately
-#: small: 98 characters + 4 markers = 102 ids, half the research corpus's 205,
+#: small: 97 characters + 4 markers = 101 ids, half the research corpus's 205,
 #: which halves the softmax and the embedding for a model this size.
 #:
 #: Carriage return is absent on purpose -- `normalise_text` folds CRLF to LF, so

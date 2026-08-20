@@ -1,0 +1,478 @@
+
+[wide]
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v12-rare.json
+
+held-out topics, 20 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0028  (1/360)  95% CI [0.0005, 0.0156]
+  + echo partition : 0.2000  (72/360)  95% CI [0.1619, 0.2444]
+  oracle over pool : 0.2167  (78/360)
+  discordant pairs : echo-only 71, shipped-only 0   McNemar p = 0.00000
+  selection changed on 345/360 draws
+  mean chars 275.8 -> 280.4
+  mean per-char logp -0.2111 -> -0.3443
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v12-rare.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s1/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v12-rare-s1.json
+
+held-out topics, 20 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.1917  (69/360)  95% CI [0.1543, 0.2355]
+  oracle over pool : 0.2000  (72/360)
+  discordant pairs : echo-only 69, shipped-only 0   McNemar p = 0.00000
+  selection changed on 342/360 draws
+  mean chars 278.2 -> 279.1
+  mean per-char logp -0.2091 -> -0.3525
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v12-rare-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s2/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v12-rare-s2.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.1861  (67/360)  95% CI [0.1493, 0.2296]
+  oracle over pool : 0.1889  (68/360)
+  discordant pairs : echo-only 67, shipped-only 0   McNemar p = 0.00000
+  selection changed on 339/360 draws
+  mean chars 277.9 -> 279.0
+  mean per-char logp -0.2070 -> -0.3578
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v12-rare-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s3/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v12-rare-s3.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.1944  (70/360)  95% CI [0.1569, 0.2385]
+  oracle over pool : 0.2028  (73/360)
+  discordant pairs : echo-only 70, shipped-only 0   McNemar p = 0.00000
+  selection changed on 321/360 draws
+  mean chars 277.3 -> 279.9
+  mean per-char logp -0.2071 -> -0.3469
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v12-rare-s3.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v3d-aligned.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.1917  (69/360)  95% CI [0.1543, 0.2355]
+  oracle over pool : 0.1944  (70/360)
+  discordant pairs : echo-only 69, shipped-only 0   McNemar p = 0.00000
+  selection changed on 331/360 draws
+  mean chars 278.2 -> 278.3
+  mean per-char logp -0.2102 -> -0.3508
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v3d-aligned.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v3d-aligned-s1.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.2278  (82/360)  95% CI [0.1875, 0.2738]
+  oracle over pool : 0.2417  (87/360)
+  discordant pairs : echo-only 82, shipped-only 0   McNemar p = 0.00000
+  selection changed on 350/360 draws
+  mean chars 276.5 -> 278.8
+  mean per-char logp -0.2139 -> -0.3634
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v3d-aligned-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v3d-aligned-s2.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.1806  (65/360)  95% CI [0.1443, 0.2236]
+  oracle over pool : 0.1861  (67/360)
+  discordant pairs : echo-only 65, shipped-only 0   McNemar p = 0.00000
+  selection changed on 334/360 draws
+  mean chars 275.7 -> 277.9
+  mean per-char logp -0.2040 -> -0.3584
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v3d-aligned-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt --set wide --seeds 6 --n 256 --out experiments\chat\_quality\v12_wide_chat-v3d-aligned-s3.json
+
+wide topics, 60 prompts x 6 seeds = 360 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/360)  95% CI [0.0000, 0.0106]
+  + echo partition : 0.2472  (89/360)  95% CI [0.2055, 0.2943]
+  oracle over pool : 0.2528  (91/360)
+  discordant pairs : echo-only 89, shipped-only 0   McNemar p = 0.00000
+  selection changed on 326/360 draws
+  mean chars 276.4 -> 276.9
+  mean per-char logp -0.2101 -> -0.3549
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_wide_chat-v3d-aligned-s3.json
+
+[heldout]
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v12-rare.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.4667  (56/120)  95% CI [0.3798, 0.5556]
+  oracle over pool : 0.5083  (61/120)
+  discordant pairs : echo-only 56, shipped-only 0   McNemar p = 0.00000
+  selection changed on 118/120 draws
+  mean chars 276.4 -> 279.0
+  mean per-char logp -0.2118 -> -0.3333
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v12-rare.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s1/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v12-rare-s1.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.5250  (63/120)  95% CI [0.4363, 0.6122]
+  oracle over pool : 0.5417  (65/120)
+  discordant pairs : echo-only 63, shipped-only 0   McNemar p = 0.00000
+  selection changed on 117/120 draws
+  mean chars 278.1 -> 278.6
+  mean per-char logp -0.2112 -> -0.3354
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v12-rare-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s2/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v12-rare-s2.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.4250  (51/120)  95% CI [0.3402, 0.5144]
+  oracle over pool : 0.5000  (60/120)
+  discordant pairs : echo-only 51, shipped-only 0   McNemar p = 0.00000
+  selection changed on 114/120 draws
+  mean chars 280.1 -> 277.4
+  mean per-char logp -0.2067 -> -0.3429
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v12-rare-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s3/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v12-rare-s3.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0083  (1/120)  95% CI [0.0015, 0.0457]
+  + echo partition : 0.4083  (49/120)  95% CI [0.3246, 0.4978]
+  oracle over pool : 0.4750  (57/120)
+  discordant pairs : echo-only 48, shipped-only 0   McNemar p = 0.00000
+  selection changed on 107/120 draws
+  mean chars 279.6 -> 281.3
+  mean per-char logp -0.2084 -> -0.3308
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v12-rare-s3.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v3d-aligned.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0167  (2/120)  95% CI [0.0046, 0.0587]
+  + echo partition : 0.5000  (60/120)  95% CI [0.4119, 0.5881]
+  oracle over pool : 0.5500  (66/120)
+  discordant pairs : echo-only 58, shipped-only 0   McNemar p = 0.00000
+  selection changed on 117/120 draws
+  mean chars 276.3 -> 277.1
+  mean per-char logp -0.2121 -> -0.3436
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v3d-aligned.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s1.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0083  (1/120)  95% CI [0.0015, 0.0457]
+  + echo partition : 0.4750  (57/120)  95% CI [0.3878, 0.5637]
+  oracle over pool : 0.5333  (64/120)
+  discordant pairs : echo-only 56, shipped-only 0   McNemar p = 0.00000
+  selection changed on 113/120 draws
+  mean chars 278.0 -> 279.1
+  mean per-char logp -0.2129 -> -0.3452
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s2.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.4917  (59/120)  95% CI [0.4039, 0.5800]
+  oracle over pool : 0.5333  (64/120)
+  discordant pairs : echo-only 59, shipped-only 0   McNemar p = 0.00000
+  selection changed on 108/120 draws
+  mean chars 273.7 -> 278.2
+  mean per-char logp -0.2048 -> -0.3362
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt --set heldout --seeds 6 --n 256 --out experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s3.json
+
+heldout topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.5000  (60/120)  95% CI [0.4119, 0.5881]
+  oracle over pool : 0.5583  (67/120)
+  discordant pairs : echo-only 60, shipped-only 0   McNemar p = 0.00000
+  selection changed on 114/120 draws
+  mean chars 276.4 -> 278.1
+  mean per-char logp -0.2155 -> -0.3385
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_heldout_chat-v3d-aligned-s3.json
+
+[fresh]
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v12-rare.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1250  (15/120)  95% CI [0.0772, 0.1960]
+  oracle over pool : 0.1333  (16/120)
+  discordant pairs : echo-only 15, shipped-only 0   McNemar p = 0.00006
+  selection changed on 119/120 draws
+  mean chars 279.5 -> 278.5
+  mean per-char logp -0.2117 -> -0.3494
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v12-rare.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s1/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v12-rare-s1.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1417  (17/120)  95% CI [0.0904, 0.2152]
+  oracle over pool : 0.1583  (19/120)
+  discordant pairs : echo-only 17, shipped-only 0   McNemar p = 0.00002
+  selection changed on 117/120 draws
+  mean chars 281.2 -> 280.6
+  mean per-char logp -0.2077 -> -0.3506
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v12-rare-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s2/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v12-rare-s2.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1333  (16/120)  95% CI [0.0838, 0.2056]
+  oracle over pool : 0.1417  (17/120)
+  discordant pairs : echo-only 16, shipped-only 0   McNemar p = 0.00003
+  selection changed on 112/120 draws
+  mean chars 277.9 -> 277.8
+  mean per-char logp -0.2088 -> -0.3503
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v12-rare-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v12-rare-s3/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v12-rare-s3.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1833  (22/120)  95% CI [0.1243, 0.2620]
+  oracle over pool : 0.1917  (23/120)
+  discordant pairs : echo-only 22, shipped-only 0   McNemar p = 0.00000
+  selection changed on 112/120 draws
+  mean chars 278.4 -> 278.3
+  mean per-char logp -0.2095 -> -0.3556
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v12-rare-s3.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v3d-aligned.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.2083  (25/120)  95% CI [0.1453, 0.2895]
+  oracle over pool : 0.2083  (25/120)
+  discordant pairs : echo-only 25, shipped-only 0   McNemar p = 0.00000
+  selection changed on 115/120 draws
+  mean chars 277.9 -> 279.6
+  mean per-char logp -0.2093 -> -0.3539
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v3d-aligned.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s1.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1667  (20/120)  95% CI [0.1106, 0.2435]
+  oracle over pool : 0.1750  (21/120)
+  discordant pairs : echo-only 20, shipped-only 0   McNemar p = 0.00000
+  selection changed on 113/120 draws
+  mean chars 278.4 -> 281.6
+  mean per-char logp -0.2185 -> -0.3555
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s1.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s2.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.1917  (23/120)  95% CI [0.1312, 0.2712]
+  oracle over pool : 0.2083  (25/120)
+  discordant pairs : echo-only 23, shipped-only 0   McNemar p = 0.00000
+  selection changed on 113/120 draws
+  mean chars 276.0 -> 278.1
+  mean per-char logp -0.2090 -> -0.3511
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s2.json
+    $ scripts/chat/echo_holdout.py --ckpt experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt --set fresh --seeds 6 --n 256 --out experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s3.json
+
+fresh topics, 20 prompts x 6 seeds = 120 draws, n=256 lambda=0.6
+  shipped selector : 0.0000  (0/120)  95% CI [0.0000, 0.0310]
+  + echo partition : 0.2000  (24/120)  95% CI [0.1382, 0.2804]
+  oracle over pool : 0.2167  (26/120)
+  discordant pairs : echo-only 24, shipped-only 0   McNemar p = 0.00000
+  selection changed on 110/120 draws
+  mean chars 276.8 -> 279.5
+  mean per-char logp -0.2111 -> -0.3449
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_fresh_chat-v3d-aligned-s3.json
+
+[story_dodge]
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v12-rare/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v12-rare.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0972 (7/72)  95% CI [0.0479, 0.1874]
+    lambda=0   dodge 0.1250 (9/72)  95% CI [0.0672, 0.2208]
+    lambda fixes 2, lambda breaks 0   McNemar p = 0.50000
+    lambda changed the pick on 29/72 draws
+    mean per-char logp -0.4451 (0) -> -0.5697 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0000 (0/72)  95% CI [0.0000, 0.0507]
+    lambda=0   dodge 0.2917 (21/72)  95% CI [0.1994, 0.4051]
+    lambda fixes 21, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 72/72 draws
+    mean per-char logp -0.1782 (0) -> -0.6682 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v12-rare.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v12-rare-s1/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v12-rare-s1.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.1389 (10/72)  95% CI [0.0772, 0.2371]
+    lambda=0   dodge 0.1667 (12/72)  95% CI [0.0980, 0.2691]
+    lambda fixes 3, lambda breaks 1   McNemar p = 0.62500
+    lambda changed the pick on 22/72 draws
+    mean per-char logp -0.5777 (0) -> -0.6750 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0694 (5/72)  95% CI [0.0300, 0.1525]
+    lambda=0   dodge 0.3611 (26/72)  95% CI [0.2598, 0.4765]
+    lambda fixes 22, lambda breaks 1   McNemar p = 0.00001
+    lambda changed the pick on 72/72 draws
+    mean per-char logp -0.1976 (0) -> -0.6170 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v12-rare-s1.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v12-rare-s2/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v12-rare-s2.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0278 (2/72)  95% CI [0.0077, 0.0957]
+    lambda=0   dodge 0.0556 (4/72)  95% CI [0.0218, 0.1343]
+    lambda fixes 2, lambda breaks 0   McNemar p = 0.50000
+    lambda changed the pick on 28/72 draws
+    mean per-char logp -0.4950 (0) -> -0.6501 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0000 (0/72)  95% CI [0.0000, 0.0507]
+    lambda=0   dodge 0.4028 (29/72)  95% CI [0.2972, 0.5182]
+    lambda fixes 29, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 69/72 draws
+    mean per-char logp -0.1851 (0) -> -0.7256 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v12-rare-s2.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v12-rare-s3/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v12-rare-s3.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0417 (3/72)  95% CI [0.0143, 0.1155]
+    lambda=0   dodge 0.0556 (4/72)  95% CI [0.0218, 0.1343]
+    lambda fixes 1, lambda breaks 0   McNemar p = 1.00000
+    lambda changed the pick on 28/72 draws
+    mean per-char logp -0.5438 (0) -> -0.6804 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0000 (0/72)  95% CI [0.0000, 0.0507]
+    lambda=0   dodge 0.3056 (22/72)  95% CI [0.2113, 0.4195]
+    lambda fixes 22, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 72/72 draws
+    mean per-char logp -0.1896 (0) -> -0.7338 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v12-rare-s3.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v3d-aligned/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v3d-aligned.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0972 (7/72)  95% CI [0.0479, 0.1874]
+    lambda=0   dodge 0.1806 (13/72)  95% CI [0.1087, 0.2848]
+    lambda fixes 6, lambda breaks 0   McNemar p = 0.03125
+    lambda changed the pick on 26/72 draws
+    mean per-char logp -0.5164 (0) -> -0.6139 (0.6)
+    verdict for lambda: above
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0000 (0/72)  95% CI [0.0000, 0.0507]
+    lambda=0   dodge 0.3333 (24/72)  95% CI [0.2353, 0.4482]
+    lambda fixes 24, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 67/72 draws
+    mean per-char logp -0.1912 (0) -> -0.6678 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v3d-aligned.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s1.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.1111 (8/72)  95% CI [0.0574, 0.2042]
+    lambda=0   dodge 0.1389 (10/72)  95% CI [0.0772, 0.2371]
+    lambda fixes 3, lambda breaks 1   McNemar p = 0.62500
+    lambda changed the pick on 28/72 draws
+    mean per-char logp -0.5204 (0) -> -0.6147 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0139 (1/72)  95% CI [0.0025, 0.0746]
+    lambda=0   dodge 0.4028 (29/72)  95% CI [0.2972, 0.5182]
+    lambda fixes 29, lambda breaks 1   McNemar p = 0.00000
+    lambda changed the pick on 71/72 draws
+    mean per-char logp -0.1845 (0) -> -0.6835 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s1.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s2.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0833 (6/72)  95% CI [0.0388, 0.1701]
+    lambda=0   dodge 0.1389 (10/72)  95% CI [0.0772, 0.2371]
+    lambda fixes 4, lambda breaks 0   McNemar p = 0.12500
+    lambda changed the pick on 26/72 draws
+    mean per-char logp -0.5333 (0) -> -0.6310 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0000 (0/72)  95% CI [0.0000, 0.0507]
+    lambda=0   dodge 0.5556 (40/72)  95% CI [0.4409, 0.6646]
+    lambda fixes 40, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 69/72 draws
+    mean per-char logp -0.1968 (0) -> -0.7085 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s2.json
+    $ scripts/chat/lambda_dodge.py --ckpt experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt --seeds 6 --n 256 --out experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s3.json
+
+story_dodge on 12 non-narrative probes x 6 seeds = 72 draws, n=256
+
+  echo ON  (what the REPL does)
+    lambda=0.6 dodge 0.0972 (7/72)  95% CI [0.0479, 0.1874]
+    lambda=0   dodge 0.1250 (9/72)  95% CI [0.0672, 0.2208]
+    lambda fixes 3, lambda breaks 1   McNemar p = 0.62500
+    lambda changed the pick on 19/72 draws
+    mean per-char logp -0.5796 (0) -> -0.6718 (0.6)
+    verdict for lambda: unresolved
+
+  echo OFF (the regime 0.6 was chosen in)
+    lambda=0.6 dodge 0.0139 (1/72)  95% CI [0.0025, 0.0746]
+    lambda=0   dodge 0.3333 (24/72)  95% CI [0.2353, 0.4482]
+    lambda fixes 23, lambda breaks 0   McNemar p = 0.00000
+    lambda changed the pick on 71/72 draws
+    mean per-char logp -0.1781 (0) -> -0.6936 (0.6)
+    verdict for lambda: above
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\v12_dodge_chat-v3d-aligned-s3.json
+
+==============================================================================
+PRE-REGISTERED BARS (PREDICTION_v12.md §2, transcribed not recomputed)
+==============================================================================
+  P16 wide oracle        291/1440 = 0.2021  95% CI [0.1821, 0.2236]  bar 150.5/1440 = 0.10451 (min)  -> PASS
+  P18 heldout guard      243/480 = 0.5062  95% CI [0.4617, 0.5507]  bar 216.5/480 = 0.45104 (min)  -> PASS
+  P19 story_dodge guard  22/288 = 0.0764  95% CI [0.0510, 0.1129]  bar 72.5/288 = 0.25174 (max)  -> PASS
+
+P17 paired, BOTH gates must clear p < 0.05:
+  wide     draws +152/-176 p=0.20403   prompts +16/-25 p=0.21102 (floor 0.00000)   -> unresolved
+  heldout  draws +36/-54 p=0.07255   prompts +4/-6 p=0.75391 (floor 0.00195)   -> unresolved
+  fresh    draws +13/-35 p=0.00209   prompts +2/-7 p=0.17969 (floor 0.00391)   -> unresolved
+
+wrote C:\Elliot's Stuff\SNN\Text SNN\experiments\chat\_quality\score_v12.json
