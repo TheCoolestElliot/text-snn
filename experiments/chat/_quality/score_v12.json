@@ -1,0 +1,308 @@
+{
+  "arm": "chat-v12-rare",
+  "control": "chat-v3d-aligned",
+  "seeds": 4,
+  "holdout_seeds": 6,
+  "n": 256,
+  "sets": {
+    "wide": {
+      "oracle_hit": {
+        "arm": {
+          "k": 291,
+          "n": 1440,
+          "rate": 0.2021,
+          "se": 0.0106,
+          "ci_low": 0.1821,
+          "ci_high": 0.2236,
+          "lattice": 0.00069,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 315,
+          "n": 1440,
+          "rate": 0.2188,
+          "se": 0.0109,
+          "ci_low": 0.1982,
+          "ci_high": 0.2408,
+          "lattice": 0.00069,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 152,
+          "draw_worse": 176,
+          "draw_p": 0.20402785144567576,
+          "prompt_better": 16,
+          "prompt_worse": 25,
+          "prompt_p": 0.21102359760880063,
+          "prompts": 60,
+          "prompt_p_floor": 9.094947017729282e-13
+        },
+        "per_seed_arm": [
+          78,
+          72,
+          68,
+          73
+        ],
+        "per_seed_control": [
+          70,
+          87,
+          67,
+          91
+        ]
+      },
+      "echo_hit": {
+        "arm": {
+          "k": 278,
+          "n": 1440,
+          "rate": 0.1931,
+          "se": 0.0104,
+          "ci_low": 0.1735,
+          "ci_high": 0.2142,
+          "lattice": 0.00069,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 305,
+          "n": 1440,
+          "rate": 0.2118,
+          "se": 0.0108,
+          "ci_low": 0.1915,
+          "ci_high": 0.2337,
+          "lattice": 0.00069,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 149,
+          "draw_worse": 176,
+          "draw_p": 0.14912769295275916,
+          "prompt_better": 16,
+          "prompt_worse": 26,
+          "prompt_p": 0.16414940178310644,
+          "prompts": 60,
+          "prompt_p_floor": 4.547473508864641e-13
+        },
+        "per_seed_arm": [
+          72,
+          69,
+          67,
+          70
+        ],
+        "per_seed_control": [
+          69,
+          82,
+          65,
+          89
+        ]
+      }
+    },
+    "heldout": {
+      "oracle_hit": {
+        "arm": {
+          "k": 243,
+          "n": 480,
+          "rate": 0.5062,
+          "se": 0.0228,
+          "ci_low": 0.4617,
+          "ci_high": 0.5507,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 261,
+          "n": 480,
+          "rate": 0.5437,
+          "se": 0.0227,
+          "ci_low": 0.499,
+          "ci_high": 0.5878,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 36,
+          "draw_worse": 54,
+          "draw_p": 0.07254953219246181,
+          "prompt_better": 4,
+          "prompt_worse": 6,
+          "prompt_p": 0.75390625,
+          "prompts": 20,
+          "prompt_p_floor": 0.001953125
+        },
+        "per_seed_arm": [
+          61,
+          65,
+          60,
+          57
+        ],
+        "per_seed_control": [
+          66,
+          64,
+          64,
+          67
+        ]
+      },
+      "echo_hit": {
+        "arm": {
+          "k": 219,
+          "n": 480,
+          "rate": 0.4562,
+          "se": 0.0227,
+          "ci_low": 0.4122,
+          "ci_high": 0.501,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 236,
+          "n": 480,
+          "rate": 0.4917,
+          "se": 0.0228,
+          "ci_low": 0.4472,
+          "ci_high": 0.5363,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 36,
+          "draw_worse": 53,
+          "draw_p": 0.08932073673118934,
+          "prompt_better": 5,
+          "prompt_worse": 8,
+          "prompt_p": 0.5810546875,
+          "prompts": 20,
+          "prompt_p_floor": 0.000244140625
+        },
+        "per_seed_arm": [
+          56,
+          63,
+          51,
+          49
+        ],
+        "per_seed_control": [
+          60,
+          57,
+          59,
+          60
+        ]
+      }
+    },
+    "fresh": {
+      "oracle_hit": {
+        "arm": {
+          "k": 75,
+          "n": 480,
+          "rate": 0.1562,
+          "se": 0.0166,
+          "ci_low": 0.1265,
+          "ci_high": 0.1914,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 97,
+          "n": 480,
+          "rate": 0.2021,
+          "se": 0.0183,
+          "ci_low": 0.1686,
+          "ci_high": 0.2403,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 13,
+          "draw_worse": 35,
+          "draw_p": 0.0020881073339964473,
+          "prompt_better": 2,
+          "prompt_worse": 7,
+          "prompt_p": 0.1796875,
+          "prompts": 20,
+          "prompt_p_floor": 0.00390625
+        },
+        "per_seed_arm": [
+          16,
+          19,
+          17,
+          23
+        ],
+        "per_seed_control": [
+          25,
+          21,
+          25,
+          26
+        ]
+      },
+      "echo_hit": {
+        "arm": {
+          "k": 70,
+          "n": 480,
+          "rate": 0.1458,
+          "se": 0.0161,
+          "ci_low": 0.1171,
+          "ci_high": 0.1802,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "control": {
+          "k": 92,
+          "n": 480,
+          "rate": 0.1917,
+          "se": 0.018,
+          "ci_low": 0.159,
+          "ci_high": 0.2293,
+          "lattice": 0.00208,
+          "z": 1.959963984540054
+        },
+        "paired": {
+          "draw_better": 18,
+          "draw_worse": 40,
+          "draw_p": 0.005354859650800292,
+          "prompt_better": 2,
+          "prompt_worse": 8,
+          "prompt_p": 0.109375,
+          "prompts": 20,
+          "prompt_p_floor": 0.001953125
+        },
+        "per_seed_arm": [
+          15,
+          17,
+          16,
+          22
+        ],
+        "per_seed_control": [
+          25,
+          20,
+          23,
+          24
+        ]
+      }
+    }
+  },
+  "story_dodge": {
+    "arm_k": 22,
+    "arm_n": 288,
+    "control_k": 28,
+    "control_n": 288
+  },
+  "thresholds": {
+    "P16_wide_oracle": [
+      150.5,
+      1440,
+      "min"
+    ],
+    "P18_heldout_oracle": [
+      216.5,
+      480,
+      "min"
+    ],
+    "P19_story_dodge": [
+      72.5,
+      288,
+      "max"
+    ]
+  },
+  "verdicts": {
+    "P16": "above",
+    "P18": "above",
+    "P19": "below",
+    "P17": "unresolved"
+  }
+}

@@ -19,7 +19,7 @@ so the mix is realised per batch element rather than per file.
 
 WHAT A "CHARACTER" COSTS
 ------------------------
-Ids are packed as `uint8`, which the 102-symbol vocabulary fits with room to
+Ids are packed as `uint8`, which the 101-symbol vocabulary fits with room to
 spare, so the on-disk size is the character count exactly and a memmap is a
 pure slice with no decode step -- the same property `snn.data` engineers for and
 for the same reason.

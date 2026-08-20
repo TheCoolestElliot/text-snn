@@ -369,8 +369,8 @@ def main() -> int:
 
     steer_note = (f" steer={args.steer_every}/{args.steer_frac:g}"
                   if args.steer_every else "")
-    print(f"\nheld-out topics, {len(HELDOUT)} prompts x {args.seeds} seeds = {n} draws, "
-          f"n={args.n} lambda={args.lam}{steer_note}")
+    print(f"\n{args.probe_set} topics, {len(probes)} prompts x {args.seeds} seeds "
+          f"= {n} draws, n={args.n} lambda={args.lam}{steer_note}")
     print(f"  shipped selector : {nb/n:.4f}  ({int(nb)}/{n})  95% CI [{lo_b:.4f}, {hi_b:.4f}]")
     print(f"  + echo partition : {ne/n:.4f}  ({int(ne)}/{n})  95% CI [{lo_e:.4f}, {hi_e:.4f}]")
     print(f"  oracle over pool : {no/n:.4f}  ({int(no)}/{n})")
