@@ -346,12 +346,69 @@ class Candidate:
     def expected_zero(self) -> list:
         return sorted(set(self.derived_zero) | set(self.post_hoc_zero))
 
+    def linear_at(self, model, k: int):
+        """Layer `k`'s input projection, or None if it has none.
+
+        `EXP_020`'s folded arm removes layer 0's GEMM outright -- that removal
+        IS the arm -- so `model.layers` holds K-1 projections indexed from
+        layer 1. Every other arm keeps K, indexed by layer. Reported as
+        `present: False` rather than as a zero, because "this layer has no
+        projection" and "this layer's projection has no gradient" are different
+        facts and only the second is a finding.
+        """
+        folded = getattr(model, "fold", False)
+        if folded:
+            return None if k == 0 else model.layers[k - 1]
+        return model.layers[k]
+
+    def param_at(self, model, name: str, k: int):
+        """The tensor `name` holds for layer `k`, or None if it holds none.
+
+        The screen's original loop assumed every new parameter is a
+        `ParameterList` with one entry per layer, which is true of every
+        candidate up to EXP_018 and of neither candidate after it:
+        `localdopamine` carries K-1 modulators because layer 0 has no previous
+        layer, and `interface`'s input table is one tensor for the whole model.
+        Returning None is the honest answer for "this layer has no such
+        parameter", and `_grad_stats(None)` already renders it as
+        `present: False` -- which is NOT the same as `exactly_zero`, and the
+        zero-leg only fires on the latter.
+        """
+        if self.arch == "localdopamine":
+            # layers 1..K-1 are modulated; the lists are indexed by k-1
+            if k == 0:
+                return None
+            # EXP_023's ladder allocates per RUNG -- `const` carries no
+            # predictor and `pos` carries a positional table instead of one --
+            # so a name this rung does not have is `present: False` and NOT an
+            # exactly-zero gradient. Only the second is a finding, and reporting
+            # an absent parameter as a zero would manufacture a saddle.
+            lst = getattr(model, name, None)
+            return None if lst is None or len(lst) == 0 else lst[k - 1]
+        if self.arch == "interface":
+            # one tensor for the whole model, attributed to layer 0 -- the layer
+            # whose current it forms -- rather than repeated at every layer
+            if k != 0:
+                return None
+            if name == "code.shadow":
+                return None if model.code is None else model.code.shadow
+            return getattr(model, name, None)
+        return getattr(model, name)[k]
+
     @property
     def param_names(self) -> tuple:
         if self.arch == "twocomp":
             return ("w", "beta_s_raw")
         if self.arch == "dopamine":
             return ("k",)
+        if self.arch == "localdopamine":
+            return ("nm_gain", "nm_a", "nm_b", "nm_log_tau", "nm_pos")
+        if self.arch == "interface":
+            # Only the parameters the switches ADD. `table` replaces the
+            # embedding rather than adding to it, and is screened for the same
+            # reason: at the fold it is the ONLY thing between a token and a
+            # membrane, so an unreachable one would be silent.
+            return ("code.shadow", "table", "table_bias")
         return tuple(name for name, _ in self.params)
 
 
@@ -492,6 +549,116 @@ CANDIDATES = [
                    "itself drops out of the additive form, so this leg is reachable "
                    "wherever DA is nonzero even in a channel whose current is 0",
     ),
+    # -- EXP_020, through the real arch --------------------------------------
+    Candidate(
+        "iface_fold", "EXP_020 folded input table", "T ~ N(0, 1/3)",
+        params=(), scan=None, arch="interface",
+        cfg_overrides={"iface_fold": True},
+        derivation="the folded table IS layer 0's current, so dL/dT[v] is the "
+                   "sum of dL/dcur over every position holding token v -- the "
+                   "same path the embedding had, one GEMM shorter. Reachable "
+                   "unless a token never occurs in the batch, which is a "
+                   "sampling property and not a saddle.",
+    ),
+    Candidate(
+        "iface_binary", "EXP_020 binary input code", "shadow ~ N(0,1), thr_in = 0",
+        params=(), scan=None, arch="interface",
+        cfg_overrides={"iface_binary_input": True, "iface_thr_in": 0.0},
+        derivation="dL/dshadow = dL/dB * atan_grad(shadow - thr_in, alpha). The "
+                   "surrogate derivative is strictly positive everywhere and "
+                   "peaks at alpha/2 = 1.0, so the straight-through path is "
+                   "reachable. Predicted separately: the RATIO will be BELOW 1, "
+                   "because a shadow drawn from N(0,1) sits where atan_grad is "
+                   "about 0.09-1.0 rather than at its peak, so the code's "
+                   "gradient is attenuated relative to a dense embedding's. An "
+                   "attenuated gradient is not fatal (Adam is scale-free per "
+                   "parameter); an exactly zero one would be.",
+    ),
+    # -- EXP_021, through the real arch --------------------------------------
+    Candidate(
+        "nm_g0", "EXP_021 local modulator", "proposed (exact nesting), kappa = 0",
+        params=(), scan=None, arch="localdopamine",
+        cfg_overrides={"nm_source": "local", "nm_tau": 0.057321,
+                       "nm_gain_init": 0.0},
+        derived_zero=("nm_a", "nm_b", "nm_log_tau"),
+        derivation="dL/dkappa_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c} * "
+                   "DA_{b,t}, which is nonzero at kappa = 0 because the factor "
+                   "(1 + kappa*DA) is then 1 and every downstream adjoint is the "
+                   "BASELINE's. But the predictor reaches the loss ONLY through "
+                   "that factor: dL/da = (dL/dDA)*(dDA/dphi)*(dphi/da) and "
+                   "dL/dDA is proportional to kappa. At kappa = 0 all three of "
+                   "nm_a, nm_b and nm_log_tau are EXACTLY zero, by the same "
+                   "backward-induction argument that makes #1's w = 0 a saddle. "
+                   "This is EXP_004 2.2's pattern and it takes EXP_004's remedy: "
+                   "a pre-registered nonzero fallback.",
+        fallback="nm_g01",
+    ),
+    Candidate(
+        "nm_g01", "EXP_021 local modulator", "pre-registered fallback, kappa = 0.1",
+        params=(), scan=None, arch="localdopamine",
+        cfg_overrides={"nm_source": "local", "nm_tau": 0.057321,
+                       "nm_gain_init": 0.1},
+        derivation="kappa != 0 opens the modulation path, so the predictor's "
+                   "parameters and the squash scale all carry gradient",
+    ),
+    # -- EXP_022, through the real arch --------------------------------------
+    Candidate(
+        "iface_sp10", "EXP_022 sparse input code", "thr_in = 1.2816 (q = 0.10)",
+        params=(), scan=None, arch="interface",
+        cfg_overrides={"iface_binary_input": True,
+                       "iface_thr_in": 1.2815515655},
+        derivation="the same straight-through path `iface_binary` screens, at a "
+                   "threshold the shadow no longer straddles symmetrically. "
+                   "PREDICTED IN ADVANCE, and it is the one thing that could "
+                   "sink this ladder: a shadow drawn from N(0,1) against a "
+                   "threshold at 1.2816 sits FURTHER from that threshold than "
+                   "it does at 0, so atan_grad is attenuated MORE than the "
+                   "q = 0.5 rung's and the ratio must come in BELOW "
+                   "iface_binary's. Attenuated is survivable (Adam is scale-free "
+                   "per parameter); exactly zero is not, and would mean the "
+                   "sparse rungs measure a frozen code rather than a sparse one. "
+                   "This is why EXP_022 6 names iface_code_sd as the axis that "
+                   "would separate density from plasticity, and prices it.",
+    ),
+    Candidate(
+        "iface_mall", "EXP_022 all-layer readout, unmatched", "d = 512, blocks = 2",
+        params=(), scan=None, arch="interface",
+        cfg_overrides={"iface_read_layers": "all"},
+        derivation="the head's extra columns multiply layer 0's spikes, which "
+                   "are nonzero at init (02_baseline_report 5.2 measures layer "
+                   "0 at 4.9 % while layer 1 is silent), so dL/dW_head over the "
+                   "layer-0 block is reachable at step 0 -- and it is the block "
+                   "that is NOT reachable in the baseline. The layer-1 block is "
+                   "the baseline's own and inherits its reachability.",
+    ),
+    # -- EXP_023, through the real arch --------------------------------------
+    Candidate(
+        "nm_const", "EXP_023 constant gain rung", "kappa = 0.1, DA = 1",
+        params=(), scan=None, arch="localdopamine",
+        cfg_overrides={"nm_source": "const", "nm_gain_init": 0.1},
+        derivation="dL/dkappa_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c}, "
+                   "with DA = 1 identically. Reachable at ANY kappa including "
+                   "0, because unlike the RPE rungs there is no second "
+                   "parameter whose only path to the loss runs through kappa. "
+                   "This rung has no saddle to fall back from.",
+    ),
+    Candidate(
+        "nm_pos", "EXP_023 positional gain rung", "kappa = 0.1, w = 0",
+        params=(), scan=None, arch="localdopamine",
+        cfg_overrides={"nm_source": "pos", "nm_gain_init": 0.1},
+        derived_zero=("nm_gain",),
+        derivation="AT w = 0, DA = tanh(0) = 0 IDENTICALLY, so "
+                   "dL/dkappa_c = sum (dL/dcur') * cur * DA is EXACTLY zero -- "
+                   "the mirror image of nm_g0, where kappa was the reachable one "
+                   "and the predictor was not. But dL/dw_t = sum_c kappa_c * "
+                   "(dL/dcur'_{t,c}) * cur_{t,c} * sech^2(0) is NOT zero at "
+                   "kappa = 0.1, so w moves at step 1 and kappa becomes "
+                   "reachable at step 2. That is a TWO-STEP SEQUENTIAL UNLOCK "
+                   "out of 20,000 and not EXP_004 2.2's saddle, which had no "
+                   "reachable parameter at all. Asserted, not argued, by "
+                   "tests/test_neuromod.py::"
+                   "test_g4_the_pos_rung_unlocks_kappa_in_two_steps_rather_than_never.",
+    ),
 ]
 
 #: Ranked candidates the screen does not apply to, listed rather than omitted.
@@ -543,8 +710,8 @@ def build_screen_model(cfg: Config, cand: Candidate) -> nn.Module:
     """
     seed_everything(cfg.seed, cfg.deterministic)
     model = build_model(cfg)
-    if cand.arch in ("twocomp", "dopamine"):
-        return model              # already owns w / beta_s_raw, or k
+    if cand.arch in ("twocomp", "dopamine", "localdopamine", "interface"):
+        return model              # already owns its own new parameters
 
     d = cfg.d_model
     for name, init in cand.params:
@@ -611,10 +778,13 @@ def screen(cfg: Config, corpus: Corpus, cand: Candidate) -> dict:
         row = {
             "layer": k,
             "firing_rate": float(aux["firing_rate"][k]),
-            "linear_weight": _grad_stats(model.layers[k].weight.grad),
+            "linear_weight": _grad_stats(
+                None if (_ly := cand.linear_at(model, k)) is None
+                else _ly.weight.grad),
         }
         for name in names:
-            st = _grad_stats(getattr(model, name)[k].grad)
+            _t = cand.param_at(model, name, k)
+            st = _grad_stats(None if _t is None else _t.grad)
             st["rms_vs_linear_weight"] = (st["rms"] / w_rms) if st["present"] else None
             st["zero_leg"] = bool(st.get("exactly_zero"))
             st["ratio_leg"] = bool(
@@ -796,12 +966,21 @@ def main(argv: list[str] | None = None) -> int:
         mark = {"PASS": "pass", "FAINT": "FAINT", "SADDLE": "SADDLE"}[r["verdict"]]
         print(f"\n  {cand.key:12s} {cand.candidate} -- {cand.init_label}")
         for row in r["per_layer"]:
+            # `present: False` means the layer HAS no such parameter, which is
+            # a fact about the arm's shape and not a reachability finding; it
+            # prints as "--" and never as a zero. The folded arm has no layer-0
+            # projection and the local modulator has no layer-0 modulator, so
+            # this is the common case rather than an edge one.
             bits = "  ".join(
-                f"|dL/d{n}| {row[n]['rms']:.3e} "
-                f"(x{row[n]['rms_vs_linear_weight']:.3f})"
+                f"|dL/d{n}| " + (
+                    "--" if not row[n].get("present")
+                    else f"{row[n]['rms']:.3e} "
+                         f"(x{row[n]['rms_vs_linear_weight']:.3f})")
                 for n in r["new_params"])
+            lw = row["linear_weight"]
+            lw_s = f"{lw['rms']:.3e}" if lw.get("present") else "--"
             print(f"      layer {row['layer']}  rate {row['firing_rate']:.4f}  "
-                  f"|dL/dW| {row['linear_weight']['rms']:.3e}   {bits}")
+                  f"|dL/dW| {lw_s}   {bits}")
         agree = "agrees" if r["derivation_agrees"] else "DISAGREES WITH DERIVATION"
         if r["post_hoc_zero"]:
             agree += f"; {r['post_hoc_zero']} added post-hoc, see JSON"
