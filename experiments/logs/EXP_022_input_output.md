@@ -5,7 +5,11 @@ reachability screen in §2.6, and the cost pre-flight in §2.7, and **before any
 arm in §3 was trained, any checkpoint was written, and any bpc existed for any
 arm in §3.** **Committed before the first run of §3.**
 
-**Status: OPEN.**
+**Status: CLOSED 2026-08-20. H2, H3, H5 and H7 held; H1 and H6 UNRESOLVED; H4
+reported. The binarity cost is mostly a DENSITY cost — a fully binary input is
+0.0096 bpc from the analogue anchor at q = 0.05, against 0.0457 at q = 0.50, for
+no parameters — and the all-layer readout is worth its parameters but not more
+than the same parameters spent on width.**
 
 ---
 
@@ -382,4 +386,281 @@ Every cell above is written before the first run and none is softened afterwards
 
 ## 9. Results
 
-*(appended after the run; nothing above this line is rewritten)*
+*(appended after the run — nothing above this line is rewritten)*
+
+**Closed 2026-08-20, ~1.9 GPU-hours** (15 training runs at 6,246 s, plus
+evaluation, a 21-checkpoint horizon sweep and the §2.6/§2.7 pre-flights already
+recorded above). Pre-registration SHA-256 stamped into `exp_022_run_manifest.json`
+before the first run and re-checked after the last: **unchanged**, and re-verified
+at resolution (`prereg_matches_manifest: true`). All 15 runs completed, **none
+diverged**, G2 exact on 15/15, no G5 violation, no K1 unexpected field, no VRAM
+alarm. The horizon probe's F1 self-check passed on all 21 checkpoints
+(`f1_failures: []`).
+
+**The resolver was committed before any bpc was read** (`858c48a`), which is
+this experiment's §8 entry condition and is the first time in this session it
+has actually been met — `EXP_020` and `EXP_021` did not meet it and their own
+commits say so.
+
+### 9.1 The scoreboard
+
+| bar | verdict | one line |
+|---|---|---|
+| **H1** `io_sp34` vs `if_binin` | **UNRESOLVED — and the sign is wrong** | +0.00717, paired t = +0.95, **1/3** seeds better. Predicted BETTER; it is nominally worse and inside the bar |
+| **H2** `io_sp10` vs `if_binin` | **HELD** | **−0.02566**, t = −3.88, **3/3** seeds, 2.8× the bar |
+| **H3** `io_sp05` vs `if_binin` | **BAR MET**, direction **sp05 BETTER** | **−0.03614**, t = −3.84, **3/3** seeds, 3.9× the bar. §4 declined to predict this sign |
+| **H4** the ladder's shape | reported, §9.4 | the gain **is** at `c = 0` for both winning rungs |
+| **H5** `io_mall` vs `if_anchor` | **HELD** | **−0.02157**, t = −8.49, **3/3** seeds |
+| **H6** `io_mall` vs `io_wide` — the decisive one | **UNRESOLVED** | +0.00276, t = +0.71, 2/3 seeds. Predicted mall BETTER; the point estimate favours **width** |
+| **H7** `io_mall`'s gain is not beyond the horizon | **HELD** | beyond-horizon **+0.00154**, against a 0.00922 bound |
+| **H8** cost | reported, §9.7 | 1.05 / 0.97 / 1.15 / 1.23 realised |
+
+**H2 and H3 are the result.** The binarity cost `EXP_020` measured is mostly a
+cost of **density**, and it is recoverable without spending a parameter.
+
+### 9.2 Leg A — the ladder is monotone below q = 0.34, and it is steep
+
+Against `if_anchor`, the analogue reference (positive = worse than analogue):
+
+| rung | `q` init | mean bpc | vs `if_binin` | vs `if_anchor` | share of binin's cost recovered |
+|---|---:|---:|---:|---:|---:|
+| `if_binin` | 0.50 | 2.29813 | — | **+0.04569** | 0 % |
+| `io_sp34` | 0.34 | 2.30530 | +0.00717 | +0.05286 | **−16 %** |
+| `io_sp10` | 0.10 | **2.27247** | **−0.02566** | +0.02002 | **56 %** |
+| `io_sp05` | 0.05 | **2.26199** | **−0.03614** | **+0.00955** | **79 %** |
+
+Per-seed, `io_sp05`: 2.25819 / 2.25781 / 2.26999. Per-seed, `io_sp10`:
+2.27016 / 2.27617 / 2.27108. Three of three in both cases.
+
+**At `q = 0.05` a fully binary input code is 0.00955 bpc from the analogue
+anchor**, against the 0.04569 the same code costs at `q = 0.50`. `EXP_020`
+priced closing I1's last exception at 0.0457; this prices it at **0.0096**,
+and the intervention costs **no parameter at all** — all four rungs are
+735,437, asserted exactly by G2.
+
+**H1 failed in a way worth stating.** §2.2's argument for `q = 0.34` was the
+strongest one in the section: at the stack's own converged firing rate the input
+boundary is statistically the same boundary as every other. It is the one rung
+that does not beat `q = 0.50`. The monotone-in-`1/q` prediction of H2 holds
+**between** sp10 and sp05 and fails at sp34, so the ladder is not monotone over
+its whole range and §2.2's leverage argument does not describe its top end.
+
+### 9.3 §6 ITEM 3 FIRES: the density that was asked for is not the density that ran
+
+`shadow` is a parameter, so the realised density drifts. §6 item 3 pre-registered
+this diagnostic and fixed its failure condition — *"if all four converge to the
+same density the ladder measured an init and not a code."* **They did not
+converge**, so the ladder is still a density ladder. But they moved, and the
+sparse rungs moved a long way:
+
+| rung | `q` init | `q` final (3 seeds) | drift | active fibres | distinct codes | silent chars |
+|---|---:|---|---:|---:|---|---:|
+| `if_binin` | 0.50 | 0.4983 / 0.4995 / 0.5062 | **1.00×** | 255 | 205/205 | 0 |
+| `io_sp34` | 0.34 | 0.1358 / 0.1364 / 0.1368 | **0.40×** | 70 | 200–201/205 | 5–6 |
+| `io_sp10` | 0.10 | 0.0252 / 0.0255 / 0.0255 | **0.25×** | 13 | 184–187/205 | 12–14 |
+| `io_sp05` | 0.05 | 0.0127 / 0.0122 / 0.0130 | **0.25×** | **6.5** | **163–166/205** | **26–28** |
+
+**So the ladder ran at realised densities 0.50 / 0.14 / 0.025 / 0.013, not
+0.50 / 0.34 / 0.10 / 0.05, and every figure above should be read against the
+realised column.** The `q = 0.50` rung is the only one that does not drift, and
+the reason is structural rather than incidental: at `thr_in = 0` the shadow is
+symmetric about its threshold, so weight decay pulling `shadow` toward zero
+leaves the density at 0.5 exactly, while at `thr_in > 0` the same pull moves
+every bit toward the inactive side. This is `docs/chat/WEIGHT_DECAY_NOTE.md`'s
+fixed-point argument on a different parameter, and it was not anticipated here.
+
+**AND THE WINNING RUNG'S CODE IS LOSSY.** §2.2 argued that nothing on this ladder
+is information-limited — the sparsest rung carries 19× the bits the alphabet
+needs. That argument is about a code's *capacity*, and the realised code is a
+random one that drifted sparser: at `io_sp05` **39–42 of 205 characters share a
+code with another character, and 26–28 emit the all-zero code**, which is
+indistinguishable from no input at all.
+
+**A code that cannot tell 42 of its 205 characters apart beats a code that
+distinguishes every one of them, by 0.036 bpc, on 3 of 3 seeds.** That is
+stronger evidence for §2.2's *mechanism* — that this is a claim about the code's
+geometry and its leverage per bit, not about how many bits it carries — than the
+capacity arithmetic §2.2 actually offered, and it is not an argument this
+experiment pre-registered. Reported as a finding, not as a bar.
+
+**§6 item 4 is now live rather than hypothetical.** The gain is a buffer fixed at
+construction from the *init* density, so at a realised `q = 0.0126` the
+`io_sp05` gain of 4.588 — derived for `q = 0.05` — no longer matches its own
+code's second moment. Recomputing it during training would be a second
+mechanism and is not done. What that costs is unmeasured.
+
+### 9.4 The decomposition, and H4's shape claim
+
+`EXP_004` §10.3's split, cut at the baseline horizon of 7, **positive = the arm
+is better**. `EXP_020` §9.5's bitwise-copy noise floor is −0.00499 total,
+−0.01395 at `c = 0`, +0.00944 within reach; read every row against it.
+
+| arm | reference | total | `c = 0` | within reach | beyond horizon |
+|---|---|---:|---:|---:|---:|
+| `if_binin` | `if_anchor` | −0.04478 | **−0.03710** | −0.00291 | −0.00477 |
+| `io_sp34` | `if_binin` | −0.00688 | **+0.02465** | **−0.03137** | −0.00016 |
+| `io_sp10` | `if_binin` | **+0.02546** | **+0.04127** | −0.01633 | +0.00052 |
+| `io_sp05` | `if_binin` | **+0.03560** | **+0.03256** | −0.00009 | +0.00312 |
+| `io_mall` | `if_anchor` | +0.02115 | **−0.02348** | **+0.04310** | +0.00154 |
+| `io_wide` | `if_anchor` | +0.02392 | +0.01186 | +0.01229 | −0.00024 |
+
+**H4 holds, and it holds for the reason §2.2 gave.** `if_binin` pays −0.03710 of
+its −0.04478 at zero context (82.8 %, reproducing `EXP_020` §9.4's 83 %), and
+**every sparse rung recovers at exactly that component**: +0.0247, +0.0413,
++0.0326 at `c = 0`. The fix appears where the cost was.
+
+**What separates the rungs is what they give back within reach**, and it is
+monotone where the totals are not: `io_sp34` pays −0.0314 and nets negative,
+`io_sp10` pays −0.0163 and nets +0.025, `io_sp05` pays −0.0001 and nets +0.036.
+So sparsity buys the same thing at `c = 0` on all three rungs and stops charging
+for it as `q` falls. **That is not a mechanism §2 predicted and no bar was
+pre-registered on it.**
+
+`io_sp10`'s +0.04127 at `c = 0` **exceeds** the −0.03710 `if_binin` lost there.
+A rung that over-recovers a component is not something §5's table anticipated;
+it is reported and not interpreted.
+
+**H4 as PRE-REGISTERED (`|c0| > |total|`) fires True, True, False** on sp34,
+sp10, sp05 — and the resolver's own note explains why that statistic cannot do
+the job §4 gave it: the decomposition is additive, so `|c0| > |total|` requires
+the rung to *lose* outside zero context, which is why the rung with the cleanest
+result (`io_sp05`, which gives back nothing) is the one that fails it. The
+sign-aware replacement reads **False, True, True**, which is the correct reading
+of the three rows. **This is the third instance of open decision #9's defect
+class**, after `EXP_012`'s Y5 and `EXP_013`'s N1, and it is **referred, not
+repaired** — the pre-registered statistic is emitted exactly as written.
+
+### 9.5 Leg B — the readout is worth its parameters, and width is worth the same
+
+| arm | arch | `d` | params | mean bpc | vs `if_anchor` |
+|---|---|---:|---:|---:|---:|
+| `if_anchor` | `snn` | 512 | 735,437 | 2.25245 | — |
+| **`io_mall`** | `interface`, `read_layers="all"` | 512 | 840,397 | **2.23088** | **−0.02157** |
+| **`io_wide`** | `snn` | 553 | 839,659 | **2.22812** | **−0.02392** |
+
+**H5 HELD** at −0.02157, t = −8.49, 3/3 seeds. The all-layer readout is worth
+its 104,960 parameters, and the frozen-feature probe that authorised it
+(−0.019/−0.022) predicted the trained size well — though §6 item 8 is why that
+agreement is not claimed as a validated prediction.
+
+**H6 UNRESOLVED at +0.00276**, t = +0.71, 2/3 seeds. §5's nearest cell is
+*"H5 holds and H6 fails — the readout is worth its parameters and width is worth
+the same; a null against `EXP_014`, not against the readout."* **The bar
+returned UNRESOLVED, not FAILED, and the verdict is reported as it fired.**
+The distinction is not pedantic: `io_mall − io_wide` is +0.00276 against a
+0.00922 bar, so this experiment establishes that the readout is **not better
+than width by 2σ** and does not establish that width is better. At n = 3 with
+`io_wide`'s sd of 0.0067 it could not have.
+
+**`io_mall`'s seed spread is the smallest this project has measured**: sd
+**0.000301** across three seeds, against `if_anchor`'s 0.004683 on the same
+tree — **15× smaller**. §3's standing rule is that σ is not a project constant
+and must be re-measured on every structurally new arm; this is a case where it
+moved by more than an order of magnitude, and it is recorded as a marker.
+
+### 9.6 The two arms reach the same total by opposite routes
+
+This is the part of leg B that H6 could not see. `io_mall` and `io_wide` are
+0.0028 apart in total and are not doing the same thing:
+
+* **`io_mall` pays −0.02348 at zero context and buys +0.04310 within reach.**
+* **`io_wide` buys +0.01186 at zero context and +0.01229 within reach** — evenly.
+
+A wider stack buys per-character capacity and reach-use in equal measure; a
+wider *head* trades zero-context capacity for a large within-reach gain.
+`EXP_015` §14.3 located the entire matched-size gap to the GRU anchor in the
+failure to *use* context, and §7 item 2 records the within-reach component as
+the one barely attacked. **`io_mall`'s +0.0431 within reach is the largest
+within-reach movement any architectural arm in this phase has produced** — the
+best previous was +0.0288 (§7 item 2) — and it is invisible in the headline
+because it is paid for at `c = 0`.
+
+**No bar was pre-registered on the decomposition's components and none is
+invented now.** This is a marker, and it is the one this experiment would most
+want a successor to aim at.
+
+**H7 HELD** at **+0.00154**, well inside the 0.00922 bound: `io_mall` gains
+essentially nothing beyond the horizon, exactly as §2.4's mechanism predicted —
+layer 0's spikes at `t` carry no information about `t' < t` that layer 1's do not
+already carry. A mechanistic prediction made before the run, and it held.
+
+### 9.7 H8 — cost, realised against pre-flighted
+
+Wall-clock ratios against `if_anchor`, recomputed from each run's own
+`summary.json`:
+
+| arm | pre-flighted §2.7 | realised | params |
+|---|---:|---:|---:|
+| `if_binin` | 1.000 | **1.047** | 735,437 |
+| `io_sp34` / `io_sp10` / `io_sp05` | 0.999 | **0.973 / 0.971 / 0.973** | 735,437 |
+| `io_mall` | 1.184 | **1.145** | 840,397 |
+| `io_wide` | 1.274 | **1.231** | 839,659 |
+
+The pre-flight was accurate to ~4 % on both leg-B arms, which is the third time
+`014_calibrate_cost.py` has transferred. **The density ladder is not merely free,
+it is faster than the anchor** (0.97×) and faster than the `q = 0.50` rung it is
+compared against — an unexplained 7 % that no part of §2.7 predicted and that
+nothing here turns on. **`io_mall` is cheaper than the width arm it is matched
+to**, as §2.7 predicted: a wider stack pays O(d²) in the scan, a wider head pays
+O(dV) once.
+
+### 9.8 The five arms `EXP_020` §5's rule blocked, reported as NOT RUN
+
+Recorded with the rule's own arithmetic, exactly as §2.5 required:
+
+| arm | fired | because |
+|---|---|---|
+| `composed` | NOT RUN | H2 UNRESOLVED (+0.01326), H4 UNRESOLVED (+0.00530) |
+| `composed_bin` | NOT RUN | H3 FAILED (+0.04569) |
+| `sparse34` | NOT RUN under `EXP_020`'s rule | H3 failed at +0.04569, 2.5× the 0.01844 threshold |
+| `sparse10` | NOT RUN under `EXP_020`'s rule | as `sparse34` |
+| `tied` | AUTHORISED, and not run here | `EXP_020` §9 measured the fold at 1.63× more than its parameters are worth and 86 % of that as a reach cost — evidence against a further fold. Referred with its price |
+
+**`sparse34` and `sparse10` were blocked by `EXP_020`'s rule and then run here
+under a new pre-registration whose §2 is labelled post-hoc-informed.** That is
+§0's construction and it is restated at the point where it matters most: the
+two rungs that produced this experiment's result are rungs `EXP_020`'s own rule
+declined to authorise.
+
+### 9.9 `n_contexts_significantly_worse`, reported as a marker and used as nothing
+
+§4 fixed this in advance and it is honoured: the statistic appears in
+`exp_022_arm_results.json` and **no bar in this experiment turns on it.**
+`EXP_020` §9.5's bitwise-copy control read 120 of 128 contexts "significantly
+worse" on a run that was bit-identical to its own anchor. Fresh evidence for
+open decision **#2**; no redefinition is proposed here.
+
+---
+
+## 10. Referred to Elliot, and not decided here
+
+1. **The input boundary can be closed for 0.0096 bpc and no parameters.**
+   `EXP_020` priced I1's last exception at 0.0457; `io_sp05` prices it at
+   0.00955 against the analogue anchor, on 3/3 seeds, at identical parameter
+   count and 0.97× wall-clock. **Whether that is cheap enough to adopt is #5's
+   shape and is Elliot's.** Nothing here ranks it.
+2. **The realised densities are not the pre-registered ones** (§9.3), and the
+   drift has a named mechanism — weight decay against a one-sided threshold.
+   The experiment that separates "sparse code" from "code the optimiser
+   sparsified" is a frozen-`shadow` rung, and it is **not run**. Priced by
+   analogy with §2.7's ladder at ~0.35 GPU-h for 3 seeds.
+3. **`iface_code_sd` is still NOT RUN**, and §2.3's confound is therefore still
+   live: every rung on this ladder moved density and plasticity together. The
+   asymmetry §2.3 fixed in advance says the reading is clean **because the
+   sparse rungs WON** — a sparse rung wins despite a worse gradient regime — so
+   H2 and H3 are interpretable. H1's failure is the confounded case, and this
+   experiment may not say which axis caused it. ~0.35 GPU-h.
+4. **The within-reach finding in §9.6 is the largest of its kind in the phase
+   and rests on no bar.** `io_mall` moves the within-reach component by +0.0431
+   against a previous best of +0.0288, and pays −0.0235 at `c = 0` for it. A
+   pre-registered arm aimed at that trade is not proposed here, because §7.1 is
+   the report's and ranking it would be this log choosing the next experiment.
+5. **`io_mall`'s sd is 15× below the anchor's on the same tree** (§9.5). If a
+   later experiment uses this arm, §3's rule requires re-measuring σ rather than
+   transferring 0.00461, and the effect of that on a 2σ bar is large.
+6. **H6 returned UNRESOLVED where §5's table has cells only for HELD and FAILED.**
+   The corrected rule — that a decisive bar needs a stated verdict for the
+   unresolved case, not two cells — is **referred forward**, not applied here.
+   This is decision **#9**'s substance reached from a third direction, after
+   §9.4's H4 defect and `EXP_013`'s N1.
+
