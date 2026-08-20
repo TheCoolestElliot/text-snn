@@ -1,0 +1,588 @@
+{
+  "audit": "09_gradient_reachability",
+  "screen": "03_phase3_candidates.md \u00a77.2",
+  "rule": "flag a new parameter whose |dL/dp| is exactly zero (fatal: AdamW cannot move it), or whose per-element RMS is below 1/100 of the layer weights' (worth recording; Adam is scale-free, so this is not on its own a reason to reject an init)",
+  "ratio_floor": 0.01,
+  "torch": "2.12.1+cu130",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "shape": {
+    "batch_size": 128,
+    "seq_len": 256,
+    "d_model": 512,
+    "n_layers": 2,
+    "seed": 0
+  },
+  "self_test": {
+    "all_held": true,
+    "controls": [
+      {
+        "control": "ctl_live",
+        "expected_leg": "pass",
+        "verdict": "PASS",
+        "held": true
+      },
+      {
+        "control": "ctl_dead",
+        "expected_leg": "zero",
+        "verdict": "SADDLE",
+        "held": true
+      },
+      {
+        "control": "ctl_faint",
+        "expected_leg": "ratio",
+        "verdict": "FAINT",
+        "held": true
+      }
+    ]
+  },
+  "reproduction": {
+    "ran": true,
+    "source": "docs/reports/data/exp_004_gradient_reachability.json",
+    "rtol": 1e-06,
+    "worst_rel_residual": 0.0,
+    "mismatches": [],
+    "held": true
+  },
+  "out_of_scope": {
+    "#3": "depth K = 4 -- no new parameter; width is re-derived, not added",
+    "#4": "readout capacity -- new parameters, but ordinary Linear layers outside the time loop with no adjoint recursion to collapse",
+    "#7": "reset ablation -- a free parameter of the existing kernel, not a learnable one",
+    "#8": "variance-scaled initialisation -- rescales existing parameters",
+    "#9": "firing-rate set-point -- a loss term plus a threshold constant; the learnable-threshold half is screened as `thr`",
+    "#11": "parameter-scaling pilot -- no new parameter kind",
+    "#12": "surrogate width sweep -- alpha is a hyperparameter, not learned",
+    "#13": "training budget -- no parameter",
+    "#14": "re-measure sigma -- a measurement, not an arm"
+  },
+  "results": [
+    {
+      "key": "ctl_live",
+      "candidate": "control (synthetic)",
+      "init": "per-channel gain on the current",
+      "derivation": "reachable by construction",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_gain"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.00040487624937668443,
+            "rms": 6.725152343278751e-05,
+            "l2": 0.0015217282343655825,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9533431187974668,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.00028896844014525414,
+            "rms": 6.75729097565636e-05,
+            "l2": 0.0015290004666894674,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9578990221377647,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "ctl_dead",
+      "candidate": "control (synthetic)",
+      "init": "parameter multiplied by exactly 0.0",
+      "derivation": "dL/dp = 0.0 * upstream, exactly",
+      "derived_zero": [
+        "ctl_dead"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "ctl_dead"
+      ],
+      "measured_zero": [
+        "ctl_dead"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_dead"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_dead": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_dead": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer0.ctl_dead",
+        "layer1.ctl_dead"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "ctl_faint",
+      "candidate": "control (synthetic)",
+      "init": "contribution scaled by 1e-9",
+      "derivation": "reachable, but ~1e-9 of the layer weights' scale",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_faint"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_faint": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 9.450534972643698e-13,
+            "rms": 2.0833219860610236e-13,
+            "l2": 4.7140195393036155e-12,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 2.953272399302176e-09,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_faint": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 3.5977856978341993e-12,
+            "rms": 1.1558032092170989e-12,
+            "l2": 2.6152840310045278e-11,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 1.6384417481522e-08,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [
+        "layer0.ctl_faint",
+        "layer1.ctl_faint"
+      ],
+      "verdict": "FAINT",
+      "passes_screen": false
+    },
+    {
+      "key": "c05",
+      "candidate": "#5 learned per-channel decay",
+      "init": "beta_raw = logit(0.5), nests baseline",
+      "derivation": "dL/dbeta_c = sum_t (dL/dv_pre_t) * v_{t-1}; v_{t-1} is a nonzero state and its adjoint is not suppressed, so the exact-nesting init is reachable",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "beta_raw"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.342060856288299e-05,
+            "rms": 8.1702910392778e-06,
+            "l2": 0.00018487258057575673,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1158202869359928,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000116470102511812,
+            "rms": 2.8164356990600936e-05,
+            "l2": 0.0006372866919264197,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.39925186169469373,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "c24_gated",
+      "candidate": "EXP_024 feedforward data-dependent decay",
+      "init": "beta_raw = logit(0.5), k_gate = 0; nests #5, and Phase 2, exactly",
+      "derivation": "dL/dk_c = sum_t (dL/dv_pre_t) * v_{t-1} * beta_t(1-beta_t) * cur_{t,c}; every factor is nonzero at the nesting init, and no parameter's only path to the loss runs through another that starts at zero, so this is not a saddle in either the EXP_004 sense or the nm_pos one",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "beta_raw",
+        "k_gate"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.342060856288299e-05,
+            "rms": 8.1702910392778e-06,
+            "l2": 0.00018487258057575673,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1158202869359928,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "k_gate": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 2.253104503324721e-05,
+            "rms": 2.9006143904553028e-06,
+            "l2": 6.563340866705403e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.04111848517735286,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000116470102511812,
+            "rms": 2.8164356990600936e-05,
+            "l2": 0.0006372866919264197,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.39925186169469373,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "k_gate": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.648179932089988e-05,
+            "rms": 2.945151891253772e-06,
+            "l2": 6.664117972832173e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.041749839200984636,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "c24_rolled",
+      "candidate": "EXP_024 misalignment control (decay driven by another sequence)",
+      "init": "beta_raw = logit(0.5), k_gate = 0",
+      "derivation": "identical to c24_gated with the drive rolled across the batch; the time index is preserved so the reachability argument is unchanged",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "beta_raw",
+        "k_gate"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.342060856288299e-05,
+            "rms": 8.1702910392778e-06,
+            "l2": 0.00018487258057575673,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1158202869359928,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "k_gate": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 9.762798072188161e-06,
+            "rms": 1.476796569477301e-06,
+            "l2": 3.341609408380464e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.020934750255612675,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000116470102511812,
+            "rms": 2.8164356990600936e-05,
+            "l2": 0.0006372866919264197,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.39925186169469373,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "k_gate": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.2661321306950413e-05,
+            "rms": 2.069604306598194e-06,
+            "l2": 4.682980215875432e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.0293382651219922,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    }
+  ]
+}

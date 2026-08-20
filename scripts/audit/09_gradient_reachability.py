@@ -176,6 +176,72 @@ def _scan_learned_decay(self, cur: Tensor, v0: Tensor, layer: int):
     return torch.stack(spikes, dim=1), v
 
 
+def _scan_gated_decay(self, cur: Tensor, v0: Tensor, layer: int):
+    """EXP_024's arm: a FEEDFORWARD data-dependent decay, driven by `cur`.
+
+        beta_{t,c} = sigmoid(logit(beta_c) + k_c * cur_{t,c})
+        v_t        = beta_{t,c} * v_{t-1} + cur_t
+
+    `cur = W_k . s^{k-1} + b_k` is layer `k-1`'s output already projected, and it
+    is computed BEFORE the time loop, so the drive costs no extra kernel and no
+    extra GEMM -- it reuses a tensor the forward pass already holds. That is the
+    shape decision #3 admits (previous-layer-driven, depth-sequential preserved)
+    and it is O(1) parameters per neuron, `beta_raw` and `k_gate`, so the I5
+    O(1)-per-neuron test holds on top.
+
+    NESTING. At `k_gate = 0` the sigmoid argument is `logit(beta_c)` and
+    `beta_{t,c} = beta_c` exactly, so this scan nests `_scan_learned_decay`
+    (candidate #5) by construction; at `beta_raw = logit(0.5)` as well it nests
+    the Phase-2 baseline.
+
+    REACHABILITY, DERIVED BEFORE THE SCREEN RAN. `dbeta_t/dk_c =
+    beta_t*(1-beta_t)*cur_{t,c}`, which is nonzero wherever `cur` is, and
+    `dL/dbeta_t = (dL/dv_pre_t) * v_{t-1}`, whose adjoint is not suppressed --
+    the same argument candidate #5's derivation makes for `beta_raw`. So
+    `dL/dk_gate` is NOT zero at `k_gate = 0`. This is NOT `EXP_004`'s saddle and
+    NOT `nm_pos`'s one-sided one: there is no parameter here whose only path to
+    the loss runs through another that starts at zero. `derived_zero` is empty
+    and is written before the measurement.
+    """
+    beta_c = torch.sigmoid(self.beta_raw[layer])
+    logit_beta = torch.log(beta_c) - torch.log1p(-beta_c)
+    gate = self.k_gate[layer]
+    v = v0
+    spikes = []
+    for t in range(cur.shape[1]):
+        beta_t = torch.sigmoid(logit_beta + gate * cur[:, t])
+        v_pre = v * beta_t + cur[:, t]
+        s = atan_spike(v_pre - self.threshold, self.surrogate_alpha)
+        v = v_pre * (1.0 - s)
+        spikes.append(s)
+    return torch.stack(spikes, dim=1), v
+
+
+def _scan_gated_decay_rolled(self, cur: Tensor, v0: Tensor, layer: int):
+    """The misalignment control: the SAME form, driven by another sequence.
+
+    `EXP_023`'s `nm_rolled` design, moved from the current to the decay. The
+    drive is rolled across the BATCH, which preserves the time index exactly, so
+    a difference between this and `_scan_gated_decay` is about WHOSE input drives
+    the decay and not about whether a time-varying decay pays at all.
+
+    It is screened because a control that cannot be trained is not a control.
+    """
+    beta_c = torch.sigmoid(self.beta_raw[layer])
+    logit_beta = torch.log(beta_c) - torch.log1p(-beta_c)
+    gate = self.k_gate[layer]
+    drive = torch.roll(cur, shifts=1, dims=0)
+    v = v0
+    spikes = []
+    for t in range(cur.shape[1]):
+        beta_t = torch.sigmoid(logit_beta + gate * drive[:, t])
+        v_pre = v * beta_t + cur[:, t]
+        s = atan_spike(v_pre - self.threshold, self.surrogate_alpha)
+        v = v_pre * (1.0 - s)
+        spikes.append(s)
+    return torch.stack(spikes, dim=1), v
+
+
 def _scan_rms_current(self, cur: Tensor, v0: Tensor, layer: int):
     """Candidate #2: RMSNorm on the input current, outside the time loop.
 
@@ -462,6 +528,25 @@ CANDIDATES = [
         derivation="dL/dbeta_c = sum_t (dL/dv_pre_t) * v_{t-1}; v_{t-1} is a "
                    "nonzero state and its adjoint is not suppressed, so the "
                    "exact-nesting init is reachable",
+    ),
+    # -- EXP_024 ---------------------------------------------------------------
+    Candidate(
+        "c24_gated", "EXP_024 feedforward data-dependent decay",
+        "beta_raw = logit(0.5), k_gate = 0; nests #5, and Phase 2, exactly",
+        params=(("beta_raw", 0.0), ("k_gate", 0.0)), scan=_scan_gated_decay,
+        derivation="dL/dk_c = sum_t (dL/dv_pre_t) * v_{t-1} * beta_t(1-beta_t) * "
+                   "cur_{t,c}; every factor is nonzero at the nesting init, and "
+                   "no parameter's only path to the loss runs through another "
+                   "that starts at zero, so this is not a saddle in either the "
+                   "EXP_004 sense or the nm_pos one",
+    ),
+    Candidate(
+        "c24_rolled", "EXP_024 misalignment control (decay driven by another sequence)",
+        "beta_raw = logit(0.5), k_gate = 0",
+        params=(("beta_raw", 0.0), ("k_gate", 0.0)), scan=_scan_gated_decay_rolled,
+        derivation="identical to c24_gated with the drive rolled across the "
+                   "batch; the time index is preserved so the reachability "
+                   "argument is unchanged",
     ),
     # -- #6, both inits -------------------------------------------------------
     Candidate(
