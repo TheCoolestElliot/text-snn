@@ -1,0 +1,182 @@
+{
+ "torch": "2.12.1+cu130",
+ "device": "cuda",
+ "args": {
+  "runs": [
+   "experiments/runs/snn_beta0.5_s0",
+   "experiments/runs/snn_beta0.5_s1",
+   "experiments/runs/snn_beta0.5_s2",
+   "experiments/runs/twocomp_s0"
+  ],
+  "ckpt": "ckpt_final.pt",
+  "split": "val",
+  "n_windows": 256,
+  "b_init": -2.97,
+  "c1_tol": 0.05,
+  "out": "docs/reports/data/exp_021_nm_calibration.json"
+ },
+ "checkpoints": [
+  {
+   "run": "snn_beta0.5_s0",
+   "arch": "snn",
+   "d_model": 512,
+   "n_layers": 2,
+   "layers": {
+    "1": {
+     "driving_layer": 0,
+     "driving_rate": 0.34469181299209595,
+     "chan_rate_min": 0.0330352783203125,
+     "chan_rate_max": 0.635040283203125,
+     "chan_rate_frac_silent": 0.0,
+     "matched": {
+      "phi_mean": -7.566995918750763e-10,
+      "phi_sd": 0.06751924008131027,
+      "phi_min": -0.1879323124885559,
+      "phi_max": 0.14883746206760406,
+      "phi_q01": -0.12157794088125229,
+      "phi_median": -0.013649925589561462,
+      "phi_q99": 0.13912257552146912,
+      "frac_positive": 0.4207916259765625,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.02618408203125
+     },
+     "init": {
+      "phi_mean": -0.8787994384765625,
+      "phi_sd": 0.27620139718055725,
+      "phi_min": -1.6301038265228271,
+      "phi_max": -0.06389293819665909,
+      "phi_q01": -1.3690686225891113,
+      "phi_median": -0.9514124393463135,
+      "phi_q99": -0.3481312096118927,
+      "frac_positive": 0.0,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.7906036376953125
+     }
+    }
+   }
+  },
+  {
+   "run": "snn_beta0.5_s1",
+   "arch": "snn",
+   "d_model": 512,
+   "n_layers": 2,
+   "layers": {
+    "1": {
+     "driving_layer": 0,
+     "driving_rate": 0.3613967299461365,
+     "chan_rate_min": 0.0503997802734375,
+     "chan_rate_max": 0.665374755859375,
+     "chan_rate_frac_silent": 0.0,
+     "matched": {
+      "phi_mean": -7.275957614183426e-10,
+      "phi_sd": 0.05284028872847557,
+      "phi_min": -0.16251225769519806,
+      "phi_max": 0.13239295780658722,
+      "phi_q01": -0.10494942218065262,
+      "phi_median": -0.00987168587744236,
+      "phi_q99": 0.11317659169435501,
+      "frac_positive": 0.41717529296875,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.0478668212890625
+     },
+     "init": {
+      "phi_mean": -0.9284130334854126,
+      "phi_sd": 0.23185792565345764,
+      "phi_min": -1.6127015352249146,
+      "phi_max": -0.07549449801445007,
+      "phi_q01": -1.3284631967544556,
+      "phi_median": -0.9862170815467834,
+      "phi_q99": -0.38293591141700745,
+      "frac_positive": 0.0,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.9749755859375
+     }
+    }
+   }
+  },
+  {
+   "run": "snn_beta0.5_s2",
+   "arch": "snn",
+   "d_model": 512,
+   "n_layers": 2,
+   "layers": {
+    "1": {
+     "driving_layer": 0,
+     "driving_rate": 0.3512469232082367,
+     "chan_rate_min": 0.027984619140625,
+     "chan_rate_max": 0.6656494140625,
+     "chan_rate_frac_silent": 0.0,
+     "matched": {
+      "phi_mean": -4.656612873077393e-10,
+      "phi_sd": 0.061801403760910034,
+      "phi_min": -0.18496744334697723,
+      "phi_max": 0.13930395245552063,
+      "phi_q01": -0.10700453817844391,
+      "phi_median": -0.010534167289733887,
+      "phi_q99": 0.13159959018230438,
+      "frac_positive": 0.412689208984375,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.045867919921875
+     },
+     "init": {
+      "phi_mean": -0.8982681035995483,
+      "phi_sd": 0.24905706942081451,
+      "phi_min": -1.612701416015625,
+      "phi_max": -0.06389293074607849,
+      "phi_q01": -1.3458654880523682,
+      "phi_median": -0.9572131633758545,
+      "phi_q99": -0.37133434414863586,
+      "frac_positive": 0.0,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.9467620849609375
+     }
+    }
+   }
+  },
+  {
+   "run": "twocomp_s0",
+   "arch": "twocomp",
+   "d_model": 512,
+   "n_layers": 2,
+   "layers": {
+    "1": {
+     "driving_layer": 0,
+     "driving_rate": 0.39152222871780396,
+     "chan_rate_min": 0.00494384765625,
+     "chan_rate_max": 0.8332672119140625,
+     "chan_rate_frac_silent": 0.0,
+     "matched": {
+      "phi_mean": -1.1350493878126144e-09,
+      "phi_sd": 0.046400655061006546,
+      "phi_min": -0.19632509350776672,
+      "phi_max": 0.10177303105592728,
+      "phi_q01": -0.1230262964963913,
+      "phi_median": 0.0017403019592165947,
+      "phi_q99": 0.07866072654724121,
+      "frac_positive": 0.5128173828125,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.0304412841796875
+     },
+     "init": {
+      "phi_mean": -1.017885684967041,
+      "phi_sd": 0.15299880504608154,
+      "phi_min": -1.4734828472137451,
+      "phi_max": -0.22631481289863586,
+      "phi_q01": -1.2936584949493408,
+      "phi_median": -1.0326234102249146,
+      "phi_q99": -0.5685608983039856,
+      "frac_positive": 0.0,
+      "n": 65536,
+      "frac_abs_over_2sd": 0.9999542236328125
+     }
+    }
+   }
+  }
+ ],
+ "C1_max_abs_phi_mean": 1.1350493878126144e-09,
+ "C1_tol": 0.05,
+ "C1_pass": true,
+ "nm_tau_median_sd": 0.0573208462446928,
+ "nm_tau_relative_spread": 0.3684276559727002,
+ "n_cells": 4
+}

@@ -1,0 +1,611 @@
+{
+ "experiment": "EXP_021",
+ "prereg_sha256_before": "1089c03f7b368eb115a950ac3a04aba516713a1acc1efdd78af8349b033d31da",
+ "steps": 20000,
+ "tau_check": {
+  "nm_tau": 0.057321,
+  "nm_tau_full_precision": 0.0573208462446928,
+  "matches_calibration": true,
+  "sigfigs": 5,
+  "relative_spread": 0.3684276559727002
+ },
+ "anchor": [
+  "if_anchor_s0",
+  "if_anchor_s1",
+  "if_anchor_s2"
+ ],
+ "vram_alarm_gib": 4.0,
+ "runs": [
+  {
+   "leg": "1",
+   "run": "nm_local_s0",
+   "arch": "localdopamine",
+   "seed": 0,
+   "overrides": {
+    "nm_source": "local"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 581.95,
+   "train_rc": 0,
+   "eval_s": 10.23,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 575.43,
+   "peak_vram_gib": 0.9842,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "off",
+     "local"
+    ],
+    "nm_tau": [
+     1.0,
+     0.057321
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "nm_local_s0"
+    ],
+    "nm_gain_init": [
+     0.0,
+     0.1
+    ],
+    "arch": [
+     "snn",
+     "localdopamine"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "1",
+   "run": "nm_local_s1",
+   "arch": "localdopamine",
+   "seed": 1,
+   "overrides": {
+    "nm_source": "local"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 559.76,
+   "train_rc": 0,
+   "eval_s": 10.19,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 554.68,
+   "peak_vram_gib": 0.9842,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "off",
+     "local"
+    ],
+    "nm_tau": [
+     1.0,
+     0.057321
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "nm_local_s1"
+    ],
+    "nm_gain_init": [
+     0.0,
+     0.1
+    ],
+    "arch": [
+     "snn",
+     "localdopamine"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "1",
+   "run": "nm_local_s2",
+   "arch": "localdopamine",
+   "seed": 2,
+   "overrides": {
+    "nm_source": "local"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 559.59,
+   "train_rc": 0,
+   "eval_s": 10.16,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 554.46,
+   "peak_vram_gib": 0.9842,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "off",
+     "local"
+    ],
+    "nm_tau": [
+     1.0,
+     0.057321
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "nm_local_s2"
+    ],
+    "nm_gain_init": [
+     0.0,
+     0.1
+    ],
+    "arch": [
+     "snn",
+     "localdopamine"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "nm_rolled_s0",
+   "arch": "localdopamine",
+   "seed": 0,
+   "overrides": {
+    "nm_source": "rolled"
+   },
+   "reference": "nm_local_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 577.88,
+   "train_rc": 0,
+   "eval_s": 10.51,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 572.72,
+   "peak_vram_gib": 0.9843,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "local",
+     "rolled"
+    ],
+    "run_name": [
+     "nm_local_s0",
+     "nm_rolled_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "nm_rolled_s1",
+   "arch": "localdopamine",
+   "seed": 1,
+   "overrides": {
+    "nm_source": "rolled"
+   },
+   "reference": "nm_local_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 561.85,
+   "train_rc": 0,
+   "eval_s": 10.34,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 556.6,
+   "peak_vram_gib": 0.9843,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "local",
+     "rolled"
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "nm_local_s0",
+     "nm_rolled_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "nm_rolled_s2",
+   "arch": "localdopamine",
+   "seed": 2,
+   "overrides": {
+    "nm_source": "rolled"
+   },
+   "reference": "nm_local_s0",
+   "expected_params": 736974,
+   "completed": true,
+   "train_s": 567.82,
+   "train_rc": 0,
+   "eval_s": 10.8,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 736974,
+   "wall_clock_s": 562.69,
+   "peak_vram_gib": 0.9843,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "nm_source": [
+     "local",
+     "rolled"
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "nm_local_s0",
+     "nm_rolled_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "tf_neg_s0",
+   "arch": "snn",
+   "seed": 0,
+   "overrides": {
+    "tf_kappa": -0.5
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 402.58,
+   "train_rc": 0,
+   "eval_s": 9.75,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 397.24,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     0.0,
+     -0.5
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "tf_neg_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "tf_neg_s1",
+   "arch": "snn",
+   "seed": 1,
+   "overrides": {
+    "tf_kappa": -0.5
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 405.74,
+   "train_rc": 0,
+   "eval_s": 9.76,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 400.59,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     0.0,
+     -0.5
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "tf_neg_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "tf_neg_s2",
+   "arch": "snn",
+   "seed": 2,
+   "overrides": {
+    "tf_kappa": -0.5
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 397.85,
+   "train_rc": 0,
+   "eval_s": 9.78,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 392.6,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     0.0,
+     -0.5
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "tf_neg_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "tf_pos_s0",
+   "arch": "snn",
+   "seed": 0,
+   "overrides": {
+    "tf_kappa": 0.5
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 393.55,
+   "train_rc": 0,
+   "eval_s": 9.71,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 388.33,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     -0.5,
+     0.5
+    ],
+    "run_name": [
+     "tf_neg_s0",
+     "tf_pos_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "tf_pos_s1",
+   "arch": "snn",
+   "seed": 1,
+   "overrides": {
+    "tf_kappa": 0.5
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 394.1,
+   "train_rc": 0,
+   "eval_s": 9.76,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 389.0,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     -0.5,
+     0.5
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "tf_neg_s0",
+     "tf_pos_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "tf_pos_s2",
+   "arch": "snn",
+   "seed": 2,
+   "overrides": {
+    "tf_kappa": 0.5
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 402.81,
+   "train_rc": 0,
+   "eval_s": 9.66,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 397.61,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "tf_kappa": [
+     -0.5,
+     0.5
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "tf_neg_s0",
+     "tf_pos_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "tf_roll_s0",
+   "arch": "snn",
+   "seed": 0,
+   "overrides": {
+    "tf_kappa": -0.5,
+    "tf_rolled": true
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 392.51,
+   "train_rc": 0,
+   "eval_s": 9.6,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 387.36,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "run_name": [
+     "tf_neg_s0",
+     "tf_roll_s0"
+    ],
+    "tf_rolled": [
+     false,
+     true
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "tf_roll_s1",
+   "arch": "snn",
+   "seed": 1,
+   "overrides": {
+    "tf_kappa": -0.5,
+    "tf_rolled": true
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 391.64,
+   "train_rc": 0,
+   "eval_s": 9.47,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 386.56,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "tf_neg_s0",
+     "tf_roll_s1"
+    ],
+    "tf_rolled": [
+     false,
+     true
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "tf_roll_s2",
+   "arch": "snn",
+   "seed": 2,
+   "overrides": {
+    "tf_kappa": -0.5,
+    "tf_rolled": true
+   },
+   "reference": "tf_neg_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 385.97,
+   "train_rc": 0,
+   "eval_s": 9.61,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 386.48,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "tf_neg_s0",
+     "tf_roll_s2"
+    ],
+    "tf_rolled": [
+     false,
+     true
+    ]
+   },
+   "K1_unexpected": []
+  }
+ ],
+ "prereg_sha256_after": "1089c03f7b368eb115a950ac3a04aba516713a1acc1efdd78af8349b033d31da",
+ "prereg_unchanged": true
+}
