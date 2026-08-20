@@ -630,6 +630,42 @@ declined to authorise.
 worse" on a run that was bit-identical to its own anchor. Fresh evidence for
 open decision **#2**; no redefinition is proposed here.
 
+### 9.10 The generalisation gap — the sparse code's win is not a regularisation effect
+
+`scripts/exp/013_generalisation_gap.py`, the committed instrument, 4 full-split
+evaluations per run over 15 runs. `gap = bpc(test) - bpc(train slice)`, so a
+POSITIVE gap is the overfitting direction. Measured after §9 was written; no bar
+was pre-registered on it and none is applied.
+
+| arm | gap, fresh | gap, carried | test bpc |
+|---|---:|---:|---:|
+| `if_anchor` | +0.00472 ± 0.00104 | −0.00388 ± 0.00156 | 2.25245 |
+| `if_binin` | **−0.00156 ± 0.00344** | **−0.01043 ± 0.00324** | **2.29813** |
+| `io_sp05` | +0.00357 ± 0.00171 | −0.00579 ± 0.00266 | 2.26199 |
+| `io_mall` | +0.00800 ± 0.00221 | −0.00135 ± 0.00272 | 2.23088 |
+| `io_wide` | +0.00752 ± 0.00192 | −0.00203 ± 0.00218 | 2.22812 |
+
+`if_anchor`'s row reproduces `EXP_021` §9.5's to five decimals, which is the
+cross-check that the instrument is measuring the same thing — they are the same
+three runs.
+
+**Two readings, and the second is the useful one.**
+
+1. **`io_sp05`'s gain is not a generalisation effect.** Its gap is within
+   ~0.0012 of the anchor's on fresh and ~0.0019 on carried, both inside the seed
+   spread. The sparse code wins on held-out text because it is a better model,
+   not because it overfits less.
+2. **The arm with the SMALLEST gap has the WORST test bpc.** `if_binin`
+   generalises best on both protocols — its carried gap is the only one below
+   −0.01 — and it is 0.0457 worse than the analogue anchor. That is `EXP_013`'s
+   no-overfitting finding arriving from a new direction: on this model at this
+   size, moving the gap does not move the number, and an intervention that looks
+   like a regulariser is not thereby an improvement.
+
+**`io_mall` and `io_wide` have the same gap** (+0.0080 vs +0.0075 fresh,
+−0.0014 vs −0.0020 carried), which is one more respect in which H6 cannot
+separate them — and it is not the respect §9.6 found that it can.
+
 ---
 
 ## 10. Referred to Elliot, and not decided here

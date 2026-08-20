@@ -596,6 +596,38 @@ other ~0.33.
 control read 120 of 128 on this statistic. Fresh evidence for open decision
 **#2**; no redefinition is proposed here.
 
+### 9.11 The generalisation gap — a fourth axis on which the rungs are the same
+
+`scripts/exp/013_generalisation_gap.py`, 4 full-split evaluations per run over
+12 runs. `gap = bpc(test) - bpc(train slice)`; positive is the overfitting
+direction. Measured after §9 was written; no bar was pre-registered on it and
+none is applied. `if_anchor` is seeds 3–5 and `nm_local` seeds 3–5, so this is
+the **fresh-seed** cell rather than a re-reading of `EXP_021` §9.5's.
+
+| arm | gap, fresh | gap, carried |
+|---|---:|---:|
+| `if_anchor` | +0.00303 ± 0.00224 | −0.00473 ± 0.00220 |
+| `nm_const` | **+0.01006 ± 0.00126** | **+0.00060 ± 0.00150** |
+| `nm_pos` | +0.00875 ± 0.00199 | −0.00014 ± 0.00060 |
+| `nm_local` | **+0.01004 ± 0.00216** | **+0.00107 ± 0.00164** |
+
+**`nm_const` and `nm_local` differ by 0.00002 on fresh and 0.00047 on carried.**
+The ladder is now indistinguishable on **four** separate measurements: test bpc
+(+0.00022), `rms(kappa)` (1.10× between these two), the beyond-horizon component
+(both inside 0.0006 of zero), and the generalisation gap. The only statistic
+that separates them at all is the `c = 0` / within-reach split in §9.6, and no
+bar was pre-registered on that.
+
+Every modulated rung widens the gap against the anchor by ~0.006–0.007 on both
+protocols. **That is a marker and not a criticism**: `EXP_013` established this
+model is in an underfitting regime, and §9.6's totals show every rung is better
+on held-out text. A modulator that fits the training slice harder *and* scores
+better held-out is what an increase in usable capacity looks like here.
+
+`nm_local`'s row is consistent with `EXP_021` §9.5's (+0.00835 / −0.00105) on
+its own three seeds, within the spread — which is the cross-check that the
+instrument is measuring the same thing on a different cell.
+
 ---
 
 ## 10. Referred to Elliot, and not decided here
