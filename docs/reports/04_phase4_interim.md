@@ -1355,10 +1355,28 @@ rev 13. The pre-registration SHA-256 stamps hold byte-for-byte, so the
 ordering is not — and no commit made later can supply it. Both logs additionally
 state they were committed before the first run while having been untracked, and
 supply `CONTRIBUTING.md` §2's stamped hash **without** the recorded
-reconstruction recipe that is the second half of the substitute for a commit, so
-their digests are not independently checkable by a third party. **`EXP_022` and
-`EXP_023` met the condition** (`858c48a`, `98d3f62`), which is what makes the
-deviation visible rather than invisible. **Nothing in §18 or §19 is retracted**;
+reconstruction recipe that is the second half of the substitute for a commit.
+
+**That second half is now measured rather than asserted, and the result is worse
+than "undocumented".** `scripts/exp/verify_prereg_hash.py` reconstructs a
+pre-registration's pre-results bytes and hashes them against the stamp.
+**`EXP_022` and `EXP_023` VERIFY** — their stamped bytes reproduce exactly, so
+their hypotheses are provably the ones their runs were scored against.
+**`EXP_020` and `EXP_021` do not**, and a deliberate search says the recipe is
+unrecoverable rather than merely unlisted: every prefix of each live log was
+hashed under both line-ending conventions, crossed with six plausible status
+lines, five §9 layouts and two truncation points, and **nothing reproduces
+either stamp**. **This is NOT a finding that either hypothesis was edited** — a
+cosmetic change above §9 after stamping would produce exactly this and is far
+more likely — but it means that for those two experiments **the stamp is no
+longer independent evidence of anything**, which is the guarantee §2 exists to
+preserve. `CONTRIBUTING.md` §3's rule for an unrecoverable reasoning trail is to
+say so in the artifact, and this is that. The older logs (`EXP_005`–`EXP_018`)
+predate the layout and read UNVERIFIED for that reason; they are evidence
+neither way and the tool says so rather than implying otherwise.
+
+**`EXP_022` and `EXP_023` met the resolver condition too** (`858c48a`,
+`98d3f62`), which is what makes the deviation visible rather than invisible. **Nothing in §18 or §19 is retracted**;
 the runs are what they are and the bars fired as they fired. Whether the project
 wants a standing gate that refuses to run a resolver whose file is untracked is
 **Elliot's**, and it is the same shape as #10's still-open half.
