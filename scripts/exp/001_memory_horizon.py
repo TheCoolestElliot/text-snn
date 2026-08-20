@@ -67,6 +67,59 @@ K_VALUES = (1, 2, 4, 8, 16, 32, 64, 128, 256)
 
 # Pre-registered arm list. Seeds are the ones the Phase-2 campaign produced.
 ARMS: dict[str, str] = {
+    # EXP_020's interface ladder and EXP_021's neuromodulation ladder. Registry
+    # entries and nothing else: the statistic, the k-sweep and the F1 tolerance
+    # are untouched, which is EXP_005's failure mode K5. They are here because an
+    # UNREGISTERED run falls into the "other" bucket, where two different arms in
+    # one invocation are averaged into a number describing neither -- and this
+    # invocation carries eleven arms at once.
+    "if_anchor_s0": "if_anchor", "if_anchor_s1": "if_anchor",
+    "if_anchor_s2": "if_anchor",
+    # EXP_023 extends the SAME anchor configuration to n = 6. Registered under
+    # the same label on purpose -- these are three more seeds of one cell, not a
+    # second arm -- and they are legal only because they are fresh seeds under a
+    # NEW pre-registration: `CONTRIBUTING.md` §4 forbids adding seeds to a cell
+    # after seeing its result *within* one experiment, which is why EXP_021
+    # priced this and did not run it.
+    "if_anchor_s3": "if_anchor", "if_anchor_s4": "if_anchor",
+    "if_anchor_s5": "if_anchor",
+    # EXP_022's input-density ladder and output-readout leg. `io_sp*` are the
+    # same binary code as `if_binin` at three sparser densities, so `if_binin`
+    # is the q = 0.50 rung of the same ladder and is NOT re-run. `io_mall` is
+    # `if_mlayer` at UNMATCHED width, which is the whole point of it: EXP_020
+    # paid for the wider head by cutting d 512 -> 471, and that cut is the same
+    # size as the effect, so H4 there could not be read.
+    "io_sp34_s0": "io_sp34", "io_sp34_s1": "io_sp34", "io_sp34_s2": "io_sp34",
+    "io_sp10_s0": "io_sp10", "io_sp10_s1": "io_sp10", "io_sp10_s2": "io_sp10",
+    "io_sp05_s0": "io_sp05", "io_sp05_s1": "io_sp05", "io_sp05_s2": "io_sp05",
+    "io_mall_s0": "io_mall", "io_mall_s1": "io_mall", "io_mall_s2": "io_mall",
+    "io_wide_s0": "io_wide", "io_wide_s1": "io_wide", "io_wide_s2": "io_wide",
+    # EXP_023's two new rungs of the modulator ladder. Registered APART from
+    # each other and from `nm_local`/`nm_rolled` for the reason the three
+    # dopamine arms below are: they are four points on one ladder, and pooling
+    # any two would average a rung with the rung it exists to be read against.
+    "nm_const_s0": "nm_const", "nm_const_s1": "nm_const",
+    "nm_const_s2": "nm_const",
+    "nm_pos_s0": "nm_pos", "nm_pos_s1": "nm_pos", "nm_pos_s2": "nm_pos",
+    "nm_local_s3": "nm_local", "nm_local_s4": "nm_local",
+    "nm_local_s5": "nm_local",
+    "nm_rolled_s3": "nm_rolled", "nm_rolled_s4": "nm_rolled",
+    "nm_rolled_s5": "nm_rolled",
+    "if_nest_s0": "if_nest",
+    "if_fold_s0": "if_fold", "if_fold_s1": "if_fold", "if_fold_s2": "if_fold",
+    "if_foldwide_s0": "if_foldwide", "if_foldwide_s1": "if_foldwide",
+    "if_foldwide_s2": "if_foldwide",
+    "if_binin_s0": "if_binin", "if_binin_s1": "if_binin",
+    "if_binin_s2": "if_binin",
+    "if_mlayer_s0": "if_mlayer", "if_mlayer_s1": "if_mlayer",
+    "if_mlayer_s2": "if_mlayer",
+    "nm_local_s0": "nm_local", "nm_local_s1": "nm_local",
+    "nm_local_s2": "nm_local",
+    "nm_rolled_s0": "nm_rolled", "nm_rolled_s1": "nm_rolled",
+    "nm_rolled_s2": "nm_rolled",
+    "tf_neg_s0": "tf_neg", "tf_neg_s1": "tf_neg", "tf_neg_s2": "tf_neg",
+    "tf_pos_s0": "tf_pos", "tf_pos_s1": "tf_pos", "tf_pos_s2": "tf_pos",
+    "tf_roll_s0": "tf_roll", "tf_roll_s1": "tf_roll", "tf_roll_s2": "tf_roll",
     "snn_beta0.5_s0": "snn_beta0.5",
     "snn_beta0.5_s1": "snn_beta0.5",
     "snn_beta0.5_s2": "snn_beta0.5",

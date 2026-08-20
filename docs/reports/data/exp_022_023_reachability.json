@@ -1,0 +1,2400 @@
+{
+  "audit": "09_gradient_reachability",
+  "screen": "03_phase3_candidates.md \u00a77.2",
+  "rule": "flag a new parameter whose |dL/dp| is exactly zero (fatal: AdamW cannot move it), or whose per-element RMS is below 1/100 of the layer weights' (worth recording; Adam is scale-free, so this is not on its own a reason to reject an init)",
+  "ratio_floor": 0.01,
+  "torch": "2.12.1+cu130",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "shape": {
+    "batch_size": 128,
+    "seq_len": 256,
+    "d_model": 512,
+    "n_layers": 2,
+    "seed": 0
+  },
+  "self_test": {
+    "all_held": true,
+    "controls": [
+      {
+        "control": "ctl_live",
+        "expected_leg": "pass",
+        "verdict": "PASS",
+        "held": true
+      },
+      {
+        "control": "ctl_dead",
+        "expected_leg": "zero",
+        "verdict": "SADDLE",
+        "held": true
+      },
+      {
+        "control": "ctl_faint",
+        "expected_leg": "ratio",
+        "verdict": "FAINT",
+        "held": true
+      }
+    ]
+  },
+  "reproduction": {
+    "ran": true,
+    "source": "docs/reports/data/exp_004_gradient_reachability.json",
+    "rtol": 1e-06,
+    "worst_rel_residual": 0.0,
+    "mismatches": [],
+    "held": true
+  },
+  "out_of_scope": {
+    "#3": "depth K = 4 -- no new parameter; width is re-derived, not added",
+    "#4": "readout capacity -- new parameters, but ordinary Linear layers outside the time loop with no adjoint recursion to collapse",
+    "#7": "reset ablation -- a free parameter of the existing kernel, not a learnable one",
+    "#8": "variance-scaled initialisation -- rescales existing parameters",
+    "#9": "firing-rate set-point -- a loss term plus a threshold constant; the learnable-threshold half is screened as `thr`",
+    "#11": "parameter-scaling pilot -- no new parameter kind",
+    "#12": "surrogate width sweep -- alpha is a hyperparameter, not learned",
+    "#13": "training budget -- no parameter",
+    "#14": "re-measure sigma -- a measurement, not an arm"
+  },
+  "results": [
+    {
+      "key": "ctl_live",
+      "candidate": "control (synthetic)",
+      "init": "per-channel gain on the current",
+      "derivation": "reachable by construction",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_gain"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.00040487624937668443,
+            "rms": 6.725152343278751e-05,
+            "l2": 0.0015217282343655825,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9533431187974668,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.00028896844014525414,
+            "rms": 6.75729097565636e-05,
+            "l2": 0.0015290004666894674,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9578990221377647,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "ctl_dead",
+      "candidate": "control (synthetic)",
+      "init": "parameter multiplied by exactly 0.0",
+      "derivation": "dL/dp = 0.0 * upstream, exactly",
+      "derived_zero": [
+        "ctl_dead"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "ctl_dead"
+      ],
+      "measured_zero": [
+        "ctl_dead"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_dead"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_dead": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_dead": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer0.ctl_dead",
+        "layer1.ctl_dead"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "ctl_faint",
+      "candidate": "control (synthetic)",
+      "init": "contribution scaled by 1e-9",
+      "derivation": "reachable, but ~1e-9 of the layer weights' scale",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "ctl_faint"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "ctl_faint": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 9.450534972643698e-13,
+            "rms": 2.0833219860610236e-13,
+            "l2": 4.7140195393036155e-12,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 2.953272399302176e-09,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "ctl_faint": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 3.5977856978341993e-12,
+            "rms": 1.1558032092170989e-12,
+            "l2": 2.6152840310045278e-11,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 1.6384417481522e-08,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [
+        "layer0.ctl_faint",
+        "layer1.ctl_faint"
+      ],
+      "verdict": "FAINT",
+      "passes_screen": false
+    },
+    {
+      "key": "c01_w0",
+      "candidate": "#1 two-compartment neuron",
+      "init": "proposed (exact nesting), w = 0",
+      "derivation": "dL/dvs_t = w*dL/dv_t + beta_s*dL/dvs_{t+1}, dL/dvs_L = 0; at w = 0 every dL/dvs_t is zero by backward induction",
+      "derived_zero": [
+        "beta_s_raw"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "beta_s_raw"
+      ],
+      "measured_zero": [
+        "beta_s_raw"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": "c01_w01",
+      "new_params": [
+        "w",
+        "beta_s_raw"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "w": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0026720527093857527,
+            "rms": 0.00035438447957858443,
+            "l2": 0.008018805645406246,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 5.02367809336719,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "beta_s_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "w": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.002172641223296523,
+            "rms": 0.0005033640773035586,
+            "l2": 0.011389829218387604,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 7.135580799545513,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "beta_s_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer0.beta_s_raw",
+        "layer1.beta_s_raw"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "c01_w01",
+      "candidate": "#1 two-compartment neuron",
+      "init": "pre-registered fallback, w = 0.1",
+      "derivation": "w != 0 opens the mix path, so both parameters carry gradient",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "w",
+        "beta_s_raw"
+      ],
+      "loss": 5.324160575866699,
+      "train_bpc": 7.681140059699415,
+      "linear_weight_grad_rms": 0.00038324008346535265,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.09094774723052979,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.005046345759183168,
+            "rms": 0.00031543496879749,
+            "l2": 0.16150270402431488,
+            "exactly_zero": false
+          },
+          "w": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.009185783565044403,
+            "rms": 0.001231614500284195,
+            "l2": 0.027868254110217094,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 3.213689155757479,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "beta_s_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000782024406362325,
+            "rms": 9.912325185723603e-05,
+            "l2": 0.0022429032251238823,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.25864531434431076,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 0.004620611667633057,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.008556509390473366,
+            "rms": 0.0004407342930790037,
+            "l2": 0.2256559580564499,
+            "exactly_zero": false
+          },
+          "w": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.012287209741771221,
+            "rms": 0.0018381989793851972,
+            "l2": 0.04159369692206383,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 4.7964684767933,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "beta_s_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0010572295868769288,
+            "rms": 0.00015378765237983316,
+            "l2": 0.0034798174165189266,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.401282796385093,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "c02",
+      "candidate": "#2 current normalisation (RMSNorm on cur)",
+      "init": "gain = 1",
+      "derivation": "the gain multiplies the current on every path to the loss",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "rms_gain"
+      ],
+      "loss": 5.3633317947387695,
+      "train_bpc": 7.737652182911727,
+      "linear_weight_grad_rms": 0.001049528713338077,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.13470458984375,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.009640032425522804,
+            "rms": 0.0007249892805702984,
+            "l2": 0.3711945116519928,
+            "exactly_zero": false
+          },
+          "rms_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.003206116147339344,
+            "rms": 0.0005467269220389426,
+            "l2": 0.012371017597615719,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.5209261214970012,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 0.15987110137939453,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.012766099534928799,
+            "rms": 0.0012951493263244629,
+            "l2": 0.663116455078125,
+            "exactly_zero": false
+          },
+          "rms_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0030552586540579796,
+            "rms": 0.0007840144098736346,
+            "l2": 0.017740221694111824,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.7470156841922301,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "c05",
+      "candidate": "#5 learned per-channel decay",
+      "init": "beta_raw = logit(0.5), nests baseline",
+      "derivation": "dL/dbeta_c = sum_t (dL/dv_pre_t) * v_{t-1}; v_{t-1} is a nonzero state and its adjoint is not suppressed, so the exact-nesting init is reachable",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "beta_raw"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.342060856288299e-05,
+            "rms": 8.1702910392778e-06,
+            "l2": 0.00018487258057575673,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1158202869359928,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "beta_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000116470102511812,
+            "rms": 2.8164356990600936e-05,
+            "l2": 0.0006372866919264197,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.39925186169469373,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "c06_b0",
+      "candidate": "#6 adaptive threshold (adLIF)",
+      "init": "proposed (exact nesting), b = 0",
+      "derivation": "dL/da_t = b*dL/dthr_t + rho*dL/da_{t+1}, dL/da_L = 0; at b = 0 every dL/da_t is zero, and dL/drho with it",
+      "derived_zero": [
+        "adapt_rho_raw"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "adapt_rho_raw"
+      ],
+      "measured_zero": [
+        "adapt_rho_raw"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": "c06_b01",
+      "new_params": [
+        "adapt_b",
+        "adapt_rho_raw"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "adapt_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000789804442320019,
+            "rms": 0.00010203762212768197,
+            "l2": 0.002308847848325968,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 1.446463365415092,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "adapt_rho_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "adapt_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 3.352511157572735e-07,
+            "rms": 1.5909137118796934e-08,
+            "l2": 3.59982692543781e-07,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.0002255245030005674,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "adapt_rho_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer0.adapt_rho_raw",
+        "layer1.adapt_rho_raw"
+      ],
+      "below_ratio_floor": [
+        "layer1.adapt_b"
+      ],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "c06_b01",
+      "candidate": "#6 adaptive threshold (adLIF)",
+      "init": "fallback, b = 0.1",
+      "derivation": "b != 0 opens the adaptation path",
+      "derived_zero": [],
+      "post_hoc_zero": [
+        "adapt_b",
+        "adapt_rho_raw"
+      ],
+      "post_hoc_reason": "MEASURED, NOT DERIVED -- the first general run of this screen (2026-08-03) disagreed with the line above, and the disagreement was the real finding. Both parameters are exactly zero in LAYER 1, and not because of the b = 0 saddle: layer 1's firing rate at this init is exactly 0.0, so the spike-driven adaptation variable a_t = rho*a_{t-1} + s_{t-1} is identically zero and takes both of its parameters' gradients with it. Raising b from 0 to 0.1 lifts the threshold, which drops layer 0's rate from 0.0518 to 0.0447, which tips layer 1 from 2.98e-07 to silent. This is the initialisation pathology of `audit_07_init_pathology.json` and EXP_003 R4, not a property of the candidate: a SPIKE-DRIVEN parameter in a silent layer is unreachable at every init of its own. Candidate #6 is therefore not screenable independently of candidate #8 (variance-scaled initialisation), which #6.3 ranked only as a prerequisite for deep arms. The pre-run derivation is left above, unedited.",
+      "expected_zero": [
+        "adapt_b",
+        "adapt_rho_raw"
+      ],
+      "measured_zero": [
+        "adapt_b",
+        "adapt_rho_raw"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": false,
+      "silent_layers": [
+        1
+      ],
+      "fallback": null,
+      "new_params": [
+        "adapt_b",
+        "adapt_rho_raw"
+      ],
+      "loss": 5.321946144104004,
+      "train_bpc": 7.677945309976987,
+      "linear_weight_grad_rms": 5.342183794709854e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.044671714305877686,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0005408985307440162,
+            "rms": 4.345135312178172e-05,
+            "l2": 0.02224709279835224,
+            "exactly_zero": false
+          },
+          "adapt_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0003815059026237577,
+            "rms": 5.4461204854305834e-05,
+            "l2": 0.0012323163682594895,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 1.0194558432870944,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "adapt_rho_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 3.3870124752866104e-05,
+            "rms": 4.851589437748771e-06,
+            "l2": 0.00010977893543895334,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.09081659531357011,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 0.0,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0005774027085863054,
+            "rms": 6.180424679769203e-05,
+            "l2": 0.03164377436041832,
+            "exactly_zero": false
+          },
+          "adapt_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": true
+          },
+          "adapt_rho_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": true
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer1.adapt_b",
+        "layer1.adapt_rho_raw"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "c10_th0",
+      "candidate": "#10 rotational / complex membrane",
+      "init": "proposed, theta = 0, im_0 = 0",
+      "derivation": "\u00a76.4: at theta = 0 with im_0 = 0 the imaginary component has no downstream influence, so dL/dim_t = 0 for all t and dL/dtheta = sum_t dL/dre_t * (-r*im_{t-1}) = 0 exactly",
+      "derived_zero": [
+        "rot_theta"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "rot_theta"
+      ],
+      "measured_zero": [
+        "rot_theta"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": "c10_thpi8",
+      "new_params": [
+        "rot_r_raw",
+        "rot_theta"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "rot_r_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.342060856288299e-05,
+            "rms": 8.1702910392778e-06,
+            "l2": 0.00018487258057575673,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1158202869359928,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "rot_theta": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "rot_r_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.000116470102511812,
+            "rms": 2.8164356990600936e-05,
+            "l2": 0.0006372866919264197,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.39925186169469373,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "rot_theta": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer0.rot_theta",
+        "layer1.rot_theta"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "c10_thpi8",
+      "candidate": "#10 rotational / complex membrane",
+      "init": "fallback, theta = pi/8",
+      "derivation": "theta != 0 couples re and im, so both parameters carry gradient",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "rot_r_raw",
+        "rot_theta"
+      ],
+      "loss": 5.321946144104004,
+      "train_bpc": 7.677945309976987,
+      "linear_weight_grad_rms": 5.681690890924074e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.05080777406692505,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0006540329777635634,
+            "rms": 4.577419167617336e-05,
+            "l2": 0.02343638613820076,
+            "exactly_zero": false
+          },
+          "rot_r_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 2.580855471023824e-05,
+            "rms": 4.235846063238569e-06,
+            "l2": 9.58462551352568e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.07455256092873522,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "rot_theta": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.94256237288937e-05,
+            "rms": 1.0694686352508143e-05,
+            "l2": 0.00024199312611017376,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.18823069677359291,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 1.1920928955078125e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.000689410837367177,
+            "rms": 6.603821384487674e-05,
+            "l2": 0.03381156548857689,
+            "exactly_zero": false
+          },
+          "rot_r_raw": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.285471368348226e-05,
+            "rms": 1.0725200809247326e-05,
+            "l2": 0.0002426835853839293,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.1887677632442087,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "rot_theta": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0001399838802171871,
+            "rms": 3.539660610840656e-05,
+            "l2": 0.000800933747086674,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.6229942245705246,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "thr",
+      "candidate": "EXP_004 \u00a710.6 learned per-channel threshold",
+      "init": "gain = 1, nests baseline",
+      "derivation": "dL/dg = -thr * sum_t (dL/d(v_pre - thr*g)); the surrogate derivative is nonzero, so an exact-nesting init is reachable here even though #1's is not",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "thr_gain"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "thr_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0005265288054943085,
+            "rms": 0.00011241936590522528,
+            "l2": 0.002543759997934103,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 1.593632730304364,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "thr_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0018056046683341265,
+            "rms": 0.0005800870130769908,
+            "l2": 0.013125870376825333,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 8.223188620751861,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "da_mult",
+      "candidate": "EXP_018 dopamine, multiplicative gain",
+      "init": "k = 0, nests baseline",
+      "derivation": "dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c} * DA_{b,t}. The reset is multiplicative and DA multiplies the current, so at k = 0 the factor (1 + k*DA) is 1 and every downstream adjoint is the BASELINE's -- nonzero. dL/dk therefore vanishes only if DA is identically 0, which needs the model's predictive distribution to be exactly its own entropy at every position. A randomly initialised head is not, so k = 0 is NOT a saddle. Predicted separately, and this is the interesting half: the RATIO will be small, because exp_018_da_calibration.json measures sd(phi) = 0.0245 at initialisation against 1.1291 at convergence -- 46x. A small ratio is not fatal (Adam is scale-free per parameter) and an exactly-zero one would be.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "k"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 5.032212357036769e-06,
+            "rms": 7.575367249046394e-07,
+            "l2": 1.714109930617269e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.010738677535624614,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 4.764475306728855e-06,
+            "rms": 6.635555109824054e-07,
+            "l2": 1.5014546988822985e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.009406420078608955,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [
+        "layer1.k"
+      ],
+      "verdict": "FAINT",
+      "passes_screen": false
+    },
+    {
+      "key": "da_add",
+      "candidate": "EXP_018 dopamine, additive drive",
+      "init": "k = 0, nests baseline",
+      "derivation": "dL/dk_c = sum_{b,t} (dL/dcur'_{b,t,c}) * DA_{b,t}; the current itself drops out of the additive form, so this leg is reachable wherever DA is nonzero even in a channel whose current is 0",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "k"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 2.771470690277056e-06,
+            "rms": 7.09099992945994e-07,
+            "l2": 1.6045101801864803e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.010052048850462382,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "k": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.1837317288154736e-05,
+            "rms": 3.202820607839385e-06,
+            "l2": 7.247155735967681e-05,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.04540249545838188,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "iface_fold",
+      "candidate": "EXP_020 folded input table",
+      "init": "T ~ N(0, 1/3)",
+      "derivation": "the folded table IS layer 0's current, so dL/dT[v] is the sum of dL/dcur over every position holding token v -- the same path the embedding had, one GEMM shorter. Reachable unless a token never occurs in the batch, which is a sampling property and not a saddle.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "code.shadow",
+        "table",
+        "table_bias"
+      ],
+      "loss": 5.321943283081055,
+      "train_bpc": 7.677941182393367,
+      "linear_weight_grad_rms": 8.060354593908414e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.05073237419128418,
+          "linear_weight": {
+            "present": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": true,
+            "numel": 104960,
+            "abs_max": 0.0001694608072284609,
+            "rms": 4.258019089320442e-06,
+            "l2": 0.00137949304189533,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.05282669688674026,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0008506964659318328,
+            "rms": 0.00021808674500789493,
+            "l2": 0.004934739787131548,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 2.7056718469025327,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 3.5762786865234375e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.001017682603560388,
+            "rms": 8.060354593908414e-05,
+            "l2": 0.04126901552081108,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "iface_binary",
+      "candidate": "EXP_020 binary input code",
+      "init": "shadow ~ N(0,1), thr_in = 0",
+      "derivation": "dL/dshadow = dL/dB * atan_grad(shadow - thr_in, alpha). The surrogate derivative is strictly positive everywhere and peaks at alpha/2 = 1.0, so the straight-through path is reachable. Predicted separately: the RATIO will be BELOW 1, because a shadow drawn from N(0,1) sits where atan_grad is about 0.09-1.0 rather than at its peak, so the code's gradient is attenuated relative to a dense embedding's. An attenuated gradient is not fatal (Adam is scale-free per parameter); an exactly zero one would be.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "code.shadow",
+        "table",
+        "table_bias"
+      ],
+      "loss": 5.321944236755371,
+      "train_bpc": 7.677942558254574,
+      "linear_weight_grad_rms": 7.390196697087958e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.052546679973602295,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.00055298040388152,
+            "rms": 6.059448060113937e-05,
+            "l2": 0.031024372205138206,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": true,
+            "numel": 104960,
+            "abs_max": 9.70934415818192e-05,
+            "rms": 2.0982017758797156e-06,
+            "l2": 0.0006797655951231718,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.02839169053113963,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.4437904357910156e-06,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.001098774722777307,
+            "rms": 8.515462832292542e-05,
+            "l2": 0.043599169701337814,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "nm_g0",
+      "candidate": "EXP_021 local modulator",
+      "init": "proposed (exact nesting), kappa = 0",
+      "derivation": "dL/dkappa_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c} * DA_{b,t}, which is nonzero at kappa = 0 because the factor (1 + kappa*DA) is then 1 and every downstream adjoint is the BASELINE's. But the predictor reaches the loss ONLY through that factor: dL/da = (dL/dDA)*(dDA/dphi)*(dphi/da) and dL/dDA is proportional to kappa. At kappa = 0 all three of nm_a, nm_b and nm_log_tau are EXACTLY zero, by the same backward-induction argument that makes #1's w = 0 a saddle. This is EXP_004 2.2's pattern and it takes EXP_004's remedy: a pre-registered nonzero fallback.",
+      "derived_zero": [
+        "nm_a",
+        "nm_b",
+        "nm_log_tau"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "nm_a",
+        "nm_b",
+        "nm_log_tau"
+      ],
+      "measured_zero": [
+        "nm_a",
+        "nm_b",
+        "nm_log_tau"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": "nm_g01",
+      "new_params": [
+        "nm_gain",
+        "nm_a",
+        "nm_b",
+        "nm_log_tau",
+        "nm_pos"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0002880179090425372,
+            "rms": 6.733812915626913e-05,
+            "l2": 0.0015236878534778953,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9545708228897347,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": true,
+            "numel": 1,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer1.nm_a",
+        "layer1.nm_b",
+        "layer1.nm_log_tau"
+      ],
+      "below_ratio_floor": [],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    },
+    {
+      "key": "nm_g01",
+      "candidate": "EXP_021 local modulator",
+      "init": "pre-registered fallback, kappa = 0.1",
+      "derivation": "kappa != 0 opens the modulation path, so the predictor's parameters and the squash scale all carry gradient",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "nm_gain",
+        "nm_a",
+        "nm_b",
+        "nm_log_tau",
+        "nm_pos"
+      ],
+      "loss": 5.321939945220947,
+      "train_bpc": 7.677936366879142,
+      "linear_weight_grad_rms": 7.947658014018089e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0009872778318822384,
+            "rms": 6.498052971437573e-05,
+            "l2": 0.033270031213760376,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 4.470348358154297e-06,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0009778636740520597,
+            "rms": 9.170924022328109e-05,
+            "l2": 0.046955130994319916,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0003135953447781503,
+            "rms": 7.210695184767246e-05,
+            "l2": 0.001631594030186534,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9072729566432041,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.3409945154307934e-08,
+            "rms": 2.574424007306675e-09,
+            "l2": 5.825256366165377e-08,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 3.239223432570831e-05,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 1.8091773412720613e-08,
+            "rms": 5.255675006310412e-09,
+            "l2": 1.1892235107779925e-07,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 6.61286003630308e-05,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": true,
+            "numel": 1,
+            "abs_max": 3.1036552172736265e-06,
+            "rms": 3.1036552172736265e-06,
+            "l2": 3.1036552172736265e-06,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.039051192336149794,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [
+        "layer1.nm_a",
+        "layer1.nm_b"
+      ],
+      "verdict": "FAINT",
+      "passes_screen": false
+    },
+    {
+      "key": "iface_sp10",
+      "candidate": "EXP_022 sparse input code",
+      "init": "thr_in = 1.2816 (q = 0.10)",
+      "derivation": "the same straight-through path `iface_binary` screens, at a threshold the shadow no longer straddles symmetrically. PREDICTED IN ADVANCE, and it is the one thing that could sink this ladder: a shadow drawn from N(0,1) against a threshold at 1.2816 sits FURTHER from that threshold than it does at 0, so atan_grad is attenuated MORE than the q = 0.5 rung's and the ratio must come in BELOW iface_binary's. Attenuated is survivable (Adam is scale-free per parameter); exactly zero is not, and would mean the sparse rungs measure a frozen code rather than a sparse one. This is why EXP_022 6 names iface_code_sd as the axis that would separate density from plasticity, and prices it.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "code.shadow",
+        "table",
+        "table_bias"
+      ],
+      "loss": 5.3219146728515625,
+      "train_bpc": 7.677899906557159,
+      "linear_weight_grad_rms": 7.383257616311312e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.052914202213287354,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0007945054676383734,
+            "rms": 5.8949710364686325e-05,
+            "l2": 0.0301822517067194,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": true,
+            "numel": 104960,
+            "abs_max": 0.00014795185416005552,
+            "rms": 2.3564737148262793e-06,
+            "l2": 0.0007634392823092639,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.03191644985568819,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 5.125999450683594e-06,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.001101585105061531,
+            "rms": 8.618253923486918e-05,
+            "l2": 0.04412546008825302,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "iface_mall",
+      "candidate": "EXP_022 all-layer readout, unmatched",
+      "init": "d = 512, blocks = 2",
+      "derivation": "the head's extra columns multiply layer 0's spikes, which are nonzero at init (02_baseline_report 5.2 measures layer 0 at 4.9 % while layer 1 is silent), so dL/dW_head over the layer-0 block is reachable at step 0 -- and it is the block that is NOT reachable in the baseline. The layer-1 block is the baseline's own and inherits its reachability.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "code.shadow",
+        "table",
+        "table_bias"
+      ],
+      "loss": 5.329489707946777,
+      "train_bpc": 7.688828372123586,
+      "linear_weight_grad_rms": 0.000277875573374331,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.003912877757102251,
+            "rms": 0.0003892558452207595,
+            "l2": 0.19929899275302887,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.000670353474561125,
+            "rms": 5.394024992710911e-05,
+            "l2": 0.027617407962679863,
+            "exactly_zero": false
+          },
+          "code.shadow": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "table_bias": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "nm_const",
+      "candidate": "EXP_023 constant gain rung",
+      "init": "kappa = 0.1, DA = 1",
+      "derivation": "dL/dkappa_c = sum_{b,t} (dL/dcur'_{b,t,c}) * cur_{b,t,c}, with DA = 1 identically. Reachable at ANY kappa including 0, because unlike the RPE rungs there is no second parameter whose only path to the loss runs through kappa. This rung has no saddle to fall back from.",
+      "derived_zero": [],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [],
+      "measured_zero": [],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "nm_gain",
+        "nm_a",
+        "nm_b",
+        "nm_log_tau",
+        "nm_pos"
+      ],
+      "loss": 5.321939945220947,
+      "train_bpc": 7.677936366879142,
+      "linear_weight_grad_rms": 7.951096631586552e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0009877885458990932,
+            "rms": 6.500785093521699e-05,
+            "l2": 0.0332840196788311,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 4.470348358154297e-06,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0009782585548236966,
+            "rms": 9.174947626888752e-05,
+            "l2": 0.04697573184967041,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0003147544339299202,
+            "rms": 7.238828402478248e-05,
+            "l2": 0.0016379599692299962,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.9104188689798154,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [],
+      "below_ratio_floor": [],
+      "verdict": "PASS",
+      "passes_screen": true
+    },
+    {
+      "key": "nm_pos",
+      "candidate": "EXP_023 positional gain rung",
+      "init": "kappa = 0.1, w = 0",
+      "derivation": "AT w = 0, DA = tanh(0) = 0 IDENTICALLY, so dL/dkappa_c = sum (dL/dcur') * cur * DA is EXACTLY zero -- the mirror image of nm_g0, where kappa was the reachable one and the predictor was not. But dL/dw_t = sum_c kappa_c * (dL/dcur'_{t,c}) * cur_{t,c} * sech^2(0) is NOT zero at kappa = 0.1, so w moves at step 1 and kappa becomes reachable at step 2. That is a TWO-STEP SEQUENTIAL UNLOCK out of 20,000 and not EXP_004 2.2's saddle, which had no reachable parameter at all. Asserted, not argued, by tests/test_neuromod.py::test_g4_the_pos_rung_unlocks_kappa_in_two_steps_rather_than_never.",
+      "derived_zero": [
+        "nm_gain"
+      ],
+      "post_hoc_zero": [],
+      "post_hoc_reason": "",
+      "expected_zero": [
+        "nm_gain"
+      ],
+      "measured_zero": [
+        "nm_gain"
+      ],
+      "derivation_agrees": true,
+      "predicted_before_any_run": true,
+      "silent_layers": [],
+      "fallback": null,
+      "new_params": [
+        "nm_gain",
+        "nm_a",
+        "nm_b",
+        "nm_log_tau",
+        "nm_pos"
+      ],
+      "loss": 5.3219451904296875,
+      "train_bpc": 7.67794393411578,
+      "linear_weight_grad_rms": 7.054283196339384e-05,
+      "per_layer": [
+        {
+          "layer": 0,
+          "firing_rate": 0.051750779151916504,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008589903591200709,
+            "rms": 5.7633351389085874e-05,
+            "l2": 0.029508275911211967,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          }
+        },
+        {
+          "layer": 1,
+          "firing_rate": 2.980232238769531e-07,
+          "linear_weight": {
+            "present": true,
+            "numel": 262144,
+            "abs_max": 0.0008600993314757943,
+            "rms": 8.14308223198168e-05,
+            "l2": 0.0416925810277462,
+            "exactly_zero": false
+          },
+          "nm_gain": {
+            "present": true,
+            "numel": 512,
+            "abs_max": 0.0,
+            "rms": 0.0,
+            "l2": 0.0,
+            "exactly_zero": true,
+            "rms_vs_linear_weight": 0.0,
+            "zero_leg": true,
+            "ratio_leg": false,
+            "flagged": true,
+            "in_silent_layer": false
+          },
+          "nm_a": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_b": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_log_tau": {
+            "present": false,
+            "rms_vs_linear_weight": null,
+            "zero_leg": false,
+            "ratio_leg": false,
+            "flagged": false,
+            "in_silent_layer": false
+          },
+          "nm_pos": {
+            "present": true,
+            "numel": 256,
+            "abs_max": 1.4110297570368857e-06,
+            "rms": 5.262940021566465e-07,
+            "l2": 8.420704034506343e-06,
+            "exactly_zero": false,
+            "rms_vs_linear_weight": 0.007460630478086725,
+            "zero_leg": false,
+            "ratio_leg": true,
+            "flagged": true,
+            "in_silent_layer": false
+          }
+        }
+      ],
+      "exactly_zero": [
+        "layer1.nm_gain"
+      ],
+      "below_ratio_floor": [
+        "layer1.nm_pos"
+      ],
+      "verdict": "SADDLE",
+      "passes_screen": false
+    }
+  ]
+}

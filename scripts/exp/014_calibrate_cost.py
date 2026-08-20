@@ -90,7 +90,8 @@ from snn.model import (  # noqa: E402
     spiking_param_count,
     twocomp_param_count,
     twocomp_threshold_param_count,
-)
+                       interface_param_count,
+                       local_dopamine_param_count,)
 
 #: Candidate widths for EXP_014's original width sweep.  512 is the committed
 #: baseline and anchors the ratios.  1020/1481 are the exact-error-minimising
@@ -153,6 +154,25 @@ def param_count(arch: str, vocab_size: int, d_model: int, n_layers: int) -> int:
         return twocomp_param_count(vocab_size, d_model, n_layers)
     if arch == "twocomp_threshold":
         return twocomp_threshold_param_count(vocab_size, d_model, n_layers)
+    if arch == "interface":
+        # EXP_020's arm. Its count depends on the SWITCHES, not on `arch` alone
+        # -- the fold removes `d*d + d`, a multi-block readout adds
+        # `(blocks - 1)*d*V` -- and this signature carries no switches. Rather
+        # than return a number that is right only at the defaults, it returns
+        # the defaults' count and the caller must pass `--base-arch snn` when
+        # pricing a non-default switch. That is stated as a raise below rather
+        # than as a comment nobody reads.
+        return interface_param_count(vocab_size, d_model, n_layers,
+                                     fold=False, read_layers="last",
+                                     read_lags=1)
+    if arch == "localdopamine":
+        # EXP_021's arm adds `3*d + 1` per MODULATED layer -- the diagonal
+        # predictor's `a` and `b`, the per-channel sensitivity, and the learned
+        # `log_tau`. It does NOT share `dopamine_param_count`: that one is
+        # head-driven and adds `d` per layer including layer 0, this one is
+        # previous-layer-driven and adds nothing to layer 0 because layer 0 has
+        # no previous layer. The two differ by construction, not by shape.
+        return local_dopamine_param_count(vocab_size, d_model, n_layers)
     if arch == "gru":
         target = spiking_param_count(vocab_size, d_model, n_layers)
         return gru_param_count(
@@ -165,10 +185,19 @@ def _calib_dir() -> Path:
     return _REPO / "experiments" / "runs" / "_exp014_cost"
 
 
-def _train_argv(arch: str, d: int, name: str, out_dir: Path) -> list[str]:
+def _train_argv(arch: str, d: int, name: str, out_dir: Path,
+                flags: list[str] | None = None) -> list[str]:
     """The child command.  Pinned by `tests/test_calibrate_cost.py` for
     `arch="snn"`, so generalising this file cannot silently change what EXP_014's
-    committed calibration was measured with."""
+    committed calibration was measured with.
+
+    `flags` appends extra `--field value` pairs so that an arm whose cost
+    depends on a SWITCH rather than on `arch` and `d_model` -- every EXP_020,
+    EXP_022 and EXP_023 arm does -- can be priced by this instrument instead of
+    a second one.  Two implementations of one statistic is how they stop
+    agreeing, and this project's single checked GPU-hour estimate was low by
+    3.1x, so the pre-flight is not optional and must not fork.
+    """
     return [
         sys.executable, str(_REPO / "scripts" / "train.py"),
         "--arch", arch,
@@ -183,7 +212,7 @@ def _train_argv(arch: str, d: int, name: str, out_dir: Path) -> list[str]:
         "--ckpt_every", str(CALIB_STEPS * 10),
         "--run_name", name,
         "--out_dir", str(out_dir),
-    ]
+    ] + list(flags or ())
 
 
 def _run_name_for(arch: str, d: int) -> str:
@@ -192,26 +221,37 @@ def _run_name_for(arch: str, d: int) -> str:
     return f"calib_d{d}" if arch == "snn" else f"calib_{arch}_d{d}"
 
 
-def _run_one(arch: str, d: int) -> dict:
+def _run_one(arch: str, d: int, *, label: str | None = None,
+             flags: list[str] | None = None,
+             params: int | None = None) -> dict:
     """Train `CALIB_STEPS` steps in one configuration and read its own log back."""
-    name = _run_name_for(arch, d)
+    name = _run_name_for(arch, d) if label is None else f"calib_{label}"
     out_dir = _calib_dir()
     run_dir = out_dir / name
     if run_dir.exists():
         shutil.rmtree(run_dir)
 
     t0 = time.time()
-    proc = subprocess.run(_train_argv(arch, d, name, out_dir),
+    proc = subprocess.run(_train_argv(arch, d, name, out_dir, flags),
                           capture_output=True, text=True)
     wall = time.time() - t0
 
     rec: dict = {
         "arch": arch,
         "d_model": d,
-        "params": param_count(arch, _VOCAB, d, _LAYERS),
+        # `param_count` dispatches on `arch` alone, so for a switched arm the
+        # caller passes the count its own closed form gives.  Passed rather than
+        # guessed: the realised-vs-closed check below is the thing that caught
+        # `local_dopamine_param_count` missing `nm_log_tau`, and it only works
+        # if the closed form being checked is the arm's.
+        "params": (param_count(arch, _VOCAB, d, _LAYERS) if params is None
+                   else int(params)),
         "returncode": proc.returncode,
         "process_wall_clock_s": round(wall, 2),
     }
+    if label is not None:
+        rec["label"] = label
+        rec["flags"] = list(flags or ())
     if proc.returncode != 0:
         rec["error"] = "\n".join(
             (proc.stderr or proc.stdout or "").strip().splitlines()[-12:]
@@ -320,6 +360,11 @@ def main() -> None:
                     help="committed 20k run whose wall-clock the projection scales")
     ap.add_argument("--keep", action="store_true",
                     help="do not delete the calibration run directories")
+    ap.add_argument("--extra", default=None,
+                    help="JSON list of switched rows: "
+                         '[{"label":..,"arch":..,"d_model":..,'
+                         '"flags":[..],"params":N}]. For arms whose cost '
+                         "depends on a switch rather than on arch and width")
     args = ap.parse_args()
 
     arches = [a.strip() for a in args.arch.split(",") if a.strip()]
@@ -341,9 +386,28 @@ def main() -> None:
                       f"clip {rec['n_logged_steps_over_clip']}/{rec['n_train_records']}",
                       flush=True)
 
+    for row in json.loads(Path(args.extra).read_text(encoding="utf-8")
+                          if Path(args.extra).exists() else args.extra) \
+            if args.extra else []:
+        label = str(row["label"])
+        print(f"[calib] {label} ...", flush=True)
+        rec = _run_one(str(row.get("arch", "snn")), int(row["d_model"]),
+                       label=label, flags=[str(f) for f in row.get("flags", ())],
+                       params=row.get("params"))
+        results.append(rec)
+        if "error" in rec:
+            print(f"[calib] {label} FAILED: {rec['error'][:300]}", flush=True)
+        else:
+            print(f"[calib] {label}  {rec['median_steps_per_s_steady']} steps/s  "
+                  f"{rec['peak_vram_gib']} GiB  params={rec['params']:,}",
+                  flush=True)
+
     ok = [r for r in results if "error" not in r]
+    # `"label" not in r` so a switched `--extra` row at the base arch and width
+    # can never become the denominator every ratio is taken against.
     base = next((r for r in ok
-                 if r["d_model"] == args.base_width and r["arch"] == args.base_arch),
+                 if r["d_model"] == args.base_width
+                 and r["arch"] == args.base_arch and "label" not in r),
                 None)
 
     for r in ok:
