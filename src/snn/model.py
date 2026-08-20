@@ -47,11 +47,15 @@ from typing import TYPE_CHECKING, Any
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch import Tensor
 
 from snn.data import _mix64
 from snn.dopamine import (DA_MODES, DA_SOURCES, apply_dopamine, dopamine,
                           roll_across_batch, rpe)
+from snn.interface import (BinaryInputCode, folded_param_count, readout,
+                           readout_width)
+from snn.neuromod import NM_SOURCES, bernoulli_rpe
 from snn.neuron import lif_scan
 from snn.noise import (NOISE_STREAM_SALT, add_background_noise,
                        fill_background_noise, noise_scale)
@@ -65,6 +69,10 @@ if TYPE_CHECKING:  # avoid a hard import cycle / hard dependency at runtime
 
 __all__ = [
     "SpikingCharLM",
+    "InterfaceCharLM",
+    "LocalDopamineCharLM",
+    "interface_param_count",
+    "local_dopamine_param_count",
     "AnalogueCharLM",
     "TwoCompartmentCharLM",
     "TwoCompDetachCharLM",
@@ -1303,6 +1311,511 @@ class TwoCompThresholdCharLM(TwoCompartmentCharLM):
 
 
 # ---------------------------------------------------------------------------
+# EXP_020: the interface arms -- what the model reads, and what it is read from
+# ---------------------------------------------------------------------------
+
+
+def interface_param_count(vocab_size: int, d_model: int, n_layers: int, *,
+                          fold: bool, read_layers: str, read_lags: int) -> int:
+    """Closed form for InterfaceCharLM. Mirrors `spiking_param_count`.
+
+    Nests it exactly: at `fold=False, read_layers='last', read_lags=1` this
+    returns `spiking_param_count(V, d, K)` for every V, d, K, which
+    `tests/test_interface.py::test_param_count_nests` asserts rather than
+    assumes.
+    """
+    blocks = (n_layers if read_layers == "all" else 1) * int(read_lags)
+    return folded_param_count(vocab_size, d_model, n_layers, folded=fold,
+                              read_blocks=blocks)
+
+
+class InterfaceCharLM(SpikingCharLM):
+    """The Phase-2 baseline with its two ends made explicit and variable.
+
+    Three independent switches, each nesting the baseline at its default:
+
+      `fold`         layer 0's GEMM is removed and the embedding table becomes
+                     the input current directly. An IDENTITY on the function
+                     class (`snn.interface` docstring), so the arm measures the
+                     factorisation's effect on the OPTIMISER, and -- at matched
+                     parameters and greater width -- what the freed 35.7 % buys.
+      `binary_input` the input code is passed through the project's own
+                     `atan_spike`, so layer 0 receives a `{0,1}` spike pattern
+                     exactly as layer 1 receives layer 0's. Completes I1 at the
+                     one boundary the committed model exempts from it.
+      `read_layers`  } the head reads a concatenation of `(layer, lag)` spike
+      `read_lags`    } blocks instead of the last layer at `t` alone. Both
+                     extensions are BINARY and both cost zero kernels inside the
+                     time loop.
+
+    At `fold=False, binary_input=False, read_layers='last', read_lags=1` this
+    class is `SpikingCharLM`, and not approximately: `tests/test_interface.py`'s
+    N1 asserts the forward is **bitwise** equal on a shared state dict, forward
+    and backward. That is the nesting gate `EXP_013` G1 and `EXP_011` K4 set the
+    precedent for, and it is bitwise here because -- unlike the additive dopamine
+    arm -- every default path is the same sequence of the same kernels.
+
+    I1..I5 are untouched. There is no new recurrence (I5: the only `[d, d]`
+    parameters are still `layers.k.weight`, still applied before a scan begins),
+    no new neuron (I2, I3), no new backward (I4, R10), and the inter-layer signal
+    is still binary (I1) -- more of it than before, since the input is now binary
+    too when `binary_input` is set.
+    """
+
+    def __init__(self, *args, fold: bool = False, binary_input: bool = False,
+                 read_layers: str = "last", read_lags: int = 1,
+                 thr_in: float = 0.0, code_sd: float = 1.0, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if read_layers not in ("last", "all"):
+            raise ValueError(
+                f"read_layers must be 'last' or 'all', got {read_layers!r}"
+            )
+        if read_lags < 1:
+            raise ValueError(f"read_lags must be >= 1, got {read_lags}")
+        if read_lags > self.d_model:
+            # Not a real limit, but a lag ladder longer than the width is a
+            # typo every time, and it would silently allocate a head wider than
+            # the model.
+            raise ValueError(f"read_lags {read_lags} is implausible")
+
+        self.fold = bool(fold)
+        self.binary_input = bool(binary_input)
+        self.read_layers_mode = str(read_layers)
+        self.read_lags = int(read_lags)
+        self.thr_in = float(thr_in)
+        self.code_sd = float(code_sd)
+
+        V, d, K = self.vocab_size, self.d_model, self.n_layers
+
+        # -- the input end ------------------------------------------------
+        #
+        # `_CharLMStack.__init__` has already built `embed` and K projections.
+        # Whichever of them this arm does not use is REMOVED rather than left
+        # unused: an unused parameter is still counted by `count_params`, still
+        # decayed by AdamW, and would make every parameter-matching gate in the
+        # experiment describe a model that is not the one that ran.
+        if self.binary_input:
+            self.code = BinaryInputCode(
+                V, d, thr_in=self.thr_in, alpha=self.surrogate_alpha,
+                # Folded, the code IS layer 0's current and matches its
+                # variance (1/3); unfolded it feeds a GEMM and matches the unit
+                # second moment that GEMM's init was calibrated for. Centred on
+                # both paths either way.
+                is_current=self.fold,
+                # EXP_022: the plasticity axis. Density is a function of
+                # thr_in/code_sd, so at thr_in = 0 this leaves q -- and
+                # therefore `gain` and `centre` -- exactly where EXP_020
+                # measured them, and moves only how far each bit sits from its
+                # own threshold at step 0.
+                code_sd=self.code_sd,
+            )
+        else:
+            self.code = None
+
+        if self.fold:
+            # T ~ N(0, 1/3): the distribution `E @ W0^T` has at the committed
+            # init, derived in `snn.interface`'s docstring and not measured
+            # first. Only allocated when the binary code is not doing this job.
+            if not self.binary_input:
+                self.table = nn.Parameter(
+                    torch.randn(V, d) * math.sqrt(1.0 / 3.0)
+                )
+            else:
+                self.table = None
+            self.table_bias = nn.Parameter(torch.zeros(d))
+            self.layers = nn.ModuleList(
+                [nn.Linear(d, d, bias=True) for _ in range(K - 1)]
+            )
+        else:
+            self.table = None
+            self.table_bias = None
+
+        if self.fold or self.binary_input:
+            # `embed` is dead on both paths: folded, the table replaced it;
+            # binary, the code replaced it.
+            self.embed = None
+
+        # -- the output end -----------------------------------------------
+        self.read_layer_idx = tuple(range(K)) if read_layers == "all" else (K - 1,)
+        self.read_lag_idx = tuple(range(self.read_lags))
+        width = readout_width(d, len(self.read_layer_idx), len(self.read_lag_idx))
+        if width != d:
+            self.head = nn.Linear(width, V, bias=True)
+
+    # -- state ------------------------------------------------------------
+
+    def init_state(self, batch_size: int, device=None) -> list[Tensor]:
+        """`_CharLMStack.init_state` reads `self.embed.weight.device`, which is
+        `None` on the folded and binary paths. The head is the one module every
+        arm has."""
+        if device is None:
+            device = self.head.weight.device
+        return [
+            torch.zeros(batch_size, self.d_model, device=device,
+                        dtype=torch.float32)
+            for _ in range(self.n_layers)
+        ]
+
+    # -- the input current for layer 0 ------------------------------------
+
+    def input_current(self, idx: Tensor) -> Tensor:
+        """`idx [B, L]` -> layer 0's input current `[B, L, d]`, fp32.
+
+        Four cases, one line each, and every one of them is O(1) kernels for the
+        whole sequence -- nothing here is inside the time loop.
+        """
+        if self.fold and self.binary_input:
+            return self.code(idx) + self.table_bias        # centred {0,1} code
+        if self.fold:
+            return F.embedding(idx, self.table) + self.table_bias
+        if self.binary_input:
+            return self._project(self.layers[0], self.code(idx))
+        return self._project(self.layers[0], self.embed(idx))
+
+    # -- forward ----------------------------------------------------------
+
+    def forward(self, idx: Tensor, state: list[Tensor] | None = None):
+        if idx.dim() != 2:
+            raise ValueError(f"idx must be [B, L], got shape {tuple(idx.shape)}")
+        batch_size = idx.shape[0]
+        if state is None:
+            state = self.init_state(batch_size, idx.device)
+        elif len(state) != self.n_layers:
+            raise ValueError(
+                f"state must hold {self.n_layers} tensors, got {len(state)}"
+            )
+
+        new_state: list[Tensor] = []
+        rates: list[Tensor] = []
+        emitted_all: list[Tensor] = []
+
+        cur = self.input_current(idx)
+        for k in range(self.n_layers):
+            if k > 0:
+                # Folded, `layers` holds K-1 projections and layer k reads
+                # index k-1; unfolded it holds K and layer k reads index k.
+                linear = self.layers[k - 1] if self.fold else self.layers[k]
+                cur = self._project(linear, emitted_all[-1])
+            emitted, v_final = self._scan(cur, state[k], k)
+            emitted_all.append(emitted)
+            new_state.append(v_final)
+            rates.append(emitted.detach().mean())
+
+        # A lag block reads `s[t - r]` from INSIDE this call's window, and no
+        # lag state is carried across calls. At L <= max(lag) every lagged block
+        # is therefore the zero padding and nothing else -- which is exactly
+        # what a one-character-at-a-time decode does, silently, forever. Raise
+        # rather than return a plausible logit built from zeros.
+        max_lag = self.read_lag_idx[-1]
+        if max_lag > 0 and idx.shape[1] <= max_lag:
+            raise ValueError(
+                f"a {len(self.read_lag_idx)}-tap readout needs L > {max_lag}; "
+                f"got L = {idx.shape[1]}. Below that every lagged block is the "
+                "zero padding, which trains nothing and decodes to a constant. "
+                "Single-step decoding a multi-tap readout requires the lag to "
+                "be carried in `state`, which changes the state contract "
+                "`snnchat.stepper._state_width` probes -- that is an arm, not a "
+                "flag."
+            )
+        h = readout(emitted_all, self.read_layer_idx, self.read_lag_idx)
+        logits = self.head(h)
+
+        aux: dict[str, Any] = {"firing_rate": rates}
+        if self.keep_spikes:
+            aux["spikes"] = emitted_all
+        if self.code is not None and self.keep_spikes:
+            # A diagnostic, detached, and never in the loss -- the same contract
+            # `firing_rate` carries. A code that collapsed to all-ones or
+            # all-zeros would still train and would still look plausible.
+            aux["code_density"] = self.code.density()
+        return logits, new_state, aux
+
+    # -- the fold, backwards ----------------------------------------------
+
+    def as_spiking_state_dict(self) -> dict[str, Tensor]:
+        """An UNFOLDED state dict for a `SpikingCharLM` of the same width.
+
+        Only defined when the fold can be inverted without inventing structure:
+        the folded table `T` is `E @ W0^T` for infinitely many `(E, W0)` pairs,
+        so this picks `E = T`, `W0 = I`, which reproduces the current exactly and
+        is the one choice that needs no measurement. It exists so that a folded
+        checkpoint can be evaluated by the committed `SpikingCharLM` code path --
+        `EXP_017`'s precedent, where the detached arm's checkpoint evaluates
+        bit-identically as `arch='twocomp'`.
+        """
+        if not self.fold or self.binary_input:
+            raise NotImplementedError(
+                "only the plain folded arm inverts; the binary code has no "
+                "real-valued preimage and the unfolded arm is already spiking"
+            )
+        if len(self.read_layer_idx) != 1 or len(self.read_lag_idx) != 1:
+            raise NotImplementedError(
+                "a multi-block readout has no SpikingCharLM counterpart"
+            )
+        d = self.d_model
+        sd = {
+            "embed.weight": self.table.detach().clone(),
+            "layers.0.weight": torch.eye(d, device=self.table.device,
+                                         dtype=self.table.dtype),
+            "layers.0.bias": self.table_bias.detach().clone(),
+        }
+        for k in range(1, self.n_layers):
+            sd[f"layers.{k}.weight"] = self.layers[k - 1].weight.detach().clone()
+            sd[f"layers.{k}.bias"] = self.layers[k - 1].bias.detach().clone()
+        sd["head.weight"] = self.head.weight.detach().clone()
+        sd["head.bias"] = self.head.bias.detach().clone()
+        return sd
+
+
+# ---------------------------------------------------------------------------
+# EXP_021: the feedforward neuromodulator (decision #3 admits this shape)
+# ---------------------------------------------------------------------------
+
+
+def local_dopamine_param_count(vocab_size: int, d_model: int, n_layers: int,
+                               *, source: str = "local",
+                               pos_len: int = 256) -> int:
+    """`spiking_param_count` plus what THIS RUNG of the ladder allocates.
+
+    Per MODULATED layer (there are `K-1` of them; layer 0 has no previous
+    layer and carries no modulator):
+
+        off / local / rolled    3*d + 1   a, b, kappa, log_tau
+        const                       d     kappa alone
+        pos                 d + pos_len   kappa and the positional table
+
+    The default is `local`, so every call written before the ladder existed
+    keeps the value it had.
+
+    Layer 0 has no previous layer and carries no modulator, so the extra is
+    `(3*d + 1)*(K-1)`: the diagonal predictor's `a` and `b`, the per-channel
+    sensitivity `kappa`, **and the learned scalar `log_tau`**. O(d) against an
+    O(d^2) stack -- 0.209 % at the committed shape -- which is why
+    width-matching this arm is parameter-matching it.
+
+    The `+ 1` is `nm_log_tau`, and it was missing from this formula for exactly
+    as long as `nm_log_tau` existed. `tests/test_neuromod.py`'s G4 caught it at
+    736,974 realised against 736,973 closed-form, **before EXP_021's ladder
+    started** -- where G2 asserts the two are equal, not close, and would have
+    aborted on the first run. The pre-registration already quotes 736,974.
+
+    That is the failure mode `InterfaceCharLM`'s own docstring names, met in
+    this file: a closed form that describes a model which is not the one that
+    ran. It arrived through EXP_021 §2.6's deliberate departure from EXP_018 --
+    tau learned rather than frozen -- and the docstring above was still
+    itemising EXP_018's three parameters.
+    """
+    if source not in NM_SOURCES:
+        raise ValueError(f"source must be one of {NM_SOURCES}, got {source!r}")
+    if source == "const":
+        per = d_model
+    elif source == "pos":
+        per = d_model + int(pos_len)
+    else:
+        per = 3 * d_model + 1
+    return spiking_param_count(vocab_size, d_model, n_layers) + per * (
+        n_layers - 1
+    )
+
+
+class LocalDopamineCharLM(SpikingCharLM):
+    """A neuromodulator driven by the PREVIOUS LAYER's spikes, not by the head.
+
+    For each layer `k >= 1`, layer `k-1`'s emission is scored against a diagonal
+    one-step predictor of itself, and the resulting Bernoulli reward prediction
+    error modulates layer `k`'s input current:
+
+        phi^k_t = bernoulli_rpe(s^{k-1}, a_k, b_k)          [B, L]
+        DA^k_t  = tanh(phi^k_t / tau)
+        cur^k   = cur^k * (1 + kappa_k * DA^k_t)
+
+    Everything here is outside the time loop: `shift_by_one`, a sigmoid, two
+    reductions over the channel axis and one broadcast multiply, all O(1)
+    kernels per layer against the scan's `K*L`. That is the same slot
+    `snn.prescan`, `snn.noise` and `snn.dopamine` occupy, and it is the reason
+    decision #3 admits this shape and forbids the head-driven one: the driving
+    activity is already computed when layer `k`'s scan begins, so there is no
+    second forward pass.
+
+    **Layer 0 is unmodulated** -- it has no previous layer. That is structural,
+    not an exemption. `nm_source='off'` skips the modulation by CODE PATH, so
+    the Phase-2 nesting does not rest on the float identity `cur*(1.0+0.0)`;
+    the parameters still exist, and G2 asserts they reach nothing.
+
+    I1..I5 hold unchanged. `a`, `b`, `kappa` are `[1, d]` per layer -- O(1)
+    parameters per neuron, no lateral `[d, d]` anywhere, and the temporal
+    recurrence is still diagonal in the channel axis. No new scan and no new
+    hand-written backward, so `snn.neuron` and its mutation campaign are
+    untouched and there is no new R10 gate.
+    """
+
+    def __init__(self, *args, nm_source: str = "off", nm_tau: float = 1.0,
+                 nm_gain_init: float = 0.0, nm_a_init: float = 0.0,
+                 nm_b_init: float = -2.97, nm_pos_len: int = 256,
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if nm_source not in NM_SOURCES:
+            raise ValueError(
+                f"nm_source must be one of {NM_SOURCES}, got {nm_source!r}"
+            )
+        if nm_tau <= 0.0:
+            raise ValueError(f"nm_tau must be > 0, got {nm_tau!r}")
+        if nm_pos_len < 1:
+            raise ValueError(f"nm_pos_len must be >= 1, got {nm_pos_len!r}")
+        self.nm_source = str(nm_source)
+        self.nm_tau = float(nm_tau)
+        self.nm_pos_len = int(nm_pos_len)
+        # Which rung of the ladder needs which parameters. An unused parameter
+        # is still counted by `count_params` and still decayed by AdamW, so the
+        # rungs that do not read the RPE do not ALLOCATE its predictor -- the
+        # same rule `InterfaceCharLM` states for `embed` on the folded path,
+        # and the reason `local_dopamine_param_count` takes the source.
+        self._needs_rpe = self.nm_source in ("local", "rolled")
+        self._needs_pos = self.nm_source == "pos"
+        d, K = self.d_model, self.n_layers
+
+        # One set per MODULATED layer, i.e. layers 1..K-1, indexed by k-1.
+        # ParameterList rather than a dict so the state dict's key order is the
+        # layer order and a checkpoint cannot silently permute.
+        #
+        # `off` allocates the predictor even though it never reads it, and that
+        # is deliberate: it makes the Phase-2 nesting a claim about the CODE
+        # PATH which G2 can check against a model that still carries the
+        # parameters. The `const` and `pos` rungs are different -- they are arms
+        # that will be scored, so a dead `[1, d]` block would be decayed by
+        # AdamW and counted by every parameter gate, describing a model that is
+        # not the one that ran.
+        _rpe_params = self._needs_rpe or self.nm_source == "off"
+        self.nm_a = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(nm_a_init)))
+             for _ in range(K - 1)] if _rpe_params else []
+        )
+        # b init: sigmoid(-2.97) = 0.0488, which is the measured firing rate of
+        # the layer this predictor reads AT INITIALISATION -- audit_07 puts
+        # layer 0 at 0.0482-0.0489 across three seeds, and 02_baseline_report
+        # §5.2 derives it. The CONVERGED rate is 0.34 (EXP_000 F3), and the
+        # init rate is the right one to match: the predictor starts where the
+        # population starts, so `phi` starts near zero and the squash starts
+        # unsaturated. `b` is learned, so it tracks the rate as it rises; a `b`
+        # initialised at the converged rate would put `phi` 0.2 nats/channel
+        # from zero at step 0, which is where `tanh` starts losing gradient.
+        self.nm_b = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(nm_b_init)))
+             for _ in range(K - 1)] if _rpe_params else []
+        )
+        # kappa init 0.0 nests the baseline exactly -- the same construction
+        # `da_gain_init` and `noise_amp` use. The §7.2 gradient-reachability
+        # screen is run on it before the arm trains, because a zero init is
+        # where this project has already found a saddle (EXP_004 §2.2).
+        self.nm_gain = nn.ParameterList(
+            [nn.Parameter(torch.full((1, d), float(nm_gain_init)))
+             for _ in range(K - 1)]
+        )
+        # tau is INITIALISED from the calibration and then LEARNED, one scalar
+        # per modulated layer. That is a deliberate departure from EXP_018,
+        # which froze tau, and the reason is a property of this signal rather
+        # than a preference: EXP_018's phi is a surprise over a 205-way
+        # vocabulary whose scale is near-stationary, while this one is a
+        # surprise over a population whose firing rate rises 7x during training
+        # (0.049 -> 0.34). A frozen tau that is right at step 0 is wrong at step
+        # 20,000, and a saturated tanh is the failure mode this arm cannot
+        # survive -- see `snn.neuromod.bernoulli_rpe` on why. Log-parameterised
+        # so tau > 0 by construction and weight decay pulls it toward 1.
+        self.nm_log_tau = nn.ParameterList(
+            [nn.Parameter(torch.tensor(math.log(float(nm_tau))))
+             for _ in range(K - 1)] if _rpe_params else []
+        )
+        # `pos`: one learned scalar per WINDOW POSITION per modulated layer,
+        # zero-initialised so `DA = tanh(0) = 0` and the arm starts at the
+        # anchor exactly as the RPE rungs do at `kappa = 0`. It unlocks in two
+        # steps rather than one -- at `w = 0` the gradient reaching `kappa` is
+        # identically zero because `DA` is, while `w`'s own gradient is
+        # `kappa * cur * dL/dcur` and is not -- so `w` moves at step 1 and
+        # `kappa` becomes reachable at step 2. That is a two-step sequential
+        # unlock out of 20,000 and NOT the saddle EXP_004 §2.2 found, which had
+        # no reachable parameter at all; §7.2's screen reports both.
+        self.nm_pos = nn.ParameterList(
+            [nn.Parameter(torch.zeros(1, self.nm_pos_len))
+             for _ in range(K - 1)] if self._needs_pos else []
+        )
+
+    def nm_active(self) -> bool:
+        return self.nm_source != "off"
+
+    def _driving_da(self, h: Tensor, k: int) -> Tensor:
+        """`DA` for layer `k`, given layer `k-1`'s emission `h`. `[B, L]`.
+
+        One branch per rung of `snn.neuromod.NM_SOURCES`, resolved on a string
+        fixed at construction, so every rung is a distinct code path and none of
+        them rests on a float identity.
+        """
+        B, L = h.shape[0], h.shape[1]
+        if self.nm_source == "const":
+            # DA = 1: `cur * (1 + kappa_c)` is a learned per-channel gain, which
+            # is EXP_008 Identity 1's per-channel threshold. Built as a real
+            # tensor rather than the Python float 1.0 so that the multiply, the
+            # broadcast and the kernel count are IDENTICAL to the other rungs'
+            # and the cost comparison is not measuring a removed kernel.
+            return torch.ones(B, L, device=h.device, dtype=torch.float32)
+        if self.nm_source == "pos":
+            if L > self.nm_pos_len:
+                raise ValueError(
+                    f"nm_source='pos' carries {self.nm_pos_len} positions but "
+                    f"the window is {L}. Raising rather than wrapping: a "
+                    "silently tiled positional gain is a different arm that "
+                    "trains and scores plausibly."
+                )
+            return torch.tanh(self.nm_pos[k - 1][:, :L]).expand(B, L)
+        phi = bernoulli_rpe(h.detach(), self.nm_a[k - 1], self.nm_b[k - 1])
+        da = torch.tanh(phi / torch.exp(self.nm_log_tau[k - 1]))
+        if self.nm_source == "rolled":
+            da = roll_across_batch(da)
+        return da
+
+    def forward(self, idx: Tensor, state: list[Tensor] | None = None):
+        if idx.dim() != 2:
+            raise ValueError(f"idx must be [B, L], got shape {tuple(idx.shape)}")
+        if state is None:
+            state = self.init_state(idx.shape[0], idx.device)
+        elif len(state) != self.n_layers:
+            raise ValueError(
+                f"state must hold {self.n_layers} tensors, got {len(state)}"
+            )
+
+        h = self.embed(idx)
+        new_state: list[Tensor] = []
+        rates: list[Tensor] = []
+        spikes: list[Tensor] = []
+        das: list[Tensor] = []
+
+        for k, linear in enumerate(self.layers):
+            cur = self._project(linear, h)
+            if k > 0 and self.nm_active():
+                # `h` is layer k-1's emission -- binary, already computed, and
+                # never the head's output. Detached: the modulator is a
+                # broadcast signal ABOUT the previous layer's activity, not a
+                # second gradient path into it, which is the contract
+                # DopamineCharLM._da holds for the head-driven signal.
+                da = self._driving_da(h, k)
+                cur = cur * (1.0 + self.nm_gain[k - 1] * da.unsqueeze(-1))
+                das.append(da.detach().mean())
+            emitted, v_final = self._scan(cur, state[k], k)
+            h = emitted
+            new_state.append(v_final)
+            rates.append(emitted.detach().mean())
+            if self.keep_spikes:
+                spikes.append(emitted)
+
+        logits = self.head(h)
+        aux: dict[str, Any] = {"firing_rate": rates}
+        if self.keep_spikes:
+            aux["spikes"] = spikes
+        if das:
+            aux["da_mean"] = das
+        return logits, new_state, aux
+
+
+# ---------------------------------------------------------------------------
 # Arm 3: the external anchor (deliberately violates I5)
 # ---------------------------------------------------------------------------
 
@@ -1447,7 +1960,8 @@ def build_model(cfg: "Config") -> nn.Module:
 
     arch = cfg.arch
     if arch in ("snn", "analogue", "twocomp", "twocomp_threshold",
-                "twocomp_detach", "tokenshift", "threshold", "noise", "dopamine"):
+                "twocomp_detach", "tokenshift", "threshold", "noise", "dopamine",
+                "interface", "localdopamine"):
         if cfg.surrogate != "atan":
             # §4.3 item 3: surrogate shape is robust, scale is fragile. Phase 2
             # locks the shape and sweeps width instead.
@@ -1515,6 +2029,33 @@ def build_model(cfg: "Config") -> nn.Module:
         elif arch == "noise":
             model = NoisyCharLM(noise_amp=cfg.noise_amp, noise_p=cfg.noise_p,
                                 **common)
+        elif arch == "interface":
+            # EXP_020. Every switch defaults to the value that nests the
+            # Phase-2 baseline bitwise, so `arch="interface"` alone is the
+            # anchor and not a fourth arm. Nothing here is re-tuned: the three
+            # init constants are derived in `snn.interface`'s docstring and
+            # `iface_thr_in` is not swept, which §6 of the pre-registration
+            # names as a limitation.
+            model = InterfaceCharLM(
+                fold=cfg.iface_fold,
+                binary_input=cfg.iface_binary_input,
+                read_layers=cfg.iface_read_layers,
+                read_lags=cfg.iface_read_lags,
+                thr_in=cfg.iface_thr_in,
+                code_sd=cfg.iface_code_sd,
+                **common,
+            )
+        elif arch == "localdopamine":
+            # EXP_021. The modulator decision #3 ADMITS: driven by layer k-1's
+            # own emission, O(1) kernels per layer, no second forward pass.
+            # `nm_tau` is calibrated and not re-tuned per arm; `nm_gain_init`
+            # is not swept. Both are §6 limitations of the pre-registration.
+            model = LocalDopamineCharLM(
+                nm_source=cfg.nm_source, nm_tau=cfg.nm_tau,
+                nm_gain_init=cfg.nm_gain_init, nm_a_init=cfg.nm_a_init,
+                nm_b_init=cfg.nm_b_init, nm_pos_len=cfg.nm_pos_len,
+                **common,
+            )
         elif arch == "dopamine":
             # EXP_018. `da_scale` is not re-tuned per arm and `da_gain_init` is
             # not swept: both are passed through unchanged from the calibration,
@@ -1540,8 +2081,8 @@ def build_model(cfg: "Config") -> nn.Module:
     else:
         raise ValueError(
             "arch must be 'snn', 'analogue', 'twocomp', 'twocomp_threshold', "
-            "'twocomp_detach', 'tokenshift', 'threshold', 'noise', 'dopamine' "
-            f"or 'gru', got {arch!r}"
+            "'twocomp_detach', 'tokenshift', 'threshold', 'noise', 'dopamine', "
+            f"'interface', 'localdopamine' or 'gru', got {arch!r}"
         )
 
     return model.to(cfg.device)

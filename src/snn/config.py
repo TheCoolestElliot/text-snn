@@ -50,7 +50,13 @@ import torch  # noqa: E402
 
 CORPUS_CHOICES = ("enwik8", "text8")
 ARCH_CHOICES = ("snn", "analogue", "twocomp", "twocomp_threshold", "twocomp_detach",
-                "tokenshift", "threshold", "noise", "dopamine", "gru")
+                "tokenshift", "threshold", "noise", "dopamine", "interface",
+                "localdopamine", "gru")
+IFACE_READ_CHOICES = ("last", "all")
+#: Kept in step with `snn.neuromod.NM_SOURCES` by
+#: tests/test_neuromod.py::test_config_choices_match_the_module -- two tuples
+#: naming the same thing is how they stop agreeing.
+NM_SOURCE_CHOICES = ("off", "const", "pos", "rolled", "local")
 DA_MODE_CHOICES = ("mult", "add")
 DA_SOURCE_CHOICES = ("off", "rpe", "rolled")
 RESET_CHOICES = ("hard", "soft", "detached", "none")
@@ -154,6 +160,87 @@ class Config:
     da_scale: float = 1.1291
     da_gain_init: float = 0.0       # dopamine only: per-channel sensitivity; 0.0 nests the baseline
 
+    # --- EXP_020: the interface (arch="interface") ----------------------
+    # Every default here nests the Phase-2 baseline BITWISE, forward and
+    # backward -- not "to a tolerance". That is what makes `arch="interface"`
+    # with no other flag a legitimate anchor rather than a fourth thing to
+    # control for, and tests/test_interface.py::test_nests_spiking asserts it.
+    # The same reason `noise_amp` and `da_gain_init` default the way they do: a
+    # run that forgets a flag trains the baseline, not something undocumented.
+    iface_fold: bool = False        # remove layers.0's GEMM; the table IS the current
+    iface_binary_input: bool = False  # layer 0 receives {0,1}, completing I1
+    iface_read_layers: str = "last"   # "last" | "all": which layers the head reads
+    iface_read_lags: int = 1          # how many taps t, t-1, ...; 1 nests the baseline
+    # The input code's firing threshold. 0.0 against a zero-mean shadow is
+    # density 0.5, which is the value `snn.interface`'s gain derivation assumes;
+    # it is NOT swept, and moving it moves the derived gain with it.
+    iface_thr_in: float = 0.0
+    # EXP_022: the input code's PLASTICITY axis, orthogonal to its density.
+    # The realised density is a function of `iface_thr_in / iface_code_sd`, so
+    # at the default threshold this moves no density, no gain and no centre --
+    # only how far each bit's shadow sits from its own threshold at step 0, and
+    # therefore how much of `atan_spike`'s surrogate gradient it receives.
+    # 1.0 is the value EXP_020's `binin` ran at.
+    iface_code_sd: float = 1.0
+
+    # --- EXP_021: neuromodulation --------------------------------------
+    # Two independent forms, deliberately separable: `nm_*` moves the RPE from
+    # the head to the previous layer (arch="localdopamine", a forward-pass
+    # modulator that decision #3 ADMITS); `tf_kappa` moves it off the forward
+    # pass entirely and onto the learning rule, and applies to EVERY arch
+    # because it changes no function class. Running both at once would compose
+    # two arms, which no pre-registration here does.
+    # EXP_023 turns this into a LADDER of decreasing signal content in one
+    # fixed algebraic form: off < const < pos < rolled < local. See
+    # snn.neuromod.NM_SOURCES -- `const` is a learned per-channel gain (which
+    # EXP_008 Identity 1 makes a learned threshold), `pos` is a learned
+    # function of window position and nothing else, and both exist because
+    # EXP_021 could not say whether its winner won by being time-varying or
+    # merely by being a gain.
+    nm_source: str = "off"          # "off" | "const" | "pos" | "rolled" | "local"
+    # How many window positions `nm_source='pos'` carries. Must cover seq_len:
+    # a positional gain that wrapped would be a different arm that still trains.
+    nm_pos_len: int = 256
+    # tau for the LOCAL signal. Different quantity and different units from
+    # da_scale (nats over d channels, not over V symbols), so it is calibrated
+    # separately and never inherited. Provenance:
+    # docs/reports/data/exp_021_nm_calibration.json.
+    nm_tau: float = 1.0
+    nm_gain_init: float = 0.0       # per-channel sensitivity; 0.0 nests the baseline
+    nm_a_init: float = 0.0          # diagonal predictor slope
+    # Predictor prior. sigmoid(-0.7) = 0.332, which is the CONVERGED population
+    # rate (EXP_000 F3: 0.345-0.392), read off layer 0 -- the predictor consumes
+    # layer k-1's spikes, so at K = 2 the only modulated layer's predictor reads
+    # LAYER 0, not layer 1 as this comment used to say.
+    #
+    # THIS IS NOT THE VALUE EXP_021 SS2.6 CERTIFIES THE ARM ON, and the
+    # difference is not cosmetic. That section certifies the squash unsaturated
+    # at `b = -2.97 = logit(0.0488)`, layer 0's rate AT INITIALISATION, measuring
+    # `mean sech^2(phi/tau) = 0.777`. `LocalDopamineCharLM.__init__` still
+    # carries -2.97 as its own default, but `build_model` forwards
+    # `cfg.nm_b_init`, so THIS value is what every committed nm_* run trained
+    # with -- verified in each run's own config.json.
+    #
+    # With `nm_a_init = 0.0` the init logit is `b` exactly, so
+    # `phi = (rbar - sigmoid(b)) * b`. At layer 0's init rate 0.0488:
+    #     b = -2.97 -> phi = -0.0000, phi/tau = -0.00, sech^2 = 1.000
+    #     b = -0.70 -> phi = +0.1981, phi/tau = +3.46, sech^2 = 0.004
+    # so the shipped value starts SATURATED and desaturates as the rate climbs,
+    # while the certified value starts unsaturated and saturates. Each is right
+    # at one end of training. `nm_tau` is learned (SS2.6), which is the design's
+    # answer to the 7x rate rise, so the saturation need not be permanent -- but
+    # the gradient into (a, b) at step 0 is attenuated ~190x against the point
+    # SS2.6 certifies. Recorded, referred, and NOT changed: -0.7 is what every
+    # committed number used, and CONTRIBUTING.md SS4 forbids moving a baseline to
+    # make a diagnostic look better. Pinned by
+    # tests/test_neuromod.py::test_nm_b_init_is_the_value_the_runs_actually_used.
+    nm_b_init: float = -0.7
+    # The three-factor loss weight. 0.0 nests the unweighted objective BY CODE
+    # PATH. |kappa| < 1 is enforced so a weight can never reach zero and delete
+    # a position from the gradient. Not swept: 0.5 is the value at which the
+    # extreme weight ratio is exactly 3.0.
+    tf_kappa: float = 0.0
+    tf_rolled: bool = False         # batch-roll the weights: THE CONTROL
     # --- optimisation ----------------------------------------------------
     lr: float = 3e-3
     weight_decay: float = 0.1
@@ -200,6 +287,60 @@ class Config:
             raise ValueError(f"Config.noise_p must be in (0, 1), got {self.noise_p!r}")
         if self.noise_amp < 0.0:
             raise ValueError(f"Config.noise_amp must be >= 0, got {self.noise_amp!r}")
+        self._check_choice("iface_read_layers", IFACE_READ_CHOICES)
+        if self.iface_read_lags < 1:
+            raise ValueError(
+                f"Config.iface_read_lags must be >= 1, got {self.iface_read_lags!r}"
+            )
+        if self.iface_read_lags > self.seq_len:
+            # A readout tap longer than the window reads nothing but the zero
+            # padding for every position, which trains and looks plausible.
+            raise ValueError(
+                f"Config.iface_read_lags ({self.iface_read_lags}) exceeds "
+                f"seq_len ({self.seq_len}); every position would read only pad"
+            )
+        if self.iface_code_sd <= 0.0:
+            raise ValueError(
+                f"Config.iface_code_sd must be > 0, got {self.iface_code_sd!r}"
+            )
+        self._check_choice("nm_source", NM_SOURCE_CHOICES)
+        if self.nm_tau <= 0.0:
+            raise ValueError(f"Config.nm_tau must be > 0, got {self.nm_tau!r}")
+        if self.nm_pos_len < 1:
+            raise ValueError(
+                f"Config.nm_pos_len must be >= 1, got {self.nm_pos_len!r}"
+            )
+        if (self.arch == "localdopamine" and self.nm_source == "pos"
+                and self.nm_pos_len < self.seq_len):
+            # The forward raises too, but three hours later. A positional gain
+            # that does not cover the window is a typo every time.
+            raise ValueError(
+                f"Config.nm_pos_len ({self.nm_pos_len}) is shorter than "
+                f"seq_len ({self.seq_len}); nm_source='pos' would raise mid-run"
+            )
+        if not -1.0 < self.tf_kappa < 1.0:
+            # At |kappa| >= 1 a weight can reach 0 or go negative, deleting a
+            # position from the gradient or rewarding the model for getting it
+            # wrong. Caught at construction, not three hours into a run.
+            raise ValueError(
+                f"Config.tf_kappa must be in (-1, 1), got {self.tf_kappa!r}"
+            )
+        if self.tf_rolled and self.tf_kappa == 0.0:
+            # The rolled control of an inactive weighting is the unweighted
+            # objective, so the run would be an anchor wearing a control's name.
+            raise ValueError(
+                "tf_rolled=True with tf_kappa=0.0 is the unweighted objective; "
+                "the control would silently BE the anchor"
+            )
+        if self.tf_rolled and self.batch_size < 2:
+            raise ValueError(
+                f"tf_rolled needs batch_size >= 2; got {self.batch_size}. At "
+                "B = 1 the roll is the identity and the control would be the arm"
+            )
+        if self.arch == "localdopamine" and self.nm_source == "rolled"                 and self.batch_size < 2:
+            raise ValueError(
+                f"nm_source='rolled' needs batch_size >= 2; got {self.batch_size}"
+            )
         self._check_choice("da_mode", DA_MODE_CHOICES)
         self._check_choice("da_source", DA_SOURCE_CHOICES)
         # Caught here rather than inside the forward pass: `dopamine()` divides by
@@ -372,6 +513,34 @@ _HELP: dict[str, str] = {
                 "docs/reports/data/exp_018_da_calibration.json",
     "da_gain_init": "dopamine only: initial per-channel sensitivity k; 0.0 nests "
                     "the Phase-2 baseline",
+    "iface_fold": "interface only: fold layers.0 into the embedding table "
+                  "(an identity on the function class; frees d*d params)",
+    "iface_binary_input": "interface only: binarise the input code through "
+                          "atan_spike, so layer 0 receives {0,1} like every "
+                          "other layer",
+    "iface_read_layers": "interface only: 'last' or 'all' -- which layers' "
+                         "spikes the head reads",
+    "iface_read_lags": "interface only: number of readout taps (t, t-1, ...); "
+                       "1 nests the baseline",
+    "iface_thr_in": "interface only: input-code firing threshold; 0.0 is "
+                    "density 0.5, which the gain derivation assumes",
+    "iface_code_sd": "interface only: sd of the input code's shadow at init. "
+                     "Density depends on iface_thr_in/iface_code_sd, so at the "
+                     "default threshold this changes plasticity and not "
+                     "density; 1.0 is EXP_020's value",
+    "nm_pos_len": "localdopamine only: window positions carried by "
+                  "nm_source='pos'; must be >= seq_len",
+    "nm_source": "localdopamine only: 'off' nests Phase 2; 'local' is the"
+                 "previous layer's Bernoulli RPE; 'rolled' is the control",
+    "nm_tau": "localdopamine only: squash scale in nats over d channels; "
+              "calibrated, see docs/reports/data/exp_021_nm_calibration.json",
+    "nm_gain_init": "localdopamine only: initial per-channel sensitivity; "
+                    "0.0 nests the Phase-2 baseline",
+    "nm_a_init": "localdopamine only: diagonal predictor slope at init",
+    "nm_b_init": "localdopamine only: predictor prior logit at init",
+    "tf_kappa": "three-factor loss weight w = 1 + kappa*tanh(phi/tau); 0.0 "
+                "nests the unweighted objective by code path",
+    "tf_rolled": "three-factor: roll the weights along the batch axis (control)",
     "lr": "peak learning rate",
     "weight_decay": "AdamW weight decay",
     "beta1": "AdamW beta1",
@@ -403,6 +572,8 @@ _CHOICES: dict[str, tuple[str, ...]] = {
     "lr_schedule": SCHEDULE_CHOICES,
     "da_mode": DA_MODE_CHOICES,
     "da_source": DA_SOURCE_CHOICES,
+    "iface_read_layers": IFACE_READ_CHOICES,
+    "nm_source": NM_SOURCE_CHOICES,
 }
 
 
