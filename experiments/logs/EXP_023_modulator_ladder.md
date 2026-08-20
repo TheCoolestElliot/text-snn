@@ -5,7 +5,7 @@ reachability screen in §2.5 and the cost pre-flight in §2.6, and **before any
 arm in §3 was trained, any checkpoint was written, and any bpc existed for any
 arm in §3.** **Committed before the first run of §3.**
 
-**Status: OPEN.**
+**Status: CLOSED 2026-08-20. H6, H1 and H5 held; H3 FAILED; H2 and H4 UNRESOLVED; H7 flat at 1.1176. The headline replicates out of sample at -0.02535 — and the rung that knows NOTHING is worth -0.02975 against the rung that knows this sequence's own prediction error at -0.02953. The optimiser buys the form, not the signal.**
 
 ---
 
@@ -348,4 +348,285 @@ because a rung whose gain never unlocked would train, score plausibly, and be
 
 ## 9. Results
 
-*(appended after the run; nothing above this line is rewritten)*
+*(appended after the run — nothing above this line is rewritten)*
+
+**Closed 2026-08-20, ~2.1 GPU-hours** (15 training runs at 7,177 s, plus
+evaluation, a 24-checkpoint horizon sweep and the §2.5/§2.6 pre-flights already
+recorded above). Pre-registration SHA-256 stamped into `exp_023_run_manifest.json`
+before the first run and re-checked after the last: **unchanged**, and re-verified
+at resolution (`prereg_matches_manifest: true`). All 15 runs completed, **none
+diverged**, G2 exact on 15/15 **and** every rung's realised count equal to its own
+closed form, no G5 violation, no K1 unexpected field, no VRAM alarm. The horizon
+probe's F1 self-check passed on all 24 checkpoints (`f1_failures: []`).
+
+**G8's second clause passed on all three `nm_pos` runs** — `rms(nm_gain)` =
+0.9927 / 0.9765 / 0.9825 against the 0.1 init, so the two-step unlock §2.4
+derived actually happened and no run is excluded. **The resolver was committed
+before any bpc was read** (`98d3f62`), which is §8's entry condition.
+
+### 9.1 H6 FIRST, and separately: the headline replicates out of sample
+
+§4 required this before every other bar, because a replication and a power
+increase are not the same number.
+
+> **H6 HELD.** `nm_local` seeds 3–5 against `if_anchor` seeds 3–5, paired,
+> **fresh seeds only**: **−0.02535 bpc, paired t = −8.45, 3/3 seeds negative**,
+> 2.7× the bar. `EXP_021`'s headline was −0.03371.
+
+Per-seed: 2.22010 / 2.22285 / 2.22315 against 2.24518 / 2.25353 / 2.24344.
+**The arm is real and it replicates**, at **75 % of the size** `EXP_021`
+reported. The three seeds that produced the original number were not the reason
+for it.
+
+### 9.2 The scoreboard
+
+| bar | verdict | one line |
+|---|---|---|
+| **H6** out-of-sample replication | **HELD** | −0.02535, t = −8.45, 3/3 fresh seeds |
+| **H1** the constant rung vs the anchor | **HELD** | **−0.02975**, Welch t = −11.50, n = [3, 6] |
+| **H2** does time-variation buy anything at all? | **UNRESOLVED**, and the sign is wrong | **+0.00022**, Welch t = 0.11 — 42× *below* the bar |
+| **H3** is the time-variation positional? | **FAILED** | +0.01099, paired t = +11.27, **0/3** seeds. Predicted BETTER; `pos` is WORSE than `const` |
+| **H4** `local` vs `rolled` at n = 6 | **UNRESOLVED** | −0.00221, t = −1.07, 5/6 seeds |
+| **H5** does data dependence beat position? | **HELD** | −0.01077, Welch t = −6.70 |
+| **H7** findability across the ladder | reported — **FLAT** | `rms(kappa)` max/min = **1.1176** across four rungs |
+| **H8** decomposition by context | reported, §9.6 | four rungs, one total, four different routes |
+| **H9** cost | reported, §9.7 | 1.12 / 1.14 / 1.47 / 1.47 realised |
+
+### 9.3 The ladder, in order of increasing signal content
+
+| rung | what `DA` knows | mean bpc | vs anchor | `rms(kappa)` | `sd(DA)` |
+|---|---|---:|---:|---:|---:|
+| `if_anchor` (n = 6) | — | 2.24992 | — | — | — |
+| **`nm_const`** (n = 3) | **nothing** | **2.22016** | **−0.02975** | 0.9822 | 0.0000 |
+| `nm_pos` (n = 3) *(non-deployable)* | **when**, only | 2.23116 | −0.01876 | 0.9839 | 0.0794 |
+| `nm_rolled` (n = 6) | when, and what surprise looks like in general | 2.22260 | −0.02732 | 0.9616 | 0.0442 |
+| `nm_local` (n = 6) | when, and what surprised **this** sequence | 2.22038 | −0.02953 | **1.0747** | **0.2283** |
+
+**Read the first and last rows together. A rung that knows NOTHING is worth
+−0.02975 and a rung that knows this sequence's own prediction error is worth
+−0.02953.** They are 0.00022 apart, and the one that knows nothing is nominally
+ahead.
+
+### 9.4 §5's cell, and it is the one §0 named as the risk
+
+§0 opened by naming the rung that could deflate the headline:
+
+> `cur * (1 + kappa_c · DA_t)` with `DA` held **constant** is
+> `cur * (1 + kappa_c)` — a learned per-channel gain on the input current, which
+> by `EXP_008` Identity 1 is **exactly a learned per-channel threshold** … until
+> the constant rung is run, this project cannot say whether its feedforward
+> modulator won by being a modulator or by being a gain it already knew about.
+
+**It won by being a gain it already knew about.** H1 held and H2 did not, so §5's
+cell is:
+
+> **"`EXP_021`'s arm is a learned per-channel gain, and the time-variation is
+> free"** — the headline is restated, `EXP_021` is not retracted, and #6 becomes
+> load-bearing for both.
+
+**A vocabulary gap, reported rather than smoothed.** §5's cell says "H2 fails"
+and the resolver returned **UNRESOLVED**, which is the honest verdict for a
++0.00022 difference against a 0.00922 bar: this experiment establishes that
+time-variation is **not worth 2σ**, not that it is worth zero. The substance of
+the cell applies — H2 did not hold, and its point estimate points the wrong way —
+but the verdict is UNRESOLVED and is recorded as such. **This is the same defect
+`EXP_022`'s H6 hit on the same day**: a decision table with cells for HELD and
+FAILED and none for the verdict a 2σ bar most often returns. Referred to
+decision **#9**, not repaired here.
+
+**§6 item 1 said in advance which way this would cut, and it cut that way.**
+`nm_const` is a gain on the *current* at 1 of 2 layers, so it is a **lower bound**
+on what adopted arm #5 would give here; if it gains, #5 gains at least as much,
+and H2 becomes harder to pass rather than easier. That asymmetry was written
+before the run and it is exactly what happened.
+
+**`EXP_008`'s figure is NOT quoted as a result**, per §6 item 2 and the standing
+rule that its gain may not enter a headline until #6 is ruled. What is said here
+is structural: the winning rung's *mechanism* is one this project has already
+adopted, and that is a statement about identity, not about size.
+
+### 9.5 H3 and H4: neither control explains the arm, and one of them is refuted
+
+**H3 FAILED, and it failed in the informative direction.** §1's argument was
+that `nm_rolled` preserves the time index, so a misaligned RPE still carries
+"how far into the window am I", and that `pos` isolates that leak. If the leak
+were the mechanism, `pos` should recover most of the gain. Instead **`nm_pos` is
+0.01099 bpc WORSE than `nm_const`, on 0 of 3 seeds better, at paired t = +11.27**
+— a clean, large, wrong-signed result. Giving the modulator *only* the position
+is worse than giving it nothing at all.
+
+**So the positional leak is not what `nm_rolled` was riding**, and §5's cell
+"the gain is time-varying and positional" is **not** the one that fires.
+
+**H4 UNRESOLVED at n = 6, and the effect got smaller rather than clearer.**
+`EXP_021` measured `local − rolled` at −0.00577 with paired se 0.0018 and §11
+item 2 priced n = 6 at ~0.6 GPU-h precisely because that lands ~2 se from the
+bar. The power was bought. **At n = 6 the difference is −0.00221, t = −1.07,
+5/6 seeds** — under half the n = 3 estimate and further from the bar than
+before. Alignment is not worth 2σ, and the extra seeds did not rescue it; they
+shrank it.
+
+**H5 HELD at −0.01077**, and it must be read against H3 rather than as a win.
+`nm_local` beats `nm_pos` because `nm_pos` is the worst rung on the ladder, not
+because data dependence pays: `nm_local` does not beat `nm_const`, which knows
+strictly less than `nm_pos` does about time.
+
+### 9.6 H8 — four rungs, one total, four different routes
+
+`EXP_004` §10.3's split, cut at the baseline horizon of 7, positive = better,
+against `if_anchor`. `EXP_020`'s bitwise-copy noise floor is −0.00499 total,
+−0.01395 at `c = 0`, +0.00944 within reach, −0.00047 beyond.
+
+| rung | total | `c = 0` | within reach | beyond horizon |
+|---|---:|---:|---:|---:|
+| `nm_const` | +0.02946 | −0.00773 | **+0.03683** | +0.00036 |
+| `nm_pos` | +0.02628 | **+0.03072** | −0.00455 | +0.00011 |
+| `nm_rolled` | +0.02696 | **−0.06324** | **+0.09045** | −0.00025 |
+| `nm_local` | +0.02940 | −0.01376 | **+0.04370** | −0.00054 |
+
+**The totals span 0.0032 and the zero-context components span 0.0940.** These
+four arms are not doing the same thing, and the bpc column cannot tell. `pos` is
+the mirror image of `rolled`: it *gains* +0.031 at zero context and loses within
+reach, while `rolled` pays −0.063 at zero context to buy +0.090 within reach.
+`const` and `local` sit between them and land at the same place.
+
+**H8's prediction was that a rung that knows less keeps the within-reach shape
+and loses the rest. It does not.** `nm_const` knows the least of the deployable
+rungs and has the *cleanest* within-reach gain (+0.0368 with only −0.0077 paid
+at `c = 0`); `nm_rolled` knows more and has the most violent trade. The
+prediction is reported as it fired and is **wrong**.
+
+**Nothing anywhere on this ladder is beyond the horizon.** All four `beyond`
+components are within 0.0006 of zero and inside `EXP_020`'s −0.00047 floor.
+`EXP_021` §9.4 found the same for `nm_local` alone; four rungs now say it.
+**A rank-1 time-varying gain on the input current does not extend reach, whatever
+drives it** — and that is the most transferable sentence in this experiment.
+
+### 9.7 H7 — the optimiser buys the form, not the signal
+
+| rung | `rms(nm_gain)` | `sd(DA)` |
+|---|---:|---:|
+| `nm_const` | 0.9822 | 0.0000 |
+| `nm_pos` | 0.9839 | 0.0794 |
+| `nm_rolled` | 0.9616 | 0.0442 |
+| `nm_local` | **1.0747** | **0.2283** |
+
+**max/min = 1.1176.** `EXP_018` measured **26** on the identical quantity;
+`EXP_021` measured 1.12 with two rungs and could not say why. §4 fixed the
+reading in advance — *"if all four rungs land within ~1.2× of each other, the
+optimiser is buying the FORM and not the signal, and that is the ladder's
+headline whichever way the bpc goes"* — and §5 fixed its sentence:
+
+> **"the optimiser buys the form, not the signal."**
+
+That is now measured across four rungs whose driving signals differ by every
+axis available: one has **no variance at all** (`sd(DA) = 0` by construction),
+one varies 5× more than another, and the optimiser grows `kappa` ~10× from its
+0.1 init in every case and cannot separate them. **The bpc ladder and the
+`rms(kappa)` ladder are the same finding stated twice.**
+
+**`sd(DA)` is what rules out the trivial explanation.** `nm_local`'s driving
+signal really does vary — 0.2283, 5.2× `nm_rolled`'s and 2.9× `nm_pos`'s — so
+the four rungs are not accidentally the same arm. They receive genuinely
+different signals and produce the same number.
+
+### 9.8 THE CONFOUND THIS LADDER INHERITED, found after the runs and stated here
+
+**Every rung on this ladder trained at `Config.nm_b_init = -0.7`, and `EXP_021`
+§2.6 certifies the arm at `b = -2.97`.** `LocalDopamineCharLM.__init__` defaults
+to −2.97; `build_model` forwards `cfg.nm_b_init`; the Config value wins.
+Verified in each run's own `config.json`.
+
+With `nm_a_init = 0.0` the init logit is `b` exactly, so
+`phi = (rbar − sigmoid(b))·b`. At layer 0's measured init rate of 0.0488:
+
+| `b` | `sigmoid(b)` | `phi` | `phi/tau` | `sech²` |
+|---:|---:|---:|---:|---:|
+| **−2.97** *(certified)* | 0.0488 | −0.0000 | −0.00 | **1.000** |
+| **−0.70** *(shipped)* | 0.3318 | +0.1981 | +3.46 | **0.004** |
+
+**The squash starts saturated**, so at step 0 the RPE rungs are algebraically the
+`const` rung, and the gradient into `(a, b)` is attenuated ~190× against the
+point §2.6 certifies. The same arithmetic reproduces `EXP_021` §2.5's own
+rejected number (−0.8797 against its reported −0.879), which is what confirms
+the formula. Pinned by
+`tests/test_neuromod.py::test_nm_b_init_is_the_value_the_runs_actually_used`,
+verified to fail against −2.97 before being trusted.
+
+**What it bears on, stated narrowly.** H2 and H5 are the bars it touches: if the
+RPE rungs begin as `const` and desaturate over training, then part of what H2
+compares is a rung against its own early self. **It does not explain the
+result**, for a reason this experiment can measure: `sd(DA) = 0.2283` at the
+final checkpoint, so `nm_local` did desaturate and was genuinely data-dependent
+by the end. And it cannot touch H1 or H3 at all — `const` has no squash and
+`pos` does not carry an RPE.
+
+**It is NOT a limitation §6 wrote**, and this section is where it is recorded
+rather than in §6, which is above the line. `nm_tau` is learned (§2.6), which is
+the design's own answer to the 7× rate rise, so the saturation is not
+permanent — but the value was never the one the certification measured.
+
+**Nothing is retracted and nothing is re-run.** −0.7 is what every committed
+figure in `EXP_021` and here used, and `CONTRIBUTING.md` §4 forbids moving a
+baseline to make a diagnostic look better. **The re-run at −2.97 is referred with
+a price in §10 and is Elliot's.**
+
+### 9.9 H9 — cost, and the practical sentence that falls out of it
+
+| rung | pre-flighted §2.6 | realised | params |
+|---|---:|---:|---:|
+| `nm_const` | 1.149 | **1.116** | 735,949 |
+| `nm_pos` | 1.175 | **1.143** | 736,205 |
+| `nm_rolled` | 1.500 | **1.474** | 736,974 |
+| `nm_local` | 1.500 | **1.470** | 736,974 |
+
+The pre-flight was accurate to ~3 % on all four rungs — the fourth time
+`014_calibrate_cost.py` has transferred. And the decomposition §2.6 offered as a
+by-product is confirmed: the broadcast multiply and its backward account for
+~0.12–0.14 of `nm_local`'s 0.47, and the Bernoulli predictor accounts for the
+other ~0.33.
+
+**Which gives the sentence: the same −0.0295 bpc is available at 1.12× or at
+1.47×.** The predictor costs 32 % of a training run and, on this ladder, buys
++0.00022 bpc in the wrong direction.
+
+### 9.10 `n_contexts_significantly_worse`, reported as a marker and used as nothing
+
+§4 fixed this in advance and it is honoured. `EXP_020` §9.5's bitwise-copy
+control read 120 of 128 on this statistic. Fresh evidence for open decision
+**#2**; no redefinition is proposed here.
+
+---
+
+## 10. Referred to Elliot, and not decided here
+
+1. **The cheapest rung is the best rung, and it is a mechanism already adopted.**
+   `nm_const` is −0.02975 at 1.12×; `nm_local` is −0.02953 at 1.47×. Whether
+   that changes anything about adopted arm #5 is **#6's business and #5's**, and
+   both are Elliot's. Nothing here re-measures arm #5 — §6 item 1 is why
+   `nm_const` is a lower bound on it and not a replacement for it.
+2. **The `nm_b_init` re-run** (§9.8). Three seeds of `nm_local` and three of
+   `nm_rolled` at `b = -2.97`, the value `EXP_021` §2.6 certifies, at ~0.6
+   GPU-h by §2.6's measured 598 s per run. It is the only measurement that can
+   say whether alignment is worth nothing or was merely started where it could
+   not be learned. **When a correction would flatter the work, refer it; when it
+   would hurt, measure it** — this one could go either way, which is why it is
+   referred with a price rather than run on the resolver's own authority.
+3. **H4 was priced at n = 6 and n = 6 did not resolve it.** The effect halved.
+   A further seed increase is not obviously the answer, and `EXP_021` §11 item
+   2's pricing method — se from n = 3, extrapolated — is what should be
+   re-examined before another cell is bought that way.
+4. **§5 and `EXP_022` §5 both lack a cell for UNRESOLVED**, which is the verdict
+   a 2σ bar most often returns. Two experiments closed on the same day hit it.
+   This is decision **#9**'s substance, and the corrected rule is referred
+   forward rather than applied.
+5. **H8's prediction was wrong** (§9.6) and the decomposition is the most
+   informative table in this experiment: four arms with the same total and a
+   zero-context spread of 0.094. **No bar was pre-registered on the components**
+   and none is invented. An experiment aimed at the c = 0 / within-reach trade
+   is not proposed here; §7.1 is the report's.
+6. **Nothing on this ladder extends reach**, and that now rests on four rungs
+   rather than one. Combined with `EXP_022` §9.6 — where a wider *head* moved
+   within-reach by +0.0431 and beyond-horizon by +0.0015 — the phase has yet to
+   move the beyond-horizon component with anything.
+

@@ -1,0 +1,935 @@
+{
+ "experiment": "EXP_023",
+ "protocol": "carried",
+ "sigma_transferred": 0.00461,
+ "sigma_source": "04_phase4_interim.md \u00a7236, baseline n=5, DIFFERENT tree",
+ "bar_2sigma": 0.00922,
+ "prereg_sha256": "a13f04fe5ccddaa25a426198b2dc0dda9511c60c5030a8a69e5571e541113ed4",
+ "ladder_knows": {
+  "nm_const": "nothing (a static per-channel gain = EXP_008 Identity 1)",
+  "nm_pos": "WHEN only -- window position. DIAGNOSTIC ONLY, non-deployable",
+  "nm_rolled": "when, and what surprise looks like in general",
+  "nm_local": "when, and what surprised THIS sequence"
+ },
+ "manifest_prereg_sha256_before": "a13f04fe5ccddaa25a426198b2dc0dda9511c60c5030a8a69e5571e541113ed4",
+ "prereg_matches_manifest": true,
+ "pooled_with_exp_021": [
+  "nm_local_s0",
+  "nm_local_s1",
+  "nm_local_s2",
+  "nm_rolled_s0",
+  "nm_rolled_s1",
+  "nm_rolled_s2",
+  "if_anchor_s0",
+  "if_anchor_s1",
+  "if_anchor_s2"
+ ],
+ "G2_all_params_match": true,
+ "G2_denominator": {
+  "runs_in_manifest": 15,
+  "runs_carrying_the_gate": 15,
+  "expected": 15
+ },
+ "G2_missing_the_gate": [],
+ "G2_closed_form_check": {
+  "if_anchor_s3": {
+   "params": 735437,
+   "expected": 735437,
+   "matches": true
+  },
+  "if_anchor_s4": {
+   "params": 735437,
+   "expected": 735437,
+   "matches": true
+  },
+  "if_anchor_s5": {
+   "params": 735437,
+   "expected": 735437,
+   "matches": true
+  },
+  "nm_const_s0": {
+   "params": 735949,
+   "expected": 735949,
+   "matches": true
+  },
+  "nm_const_s1": {
+   "params": 735949,
+   "expected": 735949,
+   "matches": true
+  },
+  "nm_const_s2": {
+   "params": 735949,
+   "expected": 735949,
+   "matches": true
+  },
+  "nm_pos_s0": {
+   "params": 736205,
+   "expected": 736205,
+   "matches": true
+  },
+  "nm_pos_s1": {
+   "params": 736205,
+   "expected": 736205,
+   "matches": true
+  },
+  "nm_pos_s2": {
+   "params": 736205,
+   "expected": 736205,
+   "matches": true
+  },
+  "nm_local_s3": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  },
+  "nm_local_s4": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  },
+  "nm_local_s5": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  },
+  "nm_rolled_s3": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  },
+  "nm_rolled_s4": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  },
+  "nm_rolled_s5": {
+   "params": 736974,
+   "expected": 736974,
+   "matches": true
+  }
+ },
+ "G2_closed_form_all_match": true,
+ "G5_violations": {},
+ "K1_unexpected": {},
+ "G8_pos_unlocked": {
+  "nm_pos_s0": true,
+  "nm_pos_s1": true,
+  "nm_pos_s2": true
+ },
+ "G8_failed_runs_excluded": [],
+ "arms": {
+  "if_anchor": {
+   "runs": [
+    "if_anchor_s0",
+    "if_anchor_s1",
+    "if_anchor_s2",
+    "if_anchor_s3",
+    "if_anchor_s4",
+    "if_anchor_s5"
+   ],
+   "kept": [
+    "if_anchor_s0",
+    "if_anchor_s1",
+    "if_anchor_s2",
+    "if_anchor_s3",
+    "if_anchor_s4",
+    "if_anchor_s5"
+   ],
+   "n": 6,
+   "n_preregistered": 6,
+   "diverged": [],
+   "gate_failed_G8": [],
+   "provisional": false,
+   "bpc": [
+    2.257471102255831,
+    2.251664799374446,
+    2.248204388503817,
+    2.2451818205700587,
+    2.253530271427594,
+    2.2434403966611693
+   ],
+   "mean": 2.2499154631321527,
+   "sd": 0.005300496825047808
+  },
+  "nm_const": {
+   "runs": [
+    "nm_const_s0",
+    "nm_const_s1",
+    "nm_const_s2"
+   ],
+   "kept": [
+    "nm_const_s0",
+    "nm_const_s1",
+    "nm_const_s2"
+   ],
+   "n": 3,
+   "n_preregistered": 3,
+   "diverged": [],
+   "gate_failed_G8": [],
+   "provisional": false,
+   "bpc": [
+    2.217955797003864,
+    2.222803453880297,
+    2.219734813831009
+   ],
+   "mean": 2.22016468823839,
+   "sd": 0.0024522516800887517
+  },
+  "nm_pos": {
+   "runs": [
+    "nm_pos_s0",
+    "nm_pos_s1",
+    "nm_pos_s2"
+   ],
+   "kept": [
+    "nm_pos_s0",
+    "nm_pos_s1",
+    "nm_pos_s2"
+   ],
+   "n": 3,
+   "n_preregistered": 3,
+   "diverged": [],
+   "gate_failed_G8": [],
+   "provisional": false,
+   "bpc": [
+    2.2306725393054267,
+    2.2321453613890774,
+    2.230647427575471
+   ],
+   "mean": 2.231155109423325,
+   "sd": 0.0008576752686784716
+  },
+  "nm_rolled": {
+   "runs": [
+    "nm_rolled_s0",
+    "nm_rolled_s1",
+    "nm_rolled_s2",
+    "nm_rolled_s3",
+    "nm_rolled_s4",
+    "nm_rolled_s5"
+   ],
+   "kept": [
+    "nm_rolled_s0",
+    "nm_rolled_s1",
+    "nm_rolled_s2",
+    "nm_rolled_s3",
+    "nm_rolled_s4",
+    "nm_rolled_s5"
+   ],
+   "n": 6,
+   "n_preregistered": 6,
+   "diverged": [],
+   "gate_failed_G8": [],
+   "provisional": false,
+   "bpc": [
+    2.2256086572411964,
+    2.226693567929966,
+    2.221225129492061,
+    2.221990975025142,
+    2.222893344233458,
+    2.217174252396568
+   ],
+   "mean": 2.2225976543863983,
+   "sd": 0.003393972657812196
+  },
+  "nm_local": {
+   "runs": [
+    "nm_local_s0",
+    "nm_local_s1",
+    "nm_local_s2",
+    "nm_local_s3",
+    "nm_local_s4",
+    "nm_local_s5"
+   ],
+   "kept": [
+    "nm_local_s0",
+    "nm_local_s1",
+    "nm_local_s2",
+    "nm_local_s3",
+    "nm_local_s4",
+    "nm_local_s5"
+   ],
+   "n": 6,
+   "n_preregistered": 6,
+   "diverged": [],
+   "gate_failed_G8": [],
+   "provisional": false,
+   "bpc": [
+    2.217053647299721,
+    2.224274264219518,
+    2.2148896518344787,
+    2.220096450350111,
+    2.2228465864502547,
+    2.2231463884175824
+   ],
+   "mean": 2.2203844980952776,
+   "sd": 0.0037467605121495468
+  }
+ },
+ "sigma_on_tree_n6": {
+  "anchor_sd": 0.005300496825047808,
+  "n": 6,
+  "transferred": 0.00461,
+  "ratio": 1.1497823915505005,
+  "note": "EXP_020 measured 0.004683 at n = 3 on this tree, a x1.02 transfer. This is the same check at n = 6. It is a marker and does not move any bar in this experiment."
+ },
+ "bars": {
+  "H1": {
+   "statement": "mean(nm_const) < mean(if_anchor) - 0.00922",
+   "note": "the rung that could deflate EXP_021's headline: a constant DA makes this a learned per-channel gain, which EXP_008 Identity 1 makes a learned threshold. NOT a re-measurement of arm #5 -- \u00a76 item 1, and #6 is open.",
+   "test": "welch",
+   "arm": "nm_const",
+   "reference": "if_anchor",
+   "delta": -0.029750774893762877,
+   "detail": {
+    "welch": true,
+    "mean_diff": -0.029750774893762877,
+    "se_diff": 0.0025859344925106575,
+    "t": -11.504844759187288,
+    "n": [
+     3,
+     6
+    ]
+   },
+   "verdict": "HELD"
+  },
+  "H2": {
+   "statement": "mean(nm_local) < mean(nm_const) - 0.00922",
+   "note": "does time-variation buy ANYTHING over a static gain?",
+   "test": "welch",
+   "arm": "nm_local",
+   "reference": "nm_const",
+   "delta": 0.00021980985688774268,
+   "detail": {
+    "welch": true,
+    "mean_diff": 0.00021980985688774268,
+    "se_diff": 0.002084278090066972,
+    "t": 0.10546090655334758,
+    "n": [
+     6,
+     3
+    ]
+   },
+   "verdict": "UNRESOLVED"
+  },
+  "H3": {
+   "statement": "mean(nm_pos) < mean(nm_const) - 0.00922",
+   "note": "is the time-variation positional? window position predicts surprise and no rung below `pos` can use it",
+   "test": "paired",
+   "arm": "nm_pos",
+   "reference": "nm_const",
+   "delta": 0.010990421184934984,
+   "detail": {
+    "paired": true,
+    "diffs": [
+     0.012716742301562611,
+     0.009341907508780167,
+     0.01091261374446173
+    ],
+    "mean_diff": 0.010990421184934837,
+    "sd_diff": 0.0016887622591674834,
+    "se_diff": 0.0009750073449276271,
+    "t": 11.27214194037752,
+    "n_negative": 0
+   },
+   "verdict": "FAILED"
+  },
+  "H4": {
+   "statement": "mean(nm_local) < mean(nm_rolled) - 0.00922",
+   "note": "EXP_021 \u00a711 item 2's measurement, at the n = 6 it priced: -0.00577 with paired se 0.0018 at n = 3",
+   "test": "paired",
+   "arm": "nm_local",
+   "reference": "nm_rolled",
+   "delta": -0.0022131562911207325,
+   "detail": {
+    "paired": true,
+    "diffs": [
+     -0.008555009941475511,
+     -0.002419303710448073,
+     -0.006335477657582356,
+     -0.0018945246750310396,
+     -4.675778320351043e-05,
+     0.005972136021014318
+    ],
+    "mean_diff": -0.0022131562911210287,
+    "sd_diff": 0.005080333783647973,
+    "se_diff": 0.002074037582160094,
+    "t": -1.0670762719815539,
+    "n_negative": 5
+   },
+   "verdict": "UNRESOLVED"
+  },
+  "H5": {
+   "statement": "mean(nm_local) < mean(nm_pos) - 0.00922",
+   "note": "does data dependence beat position? H4's question against a control that cannot leak content at all",
+   "test": "welch",
+   "arm": "nm_local",
+   "reference": "nm_pos",
+   "delta": -0.010770611328047242,
+   "detail": {
+    "welch": true,
+    "mean_diff": -0.010770611328047242,
+    "se_diff": 0.0016077638750973619,
+    "t": -6.699125098450792,
+    "n": [
+     6,
+     3
+    ]
+   },
+   "verdict": "HELD"
+  },
+  "H6": {
+   "statement": "mean(nm_local s3-5) < mean(if_anchor s3-5) - 0.00922",
+   "note": "OUT-OF-SAMPLE replication of EXP_021's headline (-0.03371). Reported FIRST and separately: a replication and a power increase are not the same number.",
+   "test": "paired, fresh seeds only",
+   "delta": -0.02535435448029144,
+   "exp_021_headline_for_reference": -0.03371,
+   "arm": {
+    "runs": [
+     "nm_local_s3",
+     "nm_local_s4",
+     "nm_local_s5"
+    ],
+    "kept": [
+     "nm_local_s3",
+     "nm_local_s4",
+     "nm_local_s5"
+    ],
+    "n": 3,
+    "n_preregistered": 3,
+    "diverged": [],
+    "gate_failed_G8": [],
+    "provisional": false,
+    "bpc": [
+     2.220096450350111,
+     2.2228465864502547,
+     2.2231463884175824
+    ],
+    "mean": 2.2220298084059826,
+    "sd": 0.0016810340074063612
+   },
+   "reference": {
+    "runs": [
+     "if_anchor_s3",
+     "if_anchor_s4",
+     "if_anchor_s5"
+    ],
+    "kept": [
+     "if_anchor_s3",
+     "if_anchor_s4",
+     "if_anchor_s5"
+    ],
+    "n": 3,
+    "n_preregistered": 3,
+    "diverged": [],
+    "gate_failed_G8": [],
+    "provisional": false,
+    "bpc": [
+     2.2451818205700587,
+     2.253530271427594,
+     2.2434403966611693
+    ],
+    "mean": 2.247384162886274,
+    "sd": 0.0053934336891148585
+   },
+   "detail": {
+    "paired": true,
+    "diffs": [
+     -0.025085370219947833,
+     -0.03068368497733953,
+     -0.02029400824358696
+    ],
+    "mean_diff": -0.02535435448029144,
+    "sd_diff": 0.005200058659015717,
+    "se_diff": 0.0030022552665845683,
+    "t": -8.445102840683868,
+    "n_negative": 3
+   },
+   "verdict": "HELD"
+  },
+  "H7": {
+   "statement": "rms(nm_gain) per rung; a FLAT column means the optimiser buys the FORM and not the signal",
+   "per_run": {
+    "nm_const": [
+     0.9897624254226685,
+     0.9814060926437378,
+     0.9753080010414124
+    ],
+    "nm_pos": [
+     0.9927365183830261,
+     0.9765040874481201,
+     0.982492208480835
+    ],
+    "nm_rolled": [
+     0.9664495587348938,
+     0.9514126181602478,
+     0.9623412489891052,
+     0.9668270945549011,
+     0.9607609510421753,
+     0.9617598056793213
+    ],
+    "nm_local": [
+     1.0788872241973877,
+     1.076918601989746,
+     1.0663912296295166,
+     1.0825390815734863,
+     1.0742242336273193,
+     1.0689712762832642
+    ]
+   },
+   "per_arm_mean": {
+    "nm_const": 0.9821588397026062,
+    "nm_pos": 0.9839109381039938,
+    "nm_rolled": 0.961591879526774,
+    "nm_local": 1.07465527455012
+   },
+   "max_over_min_ratio": 1.1175793987351346,
+   "exp_018_ratio_on_the_same_quantity": 26.0,
+   "exp_021_ratio_on_the_same_quantity": 1.12,
+   "gain_init": 0.1,
+   "da_stats_seed0": {
+    "nm_const": {
+     "nm_source": "const",
+     "tau_learned": null,
+     "tau_calibrated": 0.057321,
+     "mean": 1.0,
+     "sd": 0.0,
+     "frac_abs_over_0p99": 1.0,
+     "frac_abs_over_0p9": 1.0,
+     "n": 8192
+    },
+    "nm_pos": {
+     "nm_source": "pos",
+     "tau_learned": null,
+     "tau_calibrated": 0.057321,
+     "mean": 0.9609,
+     "sd": 0.07938,
+     "frac_abs_over_0p99": 0.0,
+     "frac_abs_over_0p9": 0.97656,
+     "n": 8192
+    },
+    "nm_rolled": {
+     "nm_source": "rolled",
+     "tau_learned": 0.003862,
+     "tau_calibrated": 0.057321,
+     "mean": 0.99601,
+     "sd": 0.04415,
+     "frac_abs_over_0p99": 0.98926,
+     "frac_abs_over_0p9": 0.99609,
+     "n": 8192
+    },
+    "nm_local": {
+     "nm_source": "local",
+     "tau_learned": 0.00711,
+     "tau_calibrated": 0.057321,
+     "mean": 0.86921,
+     "sd": 0.22833,
+     "frac_abs_over_0p99": 0.15442,
+     "frac_abs_over_0p9": 0.77271,
+     "n": 8192
+    }
+   },
+   "da_note": "the modulation is 1 + kappa_c*DA_t, so sd(DA) ~ 0 is a STATIC per-channel gain however large kappa is -- EXP_008 Identity 1, i.e. adopted arm #5. rms(kappa) alone cannot tell those apart, which is why this column exists.",
+   "note": "a marker, not a bar. EXP_021 \u00a72.7 named the FAINT reachability ratio in advance as the risk that would surface here, and it did."
+  }
+ },
+ "cost": {
+  "if_anchor": {
+   "wall_clock_ratio_vs_if_anchor": 1.0,
+   "peak_vram_gib": [
+    0.6089,
+    0.6089,
+    0.6089,
+    0.6089,
+    0.6089,
+    0.6089
+   ],
+   "params": [
+    735437,
+    735437,
+    735437,
+    735437,
+    735437,
+    735437
+   ]
+  },
+  "nm_const": {
+   "wall_clock_ratio_vs_if_anchor": 1.116,
+   "peak_vram_gib": [
+    0.7341,
+    0.7341,
+    0.7341
+   ],
+   "params": [
+    735949,
+    735949,
+    735949
+   ]
+  },
+  "nm_pos": {
+   "wall_clock_ratio_vs_if_anchor": 1.143,
+   "peak_vram_gib": [
+    0.7339,
+    0.7339,
+    0.7339
+   ],
+   "params": [
+    736205,
+    736205,
+    736205
+   ]
+  },
+  "nm_rolled": {
+   "wall_clock_ratio_vs_if_anchor": 1.474,
+   "peak_vram_gib": [
+    0.9843,
+    0.9843,
+    0.9843,
+    0.9843,
+    0.9843,
+    0.9843
+   ],
+   "params": [
+    736974,
+    736974,
+    736974,
+    736974,
+    736974,
+    736974
+   ]
+  },
+  "nm_local": {
+   "wall_clock_ratio_vs_if_anchor": 1.47,
+   "peak_vram_gib": [
+    0.9842,
+    0.9842,
+    0.9842,
+    0.9842,
+    0.9842,
+    0.9842
+   ],
+   "params": [
+    736974,
+    736974,
+    736974,
+    736974,
+    736974,
+    736974
+   ]
+  }
+ },
+ "decomposition": {
+  "measured": true,
+  "arms": {
+   "nm_const": {
+    "cut_at_context": 7,
+    "total_gain_bpc": 0.029455817172572285,
+    "zero_context_gain_bpc": -0.0077325426365408845,
+    "within_reach_gain_bpc": 0.03683245770573862,
+    "beyond_horizon_gain_bpc": 0.0003559021033745502,
+    "zero_context_share": -0.26251326151430027,
+    "within_reach_share": 1.2504306870846236,
+    "beyond_horizon_share": 0.01208257442967658,
+    "reference": "if_anchor",
+    "context_comparison": {
+     "n_contexts_significantly_worse": 0,
+     "contexts_significantly_worse": [],
+     "n_short_contexts_significantly_worse": 0,
+     "worst_delta_bpc": 0.0077325426365408845,
+     "worst_delta_at_context": 0,
+     "worst_short_context_delta_bpc": 0.0077325426365408845,
+     "worst_short_context_at": 0,
+     "short_context_table": [
+      {
+       "c": 0,
+       "delta_bpc": 0.0077325426365408845,
+       "bar_2sigma": 0.03551915914569776,
+       "multiple_of_bar": 0.21770061067105764
+      },
+      {
+       "c": 1,
+       "delta_bpc": -0.024881796067704798,
+       "bar_2sigma": 0.028338768357815364,
+       "multiple_of_bar": -0.8780126134466535
+      },
+      {
+       "c": 2,
+       "delta_bpc": -0.019206167310195976,
+       "bar_2sigma": 0.02337540948295759,
+       "multiple_of_bar": -0.8216398230028312
+      },
+      {
+       "c": 3,
+       "delta_bpc": -0.015805155796206893,
+       "bar_2sigma": 0.013212407448332537,
+       "multiple_of_bar": -1.1962358758623943
+      },
+      {
+       "c": 4,
+       "delta_bpc": -0.02261017136142529,
+       "bar_2sigma": 0.013078967332596737,
+       "multiple_of_bar": -1.7287428576317272
+      },
+      {
+       "c": 5,
+       "delta_bpc": -0.02966103999657399,
+       "bar_2sigma": 0.008542083637544254,
+       "multiple_of_bar": -3.4723424933709945
+      },
+      {
+       "c": 6,
+       "delta_bpc": -0.028435558976055653,
+       "bar_2sigma": 0.0037852452140010756,
+       "multiple_of_bar": -7.512210535496254
+      },
+      {
+       "c": 7,
+       "delta_bpc": -0.029099915069197735,
+       "bar_2sigma": 0.001996432166875932,
+       "multiple_of_bar": -14.57595983074848
+      },
+      {
+       "c": 8,
+       "delta_bpc": -0.028305252270269143,
+       "bar_2sigma": 0.003754913229576612,
+       "multiple_of_bar": -7.538190775572389
+      }
+     ]
+    }
+   },
+   "nm_pos": {
+    "cut_at_context": 7,
+    "total_gain_bpc": 0.02627913555679484,
+    "zero_context_gain_bpc": 0.03072209451737251,
+    "within_reach_gain_bpc": -0.004553862324592206,
+    "beyond_horizon_gain_bpc": 0.00011090336401453627,
+    "zero_context_share": 1.169067926567656,
+    "within_reach_share": -0.17328813250916622,
+    "beyond_horizon_share": 0.004220205941510151,
+    "reference": "if_anchor",
+    "context_comparison": {
+     "n_contexts_significantly_worse": 0,
+     "contexts_significantly_worse": [],
+     "n_short_contexts_significantly_worse": 0,
+     "worst_delta_bpc": -0.0058820203974465635,
+     "worst_delta_at_context": 3,
+     "worst_short_context_delta_bpc": -0.0058820203974465635,
+     "worst_short_context_at": 3,
+     "short_context_table": [
+      {
+       "c": 0,
+       "delta_bpc": -0.03072209451737251,
+       "bar_2sigma": 0.03551915914569776,
+       "multiple_of_bar": -0.8649443077003052
+      },
+      {
+       "c": 1,
+       "delta_bpc": -0.03210171502272363,
+       "bar_2sigma": 0.028338768357815364,
+       "multiple_of_bar": -1.1327844110017755
+      },
+      {
+       "c": 2,
+       "delta_bpc": -0.0065054238696928834,
+       "bar_2sigma": 0.02337540948295759,
+       "multiple_of_bar": -0.2783020282248241
+      },
+      {
+       "c": 3,
+       "delta_bpc": -0.0058820203974465635,
+       "bar_2sigma": 0.013212407448332537,
+       "multiple_of_bar": -0.4451891466750747
+      },
+      {
+       "c": 4,
+       "delta_bpc": -0.01576323021531012,
+       "bar_2sigma": 0.013078967332596737,
+       "multiple_of_bar": -1.205235078156621
+      },
+      {
+       "c": 5,
+       "delta_bpc": -0.021182148851877525,
+       "bar_2sigma": 0.008542083637544254,
+       "multiple_of_bar": -2.4797402777441238
+      },
+      {
+       "c": 6,
+       "delta_bpc": -0.02426077855225106,
+       "bar_2sigma": 0.0037852452140010756,
+       "multiple_of_bar": -6.409301691344577
+      },
+      {
+       "c": 7,
+       "delta_bpc": -0.026168232192780305,
+       "bar_2sigma": 0.001996432166875932,
+       "multiple_of_bar": -13.107498780551618
+      },
+      {
+       "c": 8,
+       "delta_bpc": -0.026272929522608734,
+       "bar_2sigma": 0.003754913229576612,
+       "multiple_of_bar": -6.996947177277691
+      }
+     ]
+    }
+   },
+   "nm_rolled": {
+    "cut_at_context": 7,
+    "total_gain_bpc": 0.02695947073937921,
+    "zero_context_gain_bpc": -0.06324070083518762,
+    "within_reach_gain_bpc": 0.09044912388920956,
+    "beyond_horizon_gain_bpc": -0.00024895231464272527,
+    "zero_context_share": -2.345769375316893,
+    "within_reach_share": 3.3550036928986207,
+    "beyond_horizon_share": -0.009234317581727788,
+    "reference": "if_anchor",
+    "context_comparison": {
+     "n_contexts_significantly_worse": 1,
+     "contexts_significantly_worse": [
+      0
+     ],
+     "n_short_contexts_significantly_worse": 1,
+     "worst_delta_bpc": 0.06324070083518762,
+     "worst_delta_at_context": 0,
+     "worst_short_context_delta_bpc": 0.06324070083518762,
+     "worst_short_context_at": 0,
+     "short_context_table": [
+      {
+       "c": 0,
+       "delta_bpc": 0.06324070083518762,
+       "bar_2sigma": 0.03551915914569776,
+       "multiple_of_bar": 1.7804672845935774
+      },
+      {
+       "c": 1,
+       "delta_bpc": 0.003471697185768896,
+       "bar_2sigma": 0.028338768357815364,
+       "multiple_of_bar": 0.12250698908061258
+      },
+      {
+       "c": 2,
+       "delta_bpc": -0.015038591667906331,
+       "bar_2sigma": 0.02337540948295759,
+       "multiple_of_bar": -0.6433509401779927
+      },
+      {
+       "c": 3,
+       "delta_bpc": -0.01546000082825616,
+       "bar_2sigma": 0.013212407448332537,
+       "multiple_of_bar": -1.170112327273655
+      },
+      {
+       "c": 4,
+       "delta_bpc": -0.023989939418576522,
+       "bar_2sigma": 0.013078967332596737,
+       "multiple_of_bar": -1.834238041010038
+      },
+      {
+       "c": 5,
+       "delta_bpc": -0.02370828218968901,
+       "bar_2sigma": 0.008542083637544254,
+       "multiple_of_bar": -2.775468281004195
+      },
+      {
+       "c": 6,
+       "delta_bpc": -0.027585277771754235,
+       "bar_2sigma": 0.0037852452140010756,
+       "multiple_of_bar": -7.287580120231121
+      },
+      {
+       "c": 7,
+       "delta_bpc": -0.027208423054021935,
+       "bar_2sigma": 0.001996432166875932,
+       "multiple_of_bar": -13.628523676112858
+      },
+      {
+       "c": 8,
+       "delta_bpc": -0.027053455788250247,
+       "bar_2sigma": 0.003754913229576612,
+       "multiple_of_bar": -7.2048151672737
+      }
+     ]
+    }
+   },
+   "nm_local": {
+    "cut_at_context": 7,
+    "total_gain_bpc": 0.02940319904842381,
+    "zero_context_gain_bpc": -0.013761181520068888,
+    "within_reach_gain_bpc": 0.04370129070726536,
+    "beyond_horizon_gain_bpc": -0.0005369101387726616,
+    "zero_context_share": -0.46801647322135753,
+    "within_reach_share": 1.4862767359189106,
+    "beyond_horizon_share": -0.01826026269755308,
+    "reference": "if_anchor",
+    "context_comparison": {
+     "n_contexts_significantly_worse": 0,
+     "contexts_significantly_worse": [],
+     "n_short_contexts_significantly_worse": 0,
+     "worst_delta_bpc": 0.013761181520068888,
+     "worst_delta_at_context": 0,
+     "worst_short_context_delta_bpc": 0.013761181520068888,
+     "worst_short_context_at": 0,
+     "short_context_table": [
+      {
+       "c": 0,
+       "delta_bpc": 0.013761181520068888,
+       "bar_2sigma": 0.03551915914569776,
+       "multiple_of_bar": 0.3874298224127781
+      },
+      {
+       "c": 1,
+       "delta_bpc": 0.0036445170637771085,
+       "bar_2sigma": 0.028338768357815364,
+       "multiple_of_bar": 0.12860534437347948
+      },
+      {
+       "c": 2,
+       "delta_bpc": -0.012498260897608304,
+       "bar_2sigma": 0.02337540948295759,
+       "multiple_of_bar": -0.5346755917461239
+      },
+      {
+       "c": 3,
+       "delta_bpc": -0.014962347027315026,
+       "bar_2sigma": 0.013212407448332537,
+       "multiple_of_bar": -1.1324466858765652
+      },
+      {
+       "c": 4,
+       "delta_bpc": -0.026066678689538936,
+       "bar_2sigma": 0.013078967332596737,
+       "multiple_of_bar": -1.9930226925923196
+      },
+      {
+       "c": 5,
+       "delta_bpc": -0.028218550193037206,
+       "bar_2sigma": 0.008542083637544254,
+       "multiple_of_bar": -3.3034738818302767
+      },
+      {
+       "c": 6,
+       "delta_bpc": -0.03006934860453425,
+       "bar_2sigma": 0.0037852452140010756,
+       "multiple_of_bar": -7.9438310874318185
+      },
+      {
+       "c": 7,
+       "delta_bpc": -0.029940109187196473,
+       "bar_2sigma": 0.001996432166875932,
+       "multiple_of_bar": -14.996807647137603
+      },
+      {
+       "c": 8,
+       "delta_bpc": -0.030122122723332367,
+       "bar_2sigma": 0.003754913229576612,
+       "multiple_of_bar": -8.022055605990344
+      }
+     ]
+    }
+   }
+  },
+  "arms_missing_from_horizon": [],
+  "complete": true,
+  "note": "EXP_020 \u00a79.5's bitwise-copy noise floor: -0.00499 total, -0.01395 at c=0, +0.00944 within reach. EXP_021 found nm_local's gain ENTIRELY within reach (+0.0559) and nothing beyond the horizon (-0.0005); \u00a74 H8 predicts a rung that knows less keeps that shape and loses the rest."
+ }
+}
