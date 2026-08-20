@@ -1,0 +1,599 @@
+{
+ "experiment": "EXP_020",
+ "prereg_sha256_before": "8979b63de5ec48d923353f6ea6c20035e0f28b11013ad67b402e5f5f0c63e1c6",
+ "steps": 20000,
+ "vram_alarm_gib": 4.0,
+ "runs": [
+  {
+   "leg": "1",
+   "run": "if_anchor_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": null,
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 383.13,
+   "train_rc": 0,
+   "eval_s": 10.23,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 378.04,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {}
+  },
+  {
+   "leg": "1",
+   "run": "if_anchor_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 397.86,
+   "train_rc": 0,
+   "eval_s": 9.85,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 392.58,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "if_anchor_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "1",
+   "run": "if_anchor_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 390.19,
+   "train_rc": 0,
+   "eval_s": 10.13,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 384.93,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "if_anchor_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "1b",
+   "run": "if_nest_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 383.66,
+   "train_rc": 0,
+   "eval_s": 9.4,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 378.55,
+   "peak_vram_gib": 0.6089,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "arch": [
+     "snn",
+     "interface"
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "if_nest_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "if_fold_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 473293,
+   "completed": true,
+   "train_s": 297.39,
+   "train_rc": 0,
+   "eval_s": 9.38,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 473293,
+   "wall_clock_s": 292.34,
+   "peak_vram_gib": 0.5658,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_fold": [
+     false,
+     true
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_fold_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "if_fold_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 473293,
+   "completed": true,
+   "train_s": 316.05,
+   "train_rc": 0,
+   "eval_s": 9.45,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 473293,
+   "wall_clock_s": 310.86,
+   "peak_vram_gib": 0.5658,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     1
+    ],
+    "iface_fold": [
+     false,
+     true
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_fold_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "2",
+   "run": "if_fold_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 473293,
+   "completed": true,
+   "train_s": 298.56,
+   "train_rc": 0,
+   "eval_s": 9.3,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 473293,
+   "wall_clock_s": 293.5,
+   "peak_vram_gib": 0.5658,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "seed": [
+     0,
+     2
+    ],
+    "iface_fold": [
+     false,
+     true
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_fold_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "if_foldwide_s0",
+   "d_model": 675,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_fold_s0",
+   "expected_params": 733930,
+   "completed": true,
+   "train_s": 456.87,
+   "train_rc": 0,
+   "eval_s": 9.68,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 733930,
+   "wall_clock_s": 451.83,
+   "peak_vram_gib": 0.6895,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     675
+    ],
+    "run_name": [
+     "if_fold_s0",
+     "if_foldwide_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "if_foldwide_s1",
+   "d_model": 675,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_fold_s0",
+   "expected_params": 733930,
+   "completed": true,
+   "train_s": 456.73,
+   "train_rc": 0,
+   "eval_s": 9.72,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 733930,
+   "wall_clock_s": 451.7,
+   "peak_vram_gib": 0.6895,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     675
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "if_fold_s0",
+     "if_foldwide_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "3",
+   "run": "if_foldwide_s2",
+   "d_model": 675,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_fold": true
+   },
+   "reference": "if_fold_s0",
+   "expected_params": 733930,
+   "completed": true,
+   "train_s": 466.14,
+   "train_rc": 0,
+   "eval_s": 11.63,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 733930,
+   "wall_clock_s": 460.88,
+   "peak_vram_gib": 0.6895,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     675
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "if_fold_s0",
+     "if_foldwide_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "if_binin_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 412.35,
+   "train_rc": 0,
+   "eval_s": 11.07,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 406.4,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_binary_input": [
+     false,
+     true
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_binin_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "if_binin_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 407.31,
+   "train_rc": 0,
+   "eval_s": 10.27,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 401.66,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_binary_input": [
+     false,
+     true
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_binin_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "4",
+   "run": "if_binin_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 406.79,
+   "train_rc": 0,
+   "eval_s": 11.0,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 401.29,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_binary_input": [
+     false,
+     true
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_binin_s2"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "if_mlayer_s0",
+   "d_model": 471,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 734494,
+   "completed": true,
+   "train_s": 477.35,
+   "train_rc": 0,
+   "eval_s": 10.8,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 734494,
+   "wall_clock_s": 471.62,
+   "peak_vram_gib": 0.6515,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     471
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_mlayer_s0"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "if_mlayer_s1",
+   "d_model": 471,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 734494,
+   "completed": true,
+   "train_s": 471.89,
+   "train_rc": 0,
+   "eval_s": 10.54,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 734494,
+   "wall_clock_s": 466.46,
+   "peak_vram_gib": 0.6515,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     471
+    ],
+    "seed": [
+     0,
+     1
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_mlayer_s1"
+    ]
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "5",
+   "run": "if_mlayer_s2",
+   "d_model": 471,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 734494,
+   "completed": true,
+   "train_s": 472.71,
+   "train_rc": 0,
+   "eval_s": 10.71,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 734494,
+   "wall_clock_s": 467.37,
+   "peak_vram_gib": 0.6515,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     471
+    ],
+    "seed": [
+     0,
+     2
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ],
+    "run_name": [
+     "if_nest_s0",
+     "if_mlayer_s2"
+    ]
+   },
+   "K1_unexpected": []
+  }
+ ],
+ "prereg_sha256_after": "8979b63de5ec48d923353f6ea6c20035e0f28b11013ad67b402e5f5f0c63e1c6",
+ "prereg_unchanged": true
+}
