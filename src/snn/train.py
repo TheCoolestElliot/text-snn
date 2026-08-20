@@ -57,13 +57,13 @@ from typing import Any
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 
 from snn.config import Config, config_hash, seed_everything
 from snn.data import Corpus, RandomWindowSampler
 from snn.evaluate import evaluate
 from snn.metrics import bits_per_char
 from snn.model import build_model, count_params
+from snn.neuromod import three_factor_loss
 
 # Slot layout of the single static metrics tensor.  One small D2H transfer per
 # step instead of one sync per scalar.
@@ -134,6 +134,17 @@ class Trainer:
 
         # --- model / optimiser ----------------------------------------------
         self.model = build_model(cfg).to(self.device)
+        # Read once, into Python floats, so the captured step reads no config
+        # object and the graph bakes in a constant rather than an attribute
+        # lookup. `tf_tau` is EXP_018's MEASURED da_scale reused deliberately:
+        # the three-factor weight squashes the HEAD's surprise over the same
+        # 205-way vocabulary, in the same nats, so it is the same quantity --
+        # unlike `nm_tau`, which is a different quantity in different units and
+        # is calibrated separately (CONTRIBUTING.md 4: never inherit a constant
+        # across a structurally different arm).
+        self._tf_kappa = float(cfg.tf_kappa)
+        self._tf_tau = float(cfg.da_scale)
+        self._tf_rolled = bool(cfg.tf_rolled)
         self.model.train()
         self.params = [p for p in self.model.parameters() if p.requires_grad]
         self.n_params = count_params(self.model)
@@ -227,8 +238,16 @@ class Trainer:
         """
         self.opt.zero_grad(set_to_none=False)
         logits, _, aux = self.model(self.static_x, None)
-        loss = F.cross_entropy(
-            logits.reshape(-1, self._vocab).float(), self.static_y.reshape(-1)
+        # EXP_021 form 2. At tf_kappa = 0.0 -- every arm but that one --
+        # `three_factor_loss` returns `F.cross_entropy(flat, tgt)`, the same
+        # call this line used to make, so the objective is unchanged BY CODE
+        # PATH and not by a float identity. The weighting is capture-safe: no
+        # `.item()`, no host read, no data-dependent branch, and the only new
+        # kernels are a log-softmax that was already implicit in the CE and one
+        # reduction over V.
+        loss = three_factor_loss(
+            logits, self.static_y, kappa=self._tf_kappa, tau=self._tf_tau,
+            roll_control=self._tf_rolled,
         )
         loss.backward()
         gnorm = _clip_grad_norm_fp64(self.params, self._max_norm)
