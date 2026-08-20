@@ -1,0 +1,646 @@
+{
+ "experiment": "EXP_022",
+ "prereg_sha256_before": "be805cf8b38ca71ab234b5725dea37c878895dc08452a527688b9a444dabbcff",
+ "steps": 20000,
+ "vram_alarm_gib": 4.0,
+ "reused_from_exp_020": [
+  "if_anchor_s0",
+  "if_anchor_s1",
+  "if_anchor_s2",
+  "if_binin_s0",
+  "if_binin_s1",
+  "if_binin_s2"
+ ],
+ "runs": [
+  {
+   "leg": "A",
+   "run": "io_sp34_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 0.4124631294
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "skipped_complete": true,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 375.01,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     0.4124631294
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp34_s0"
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp34_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 0.4124631294
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 380.13,
+   "train_rc": 0,
+   "eval_s": 9.94,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 375.06,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     0.4124631294
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp34_s1"
+    ],
+    "seed": [
+     0,
+     1
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp34_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 0.4124631294
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 379.65,
+   "train_rc": 0,
+   "eval_s": 9.88,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 374.68,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     0.4124631294
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp34_s2"
+    ],
+    "seed": [
+     0,
+     2
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp10_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.2815515655
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 379.06,
+   "train_rc": 0,
+   "eval_s": 9.71,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 374.08,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.2815515655
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp10_s0"
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp10_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.2815515655
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 378.89,
+   "train_rc": 0,
+   "eval_s": 9.65,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 373.85,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.2815515655
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp10_s1"
+    ],
+    "seed": [
+     0,
+     1
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp10_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.2815515655
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 378.91,
+   "train_rc": 0,
+   "eval_s": 9.55,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 373.89,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.2815515655
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp10_s2"
+    ],
+    "seed": [
+     0,
+     2
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp05_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.644853627
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 378.88,
+   "train_rc": 0,
+   "eval_s": 9.56,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 373.9,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.644853627
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp05_s0"
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp05_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.644853627
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 379.72,
+   "train_rc": 0,
+   "eval_s": 9.66,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 374.79,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.644853627
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp05_s1"
+    ],
+    "seed": [
+     0,
+     1
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "A",
+   "run": "io_sp05_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_binary_input": true,
+    "iface_thr_in": 1.644853627
+   },
+   "reference": "if_binin_s0",
+   "expected_params": 735437,
+   "completed": true,
+   "train_s": 380.42,
+   "train_rc": 0,
+   "eval_s": 10.42,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 735437,
+   "wall_clock_s": 375.22,
+   "peak_vram_gib": 0.6093,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "iface_thr_in": [
+     0.0,
+     1.644853627
+    ],
+    "run_name": [
+     "if_binin_s0",
+     "io_sp05_s2"
+    ],
+    "seed": [
+     0,
+     2
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B1",
+   "run": "io_mall_s0",
+   "d_model": 512,
+   "seed": 0,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 840397,
+   "completed": true,
+   "train_s": 446.02,
+   "train_rc": 0,
+   "eval_s": 10.2,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 840397,
+   "wall_clock_s": 440.96,
+   "peak_vram_gib": 0.6932,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "run_name": [
+     "if_nest_s0",
+     "io_mall_s0"
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B1",
+   "run": "io_mall_s1",
+   "d_model": 512,
+   "seed": 1,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 840397,
+   "completed": true,
+   "train_s": 448.37,
+   "train_rc": 0,
+   "eval_s": 10.85,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 840397,
+   "wall_clock_s": 443.18,
+   "peak_vram_gib": 0.6932,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "run_name": [
+     "if_nest_s0",
+     "io_mall_s1"
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ],
+    "seed": [
+     0,
+     1
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B1",
+   "run": "io_mall_s2",
+   "d_model": 512,
+   "seed": 2,
+   "overrides": {
+    "arch": "interface",
+    "iface_read_layers": "all"
+   },
+   "reference": "if_nest_s0",
+   "expected_params": 840397,
+   "completed": true,
+   "train_s": 444.72,
+   "train_rc": 0,
+   "eval_s": 9.87,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 840397,
+   "wall_clock_s": 439.53,
+   "peak_vram_gib": 0.6932,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "run_name": [
+     "if_nest_s0",
+     "io_mall_s2"
+    ],
+    "iface_read_layers": [
+     "last",
+     "all"
+    ],
+    "seed": [
+     0,
+     2
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B2",
+   "run": "io_wide_s0",
+   "d_model": 553,
+   "seed": 0,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 839659,
+   "completed": true,
+   "train_s": 478.85,
+   "train_rc": 0,
+   "eval_s": 9.74,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 839659,
+   "wall_clock_s": 473.89,
+   "peak_vram_gib": 0.6561,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     553
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "io_wide_s0"
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B2",
+   "run": "io_wide_s1",
+   "d_model": 553,
+   "seed": 1,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 839659,
+   "completed": true,
+   "train_s": 479.33,
+   "train_rc": 0,
+   "eval_s": 9.82,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 839659,
+   "wall_clock_s": 474.39,
+   "peak_vram_gib": 0.6561,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     553
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "io_wide_s1"
+    ],
+    "seed": [
+     0,
+     1
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  },
+  {
+   "leg": "B2",
+   "run": "io_wide_s2",
+   "d_model": 553,
+   "seed": 2,
+   "overrides": {
+    "arch": "snn"
+   },
+   "reference": "if_anchor_s0",
+   "expected_params": 839659,
+   "completed": true,
+   "train_s": 479.32,
+   "train_rc": 0,
+   "eval_s": 9.73,
+   "eval_rc": 0,
+   "diverged": false,
+   "params": 839659,
+   "wall_clock_s": 474.35,
+   "peak_vram_gib": 0.6561,
+   "vram_alarm": false,
+   "G2_params_match": true,
+   "G5_frozen_violations": {},
+   "K1_diff": {
+    "d_model": [
+     512,
+     553
+    ],
+    "run_name": [
+     "if_anchor_s0",
+     "io_wide_s2"
+    ],
+    "seed": [
+     0,
+     2
+    ]
+   },
+   "K1_new_fields_at_default": {
+    "nm_pos_len": 256,
+    "iface_code_sd": 1.0
+   },
+   "K1_unexpected": []
+  }
+ ],
+ "prereg_sha256_after": "be805cf8b38ca71ab234b5725dea37c878895dc08452a527688b9a444dabbcff",
+ "prereg_unchanged": true
+}
