@@ -1,9 +1,33 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 14, 2026-08-20.** Interim, not final: Phase 4 is open and this document
+**Revision 15, 2026-08-21.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
+
+> **Rev 15 folds in no experiment and corrects four things, the first of them
+> rev 14's own note.** The pre-registration audit was reading one wrong key, one
+> mis-parsed filename and a single-variant placeholder table, and it had no
+> second route; with all four repaired and the object database consulted the
+> record reads **7/9, not 2/12** — six experiments verified against a **committed
+> blob**, `EXP_013` against the recipe its own log states, and all six
+> commit-verified logs also agree with the live file above `## 9. Results`.
+> **`EXP_020` and `EXP_021` are unchanged**: one commit each, and it already
+> carried results. Then `EXP_024`'s pre-registration: §4's prose generalises to
+> *"any arm"* a band the same document scopes correctly to six — **7 of 24
+> committed primary arm-gain readings sit outside it and three clear H1's own 2σ
+> bar** (`scripts/audit/11_beyond_horizon_census.py`, 41 blocks, 12 artifacts,
+> **zero GPU**); its one modulated layer is **layer 1**, which the screen's own
+> artifact records at a firing rate of **2.98e-07** against an **exact**-equality
+> silence guard, a regime the project has already measured away by step 50 and
+> which §§2.2, 2.6 and 6 do not mention; and §8's `1.0117` is `EXP_002`'s
+> **kernels-per-timestep**, identical to the N0 baseline's, not a step-time
+> ratio — the honest reading is **parity**, and the budget does not move.
+> **`EXP_024_gated_decay.md` is not edited**; it is committed at `aff0d49` and a
+> commit, not a stamp, is what fixes it. **The four corrections cut in different
+> directions and this note takes no position on the R10 tax**, which is decision
+> #4's. **No row of §8 is edited, nothing is adopted, and no bar is proposed,
+> widened or repaired.** See §8's rev-15 note.
 
 > **Rev 14 folds in `EXP_022` and `EXP_023` as §20 and §21: the cost of a binary
 > input was a cost of its DENSITY, and the modulator that won §19 wins just as
@@ -235,7 +259,7 @@ unapplied.
 | GPU-hours spent | **~23.7 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9; **`EXP_014` cost ~1.5**; **`EXP_015` cost ~2.1** — 1.79 of ladder training (§14.1), ~0.09 of arch calibration, ~0.08 for the divergence chase, and ~0.1 for the evaluations, horizon, gap and state probes. **~0.7 of `EXP_015`'s training bought no number**: two legs ran 20,000 steps of which ~14,750 and ~18,000 computed NaN, and that is recorded as spent rather than netted off. **`EXP_016` cost ~0.8 and trained nothing** — five forward passes over committed checkpoints and two instrumented replays of one step — of which **~0.37 bought no number**, two aborted Leg B attempts whose defects are recorded in §15.5's source log. **`EXP_017` cost ~2.0** — 1.60 of training across seven runs, ~0.25 of probes and the horizon, and ~0.12 for running the mutation campaign **twice**, which is recorded as spent because the first run is what caught D09); **`EXP_018` cost ~2.9** — 2.63 of ladder training across sixteen runs, none of which diverged, plus ~0.3 of calibration, the systems probe, the §7.2 screen and the horizon sweep); **`EXP_020` cost ~1.9** — 16 runs at 6,658 s, none diverged, plus the frozen-feature probe, the §7.2 screen, the cost pre-flight and a 16-checkpoint horizon sweep; **`EXP_021` cost ~2.0** — 15 runs at 7,125 s, none diverged, plus the `tau` calibration, the screen, the pre-flight, an 18-checkpoint horizon sweep and 12 generalisation-gap evaluations. **Nothing in either bought no number.** 31 runs across the two, **zero divergences**; **`EXP_022` cost ~1.9** — 15 runs at 6,246 s, none diverged, plus a 21-checkpoint horizon sweep and 15 generalisation-gap evaluations; **`EXP_023` cost ~2.1** — 15 runs at 7,177 s, none diverged, plus a 24-checkpoint horizon sweep and 12 gap evaluations. **61 runs across the four, zero divergences, and nothing that bought no number** |
 | Unexplained divergences | **4, sharing 2 causes** — `twocomp_distill_s1` (§6.4) has its own; `compose_s0` (§10.4) and **both of `EXP_015`'s dead legs (§14.5)** share a signature: origin in layer 0's backward, forward and loss finite, fp32 and fp64 gradient norms equal, and the eager path producing an identical NaN in identical tensors. **It is now reproducible 138 steps from a committed checkpoint rather than 17,598**, and it blocks scaling the adopted arm. **At rev 10 the shared signature has a mechanism (§15)**: the first non-finite value is made *inside* layer 0's reverse recursion, on both dispatch paths, after an amplification of **10^41.62 within one backward pass** — and the plain LIF's recurrence is provably incapable of it. **At rev 11 there are 6, sharing 2 causes**: two *freshly trained* `twocomp` seeds at `d = 512` (§16.4) joined the shared signature, at the width the arm was adopted at, where the committed record holds seven clean seeds |
 | Phase-3 §9 sign-off | **signed off 2026-08-05** (decision #1), and **recorded as retrospective**: Phase 4 was opened without it on instruction and eight experiments ran before it |
-| Decisions open | **6 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add. **Rev 12 adds none and RESOLVES #3** — `EXP_018` handed it a fourth boundary case (a rank-1 broadcast from the head) and it was ruled on Elliot's instruction: **feedforward-driven modulators admitted, head-driven ones diagnostic-only**, extended in `01_reconnaissance.md` §4.6. **Rev 13 adds none and edits none**, and records fresh measured evidence for **#2** and a second independent measurement bearing on **#6** in prose beneath the table. **Rev 14 adds none and edits none either**, and records beneath the table a third measurement bearing on **#6**, a third instance of **#9**'s defect class, and a protocol deviation in §18's and §19's entry conditions |
+| Decisions open | **6 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add. **Rev 12 adds none and RESOLVES #3** — `EXP_018` handed it a fourth boundary case (a rank-1 broadcast from the head) and it was ruled on Elliot's instruction: **feedforward-driven modulators admitted, head-driven ones diagnostic-only**, extended in `01_reconnaissance.md` §4.6. **Rev 13 adds none and edits none**, and records fresh measured evidence for **#2** and a second independent measurement bearing on **#6** in prose beneath the table. **Rev 14 adds none and edits none either**, and records beneath the table a third measurement bearing on **#6**, a third instance of **#9**'s defect class, and a protocol deviation in §18's and §19's entry conditions. **Rev 15 adds none and edits none either.** It corrects rev 14's own note on the pre-registration audit — the record is **7/9, not 2/12** — and three things in `EXP_024`'s pre-registration, which is **not edited**. It bears on **#4** only by improving the record that decision will be taken on, and **takes no position on it** |
 
 The phase has moved the project's answer to its own question twice, and both
 moves were away from the thing the ranking was built around.
@@ -1380,6 +1404,271 @@ neither way and the tool says so rather than implying otherwise.
 the runs are what they are and the bars fired as they fired. Whether the project
 wants a standing gate that refuses to run a resolver whose file is untracked is
 **Elliot's**, and it is the same shape as #10's still-open half.
+
+**A rev-15 note. No row is edited, no decision is ruled, no bar is proposed, and
+`EXP_024`'s pre-registration is not touched. Four corrections, and the first of
+them corrects rev 14's own note above.**
+
+**1. The pre-registration audit was reading one key, one filename and one
+placeholder, and it had no second route. With all four repaired the record is
+7/9, not 2/12.** The tool printed **"2/12"** when rev 14 ran it; rev 14 itself
+records its verdicts qualitatively and states no ratio, so the figure is quoted
+here from the tool's stdout rather than from the note above.
+`scripts/exp/verify_prereg_hash.py` now also tries the **object database** — if
+any commit in a log's history holds bytes that hash to the stamp, the
+pre-registration is verified against a committed object rather than against a
+guess about layout. The result, with the tree at `593baaa` and the revised tool
+in the working copy:
+
+| verdict | experiments | route |
+|---|---|---|
+| **VERIFIED BY COMMIT** | `EXP_014` (`d59f98e`), `EXP_015` (`d4469d6`), `EXP_017` (`50b3904`), `EXP_018` (`dd652bf`), `EXP_022` (`858c48a`), `EXP_023` (`98d3f62`) | a committed blob hashes to the stamp |
+| **VERIFIED BY RECIPE** | `EXP_013` | the reconstruction stub the log records at its own `:424-431` |
+| **UNVERIFIED** | `EXP_020`, `EXP_021` | one commit each, and it already contained results |
+| **NO STAMP** | `EXP_005`, `EXP_007_008`, `EXP_009`, `EXP_011` | no `prereg_*` key in the manifest at all |
+
+**Three defects moved the denominator and one absent route moved the
+numerator**, and separating them matters because only the first three were
+defects. The tool read `prereg_sha256_before` while `EXP_013`–`EXP_018` stamp
+`prereg_sha256_before_first_run`. It parsed `exp_007_008_run_manifest.json` into
+a nonexistent id `007`. And it counted **three** unstamped manifests — `EXP_005`,
+`EXP_009`, `EXP_011` — in the denominator of "stamped pre-registrations", which
+reports an absent stamp as a failed one; the fourth unstamped manifest,
+`exp_007_008`, never reached that denominator at all, because the id defect had
+already excluded it, so the two are interlocked rather than independent and the
+twelve is `3 + 9`. **Correcting all three and keeping the recipe route alone
+gives 2/9.** The numerator moves only when the object database is consulted.
+
+**A fourth defect, and it is the same species as the first.** `PLACEHOLDERS` is a
+single-variant lookup table and it omitted the variant used by `EXP_013` — the
+one log `CONTRIBUTING.md` §2 names as the exemplar that *"records the recipe"*,
+and which states that recipe verbatim at `:424-431`. The exemplar read UNVERIFIED
+for want of a table entry the log itself supplies. That is recorded here rather
+than quietly repaired, because a tool written to catch this class contained two
+instances of it.
+
+**The four newly commit-verified blobs are the pre-registration commits
+themselves** — the oldest commit touching each log, subject *"Pre-register
+EXP_0NN: …"*, status `PRE-REGISTERED — no results yet`, §9 empty. **No false
+positive is possible in that set:** §9 in all six matched blobs holds nothing but
+its heading and a placeholder, so no stamp was computed after results existed.
+So **rev 14's "evidence neither way" is false for four of `EXP_005`–`EXP_018`**,
+and `EXP_013` verifies on top of that.
+
+**One qualification the commit route needs, and the tool now closes it rather
+than leaving it open.** A stamp that matches a historical blob is strong evidence
+that the **stamp** is honest and no evidence at all that the **working file** is
+unedited — the guarantee §2 actually wants. So every commit-verified row now also
+reports `live_file_agrees_above_results`: the blob and the live file, both
+truncated at `## 9. Results`, compared line by line. **All six read `True`.**
+
+That check needed one correction before it could be trusted, and it is the kind
+this tool exists not to make. Dropping only the *first* `**Status:` line left
+`EXP_022`'s five continuation lines — its `**Status: CLOSED …**` wraps over six
+lines and summarises the verdicts — looking like an edited hypothesis. The whole
+status block is the one permitted change above the heading, so the whole block is
+dropped from both sides. A first-line filter would have convicted a clean log.
+
+**Nothing changes for `EXP_020` and `EXP_021`** — rev 14's finding stands exactly
+as written, and the reason is now mechanical: their logs have one commit each and
+it already carried §9.
+
+**2. `EXP_024` §4's prose generalises a claim the same document scopes correctly
+three times, and the generalisation is false on the wider record.** §4's own H1
+row says *"**Six arms** have moved this component by at most 0.0015 (§0)"*, §6
+item 5 says *"across **six arms**"*, and §0's table names those six — all true,
+all inside the band, maximum `|0.00154|`. **The premise H1 rests on is sound as
+scoped.** The unqualified restatement is not:
+
+> *The beyond-horizon component has never been observed outside ±0.0016 on any
+> arm, so an UNRESOLVED H1 is the modal outcome and is not a disappointment.*
+
+`scripts/audit/11_beyond_horizon_census.py` reads every committed block carrying
+the component under **either** of its two spellings — `beyond_horizon_gain_bpc`
+and the `beyond_horizon_bpc` of five `*_memory_horizon.json` files — **41 blocks
+across 12 artifacts, zero GPU** — and classifies them, because most do not bear
+on the claim. Gap blocks (`remaining_gap_vs_gru`, `i5_gap_decomposition`) are
+excluded: `010_phase4_arm_results.py:569` computes the first as
+`decompose(curve, gru_curve)`, the same function with the arm in the *reference*
+slot, so they measure the gap to the anchor that §0 already cites as its
+motivation rather than an arm's gain. `bars.*` blocks duplicate an arm row, and
+`if_binin` — stored **bit-identically** in `EXP_020` and `EXP_022` — is counted
+once. `docs/reports/data/audit_11_beyond_horizon_census.json` carries all 41 rows
+with the classification on each.
+
+**The cleanest counterexamples are not the large ones**, and neither is in §0's
+table: **`tokenshift` reads +0.00565 on an arm that WON** (total +0.04847) — 3.5×
+the band, 12× the bitwise-copy floor, with no question of compression attached —
+and **`io_sp05` reads +0.00312** on a winning arm (+0.03560). Of **24 distinct
+primary arm-gain readings outside the two-compartment family, 7 are outside
+±0.0016** and three clear `EXP_024`'s own H1 bar of 2σ = 0.00922:
+
+| reading | total | beyond horizon | share | source |
+|---|---:|---:|---:|---|
+| `if_foldwide` | **−0.01366** | **+0.01708** | **−1.2508** | `exp_020_arm_results.json` |
+| width `d=1481` *(a width leg, not an arm — §1: "`EXP_014` adopts nothing")* | +0.24961 | **+0.01497** | n/a | `exp_014_scaling_results.json` |
+| `if_fold` | **−0.09453** | **+0.01400** | **−0.1481** | `exp_020_arm_results.json` |
+
+**Two of the three are arms that LOST**, so a positive beyond-horizon reading on
+them cannot be read as a win — and the census flags both `compression_suspect`.
+**But the sign pattern is not itself diagnostic, and this note will not claim it
+is.** From `scripts/exp/010_phase4_arm_results.py:190-196` the quantity is
+`beyond = (ref[CMAX] − arm[CMAX]) − (ref[h] − arm[h]) = g(CMAX) − g(h)` — a
+**difference of gains**, invariant under any constant shift of the arm's curve,
+so an arm uniformly worse by any amount scores `beyond = 0`. A negative total
+does not mechanically induce a positive beyond. The negative
+`beyond_horizon_share` is `beyond/total` restating the two signs it is built
+from, not independent corroboration. And the pattern fails its own control:
+**`if_binin` lost more than `if_foldwide`** (−0.04478 against −0.01366) and read
+beyond **−0.00477**, its horizon *falling* to `[6, 6, 7]`.
+
+**So the flag is checked against the horizon rather than left standing**, and the
+horizon declines to support it. `exp_020_memory_horizon.json`,
+`by_arm.<arm>._paired.horizon_2sigma_per_seed`: `if_fold` **`[9, 10, 9]`**,
+`if_foldwide` **`[9, 8, 9]`**, against `if_anchor` `[7, 7, 7]` and a **bitwise
+copy of the anchor** at `[7]`. Both move on 3 of 3 seeds, past the 6/7/8 band
+§13.3 treats as "did not move". The two markers **agree** for exactly the two
+arms in question.
+
+**None of which is new to this report, and that is worth saying plainly.** §18.4
+already concluded, in bold, that *"the fold's cost is a REACH cost"*. What is new
+is only that the same two readings sit outside a band `EXP_024` §4 states as
+universal, and that the horizon corroborates them.
+
+**`EXP_024`'s H4 answers the compression question on these cases, and it fires.**
+`exp_020_arm_results.json`'s `short_context_table` stores the multiples outright:
+`if_fold` at c = 3 is **7.90×** its bar and at c = 4 **10.22×**; `if_foldwide`
+**5.53×** and **6.09×**. Both would route to §5's second row — *"it bought reach
+the losing way"* — so the anti-signature is not silent here. **Whether H4 is a
+sufficient guard in general remains open**, and no bar is proposed, widened or
+repaired by this note. *(The width leg's apparent H4 failure is confounded by its
+much lower asymptote and is not cited alongside them.)*
+
+**What the census establishes is narrower than "the premise is falsified" and
+more useful than it.** H1's 2σ bar is cleared by three committed readings, two of
+them on arms that lost bits, and those two are precisely the ones whose horizon
+marker also moved. **Whether `if_fold` and `if_foldwide` bought reach and paid
+for it elsewhere is unresolved on the committed record** — the integer horizon
+has no σ anywhere in this project (`EXP_017` §10 item 8; `EXP_024`'s own H9
+carries it as a marker with no verdict), `EXP_020` §4 pre-registered H5 with no
+bar on it, and n = 3 cannot resolve it. **Two markers agreeing is two markers
+agreeing.** It is worth recording only that these are arms carrying **no new
+kernel and no new hand-written backward** (`f90c8c5`: the fold axis "sits outside
+the time loop"). **Nothing here proposes running anything.**
+
+**3. `EXP_024` modulates exactly one layer, that layer is silent at
+initialisation, the screen's guard for that condition misses it by 3e-07, and the
+pre-registration mentions neither — nor that the project has already measured the
+silence away by step 50.**
+
+§2.6's table carries both layers (`0.116 / 0.399` for `beta_raw`, `0.041 / 0.042`
+for `k_gate`), though nothing in its headers says the "/" separates layers; the
+prose is the only place that pairing is explained, and it explains it correctly
+for **layer 0**, reporting `k_gate`'s 0.041 as 2.8× below `beta_raw`'s 0.116. §3
+states outright that *"`K = 2`, so there is one modulated layer"*, and §2.2 and
+`model.py:1640` put it at **layer 1**, where the ratios are `k_gate` **0.041750**
+against `beta_raw` **0.399252** — **9.56×**. **That widening is `beta_raw`
+moving, not `k_gate` failing:** `k_gate` reads 0.041118 at layer 0 and 0.041750
+at layer 1, a **1.5 %** difference clearing the screen's 0.01 floor by ~4.1× at
+both, while `beta_raw` moves **3.45×**. The gate is no harder to find at the
+layer that carries it; its co-parameter is far easier.
+
+**The layer-1 reading is measured in a regime the pre-registration never names.**
+`exp_024_reachability.json` records layer 1's firing rate at this init as
+**2.98e-07** — layer 0 is at **5.2 %** in the same screen — and
+`audit_07_init_pathology.json` records layer 1 at `d=512, K=2, thr=1.0` as
+**exactly 0.0 on 3 of 3 seeds, `silent_layers: 1`**. The screen's own guard is
+`silent = [... if r["firing_rate"] == 0.0]`
+(`scripts/audit/09_gradient_reachability.py:888`), an **exact** equality, so
+2.98e-07 clears it and every layer-1 parameter is stamped `in_silent_layer:
+false`. That the margin is real and known is in the same file at `:576`, which
+describes a threshold change that *"tips layer 1 from 2.98e-07 to silent"*.
+
+**And the same artifacts record the escape, which is why this is a gap in §6's
+limitations list rather than a hazard to the arm.** `02_baseline_report` §5.3 —
+titled *"It self-corrects — measured, not assumed"* — tabulates layer 1 at
+`0.000` at step 0, `0.066` at step 25 and `0.452` at step 50 on the real corpus;
+`audit_07_init_pathology.json`'s `P23_escape_and_fix` records
+`steps_to_first_spike_in_layer1: 50`; and §5.4 carries the project's standing
+ruling that the pathology *"self-corrects within ~50 of 20 000 steps"* and that
+changing an initialisation because a resolved diagnostic looked bad *"would be
+exactly the kind of unforced modification that makes a baseline non-comparable"*.
+**Nothing here overturns §2.6's PASS, and nothing here says the gate is in the
+wrong place.** What §2.2, §2.6 and §6 omit is that the arm's one modulated layer
+spends its first ~50 steps in that regime and that the screen measures exactly
+it.
+
+**A third thing the same artifact shows is not an open question, and the tree
+already answers it.** The screen reports a nonzero `k_gate` gradient at **layer
+0** (0.041118) for a design that says layer 0 carries no gate — because
+`build_screen_model` (`scripts/audit/09_gradient_reachability.py:800-806`)
+allocates every *grafted* candidate's parameters `for _ in range(cfg.n_layers)`
+and grafts the scan onto all of them, which is why `c24_gated` shows layer-0
+entries where the real-arch `nm_*` candidates read `present: false`. So layer 0's
+column describes a topology the arm will not have — a property of the screening
+harness, visible in the committed script. It does not disturb the layer-1
+numbers. **The gate that will hold `gateddecay.py` to one modulated layer is
+`G2`**, whose closed form is §3's `735,437 + 2d·(K−1)` — not `G4`, which asserts
+*nesting* rather than topology. `model.py:1640` already names that same mechanism
+for the modulator's unused layer-0 parameters: *"the parameters still exist, and
+**G2** asserts they reach nothing."*
+
+**4. §8's cost sentence misreads `EXP_002`'s artifact, and the honest replacement
+is parity rather than a saving.** §8 states that *"`EXP_002` N1 priced a
+per-channel decay's **systems** cost at a relative step time of 1.0117"*. In
+`exp_002_candidate_neuron_cost.json`, `1.0117` is N1's `kernels_per_timestep`
+and is **identical to the N0 baseline's** — both `kernels = 259`, and
+259/256 = 1.01171875. It is the one-kernel-per-timestep result, not a step-time
+ratio, and both committed write-ups label that column "Kernels/timestep". N1's
+committed `ms_vs_baseline` is **0.972** — 8.898 ms against 9.158 — **but that is
+a median of three**, with N1's own `ms_spread_rel` at **7.3 %** and N0's whole
+range `[9.096, 9.279]` sitting inside N1's `[8.725, 9.378]`. Per `CLAUDE.md`'s
+standing rule that a figure compared against a threshold carries an interval and
+its denominator, the reading is **parity**: not 1.17 % slower, and not faster.
+**It moves nothing** — 10 runs × 398.9 s is 1.108 h, ×1.0117 is 1.121 h, ×0.972
+is 1.077 h, and §8's *"~1.1 GPU-h"* survives either way — and it does not touch
+§8 item 5's requirement that the budget be pre-flighted rather than quoted.
+
+**What this note does not do.** It edits no row, resolves nothing, ranks no arm
+and proposes no bar. It does **not** edit `EXP_024_gated_decay.md`: that log is
+**committed** at `aff0d49`, and a commit — not a stamp — is what fixes it;
+`EXP_024` has no run manifest yet (its own §8 item 7 is an unmet entry
+condition), so `verify_prereg_hash.py` reports `NO MANIFEST` for it and `git
+diff` is the only check available for that log today. The correction goes in
+prose here because the decision it bears on — the R10 tax — is §8 item 1's, and
+routes to open decision **#4**.
+
+**It takes no position on that item**, and the four corrections cut in different
+directions rather than one:
+
+* **1 is unambiguously good news for the record**, and its only bearing on
+  `EXP_024` is that the project's provenance is in better shape than rev 14 said.
+* **2 cuts both ways.** It weakens §0's *necessity* argument — the statistic has
+  moved further, on more arms, than §4's generalisation allows — while also
+  weakening H1's *bar*, since three committed readings clear 2σ and two of them
+  sit on arms that lost bits.
+* **3 is a documentation gap, not bad news for the arm.** The layer is silent for
+  ~50 of 20 000 steps by this project's own measurement, §5.4 already ruled that
+  this does not warrant changing an initialisation, and the PASS stands. What is
+  missing is any mention of it in §2.2, §2.6 or §6.
+* **4 corrects a label without moving the budget.**
+
+**The point of the note is that whichever way that decision goes, it goes on the
+real record.** Corrections 3 and 4 were found only because the census in
+correction 2 was built and run; none of the four required a GPU.
+
+**The three places elsewhere in this report that read "revision 14" have moved
+with this note**: line 3's masthead, §22's changelog table, and §1's "Decisions
+open" cell, which has carried a per-revision sentence since rev 11. **A masthead
+blockquote is added as a fourth**, which is not one of those three and is
+recorded here for that reason: it is the convention every revision since 7 has
+followed, and rev 14's changelog row (b) is where the one revision that skipped
+it is named. **The gate table in §9 is not re-run**, on the precedent revs 5 and
+7 both state explicitly: this revision closes no experiment, adopts nothing, and
+touches no code that any row in it describes. `ruff check .` passes and the CPU
+suite is **540 passed, 1 skipped** on this tree; both tools this note relies on
+were re-run from the committed artifacts and
+`docs/reports/data/audit_11_beyond_horizon_census.json` reproduces **byte-for-byte**.
 
 ---
 
@@ -3516,6 +3805,7 @@ referrals between them, all in their own §10s, all Elliot's.
 
 | Rev | Change |
 |---|---|
+| 15 | 2026-08-21. **No experiment folds in; four corrections, and the first of them corrects rev 14's own §8 note.** (a) **The pre-registration audit was reading one key, one filename and one placeholder, and it had no second route.** `scripts/exp/verify_prereg_hash.py` read `prereg_sha256_before` while `EXP_013`–`EXP_018` stamp `prereg_sha256_before_first_run`; it parsed `exp_007_008_run_manifest.json` into a nonexistent id `007`; it counted three **unstamped** manifests in the denominator of *stamped* pre-registrations; and its `PLACEHOLDERS` table omitted the variant used by `EXP_013` — the one log `CONTRIBUTING.md` §2 names as the exemplar, which states that recipe verbatim at its own `:424-431`. **A tool written to catch this class contained two instances of it, and that is recorded rather than quietly repaired.** (b) **A second route is added and it is the stronger one**: if any commit in a log's history holds bytes that hash to the stamp, the pre-registration verifies against **an object in the repository** rather than a guess about layout, and the earliest such commit is named. **The record reads 7/9, not 2/12** — correcting the three defects alone gives 2/9, so the denominator and the numerator moved for different reasons. The four newly commit-verified blobs are the **pre-registration commits themselves**, §9 empty in all six, so **no false positive is possible in that set**. (c) **`EXP_020` and `EXP_021` are unchanged and rev 14's finding stands**, now with a mechanical reason: one commit each, and it already carried §9. (d) **Every commit-verified row also reports `live_file_agrees_above_results`, and all six read `True`** — a matching blob proves the *stamp* is honest and says nothing about the file on disk, which is the guarantee §2 wants. That check needed one fix first: `EXP_022`'s `**Status: CLOSED …**` wraps over **six** lines, so a first-line-only filter reported five continuation lines as an edited hypothesis and **would have convicted a clean log**. (e) **`EXP_024` §4's prose generalises to "any arm" a band the same document scopes correctly to six**, and on the wider committed record that is false: `scripts/audit/11_beyond_horizon_census.py` reads **41 blocks across 12 artifacts under both spellings, zero GPU**, and of **24 primary arm-gain readings 7 sit outside ±0.0016**, three clearing H1's own 2σ bar. **The cleanest counterexamples are not the largest**: `tokenshift` reads **+0.00565 on an arm that WON**. (f) **Two of the three largest are arms that LOST**, so the census flags them `compression_suspect` — **and checks the flag rather than leaving it standing**: the horizon marker moves for both (`[9, 10, 9]` and `[9, 8, 9]` against `[7, 7, 7]`), while `if_binin` lost more and read **−0.00477**. **Two markers agreeing is two markers agreeing**; the integer horizon has no σ anywhere in this project, and **it is left unresolved**. (g) **`EXP_024` modulates layer 1, that layer's firing rate at init is 2.98e-07, and the screen's silence guard is an exact equality** — so it clears, and every layer-1 parameter is stamped `in_silent_layer: false`. **§2.6's PASS is not disturbed**: `02_baseline_report` §5.3 measures the escape by step 50 and §5.4 already ruled that a resolved diagnostic does not warrant changing an init. What is missing is any mention of it in §§2.2, 2.6 or 6. The screen's layer-0 `k_gate` entry is a **harness** property — `build_screen_model` grafts every candidate onto all layers — and the gate holding the arm to one modulated layer is **G2**, not G4. (h) **§8's `1.0117` is `EXP_002`'s kernels-per-timestep, identical to the N0 baseline's** (both `kernels = 259`), not a step-time ratio; N1's `ms_vs_baseline` is 0.972 but is a **median of three** with 7.3 % spread and overlapping ranges, so **the honest reading is parity** and the ~1.1 GPU-h survives either way. (i) **`EXP_024_gated_decay.md` is NOT edited** — it is committed at `aff0d49`, and a commit rather than a stamp is what fixes it; it has no run manifest yet, so `git diff` is the only check available for that log today. (j) **The §9 gate table is not re-run**, on revs 5's and 7's precedent: this revision closes no experiment, adopts nothing, and touches no code any row in it describes. **No §8 row is edited, no decision is ruled, no bar is proposed, widened or repaired, and corrections 3 and 4 were found only because the census in correction 2 was built and run. None of the four required a GPU.** |
 | 14 | 2026-08-20. **`EXP_022` and `EXP_023` fold in as §20 and §21: the cost of a binary input was a cost of its DENSITY, and the modulator that won §19 wins just as well when its signal is a constant.** (a) **§20 and §21 added**, pushing the changelog **§20 → §22** — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10, 11, 12 (a) and 13 (a) each record for their own. (b) **The masthead is corrected from Revision 12 to Revision 14**: rev 13 shipped a rev-13 changelog row, rev-13 status text and two new sections behind a masthead still reading *Revision 12, 2026-08-14*, and it is the only revision since 7 that added no masthead blockquote. Recorded rather than quietly fixed. (c) **A fully binary input code costs 0.00955 bpc at `q = 0.05` against 0.04569 at `q = 0.50`** — 79 % of §18's binarity cost recovered at **identical parameter count** and **0.97× wall-clock**, on 3/3 seeds, H2 at 2.8× its bar and H3 at 3.9×. (d) **82.8 % of that cost sits at zero context and all three sparse rungs recover at exactly that component**; what separates them is what they give back within reach (−0.0314 / −0.0163 / −0.0001), and no bar was pre-registered on that gradient. (e) **The winning code is LOSSY** — 39–42 of 205 characters share a code and 26–28 emit the all-zero one — and it beats the code that distinguishes every character. (f) **`EXP_022` §6 item 3's diagnostic fired**: realised densities are 0.50 / 0.14 / 0.025 / 0.013, not the 0.50 / 0.34 / 0.10 / 0.05 asked for, with a named mechanism (weight decay against a one-sided threshold). (g) **H6 UNRESOLVED**: the all-layer readout is worth its parameters (H5, −0.0216, t = −8.49) and **not** worth more than the same parameters spent on width — but §20.5 shows the two reach the same total by opposite routes, and the readout's **+0.0431 within reach is the largest such movement of the phase**. (h) **§19's headline REPLICATES out of sample** at −0.02535 on three fresh seeds, t = −8.45. (i) **And a four-rung ladder takes its mechanism away for the second time**: `nm_const`, whose driving signal is a constant, is worth −0.02975 against `nm_local`'s −0.02953 — H2 at **+0.00022**, forty-two times below the bar and pointing the wrong way — so §5's pre-written cell fires: *EXP_021's arm is a learned per-channel gain, and the time-variation is free*. (j) **H3 FAILED and refutes the positional-leak explanation**: `nm_pos` is 0.011 WORSE than `nm_const`, 0/3 seeds. (k) **H4 was priced at n = 6 and n = 6 halved it** — −0.00221 against the n = 3 estimate of −0.00577, still unresolved. (l) **H7 flat at 1.1176 across four rungs** against `EXP_018`'s 26, with `sd(DA)` spanning 0.000 to 0.2283 — the optimiser buys the form, not the signal. (m) **Nothing on either ladder reaches beyond the horizon.** (n) **A confound found by audit after both experiments ran**: every `localdopamine` run used `nm_b_init = -0.7` (init `sech²` = 0.004) against the −2.97 `EXP_021` §2.6 certifies (0.777). Pinned by a test verified to fail, recorded in §21.6, **not changed**, and the re-run referred at ~0.6 GPU-h. (o) **A protocol deviation recorded beneath §8**: §18's and §19's resolvers were never committed before their bpc was read; §20's and §21's were. (p) **A resolver defect caught BEFORE commit** — H4's post-hoc replacement had its sign inverted and would have announced a gain on a pure cost; fixed free, gated by four tests, three verified to fail against the original. (q) **No row of §8 is edited, no rank is applied, no arm is adopted and no open decision is ruled.** |
 | 13 | 2026-08-19. **`EXP_020` and `EXP_021` fold in as §18 and §19: the model's two ends are measured for the first time and every arm loses, and a feedforward modulator beats its anchor for a reason its own control takes away.** (a) **§18 and §19 added**, pushing the changelog **§18 → §20** — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10, 11 and 12 (a) each record for their own. (b) **`layers.0.weight` is provably redundant with the embedding** — `cur0 = W0·E[x] + b0 = T[x] + b0` exactly, measured at 5.19e-08 relative — and it is **35.7 % of the model**. **Removing it costs +0.09459 bpc against the +0.0582 §13's slope predicts for a generic cut that size: 1.63× more than the parameters are worth**, and spending the freed budget on width does not recover it (`foldwide` +0.01326 *worse*). This is **§6.5's `EXP_008` result one layer earlier and larger**, and it is now two independent measurements bearing on open decision **#6**. (c) **T1 PASSED at exactly 0.0** — a full 20,000-step nesting run reproducing its anchor bitwise in both protocols. (d) **A binary input code costs +0.04569 bpc at IDENTICAL parameter count, and 83 % of that is at zero context** — a per-character expressiveness price, not a memory price (−0.0029 within reach, −0.0048 beyond). The committed model is binary on **1024 of 1536** inter-unit wires; the arm is 1536/1536, and the centring is a provable reparameterisation of `layers.0.bias`, so it is a **true spike input** and not a two-valued analogue one. (e) **The fold's cost is a REACH cost** — 86 % within-reach — which no argument from parameter counting predicts, and `foldwide`'s headline is a real +0.0397 zero-context gain plus a larger −0.0705 within-reach loss that nearly cancel. (f) **σ transfer CHECKED and HELD for the first time**: 0.004683 on this tree against the transferred 0.00461, ×1.02. §3's rule is unchanged — the point is that the check was run. (g) **The per-context instrument failed its own negative control, and that is a finding.** `if_nest_s0` is **bitwise** its anchor and still reads **120 of 128 contexts "significantly worse"**; the bars fall to 2.4e-05 where single-seed variation is ~0.005 — **up to 80× below it**. `n_contexts_significantly_worse` is **unusable at n = 3**. Fresh measured evidence for open decision **#2**; **no redefinition is proposed** and every later experiment quotes this floor beside the statistic. (h) **`EXP_021`'s `nm_local` beats its anchor by −0.03371 bpc, t = −8.95, 3/3 seeds, 3.7× the bar, at 1.49× with no second forward pass** — the first arm since `EXP_008` to do so, and in the slot **#3 admits**. (i) **And its own controls take the mechanism away**: H2 UNRESOLVED at −0.00577 against the batch-rolled control, and H3's `rms(nm_gain)` ratio is **1.12** against §17's **26** on the identical quantity. §5's pre-fixed cell stands: *a bounded time-varying gain pays and the RPE is not why*. (j) **The gain is ENTIRELY within reach** — +0.0559 inside the baseline's 7-character horizon, **−0.0005 beyond it** — which is exactly where §14.3 located the whole matched-size gap to the GRU, and where §18's decomposition puts the two-compartment neuron's gain too. Complementary or redundant is **not measured** and is referred. (k) **Not a generalisation effect**, measured with §12's committed instrument: the arm's gap is within ~0.004 of the anchor's on both protocols — the **opposite** of §17, whose arm widened its gap by 0.0057 while losing. (l) **Dopamine on the LEARNING RULE is actively harmful**: `tf_neg` +0.04826 worse (t 29.34, 0/3), the harm IS alignment-dependent (`tf_roll` neutral at −0.0008), and learn-from-errors beats consolidate-success by 0.0377 though both lose. (m) **A pre-registered statistic was INVALID and §17's own referral predicted it** — H7 read the train→test gap from a logged loss that is the *weighted* objective for the `tf_*` arms, returning −0.354 and +0.673. **Second experiment caught by `EXP_018` §10 item 11, first caught after it was written down**; re-measured with the committed instrument. **It should be ratified into `CONTRIBUTING.md`.** (n) **Two derivations forced by measurement before any run**: a summed `phi` is +101 nats at `d = 512` and saturates `tanh` to exactly 1.0, which would have made the arm a constant per-channel gain — i.e. **adopted arm #5 under a new name, training and scoring plausibly**; and the literal `H − S` measured **2.01×**, worse than the arm it exists to beat, until the exact cancellation `phi = mean_c (s − p)·logit` brought it to 1.49×. (o) **Three defects found, none touching a number**: a closed form missing `nm_log_tau` (caught by strict-xfail *before* the gate that would have aborted on it), `iface_read_lags > 1` silently decoding zeros at `L = 1`, and a resolver reading per-context bars from a wrapper — **caught only because two implementations of one statistic disagreed**. (p) §1's status table updated: experiments closed gains `EXP_020` and `EXP_021`; **ranked candidates closed unchanged at 6 of 14** — neither is on the 18-item list; **arms adopted unchanged at 2**; **GPU-hours ~15.8 → ~19.7**. (q) **`EXP_019` is pre-registered and NOT RUN**, and is recorded here rather than given a section: its zero-GPU instruments produced the regional census committed at `19cdd4a`, and its training ladder never started. (r) **No §8 row is edited and none is added.** #2 gains fresh evidence in prose beneath the table, per the rev-5 rule; #6 gains a second independent measurement, also in prose. **Six decisions remain open.** (s) **No arm is adopted, no rank is renumbered, no tolerance is set, no phase is authorised, and no recipe term moves.** |
 | 12 | 2026-08-14. **`EXP_018` folds in as §17: a broadcast reward prediction error is findable, wanted, and harmful.** (a) **§17 added**, pushing the changelog to §18 — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10 and 11 each record for their own. (b) **The derivation removed a hyperparameter before the arm existed**: `E[-log p] = H(p)` exactly, so the RPE is zero-mean under the model's own belief with no baseline, no EMA and no critic — and, decisively for the implementation, no sequential scan over `t` inside a CUDA-graph capture. (c) **Not a reparameterisation**, unlike `EXP_008`: `DA_t` varies with `t` and folds into no weight, so decision #6 does not arise for it. (d) **D1 UNRESOLVED by 3.6e-06 bpc** and reported as a miss (`CONTRIBUTING.md` §3), in the direction of harm. (e) **The pre-registration's own defect, measured rather than referred because it hurts**: an unpaired Welch test on paired data — a seed here fixes both the initial weights and the data order — and the paired test gives 5/5 seeds worse, −0.006215, t = −7.477, p = 1.7e-03. The verdict still stands as it fired. (f) **The 26x**: `rms(k)` 0.1950 for the aligned RPE against 0.0075 for the same signal rolled across the batch, stable across seeds — the optimiser can tell them apart and wants the real one. (g) **Identical train fit (+0.00043, p 0.63), worse test fit (+0.00611, p 0.0017)**; the gap widens 0.0057, roughly doubling §12.2's 0.0059. Hypothesis offered and not established: `phi` is a function of the model's own parameters, so conditioning on it may open a self-referential channel. (h) **The decomposition is two effects of opposite sign** — −0.0246 at c = 0 where the mechanism is structurally inactive, +0.0427 at c = 3, ~+0.006 asymptotically; worse at 125 of 128 contexts, so `EXP_001`'s dominance criterion fails at short contexts. (i) **Cost 1.708x at training AND inference**, measured against a same-session anchor, against `EXP_007`'s already-dominated 1.49x. (j) **Adopts nothing, ranks nothing, closes no ranked candidate.** It raises a **fourth** I5 boundary case for #3 — and **#3 is then RESOLVED at this revision on Elliot's instruction of 2026-08-14**, the first §8 row a revision has closed since rev 6: feedforward-driven modulators admitted, head-driven ones diagnostic-only, extension ratified in `01_reconnaissance.md` §4.6 beside the 2026-08-01 original. Ruled after the evidence existed and stated as such; the criterion is structural and costs the project nothing it wanted. Six post-run referrals. (k) **A claim §17.4 made was withdrawn inside the same revision.** `EXP_018` §10 item 7 referred the proper generalisation-gap measurement to a later experiment; it was run here instead, with §12's own committed instrument over all sixteen checkpoints. It says the arm is worse on the **train slice** by **+0.00522** (t 7.23, p 0.0019, 5/5 seeds) against **+0.00621** on test, so **the gap does NOT widen** (p 0.16 carried, 0.74 fresh). "The gap roughly doubles" is withdrawn: **this is a capability loss on seen and unseen text alike, not a generalisation failure**, and the self-referential-channel hypothesis loses the observation that motivated it. The correction sits beneath the standing original, per §14.5's precedent. (l) **Two train-side estimators disagree by ~0.005 in opposite directions for the two arms** — the anchor's running loss sits 0.0028 above its fresh train-slice bpc, the arm's 0.0026 below — **chased and resolved rather than referred**: a logged training loss is measured at pre-update weights, and the anchor was still improving over the logged tail by 0.00619 against the arm's 0.00285 — an asymmetry of +0.00334 ± 0.00096 (p 0.026) that cancelled the effect. Re-scored on the SAME batches at final weights the arm is worse by **+0.00377** (t 4.22, p 0.0135, 5/5), and `eval()`/`train()` agree **bit-for-bit**, so there is no mode-dependence and no undeclared state in the arm — a third independent slice agreeing with the other two. **Standing lesson: a running training loss is not a stand-in for a train-split bpc.** |

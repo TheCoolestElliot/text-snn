@@ -3,6 +3,7 @@ SHA-256 its run manifest stamped before the first run.
 
     python scripts/exp/verify_prereg_hash.py                # every stamped experiment
     python scripts/exp/verify_prereg_hash.py --exp 022      # one
+    python scripts/exp/verify_prereg_hash.py --json         # machine-readable
 
 WHY THIS EXISTS
 ---------------
@@ -16,46 +17,114 @@ only on a condition most of this project's logs have not met:
 
 The recipe is the second half, and without it the stamp is not independently
 checkable: once §9 is appended the live file no longer hashes to the stamp, and a
-reader has no way to tell a correct stamp from a wrong one. Report §8's rev-14
-note records that `EXP_020` and `EXP_021` supply the first half and not the
-second. This file is the recipe, executable, so the guarantee survives appending
-results for every experiment that follows the same layout.
+reader has no way to tell a correct stamp from a wrong one. This file is the
+recipe, executable.
 
-THE RECIPE, AND IT IS THE WHOLE CONTRACT
-----------------------------------------
-A pre-registration is stamped in the state it had when §9 held nothing but its
-placeholder. Two things change when an experiment closes, and only two:
+TWO ROUTES TO THE PRE-RESULTS BYTES, AND THE FIRST IS STRONGER
+--------------------------------------------------------------
+1. **BY COMMIT.** These logs are committed. If any commit in a log's history
+   holds bytes that hash to the stamp, the pre-registration is verified against
+   an object in the repository rather than against a guess about layout. History
+   is walked **oldest first**, so the commit named is the earliest that held the
+   stamped bytes. This route needs no PLACEHOLDERS table and names the commit so
+   a reader can `git show` it. **It is tried first, and where it fires the recipe
+   route is not consulted.**
 
-  1. everything from the `## 9. Results` heading onward is replaced by the
-     appended results;
-  2. the one-line `**Status: OPEN.**` becomes `**Status: CLOSED ...**`.
+   **What it does NOT establish, and why there is a third check.** A blob that
+   matches the stamp proves the STAMP is honest. It says nothing about the file
+   on disk today, which is the guarantee §2 actually wants. So every
+   commit-verified row also reports `live_file_agrees_above_results`: the blob
+   and the live file, both truncated at the heading, compared line by line with
+   the status BLOCK removed from each. The status is the one change above the
+   heading that closing an experiment may make, and it is not one line --
+   `EXP_022`'s wraps over six and summarises its verdicts, so a first-line-only
+   filter reported five continuation lines as an edited hypothesis. All six
+   commit-verified logs read `True`.
 
-So the pre-results bytes are recovered by truncating at the heading, restoring
-the placeholder line, and restoring the status line. **Nothing else may differ.**
-If a log has been edited above §9 in any other way this check fails, which is
-exactly what it is for -- `CONTRIBUTING.md` §2's "never rewrite the hypothesis"
-has had no mechanical enforcement until now.
+2. **BY RECIPE.** Where history does not hold the pre-results bytes -- a log
+   whose only commit already contained its results -- the bytes are reconstructed
+   from the live file. A pre-registration is stamped in the state it had when §9
+   held nothing but its placeholder, and exactly two things change when an
+   experiment closes:
 
-WHAT IT FOUND WHEN IT WAS FIRST RUN, 2026-08-20
-------------------------------------------------
-`EXP_022` and `EXP_023` **VERIFY**: their stamped bytes reconstruct exactly, so
-their hypotheses are provably the ones the runs were scored against.
+     a. everything from the `## 9. Results` heading onward is replaced;
+     b. the one-line `**Status: OPEN.**` becomes `**Status: CLOSED ...**`.
 
-`EXP_020` and `EXP_021` **DO NOT**, and a deliberate search says the recipe is
-unrecoverable rather than merely unlisted. Every prefix of each live log was
-hashed under both line-ending conventions, crossed with six plausible status
-lines, five §9 layouts and two truncation points; nothing reproduces either
-stamp. **That is not a finding that a hypothesis was edited** — the far more
-likely explanation is a cosmetic change above §9 after stamping, which is
-innocuous and unverifiable in exactly the same way. What it does mean is that
-for those two experiments **the stamp is no longer independent evidence of
-anything**, which is the guarantee `CONTRIBUTING.md` §2 was written to preserve.
-Report §8's rev-14 note records it. `CONTRIBUTING.md` §3 — *"where a reasoning
-trail is unrecoverable, say so in the artifact"* — is why it is stated here
-rather than quietly omitted.
+   So the bytes are recovered by truncating at the heading and restoring the
+   placeholder and status lines. **Nothing else may differ.** A log edited above
+   §9 in any other way fails, which is exactly what it is for -- §2's "never
+   rewrite the hypothesis" had no mechanical enforcement before this file.
 
-The older logs (`EXP_005`–`EXP_018`) predate this layout and read UNVERIFIED for
-that reason; they are not evidence of anything either way and the tool says so.
+FOUR STATES, NOT TWO, AND THE DENOMINATOR IS PART OF THE FINDING
+-----------------------------------------------------------------
+An earlier revision of this tool reported "2/12 verified". Both halves were
+wrong, and the way they were wrong is the reason this docstring is long:
+
+* **Three of those twelve carry no stamp at all.** `exp_005`, `exp_009` and
+  `exp_011` have no `prereg_*` key in their manifests. Counting them in the
+  denominator of "stamped pre-registrations" reports an absent stamp as a failed
+  one. They are now `NO STAMP`, and they are excluded. **A fourth manifest,
+  `exp_007_008`, also carries no stamp but never reached that denominator** --
+  the id defect below had already excluded it. The two defects are interlocked,
+  and the twelve is `3 unstamped + 9 stamped`, of which 2 verified.
+* **Five more stamp under a different key.** `EXP_013`, `014`, `015`, `017` and
+  `018` write `prereg_sha256_before_first_run`, not `prereg_sha256_before`. The
+  tool read only the latter, got `None`, and compared every candidate against
+  `None`. Both spellings are now accepted.
+* **The id parse split the wrong filename.** `p.name[4:7]` turns
+  `exp_007_008_run_manifest.json` into `007`, and the tool then looked for a
+  manifest named `exp_007_run_manifest.json`, which does not exist, and reported
+  `NO MANIFEST` for a manifest it had just enumerated. Ids are now taken whole.
+* **`PLACEHOLDERS` omitted the variant used by the one log `CONTRIBUTING.md` §2
+  names.** `EXP_013` records its own reconstruction stub at `:424-431` and the
+  table did not carry it, so the exemplar read UNVERIFIED. That is the
+  single-variant-lookup defect again, one entry away from the key defect above.
+
+WHAT IT FINDS AT `593baaa`, WITH BOTH ROUTES AND THE KEYS READ CORRECTLY
+------------------------------------------------------------------------
+  VERIFIED BY COMMIT   EXP_014, EXP_015, EXP_017, EXP_018, EXP_022, EXP_023
+  VERIFIED BY RECIPE   EXP_013
+  UNVERIFIED           EXP_020, EXP_021
+  NO STAMP             EXP_005, EXP_007_008, EXP_009, EXP_011
+
+**7/9, against the 2/12 the previous revision printed.** Five experiments it
+reported as UNVERIFIED are provably unedited: four against a named commit, and
+`EXP_013` against the recipe its own log records. `EXP_022` and `EXP_023` verify
+by **both** routes, which is a check on the recipe itself -- the reconstruction
+agrees with the object database wherever both exist.
+
+The two that remain unverified share one cause and it is not suspicion: each has
+exactly **one** commit touching its log, and that commit already contained its
+results, so no pre-results bytes exist in history to compare against. For
+`EXP_020` and `EXP_021` an exhaustive prefix search under both line endings,
+crossed with every known status and placeholder variant, also reproduces
+neither stamp. **That is not a finding that a hypothesis was edited** -- a
+cosmetic change above §9 after stamping produces exactly this and is far more
+likely. What it means is that for those two the stamp is no longer independent
+evidence of anything, which is the guarantee §2 exists to preserve.
+`CONTRIBUTING.md` §3 -- *"where a reasoning trail is unrecoverable, say so in the
+artifact"* -- is why that is stated here rather than quietly omitted.
+
+WHAT THIS TOOL REFUSES TO DO
+----------------------------
+**It reports UNVERIFIED, never MISMATCH.** The placeholder line varies between
+logs -- `EXP_021` uses an em-dash where `EXP_022` uses a semicolon -- and an
+unlisted variant reads identically to a real edit. This tool can confirm; it
+cannot convict.
+
+**It hashes both line endings.** `Path.write_text` translates "\n" to os.linesep
+on Windows, so a log edited by a Python tool on this box acquires CRLF while a
+driver that read raw bytes stamped LF. Hashing only one turns a newline
+convention into an apparent hypothesis edit. `EXP_015` verifies only under the
+CRLF reading of its committed blob, so this is load-bearing and not theoretical.
+
+**It refuses the headline when git is unavailable.** `git_history` returns `None`
+for "could not consult git" and `[]` for "consulted, no history". Collapsing
+those printed `EXP_014  0 commit(s) touching the log` beneath a heading that
+explains UNVERIFIED as "one commit, and it already contained results" -- an
+affirmatively false sentence about a log with four commits, produced by a tool
+whose whole purpose is provenance. The two are now distinguished and a
+recipe-only run says so above the ratio.
 
 It is deliberately NOT a pytest gate: it reads `experiments/runs/`-derived
 manifests under `docs/reports/data/`, and it is a provenance audit rather than a
@@ -67,7 +136,7 @@ import argparse
 import hashlib
 import json
 import re
-import sys
+import subprocess
 from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[2]
@@ -75,6 +144,12 @@ LOGS = _REPO / "experiments" / "logs"
 DATA = _REPO / "docs" / "reports" / "data"
 
 HEADING = "## 9. Results"
+
+#: Both spellings appear in committed manifests. `EXP_013`-`EXP_018` write the
+#: `_first_run`/`_last_run` pair; `EXP_020` onward write the short pair. Reading
+#: only one of them reports five intact pre-registrations as unverified.
+STAMP_KEYS_BEFORE = ("prereg_sha256_before", "prereg_sha256_before_first_run")
+STAMP_KEYS_AFTER = ("prereg_sha256_after", "prereg_sha256_after_last_run")
 
 #: The placeholder line differs between logs -- `EXP_021` uses an em-dash where
 #: `EXP_022` uses a semicolon -- and that is a formatting difference, NOT
@@ -84,10 +159,134 @@ PLACEHOLDERS = (
     "*(appended after the run; nothing above this line is rewritten)*\n",
     "*(appended after the run — nothing above this line is rewritten)*\n",
     "*(appended after the run - nothing above this line is rewritten)*\n",
+    # `EXP_013` is the log `CONTRIBUTING.md` §2 names as the one that "records
+    # the recipe", and it records this stub verbatim at its own :424-431. A
+    # single-variant table that omits it reports the exemplar as UNVERIFIED --
+    # which is the same defect as reading a single manifest key, one paragraph
+    # apart, and it is why this entry is quoted from the log rather than guessed.
+    ("*(Empty at pre-registration. Appended after the runs; predictions are "
+     "resolved as\nwritten, including the ones that fail.)*\n"),
     "",
 )
 STATUS_OPEN = "**Status: OPEN.**\n"
 STATUS_RE = re.compile(r"\*\*Status: CLOSED.*?\*\*\n", re.S)
+
+
+def _first(mapping: dict, keys) -> str | None:
+    """The first key present and non-empty, or None. Order is precedence."""
+    for k in keys:
+        if mapping.get(k):
+            return mapping[k]
+    return None
+
+
+def _variants(raw: bytes):
+    """`(label, bytes)` for the byte-identical, all-CRLF and all-LF readings.
+
+    Deduplicated, so a file already in one convention yields one entry and the
+    label a match reports is the convention that actually applied to it.
+    """
+    seen: dict[bytes, str] = {}
+    for label, b in (("as-committed", raw),
+                     ("CRLF", raw.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")),
+                     ("LF", raw.replace(b"\r\n", b"\n"))):
+        seen.setdefault(b, label)
+    return [(label, b) for b, label in seen.items()]
+
+
+def git_history(relpath: str) -> list[str] | None:
+    """Commits touching `relpath`, newest first.
+
+    **`None` means git could not be consulted; `[]` means it was and the file has
+    no history.** Collapsing those two into `[]` made the summary print
+    "EXP_014  0 commit(s) touching the log" under a heading that explains an
+    UNVERIFIED result as "one commit, and it already contained results" -- an
+    affirmatively false sentence about a log with four commits. When git is
+    unavailable the headline is refused rather than restated without it.
+    """
+    try:
+        r = subprocess.run(["git", "log", "--follow", "--format=%H", "--", relpath],
+                           cwd=_REPO, capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if r.returncode != 0:
+        return None
+    return r.stdout.decode("utf-8", "replace").split()
+
+
+def git_blob(sha: str, relpath: str) -> bytes:
+    """The file's bytes at `sha`, or empty if it did not exist there."""
+    try:
+        r = subprocess.run(["git", "show", f"{sha}:{relpath}"],
+                           cwd=_REPO, capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return b""
+    return r.stdout if r.returncode == 0 else b""
+
+
+def by_commit(relpath: str, stamp: str) -> tuple[str, str] | None:
+    """`(short_sha, line_ending_label)` of the first commit whose blob hashes to
+    `stamp`, or None.
+
+    This is the strong route: it compares the stamp against an object in the
+    repository instead of against a guess about how results were appended.
+
+    History is walked OLDEST FIRST. `git log` emits newest first, and returning
+    the newest match would name the last commit that happened to hold the
+    stamped bytes rather than the first -- for a still-OPEN experiment whose live
+    file equals its stamp, that is HEAD, which is provenance-free. The earliest
+    match is the claim worth making: these bytes existed at least this early.
+    """
+    for sha in reversed(git_history(relpath) or []):
+        raw = git_blob(sha, relpath)
+        if not raw:
+            continue
+        for label, b in _variants(raw):
+            if hashlib.sha256(b).hexdigest() == stamp:
+                return sha[:8], label
+    return None
+
+
+def live_matches_blob(sha: str, relpath: str, text: str) -> bool | None:
+    """Does the LIVE file still agree with the verified blob above `## 9. Results`?
+
+    The commit route returns before the live file is ever read, so on its own it
+    is strong evidence that the STAMP is honest and weak evidence that the
+    working file is unedited -- the guarantee this tool exists to give. This is
+    the cheap third check: truncate both at the heading and compare. `None` when
+    the blob cannot be re-read.
+    """
+    raw = git_blob(sha, relpath)
+    if not raw:
+        return None
+
+    def above(s: str) -> list[str]:
+        """Lines above the heading, with the whole status BLOCK removed.
+
+        The status is the one change above the heading that closing an
+        experiment is allowed to make, and it is not one line: `EXP_022`'s
+        `**Status: CLOSED ...**` wraps over six, summarising the verdicts. A
+        first-line-only filter reported those five continuation lines as an
+        edited hypothesis -- precisely the false alarm this tool exists not to
+        raise -- so the block is dropped from the opening `**Status:` through the
+        line that closes its bold span.
+        """
+        s = s.replace("\r\n", "\n")
+        head = s[:s.index(HEADING)] if HEADING in s else s
+        out, skipping = [], False
+        for ln in head.split("\n"):
+            t = ln.strip()
+            if not skipping and t.startswith("**Status:"):
+                # A one-line status opens and closes on the same line.
+                skipping = not (t.endswith("**") and len(t) > len("**Status:"))
+                continue
+            if skipping:
+                skipping = not t.endswith("**")
+                continue
+            out.append(ln)
+        return out
+
+    return above(raw.decode("utf-8", "replace")) == above(text)
 
 
 def candidates(text: str):
@@ -110,74 +309,125 @@ def candidates(text: str):
     for hlabel, h in heads:
         for i, ph in enumerate(PLACEHOLDERS):
             body = h + HEADING + ("\n\n" + ph if ph else "\n")
-            # BOTH LINE ENDINGS. `Path.write_text` translates "\n" to os.linesep
-            # on Windows, so a log edited by a Python tool on this box acquires
-            # CRLF while the same file stamped by a driver that read raw bytes
-            # may have been LF. Hashing only one of them turns a newline
-            # convention into an apparent hypothesis edit.
             yield f"{hlabel}, placeholder #{i}, LF", body
             yield f"{hlabel}, placeholder #{i}, CRLF", body.replace("\n", "\r\n")
 
 
 def check(exp: str) -> dict:
+    """`exp` is the manifest's own id -- "022", or "007_008" -- taken whole."""
     man_path = DATA / f"exp_{exp}_run_manifest.json"
     if not man_path.exists():
         return {"experiment": exp, "status": "NO MANIFEST"}
     man = json.loads(man_path.read_text(encoding="utf-8"))
-    stamp = man.get("prereg_sha256_before")
-    after = man.get("prereg_sha256_after")
-    matches = [p for p in LOGS.glob(f"EXP_{exp}_*.md")]
+    stamp = _first(man, STAMP_KEYS_BEFORE)
+    after = _first(man, STAMP_KEYS_AFTER)
+
+    # The log id is the manifest id's first segment: `exp_007_008` covers
+    # `EXP_007` and `EXP_008`, and its log glob must not carry the second.
+    matches = sorted(LOGS.glob(f"EXP_{exp.split('_')[0]}_*.md"))
     if len(matches) != 1:
         return {"experiment": exp, "status": f"AMBIGUOUS LOG ({len(matches)} matches)"}
     log = matches[0]
-    text = log.read_text(encoding="utf-8")
-    live = hashlib.sha256(text.encode("utf-8")).hexdigest()
     out = {
         "experiment": exp, "log": log.name,
         "manifest_stamp_before": stamp, "manifest_stamp_after": after,
-        "before_equals_after": stamp == after,
-        "live_hash": live,
-        "live_equals_stamp": live == stamp,
+        "before_equals_after": bool(stamp) and stamp == after,
     }
-    if live == stamp:
+    if not stamp:
+        # An absent stamp is not a failed one. Reporting it as UNVERIFIED, and
+        # counting it in the denominator, is how "2/12" was arrived at.
+        out["status"] = "NO STAMP"
+        out["matched_layout"] = None
+        return out
+
+    relpath = f"experiments/logs/{log.name}"
+    history = git_history(relpath)
+    out["git_available"] = history is not None
+    text = log.read_text(encoding="utf-8")
+    hit = by_commit(relpath, stamp)
+    if hit:
+        sha, ending = hit
+        out["status"] = "VERIFIED BY COMMIT"
+        out["commit"] = sha
+        out["matched_layout"] = f"blob at {sha} ({ending})"
+        out["live_file_agrees_above_results"] = live_matches_blob(sha, relpath, text)
+        return out
+
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() == stamp:
         # An OPEN experiment, or one whose results live elsewhere.
-        out["status"] = "VERIFIED"
+        out["status"] = "VERIFIED BY RECIPE"
         out["matched_layout"] = "live file, unmodified"
         return out
     for label, body in candidates(text):
         if hashlib.sha256(body.encode("utf-8")).hexdigest() == stamp:
-            out["status"] = "VERIFIED"
+            out["status"] = "VERIFIED BY RECIPE"
             out["matched_layout"] = label
             return out
     # NOT "mismatch", and deliberately not. See `candidates`.
-    out["status"] = "UNVERIFIED — no known layout reconstructs the stamp"
+    out["status"] = "UNVERIFIED"
     out["matched_layout"] = None
+    out["history_commits"] = None if history is None else len(history)
     return out
+
+
+def manifest_ids() -> list[str]:
+    """Ids taken whole from the filename, so `exp_007_008` stays `007_008`."""
+    return sorted(p.name[len("exp_"):-len("_run_manifest.json")]
+                  for p in DATA.glob("exp_*_run_manifest.json"))
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--exp", default="", help="one experiment id, e.g. 022")
+    ap.add_argument("--json", action="store_true", help="emit the rows as JSON")
     args = ap.parse_args(argv)
 
-    ids = ([args.exp] if args.exp else
-           sorted(p.name[4:7] for p in DATA.glob("exp_*_run_manifest.json")))
-    rows = [check(e) for e in ids]
-    ok = sum(r["status"] == "VERIFIED" for r in rows)
-    stamped = sum(r["status"] != "NO MANIFEST" for r in rows)
+    rows = [check(e) for e in ([args.exp] if args.exp else manifest_ids())]
+    if args.json:
+        print(json.dumps(rows, indent=2))
+        return 0
+
+    n_commit = sum(r["status"] == "VERIFIED BY COMMIT" for r in rows)
+    n_recipe = sum(r["status"] == "VERIFIED BY RECIPE" for r in rows)
+    unverified = [r for r in rows if r["status"] == "UNVERIFIED"]
+    nostamp = [r for r in rows if r["status"] == "NO STAMP"]
+    stamped = n_commit + n_recipe + len(unverified)
+
+    if any(r.get("git_available") is False for r in rows):
+        print()
+        print("  WARNING: git could not be consulted, so the commit route did "
+              "not run.")
+        print("  The ratio below is the RECIPE ROUTE ONLY and is not this "
+              "tool's verdict.")
     print()
     for r in rows:
-        print(f"  EXP_{r['experiment']}  {r['status']}")
+        print(f"  EXP_{r['experiment']:<8} {r['status']}")
         if r.get("matched_layout"):
-            print(f"      stamp {r['manifest_stamp_before'][:32]}…  "
+            print(f"      stamp {r['manifest_stamp_before'][:32]}...  "
                   f"before==after {r['before_equals_after']}")
             print(f"      via   {r['matched_layout']}")
-    print(f"\n{ok}/{stamped} stamped pre-registrations verified.")
-    print("UNVERIFIED means no layout this tool knows reconstructs the stamp. It is\n"
-          "NOT a finding that a hypothesis was edited -- the placeholder line and the\n"
-          "status line vary between logs, and a variant not listed in PLACEHOLDERS\n"
-          "reads the same way as a real edit. Add the variant, or check by hand.\n")
+            live = r.get("live_file_agrees_above_results")
+            if live is not None:
+                print(f"      live  file agrees with that blob above "
+                      f"'{HEADING}': {live}")
+
+    print(f"\n{n_commit + n_recipe}/{stamped} stamped pre-registrations verified "
+          f"({n_commit} by commit, {n_recipe} by recipe).")
+    if nostamp:
+        print(f"{len(nostamp)} manifest(s) carry NO STAMP and are excluded from that "
+              f"denominator: {', '.join('EXP_' + r['experiment'] for r in nostamp)}.")
+    if unverified:
+        print("\nUNVERIFIED means neither route reconstructs the stamp. It is NOT a")
+        print("finding that a hypothesis was edited -- a cosmetic edit above section 9")
+        print("after stamping reads identically. Where the log has one commit and it")
+        print("already contained results, no pre-results bytes exist to compare:")
+        for r in unverified:
+            n = r.get("history_commits")
+            print(f"  EXP_{r['experiment']:<8} "
+                  + ("git unavailable -- history not consulted" if n is None
+                     else f"{n} commit(s) touching the log"))
+    print()
     # Exit 0: this is a provenance report, not a gate. A gate that cannot tell a
     # formatting variant from an edited hypothesis would be a gate nobody reads.
     return 0
