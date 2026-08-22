@@ -1,6 +1,12 @@
 # EXP_025 — Width, on the neuron the project actually adopted
 
-**Status: PRE-REGISTERED — no results yet.**
+**Status: CLOSED 2026-08-22 — H1 HELD, H2 UNRESOLVED, H3 HELD, H4 HELD, H5
+FAILED. 12 runs, 0 divergences, ~5.17 GPU-h. The detached two-compartment arm is
+0.13426 bpc below the plain LIF at 5.0M on 3 seeds at 79.4 se; its advantage is
+flat in width to a resolution this design could not reach; and its entire gain is
+REACH — it reads to 61 characters where the plain LIF stops at 9, and it pays
+0.025 bpc within the baseline's own horizon to do it. Nothing is adopted, nothing
+is ranked, no open decision is ruled, and no recipe term moved.**
 
 Pre-registered before any driver, resolver or run existed. `## 9. Results` holds
 nothing but its placeholder until the ladder is complete.
@@ -452,4 +458,247 @@ Elliot's.
 
 ## 9. Results
 
-*(placeholder — no results yet)*
+**Closed 2026-08-22. 12 runs, 0 divergences, 4.858 GPU-h of ladder against 4.84
+projected — 0.4 % over. Nothing is adopted, nothing is ranked, no open decision
+is ruled, and no recipe term moved.**
+
+Evidence: `docs/reports/data/exp_025_scaling_results.json`,
+`exp_025_run_manifest.json`, `exp_025_memory_horizon.json`,
+`exp_025_cost_calibration.json`.
+
+### 9.1 The scoreboard
+
+| bar | verdict | the number |
+|---|---|---|
+| **H1** — the advantage exists at 5.0M | **HELD** | −0.13426 bpc, **79.4 se**, 95 % CI [−0.13914, −0.12939] |
+| **H2** — the advantage is FLAT in width | **UNRESOLVED** | DoD **+0.00286**; primary reading FLAT, alternate UNRESOLVED, and §3.0's disagreement guard fired |
+| **H3** — stability at n = 6 | **HELD** | **6/6**, 95 % CI [0.610, 1.000] |
+| **H4** — σ at width | **HELD** | pooled sd at `d = 1481` = **0.002070**, **0.449×** the transferred 0.00461 |
+| **H5** — the gain is not predominantly beyond-horizon | **FAILED** | zero + within carry **−18.6 %** of it; beyond-horizon carries **118.6 %** |
+
+**Carried test bpc, n = 3 per cell:**
+
+| arch | `d = 512` | `d = 1481` |
+|---|---:|---:|
+| `snn` | 2.25245 (sd 0.004683) | 1.99920 (sd 0.001721) |
+| `twocomp_detach` | **2.11533** (sd 0.002363) | **1.86494** (sd 0.002368) |
+| **Δ** | **−0.13712** | **−0.13426** |
+
+### 9.2 H1 — HELD, and it is the least interesting row here
+
+−0.13426 bpc at 79.4 se, against a 2σ bar of 0.00753. §3 predicted this would
+hold and predicted it would be uninformative; both were right. Its guards are
+discharged: **D1** is §9.7 and **H5** is §9.6, and H1 is not quoted anywhere
+without them.
+
+### 9.3 H2 — UNRESOLVED, by the guard that was written for exactly this
+
+The difference-of-differences is **+0.00286 bpc** — the advantage *eroded* by
+that much across 2.76 octaves of parameters, which is a quarter of the
+pre-declared margin and below every resolution this design has.
+
+| reading | margin | verdict |
+|---|---:|---|
+| primary (§3.0's pre-declared constant) | 0.010648 | **FLAT** — CI₉₀ [−0.00422, +0.00994] lies inside |
+| alternate (2 × measured se) | 0.006936 | **UNRESOLVED** |
+
+**They disagree, so the verdict is UNRESOLVED**, per §3.0: *"a verdict that flips
+depending on whether measured or transferred σ is used is reported as
+UNRESOLVED, and both are published."* The guard fired and it cost the experiment
+its cleanest headline, which is what a guard is for. **The alternate margin is
+tighter only because H4 found σ smaller than transferred** — the same measurement
+that makes H4 hold is what denies H2 its verdict.
+
+**No per-octave slope may be quoted from this row.** There is no middle rung.
+
+### 9.4 H3 — HELD, 6/6, and the cross-tree comparison is weaker than §3 said
+
+**6 of 6** runs completed 20,000 steps with zero non-finite losses, 3/3 at each
+rung. `6/6, 95 % CI [0.610, 1.000]`.
+
+**§3's stated Fisher p of 0.0048 is wrong.** The one-sided probability for 6/6
+against `twocomp`'s committed 1/4 is `C(7,6)·C(3,0)/C(10,6)` = **7/210 =
+0.0333** — a factor of **6.9**. The pre-registration is **not edited**
+(`CONTRIBUTING.md` §3); `scripts/exp/025_detached_scaling_results.py` computes it
+mechanically, `_selfcheck_fisher` checks it against hand-computed tables, and
+`tests/test_exp025_resolver.py` asserts the pre-registered value is *not*
+reproducible. **The direction survives and the force does not**, and it remains a
+secondary cross-tree comparison H3's own verdict never rested on.
+
+### 9.5 H4 — HELD, and it is the row that changes another experiment
+
+**σ at 5.0M parameters, measured for the first time in this project: 0.002070**,
+pooled across both arms' d = 1481 cells. That is **0.449×** the 0.00461
+`EXP_014` transferred to every one of its bars.
+
+| cell | n | sd |
+|---|---:|---:|
+| `snn` d = 512 | 3 | 0.004683 |
+| `snn` d = 1481 | 3 | **0.001721** |
+| `twocomp_detach` d = 512 | 3 | 0.002363 |
+| `twocomp_detach` d = 1481 | 3 | **0.002368** |
+
+`snn` d = 512's 0.004683 lands **0.5 % from the committed five-seed 0.00461**,
+which is the instrument agreeing with itself on the one cell where a committed
+value exists.
+
+**σ falls with width on the plain LIF (0.37×) and is flat on the detached arm
+(1.00×).** No bar was placed on that and none is invented; it is recorded.
+
+**Re-reporting `EXP_014`'s bars against the measured σ, which H4 promised:** its
+S1 required 10σ = 0.0461 and measured −0.25238, i.e. **54.75 transferred σ**;
+against 0.002070 the same margin is 0.0207 and the same measurement is **~122 σ**.
+`EXP_014`'s conclusion is **strengthened, not weakened** — its transferred σ was
+conservative by 2.2×. Its S2 pair gate moves 0.00922 → 0.00414.
+
+### 9.6 H5 — FAILED, and the failure is the most useful result in this experiment
+
+Pre-registered: zero-context and within-reach together carry ≥ 50 % of the gain.
+**Measured: −18.6 %.** The decomposition at `EXP_004` §10.3's cut of 7:
+
+| component | bpc | share |
+|---|---:|---:|
+| total | +0.12182 | — |
+| zero context | +0.00243 | +2.0 % |
+| within reach | **−0.02504** | **−20.6 %** |
+| beyond horizon | **+0.14443** | **+118.6 %** |
+
+**The arm's entire gain is reach, and it PAYS for it at short context.** The two
+curves cross at **context 9**. Below it the detached arm is *worse* — worst
+−0.04305 at c = 5. Above it, it pulls away monotonically.
+
+**The horizon marker agrees, and here it agrees on a winning arm:**
+
+| arm | per-seed horizon (2σ) | median |
+|---|---|---:|
+| `snn` d = 512 | [7, 7, 7] | 7 |
+| `snn` d = 1481 | [8, 9, 9] | **9** |
+| `twocomp_detach` d = 512 | [47, 50, 48] | 48 |
+| `twocomp_detach` d = 1481 | [61, 52, 61] | **61** |
+
+Report §8's rev-15 note flagged positive beyond-horizon readings on arms that
+*lost* as compression-suspect. **This arm wins by 0.12182 and its horizon marker
+moves 9 → 61 on 3 of 3 seeds**, so that flag does not apply — which is the case
+the census said it could not adjudicate and this one can.
+
+**The most striking number is not in the table.** From c = 11 to c = 127 the
+plain LIF at 5.0M improves by **+0.00032 bpc** — its curve is flat to
+sd = 0.000156 over 116 characters. The detached arm improves by **+0.09956** over
+the same span, **311×** as much. *The plain LIF stops reading at about ten
+characters and stays stopped, at both widths.*
+
+**The 118.6 % share is a property of the CUT and is reported as one.** The cut is
+at the *baseline's* horizon of 7, which `EXP_007` §5 item 4 already records as a
+limitation rather than a convenience. Moving it:
+
+| cut | within reach | beyond horizon | beyond share |
+|---:|---:|---:|---:|
+| **7** *(pre-registered)* | −0.02504 | +0.14443 | **+118.6 %** |
+| 9 *(the crossover)* | +0.00400 | +0.11540 | +94.7 % |
+| 16 | +0.05866 | +0.06073 | +49.9 % |
+| 61 *(the arm's own horizon)* | +0.11364 | +0.00576 | +4.7 % |
+
+**The share is cut-dependent; the finding is not.** At every cut the gain lives
+past the plain LIF's horizon, and the crossover at c = 9 is a fact of the curve.
+`d = 512` decomposes the same way at the same cut: total +0.12651, within reach
+**−0.00964**, beyond horizon **+0.13099** (+103.5 %).
+
+### 9.7 D1 — the clip, and it does not rescue the reading
+
+Not a bar. Realised wall-clock, VRAM and parameter counts are in
+`exp_025_run_manifest.json` per run. §2.3's calibration predicted the clip fires
+2.7× more often on the detached arm at the high rung, and §5 item 4 stands: this
+design does not separate a capacity effect from a differential throttling
+effect. **It bears on H1 and it cannot explain H5** — a clip that fires more
+often does not make a model read 61 characters instead of 9.
+
+### 9.8 Gates
+
+**All twelve runs: K1a, K1b, G3, G4, K3 and G5 green.**
+
+* **G5 — every run trained under the frozen recipe**, ten fields read back out of
+  each `config.json`, including all six at 5.0M. **Decision #11 is not engaged,
+  mechanically rather than by assertion**, at the exact width where the adopted
+  `twocomp` arm diverges.
+* **K1a — zero exemptions across all twelve**, as §7 predicted: the reference is
+  this experiment's own `e25_snn_d512_s0` and every run came off one tree.
+* **K1b** — differences confined to `arch`, `d_model`, `seed`, `run_name`, with
+  exactly the 24 named fields absent-and-at-default.
+* **G3** — 735,437 / 737,485 / 4,997,099 / 5,003,023, all exact.
+* **G4** — peak VRAM 0.6089 / 0.9801 / 1.6434 / 2.6138 GiB, reproducing the
+  calibration to four decimals, against a 3.0 alarm.
+* **K3** — ratios 0.933–1.043. **A4 never approached its 1.5 halt.**
+* Pre-registration SHA-256 unchanged across both rungs.
+
+### 9.9 The result nobody pre-registered: four runs reproduce bitwise
+
+`e25_detach_d512_s0/1/2` and `e25_snn_d512_s0` reproduce `EXP_017`'s and
+`EXP_014`'s committed runs **bit-for-bit** — 2.1176906639749444,
+2.1129641077769445, 2.1153212748345145 and 2.257471102255831.
+
+No prediction was placed on this and it is carried as an observation. It
+establishes that the 24 `Config` fields added since `EXP_017` and
+`three_factor_loss` entering the captured step at `tf_kappa = 0` changed
+**nothing** for these arms — the claim `train.py`'s comment makes ("the same call
+this line used to make… unchanged BY CODE PATH") measured rather than asserted.
+It is the mirror of `EXP_014`'s **G1 failure**, and it narrows H3's cross-tree
+caveat on the detached side to nothing. **It says nothing about `twocomp`**,
+which was not trained here.
+
+### 9.10 Three defects in this experiment's own instruments
+
+All three are decision **#9**'s class — a bar whose guard clause was written and
+whose arithmetic was not — and all three lived in inline expressions where
+nothing could assert on them.
+
+1. **H3's Fisher p, in the committed pre-registration** (§9.4). Not repaired;
+   computed forward.
+2. **H2's equivalence margin**, which read literally makes TOST degenerate —
+   equivalence would need `|DoD| < 0.1·se`, so UNRESOLVED would have been
+   pre-determined by arithmetic. Both readings emitted; found before any bpc was
+   read.
+3. **H5's share was computed from ABSOLUTE components**, returning 3.393 — a
+   339 % "share" — on an `io_mall`-shaped decomposition, and would have cleared
+   its own 50 % bar on sign disagreement alone. Fixed **after** the `d = 512`
+   bpc was read and **before H5 had ever fired**; recorded in the artifact's
+   `resolver_defects_fixed_in_this_file` as well as here.
+
+The three statistics are now module-level functions with **17 tests**, verified
+to fail before being trusted: **9 mutations, 9 caught.**
+
+### 9.11 Cost
+
+| item | projected | realised |
+|---|---:|---:|
+| ladder, 12 runs | 4.84 GPU-h | **4.858** |
+| horizon sweep, 12 checkpoints | — | ~0.23 |
+| cost pre-flight | — | ~0.08 |
+| **total** | ~5.1 | **~5.17 GPU-h** |
+
+**The cost model was right to 0.4 %** — the first Phase-4 estimate to be, and it
+is a measurement rather than a descendant of the withdrawn constant.
+
+---
+
+## 10. Referred to Elliot, and not decided here
+
+1. **The two-compartment neuron buys reach and pays capacity; width buys
+   capacity and no reach** (`EXP_014` S4). They are complementary and this
+   experiment measured both on one tree. **What follows for the ranked list is
+   §7.1's business and is not ruled here.**
+2. **Decision #5** — adopting the detached arm — now has a bar behind it at 5.0M
+   on 3 seeds. **Nothing here adopts it**, and §5 item 7's caveat stands: this
+   measures `twocomp_detach`, and `EXP_017` §9.2's A6 row says the detached rule
+   trains *further* inside the dangerous region of weight space.
+3. **Decision #11 is untouched and may now be cheaper to leave open** — the arm
+   the project would want to scale trains at 5.0M under the frozen recipe.
+   Whether that retires #11 or merely routes around it is Elliot's.
+4. **H2 is unresolved and n = 3 is why.** Seeds *added* — never substituted —
+   would resolve it. §5 item 2 priced the design's power in advance and this is
+   that limitation arriving, not a surprise.
+5. **The plain LIF's 116-character plateau** (§9.6) is the sharpest statement of
+   the reach gap this project has produced. Whether it deserves its own
+   instrument is referred.
+6. **Whether a bar's arithmetic should be machine-checked before the
+   pre-registration is committed** — decision #9's fourth instance, and the first
+   where the defect reached a *committed* log rather than a resolver.

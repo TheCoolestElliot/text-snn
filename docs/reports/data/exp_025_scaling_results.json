@@ -1,0 +1,444 @@
+{
+ "experiment": "EXP_025_detached_scaling",
+ "log": "experiments/logs/EXP_025_detached_scaling.md",
+ "protocol_primary": "carried",
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "rules_no_open_decision": true,
+ "engages_decision_11": false,
+ "selfchecks": {
+  "student_t": {
+   "passed": true,
+   "worst_abs_diff": 4.1352041648679005e-06,
+   "rows": {
+    "2": {
+     "published": 4.30265,
+     "computed": 4.302652729749456,
+     "abs_diff": 2.729749455809838e-06
+    },
+    "6": {
+     "published": 2.44691,
+     "computed": 2.446911851144968,
+     "abs_diff": 1.8511449679792236e-06
+    },
+    "8": {
+     "published": 2.306,
+     "computed": 2.306004135204165,
+     "abs_diff": 4.1352041648679005e-06
+    },
+    "30": {
+     "published": 2.04227,
+     "computed": 2.042272456301233,
+     "abs_diff": 2.456301233078051e-06
+    },
+    "1000": {
+     "published": 1.96234,
+     "computed": 1.9623390808264358,
+     "abs_diff": 9.191735641511656e-07
+    }
+   }
+  },
+  "fisher": {
+   "passed": true,
+   "worst_abs_diff": 0.0,
+   "rows": [
+    {
+     "table": [
+      6,
+      0,
+      1,
+      3
+     ],
+     "expected": 0.03333333333333333,
+     "got": 0.03333333333333333,
+     "why": "EXP_025 H3's own table: C(7,6)C(3,0)/C(10,6)"
+    },
+    {
+     "table": [
+      3,
+      0,
+      0,
+      3
+     ],
+     "expected": 0.05,
+     "got": 0.05,
+     "why": "the 3v3 table; C(3,3)C(3,0)/C(6,3) = 1/20"
+    },
+    {
+     "table": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "expected": 0.8333333333333334,
+     "got": 0.8333333333333334,
+     "why": "the null-est table there is"
+    }
+   ]
+  }
+ },
+ "sigma_transferred": 0.00461,
+ "bars_pre_declared": {
+  "H1_2sigma": 0.007528,
+  "H2_margin_dod": 0.010648,
+  "H4_factor": 1.5,
+  "H5_share": 0.5
+ },
+ "prereg_defects_found_before_any_bpc_was_read": [
+  {
+   "bar": "H3",
+   "defect": "stated Fisher p = 0.0048; correct is 7/210 = 0.0333, a factor of 6.9",
+   "repaired_in_prereg": false,
+   "handled": "computed mechanically here; reported as it fired"
+  },
+  {
+   "bar": "H2",
+   "defect": "equivalence margin stated as 2*sigma_DoD while \u00a73.0 says bars use measured sigma; together those make TOST degenerate",
+   "repaired_in_prereg": false,
+   "handled": "margin read as \u00a73.0's pre-declared 0.010648; BOTH readings emitted and disagreement resolves UNRESOLVED"
+  }
+ ],
+ "resolver_defects_fixed_in_this_file": [
+  {
+   "bar": "H3",
+   "defect": "returned FAILED against an empty tree -- a run that had not happened was counted as a divergence, firing a verdict on absent data",
+   "found": "before the driver ran; before any bpc existed"
+  },
+  {
+   "bar": "H5",
+   "defect": "the non-beyond-horizon share was computed from ABSOLUTE components, which returns 3.393 on an io_mall-shaped decomposition and would clear the 50 % threshold on any arm whose components merely disagreed in sign; now computed from the signed shares, which are additive and sum to 1",
+   "found": "after the d=512 rung's bpc was read and BEFORE H5 had ever fired -- H5's input artifact (exp_025_memory_horizon.json) needs d=1481 checkpoints that did not exist. Recorded rather than slipped in, because the resolver's entry condition is that it was committed before any bpc was read and this edit is after."
+  }
+ ],
+ "cells": {
+  "snn_d512": {
+   "n": 3,
+   "missing": [],
+   "seeds": [
+    {
+     "seed": 0,
+     "run": "e25_snn_d512_s0",
+     "fresh": 2.273872258304913,
+     "carried": 2.257471102255831,
+     "clip": {
+      "wall_clock_s": 372.2,
+      "peak_vram_gib": 0.6089,
+      "params": 735437
+     }
+    },
+    {
+     "seed": 1,
+     "run": "e25_snn_d512_s1",
+     "fresh": 2.2680785972798314,
+     "carried": 2.251664799374446,
+     "clip": {
+      "wall_clock_s": 372.78,
+      "peak_vram_gib": 0.6089,
+      "params": 735437
+     }
+    },
+    {
+     "seed": 2,
+     "run": "e25_snn_d512_s2",
+     "fresh": 2.2646840308722562,
+     "carried": 2.248204388503817,
+     "clip": {
+      "wall_clock_s": 372.84,
+      "peak_vram_gib": 0.6089,
+      "params": 735437
+     }
+    }
+   ]
+  },
+  "snn_d1481": {
+   "n": 3,
+   "missing": [],
+   "seeds": [
+    {
+     "seed": 0,
+     "run": "e25_snn_d1481_s0",
+     "fresh": 2.020068093029518,
+     "carried": 2.0007266016460163,
+     "clip": {
+      "wall_clock_s": 2311.88,
+      "peak_vram_gib": 1.6434,
+      "params": 4997099
+     }
+    },
+    {
+     "seed": 1,
+     "run": "e25_snn_d1481_s1",
+     "fresh": 2.0187868980887322,
+     "carried": 1.9995462281399046,
+     "clip": {
+      "wall_clock_s": 2316.42,
+      "peak_vram_gib": 1.6434,
+      "params": 4997099
+     }
+    },
+    {
+     "seed": 2,
+     "run": "e25_snn_d1481_s2",
+     "fresh": 2.0169522426111035,
+     "carried": 1.9973367749445237,
+     "clip": {
+      "wall_clock_s": 2327.02,
+      "peak_vram_gib": 1.6434,
+      "params": 4997099
+     }
+    }
+   ]
+  },
+  "twocomp_detach_d512": {
+   "n": 3,
+   "missing": [],
+   "seeds": [
+    {
+     "seed": 0,
+     "run": "e25_detach_d512_s0",
+     "fresh": 2.1446435236497927,
+     "carried": 2.1176906639749444,
+     "clip": {
+      "wall_clock_s": 502.09,
+      "peak_vram_gib": 0.9801,
+      "params": 737485
+     }
+    },
+    {
+     "seed": 1,
+     "run": "e25_detach_d512_s1",
+     "fresh": 2.139719903620524,
+     "carried": 2.1129641077769445,
+     "clip": {
+      "wall_clock_s": 501.94,
+      "peak_vram_gib": 0.9801,
+      "params": 737485
+     }
+    },
+    {
+     "seed": 2,
+     "run": "e25_detach_d512_s2",
+     "fresh": 2.142310921824676,
+     "carried": 2.1153212748345145,
+     "clip": {
+      "wall_clock_s": 502.14,
+      "peak_vram_gib": 0.9801,
+      "params": 737485
+     }
+    }
+   ]
+  },
+  "twocomp_detach_d1481": {
+   "n": 3,
+   "missing": [],
+   "seeds": [
+    {
+     "seed": 0,
+     "run": "e25_detach_d1481_s0",
+     "fresh": 1.8948356818941585,
+     "carried": 1.862896336873827,
+     "clip": {
+      "wall_clock_s": 2759.25,
+      "peak_vram_gib": 2.6138,
+      "params": 5003023
+     }
+    },
+    {
+     "seed": 1,
+     "run": "e25_detach_d1481_s1",
+     "fresh": 1.8955720086418555,
+     "carried": 1.8643952765596474,
+     "clip": {
+      "wall_clock_s": 2602.4,
+      "peak_vram_gib": 2.6138,
+      "params": 5003023
+     }
+    },
+    {
+     "seed": 2,
+     "run": "e25_detach_d1481_s2",
+     "fresh": 1.8983375982883512,
+     "carried": 1.867537122382033,
+     "clip": {
+      "wall_clock_s": 2546.4,
+      "peak_vram_gib": 2.6138,
+      "params": 5003023
+     }
+    }
+   ]
+  }
+ },
+ "H1": {
+  "statement": "mean carried test bpc of twocomp_detach at d=1481 is below snn's, resolving at >= 2 sigma",
+  "verdict": "HELD",
+  "welch": {
+   "mean_a": 1.8649429119385026,
+   "sd_a": 0.002368364607577134,
+   "n_a": 3,
+   "mean_b": 1.9992032015768146,
+   "sd_b": 0.0017207503258105294,
+   "n_b": 3,
+   "delta": -0.13426028963831205,
+   "welch_se": 0.0016901807199429923,
+   "df": 3.6513645227310447,
+   "t_crit": 2.8841853335870677,
+   "ci95": [
+    -0.13913508408188324,
+    -0.12938549519474085
+   ],
+   "excludes_zero": true,
+   "delta_in_se": -79.43546394425827,
+   "resolution_floor_bpc": 0.009749588887142419
+  },
+  "bar_2sigma_transferred": 0.007528,
+  "provisional": false,
+  "guards": [
+   "H1 may not be reported as held unless D1 is published beside it (EXP_025 \u00a73)",
+   "H1 may not be reported as held unless H5's decomposition is published beside it"
+  ],
+  "power_stated_in_advance": "EXP_017's committed n=1 reading is -0.13783, which is 18x this bar; a FAILURE here is a systems finding, not a scientific one (EXP_025 \u00a74 rule 4)"
+ },
+ "H2": {
+  "statement": "|Delta(d=1481) - Delta(d=512)| < margin; the arm's advantage neither grows nor erodes across 2.76 octaves of parameters",
+  "margin_prereg_constant": 0.010648,
+  "delta_per_rung": {
+   "512": -0.13712141451589677,
+   "1481": -0.13426028963831205
+  },
+  "difference_of_differences": 0.00286112487758472,
+  "margin_from_measured_sigma": 0.006936072388829196,
+  "primary": {
+   "verdict": "FLAT",
+   "delta": 0.00286112487758472,
+   "se": 0.003468036194414598,
+   "df": 4.715322849074955,
+   "margin": 0.010648,
+   "t_crit_one_sided": 2.042235196735909,
+   "ci_1_minus_2alpha": [
+    -0.004221420702202831,
+    0.00994367045737227
+   ],
+   "interval_inside_margin": true,
+   "note": "GROWS means the detached arm's ADVANTAGE grew, i.e. the difference-of-differences went more negative; the sign is stated because 'grows' and 'delta increases' point opposite ways here"
+  },
+  "alternate_reading_margin_2se": {
+   "verdict": "UNRESOLVED",
+   "delta": 0.00286112487758472,
+   "se": 0.003468036194414598,
+   "df": 4.715322849074955,
+   "margin": 0.006936072388829196,
+   "t_crit_one_sided": 2.042235196735909,
+   "ci_1_minus_2alpha": [
+    -0.004221420702202831,
+    0.00994367045737227
+   ],
+   "interval_inside_margin": false,
+   "note": "GROWS means the detached arm's ADVANTAGE grew, i.e. the difference-of-differences went more negative; the sign is stated because 'grows' and 'delta increases' point opposite ways here"
+  },
+  "readings_agree": false,
+  "verdict": "UNRESOLVED",
+  "why_unresolved_if_disagreeing": "EXP_025 \u00a73.0: a verdict that flips depending on which sigma is used is reported as UNRESOLVED, and both are published",
+  "guard": "there is no middle rung, so NO per-octave slope may be quoted from H2; 'flat' means flat across this interval, never linear within it",
+  "provisional": false
+ },
+ "H3": {
+  "statement": "6 of 6 twocomp_detach runs complete 20,000 steps with zero non-finite losses",
+  "rate": "6/6",
+  "rate_value": 1.0,
+  "ci95_wilson": [
+   0.6096657119861439,
+   1.0
+  ],
+  "attempted": 6,
+  "pre_registered_n": 6,
+  "per_rung": {
+   "512": {
+    "trained": 3,
+    "of": 3,
+    "diverged": [],
+    "not_run": []
+   },
+   "1481": {
+    "trained": 3,
+    "of": 3,
+    "diverged": [],
+    "not_run": []
+   }
+  },
+  "verdict": "HELD",
+  "secondary_cross_tree": {
+   "labelled": "CROSS-TREE, and H3's verdict does not depend on it",
+   "control": "twocomp: 1/3 trained at d=512 (EXP_017 \u00a79.4), 0/1 at d=1481 (EXP_015)",
+   "fisher_one_sided_p": 0.03333333333333333,
+   "correction": "EXP_025 \u00a73 states this p as 0.0048. It is 7/210 = 0.0333. The pre-registration is NOT edited (CONTRIBUTING.md \u00a73); the value is computed here and the discrepancy is reported as a defect.",
+   "prereg_stated": 0.0048
+  },
+  "note": "a rate compared against a threshold carries an interval and its denominator (CONTRIBUTING.md \u00a73)"
+ },
+ "H4": {
+  "statement": "the pooled within-arm sd at d=1481 differs from the transferred 0.00461 by more than 1.5x",
+  "sigma_transferred": 0.00461,
+  "factor_threshold": 1.5,
+  "per_cell": {
+   "snn_d512": {
+    "n": 3,
+    "mean": 2.2524467633780314,
+    "sd": 0.004682584405819019
+   },
+   "twocomp_detach_d512": {
+    "n": 3,
+    "mean": 2.1153253488621346,
+    "sd": 0.002363280732686782
+   },
+   "snn_d1481": {
+    "n": 3,
+    "mean": 1.9992032015768146,
+    "sd": 0.0017207503258105294
+   },
+   "twocomp_detach_d1481": {
+    "n": 3,
+    "mean": 1.8649429119385026,
+    "sd": 0.002368364607577134
+   }
+  },
+  "pooled_sd_d1481": 0.0020700401684751236,
+  "ratio_to_transferred": 0.4490325745065344,
+  "verdict": "HELD",
+  "deliverable": "the NUMBER, not the bar: every EXP_014 bar placed against the transferred 0.00461 is re-reported against this pooled sd in \u00a79",
+  "exp_014_bars_rescored": {
+   "S1_margin_required_bpc_at_transferred": 0.0461,
+   "S1_margin_required_bpc_at_measured": 0.020700401684751235,
+   "S2_pair_gate_at_transferred": 0.00922,
+   "S2_pair_gate_at_measured": 0.004140080336950247
+  }
+ },
+ "H5": {
+  "statement": "the gain at d=1481 is NOT predominantly a beyond-horizon gain: zero-context and within-reach together carry >= 50 % of it",
+  "decomposition": {
+   "cut_at_context": 7,
+   "total_gain_bpc": 0.12182126814294314,
+   "zero_context_gain_bpc": 0.002429000821851268,
+   "within_reach_gain_bpc": -0.025042186394013566,
+   "beyond_horizon_gain_bpc": 0.14443445371510544,
+   "zero_context_share": 0.019939053819412855,
+   "within_reach_share": -0.20556497872464652,
+   "beyond_horizon_share": 1.1856259249052337
+  },
+  "zero_plus_within_share": -0.18562592490523366,
+  "verdict": "FAILED",
+  "beyond_horizon_is_a_MARKER_not_a_bar": {
+   "value": 0.14443445371510544,
+   "why": "report \u00a78's rev-15 note: this component has read outside +/-0.0016 on 7 of 24 committed primary arm-gain readings, three clearing a 2 sigma bar, and its sign carries a compression artifact on losing arms",
+   "horizon_reported_beside_it": [
+    [
+     61,
+     52,
+     61
+    ],
+    61
+   ],
+   "inherited_conclusion": "two markers agreeing is two markers agreeing"
+  }
+ }
+}
