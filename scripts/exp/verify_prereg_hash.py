@@ -247,6 +247,57 @@ def by_commit(relpath: str, stamp: str) -> tuple[str, str] | None:
     return None
 
 
+def lines_above_results(s: str) -> list[str]:
+    """Lines above the heading, with the whole status BLOCK removed.
+
+    The status is the one change above the heading that closing an
+    experiment is allowed to make, and it is not one line: `EXP_022`'s
+    `**Status: CLOSED ...**` wraps over six, summarising the verdicts. A
+    first-line-only filter reported those five continuation lines as an
+    edited hypothesis -- precisely the false alarm this tool exists not to
+    raise.
+
+    THE BLOCK IS A PARAGRAPH, NOT A BOLD SPAN, AND THAT CORRECTION MATTERS
+    ---------------------------------------------------------------------
+    This skipped from `**Status:` to the line closing its **bold span**,
+    which silently mis-parsed the second status shape the project's own logs
+    use. `EXP_013`, `EXP_014` and `EXP_018` write
+
+        **Status:** PRE-REGISTERED -- no results yet.
+
+    -- the bold closes after the label, so the line does not end in `**` and
+    the scan ran on, swallowing the pre-registration blurb, the first real
+    heading, and every line down to the next bold-terminated one. On a
+    probe of that shape **five of seven lines vanished from the
+    comparison**, `## 1. The question` among them.
+
+    It read `True` anyway, because the blob and the live file mis-parsed
+    *identically* -- so the guarantee held **by coincidence, not by
+    correctness**, and any edit to those three status lines would have
+    silently changed what the check compares. That is the same
+    single-variant defect report §8's rev-15 note found in `PLACEHOLDERS`,
+    in the same file, arriving by a second route.
+
+    A status is a **paragraph**: it ends at the blank line, whatever its
+    bold shape. The blank line itself is kept, so a one-line status and a
+    six-line one both collapse to the same thing on both sides.
+    """
+    s = s.replace("\r\n", "\n")
+    head = s[:s.index(HEADING)] if HEADING in s else s
+    out, skipping = [], False
+    for ln in head.split("\n"):
+        t = ln.strip()
+        if skipping:
+            if t:
+                continue          # still inside the status paragraph
+            skipping = False      # the blank line ends it, and is kept
+        elif t.startswith("**Status:"):
+            skipping = True
+            continue
+        out.append(ln)
+    return out
+
+
 def live_matches_blob(sha: str, relpath: str, text: str) -> bool | None:
     """Does the LIVE file still agree with the verified blob above `## 9. Results`?
 
@@ -260,33 +311,8 @@ def live_matches_blob(sha: str, relpath: str, text: str) -> bool | None:
     if not raw:
         return None
 
-    def above(s: str) -> list[str]:
-        """Lines above the heading, with the whole status BLOCK removed.
-
-        The status is the one change above the heading that closing an
-        experiment is allowed to make, and it is not one line: `EXP_022`'s
-        `**Status: CLOSED ...**` wraps over six, summarising the verdicts. A
-        first-line-only filter reported those five continuation lines as an
-        edited hypothesis -- precisely the false alarm this tool exists not to
-        raise -- so the block is dropped from the opening `**Status:` through the
-        line that closes its bold span.
-        """
-        s = s.replace("\r\n", "\n")
-        head = s[:s.index(HEADING)] if HEADING in s else s
-        out, skipping = [], False
-        for ln in head.split("\n"):
-            t = ln.strip()
-            if not skipping and t.startswith("**Status:"):
-                # A one-line status opens and closes on the same line.
-                skipping = not (t.endswith("**") and len(t) > len("**Status:"))
-                continue
-            if skipping:
-                skipping = not t.endswith("**")
-                continue
-            out.append(ln)
-        return out
-
-    return above(raw.decode("utf-8", "replace")) == above(text)
+    return (lines_above_results(raw.decode("utf-8", "replace"))
+            == lines_above_results(text))
 
 
 def candidates(text: str):
