@@ -624,15 +624,12 @@ def config_from_args(argv: list[str] | None = None) -> Config:
     return Config(**vars(ns))
 
 
-def default_run_name(cfg: Config) -> str:
-    """`<arch>-<corpus>-d<d>-L<K>-s<seed>-<hash>`; used when run_name is empty.
-
-    Lives here rather than in train.py so that launch.py and train.py cannot
-    disagree about where a run's artifacts are.
-    """
-    if cfg.run_name:
-        return cfg.run_name
-    return (
-        f"{cfg.arch}-{cfg.corpus}-d{cfg.d_model}-L{cfg.n_layers}"
-        f"-s{cfg.seed}-{config_hash(cfg)}"
-    )
+# `default_run_name` was removed here. It was never called, and its docstring
+# claimed it existed "so that launch.py and train.py cannot disagree about where
+# a run's artifacts are" -- a guarantee it did not provide. `train.py` has its own
+# `_default_run_name`, which is the one that actually runs, and the two disagreed
+# in both format (`snn_enwik8_d512_K2_...` against `snn-enwik8-d512-L2-...`) and
+# in hash input (`config_hash` of the config with `run_name`/`out_dir` cleared,
+# against `config_hash` of the config as-is). A dead function promising an
+# invariant nothing enforces is worse than no function: the next caller to import
+# it would have got a name `train.py` would never produce.

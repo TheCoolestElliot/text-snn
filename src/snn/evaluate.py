@@ -136,13 +136,14 @@ def evaluate(model, corpus, split: str, cfg: Config, protocol: str,
     }
 
 
-def evaluate_both(model, corpus, split: str, cfg: Config,
-                  max_windows: int = 0) -> dict:
-    """Convenience wrapper: {"fresh": {...}, "carried": {...}}.
-
-    Exists so that no caller can accidentally report one protocol and forget
-    the other -- the single most likely way for this repository to publish a
-    number that is not comparable with what it claims to be comparable with.
-    """
-    return {p: evaluate(model, corpus, split, cfg, p, max_windows=max_windows)
-            for p in _PROTOCOLS}
+# `evaluate_both` was removed here. Its docstring said it existed "so that no
+# caller can accidentally report one protocol and forget the other -- the single
+# most likely way for this repository to publish a number that is not comparable
+# with what it claims to be comparable with." **Nothing called it**, so it
+# guaranteed nothing, and a dead guard is worse than an absent one: it reads like
+# the invariant is enforced somewhere.
+#
+# The invariant is real and is now carried by `_PROTOCOLS` alone, which both
+# callers iterate -- `scripts/evaluate.py` already did, and `snn/train.py`'s
+# `_run_eval` had a second hardcoded `("fresh", "carried")` that has been pointed
+# at this tuple. One constant, two call sites, no third copy to drift.

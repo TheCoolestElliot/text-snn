@@ -60,7 +60,7 @@ import torch
 
 from snn.config import Config, config_hash, seed_everything
 from snn.data import Corpus, RandomWindowSampler
-from snn.evaluate import evaluate
+from snn.evaluate import _PROTOCOLS, evaluate
 from snn.metrics import bits_per_char
 from snn.model import build_model, count_params
 from snn.neuromod import three_factor_loss
@@ -507,7 +507,11 @@ class Trainer:
         different protocol from the headline is a trap waiting to be quoted."""
         out = {}
         self._last_eval_step = self.global_step
-        for protocol in ("fresh", "carried"):
+        # `_PROTOCOLS`, not a second hardcoded tuple: `evaluate.py` owns the
+        # list and `scripts/evaluate.py` already iterates it, so a third copy
+        # here is exactly how the headline and the monitoring number stop
+        # covering the same protocols.
+        for protocol in _PROTOCOLS:
             res = evaluate(self.model, self.corpus, split, self.cfg, protocol,
                            max_windows=self.cfg.eval_max_windows)
             out[protocol] = res
