@@ -379,6 +379,37 @@ def run_gate(timeout_s: int, gate: str = GATE) -> tuple[bool, str]:
     return proc.returncode == 0, tail
 
 
+def _tree_provenance() -> dict:
+    """HEAD, and whether the guarded sources are dirty relative to it.
+
+    Recorded rather than assumed: an artifact produced from a dirty tree
+    describes code that is in no commit, and `dirty_paths` is what lets a reader
+    tell that apart from a clean re-verification. Every field degrades to `None`
+    rather than raising -- this is provenance, and failing to collect it must
+    never fail a campaign that otherwise ran.
+    """
+    def _git(*a: str) -> str | None:
+        try:
+            out = subprocess.run(["git", *a], cwd=str(REPO), capture_output=True,
+                                 text=True, timeout=30)
+            return out.stdout.strip() if out.returncode == 0 else None
+        except Exception:  # noqa: BLE001 - provenance is best-effort
+            return None
+
+    guarded = sorted(
+        p.relative_to(REPO).as_posix()
+        for p in (KERNELS, SURROGATE, TWOCOMP, TWOCOMP_DETACH)
+    )
+    dirty = _git("status", "--porcelain", "--", "src/snn")
+    return {
+        "head": _git("rev-parse", "HEAD"),
+        "head_short": _git("rev-parse", "--short", "HEAD"),
+        "guarded_sources": guarded,
+        "dirty_paths": [ln[3:] for ln in dirty.splitlines()] if dirty else [],
+        "tree_clean_under_src_snn": dirty == "" if dirty is not None else None,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default="docs/reports/data/audit_08_mutation_campaign.json")
@@ -437,6 +468,16 @@ def main(argv: list[str] | None = None) -> int:
 
     results: dict = {
         "audit": "08_mutation_campaign",
+        # WHICH TREE THIS VERIFIED. Without it the artifact cannot say whether it
+        # is current: the campaign guards `src/snn/`, so a commit to `src/snn/`
+        # after the artifact's own commit leaves the R10 gate unverified against
+        # the code it is supposed to guard, and a reader has no way to tell.
+        # That state was reached once -- the artifact sat at `e01c8c4` while five
+        # `src/snn/` commits landed on top of it -- and establishing it took a
+        # manual `git log` archaeology that this field makes unnecessary.
+        # `CONTRIBUTING.md` §3: a claim about the gate that guards against
+        # unfalsifiable results should not itself be unfalsifiable.
+        "verified_tree": _tree_provenance(),
         "gates": baselines,
         "baseline_pass": all(b["pass"] for b in baselines.values()),
         "baseline_seconds": round(sum(b["seconds"] for b in baselines.values()), 1),
