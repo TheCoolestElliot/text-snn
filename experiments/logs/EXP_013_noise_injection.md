@@ -6,7 +6,7 @@ and **before any noise arm was trained**. The arm's code (`src/snn/noise.py`,
 `NoisyCharLM`) was written alongside this file; no training run starts until this
 file is committed. That sequencing is stated rather than claimed as
 "before any code existed", because it was not.
-**Status:** PRE-REGISTERED — no results yet.
+**Status: CLOSED 2026-08-05 — predictions resolved exactly as §3 wrote them, including the three that FAILED and the one that held for a reason that does not support it.** A null: this model does not overfit. Results in §9; folded into `docs/reports/04_phase4_interim.md` §12.**
 **Phase:** 4 (controlled experiments). **This candidate is not on
 `03_phase3_candidates.md` §6.3's list, and is not on the 18-candidate set in
 `docs/reports/data/phase3_candidates.json` at all** — see §0.

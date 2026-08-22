@@ -3,7 +3,7 @@
 **Pre-registered:** 2026-08-10, after the cost calibration in §2.1 and before any
 training run. **Committed before the first run.**
 
-**Status: PRE-REGISTERED — no results yet.**
+**Status: CLOSED 2026-08-10 — two of the three trained legs DIED, the leg with no bar produced the finding, and the most useful output is a Phase-5 blocker rather than a bpc.** Both two-compartment arms diverged at 5.0M; that became open decision #11. Results in §9; folded into `docs/reports/04_phase4_interim.md` §14.**
 
 ---
 

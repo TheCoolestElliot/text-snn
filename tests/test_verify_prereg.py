@@ -129,6 +129,40 @@ def test_crlf_and_lf_are_read_identically():
     assert m.lines_above_results(lf) == m.lines_above_results(lf.replace("\n", "\r\n"))
 
 
+def test_the_recipe_can_restore_more_than_one_stamped_status_shape():
+    """`EXP_013`'s only route is reconstruction from the live file, so its status
+    line is load-bearing: restoring only `**Status: OPEN.**` meant correcting a
+    stale header silently cost it its verification. The table holds SHAPES."""
+    m = _mod()
+    shapes = {st.strip() for st in m.STATUS_RESTORES}
+    assert "**Status: OPEN.**" in shapes
+    assert "**Status:** PRE-REGISTERED — no results yet." in shapes
+    assert "**Status: PRE-REGISTERED — no results yet.**" in shapes
+
+
+def test_a_closed_log_reconstructs_to_each_stamped_shape():
+    """The end the table exists for: a closed header must be restorable to the
+    pre-results one, whichever shape that was."""
+    m = _mod()
+    closed = ("**Status: CLOSED 2026-08-05 — everything held. Results in §9.**")
+    doc = _doc(closed)
+    labels = [lab for lab, _ in m.candidates(doc)]
+    for shape in ("**Status: OPEN.**", "**Status:** PRE-REGISTERED — no results yet."):
+        assert any(shape in lab for lab in labels), shape
+
+
+def test_restoring_a_status_preserves_the_documents_newline_convention():
+    """A restored status carrying the wrong newline turns a line ending into an
+    apparent hypothesis edit -- the failure `_variants` exists to prevent."""
+    m = _mod()
+    crlf = _doc("**Status: CLOSED 2026-08-05 — held.**").replace("\n", "\r\n")
+    for _, body in m.candidates(crlf):
+        text = body.decode("utf-8") if isinstance(body, bytes) else body
+        if "**Status: OPEN.**" in text:
+            assert "**Status: OPEN.**\r\n" in text or "\n" not in text
+            break
+
+
 def test_the_real_logs_still_agree_with_their_committed_blobs():
     """The end-to-end claim, on the actual repository rather than a fixture."""
     m = _mod()

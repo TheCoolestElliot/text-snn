@@ -3,7 +3,7 @@
 **Pre-registered:** 2026-08-11, after the derivation in §2 and **before any probe
 was run against any checkpoint**. **Committed before the first run.**
 
-**Status: PRE-REGISTERED — no results yet.**
+**Status: CLOSED 2026-08-11 — T1, T2, P1 and P5 held; P2 DIRECTION HELD; P3 REFUTED AS SUFFICIENT; P4 DIRECTION REVERSED.** The plain LIF's backward is provably a contraction; the two-compartment arm's is bounded by nothing. ~0.8 GPU-h, of which ~0.37 bought no number. Results in §9; folded into `docs/reports/04_phase4_interim.md` §15.**
 
 ---
 
