@@ -1,0 +1,1019 @@
+{
+ "experiment": "EXP_025_detached_scaling",
+ "prereg": "experiments/logs/EXP_025_detached_scaling.md",
+ "prereg_sha256_before_first_run": "1b7440f9b16e6c5b2034c59965a3b586400bf77180cf48cb362f396945ce91ee",
+ "k1a_reference": "e25_snn_d512_s0",
+ "k1b_reference": "snn_beta0.5_s0",
+ "may_differ": [
+  "arch",
+  "d_model",
+  "run_name",
+  "seed"
+ ],
+ "k1b_exempt_new_at_default": [
+  "beta_slow",
+  "da_gain_init",
+  "da_mode",
+  "da_scale",
+  "da_source",
+  "iface_binary_input",
+  "iface_code_sd",
+  "iface_fold",
+  "iface_read_lags",
+  "iface_read_layers",
+  "iface_thr_in",
+  "mu_init",
+  "nm_a_init",
+  "nm_b_init",
+  "nm_gain_init",
+  "nm_pos_len",
+  "nm_source",
+  "nm_tau",
+  "noise_amp",
+  "noise_p",
+  "tf_kappa",
+  "tf_rolled",
+  "thr_log_init",
+  "w_init"
+ ],
+ "frozen_recipe": {
+  "lr": 0.003,
+  "lr_schedule": "cosine",
+  "max_steps": 20000,
+  "warmup_steps": 200,
+  "grad_clip": 1.0,
+  "weight_decay": 0.1,
+  "beta1": 0.9,
+  "beta2": 0.95,
+  "batch_size": 128,
+  "seq_len": 256
+ },
+ "vram_alarm_gib": 3.0,
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "arches": [
+  "snn",
+  "twocomp_detach"
+ ],
+ "adopts_nothing": true,
+ "ranks_nothing": true,
+ "rules_no_open_decision": true,
+ "engages_decision_11": false,
+ "cells": [
+  {
+   "arch": "snn",
+   "d_model": 512,
+   "seed": 0,
+   "run": "e25_snn_d512_s0",
+   "train_wall_clock_s": 377.1,
+   "eval_wall_clock_s": 9.3,
+   "params": 735437,
+   "params_expected": 735437,
+   "peak_vram_gib": 0.6089,
+   "wall_clock_s": 372.2,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 398.8,
+    "realised_train_wall_clock_s": 372.2,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9333
+   }
+  },
+  {
+   "arch": "snn",
+   "d_model": 512,
+   "seed": 1,
+   "run": "e25_snn_d512_s1",
+   "train_wall_clock_s": 377.7,
+   "eval_wall_clock_s": 9.3,
+   "params": 735437,
+   "params_expected": 735437,
+   "peak_vram_gib": 0.6089,
+   "wall_clock_s": 372.78,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 398.8,
+    "realised_train_wall_clock_s": 372.78,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9348
+   }
+  },
+  {
+   "arch": "snn",
+   "d_model": 512,
+   "seed": 2,
+   "run": "e25_snn_d512_s2",
+   "train_wall_clock_s": 377.7,
+   "eval_wall_clock_s": 9.3,
+   "params": 735437,
+   "params_expected": 735437,
+   "peak_vram_gib": 0.6089,
+   "wall_clock_s": 372.84,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 398.8,
+    "realised_train_wall_clock_s": 372.84,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9349
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 0,
+   "run": "e25_detach_d512_s0",
+   "train_wall_clock_s": 507.0,
+   "eval_wall_clock_s": 10.1,
+   "params": 737485,
+   "params_expected": 737485,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 502.09,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 521.5,
+    "realised_train_wall_clock_s": 502.09,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9628
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 1,
+   "run": "e25_detach_d512_s1",
+   "train_wall_clock_s": 506.9,
+   "eval_wall_clock_s": 9.9,
+   "params": 737485,
+   "params_expected": 737485,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 501.94,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 521.5,
+    "realised_train_wall_clock_s": 501.94,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9625
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 512,
+   "seed": 2,
+   "run": "e25_detach_d512_s2",
+   "train_wall_clock_s": 507.1,
+   "eval_wall_clock_s": 10.0,
+   "params": 737485,
+   "params_expected": 737485,
+   "peak_vram_gib": 0.9801,
+   "wall_clock_s": 502.14,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 521.5,
+    "realised_train_wall_clock_s": 502.14,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9629
+   }
+  },
+  {
+   "arch": "snn",
+   "d_model": 1481,
+   "seed": 0,
+   "run": "e25_snn_d1481_s0",
+   "train_wall_clock_s": 2318.8,
+   "eval_wall_clock_s": 20.6,
+   "params": 4997099,
+   "params_expected": 4997099,
+   "peak_vram_gib": 1.6434,
+   "wall_clock_s": 2311.88,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2241.3,
+    "realised_train_wall_clock_s": 2311.88,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 1.0315
+   }
+  },
+  {
+   "arch": "snn",
+   "d_model": 1481,
+   "seed": 1,
+   "run": "e25_snn_d1481_s1",
+   "train_wall_clock_s": 2320.0,
+   "eval_wall_clock_s": 20.8,
+   "params": 4997099,
+   "params_expected": 4997099,
+   "peak_vram_gib": 1.6434,
+   "wall_clock_s": 2316.42,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2241.3,
+    "realised_train_wall_clock_s": 2316.42,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 1.0335
+   }
+  },
+  {
+   "arch": "snn",
+   "d_model": 1481,
+   "seed": 2,
+   "run": "e25_snn_d1481_s2",
+   "train_wall_clock_s": 2333.5,
+   "eval_wall_clock_s": 20.3,
+   "params": 4997099,
+   "params_expected": 4997099,
+   "peak_vram_gib": 1.6434,
+   "wall_clock_s": 2327.02,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2241.3,
+    "realised_train_wall_clock_s": 2327.02,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 1.0382
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 1481,
+   "seed": 0,
+   "run": "e25_detach_d1481_s0",
+   "train_wall_clock_s": 2765.7,
+   "eval_wall_clock_s": 22.2,
+   "params": 5003023,
+   "params_expected": 5003023,
+   "peak_vram_gib": 2.6138,
+   "wall_clock_s": 2759.25,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2645.2,
+    "realised_train_wall_clock_s": 2759.25,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 1.0431
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 1481,
+   "seed": 1,
+   "run": "e25_detach_d1481_s1",
+   "train_wall_clock_s": 2608.8,
+   "eval_wall_clock_s": 19.3,
+   "params": 5003023,
+   "params_expected": 5003023,
+   "peak_vram_gib": 2.6138,
+   "wall_clock_s": 2602.4,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2645.2,
+    "realised_train_wall_clock_s": 2602.4,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9838
+   }
+  },
+  {
+   "arch": "twocomp_detach",
+   "d_model": 1481,
+   "seed": 2,
+   "run": "e25_detach_d1481_s2",
+   "train_wall_clock_s": 2551.8,
+   "eval_wall_clock_s": 19.3,
+   "params": 5003023,
+   "params_expected": 5003023,
+   "peak_vram_gib": 2.6138,
+   "wall_clock_s": 2546.4,
+   "g5": {
+    "gate": "G5",
+    "frozen_fields_checked": [
+     "batch_size",
+     "beta1",
+     "beta2",
+     "grad_clip",
+     "lr",
+     "lr_schedule",
+     "max_steps",
+     "seq_len",
+     "warmup_steps",
+     "weight_decay"
+    ],
+    "all_frozen": true
+   },
+   "k1b": {
+    "reference": "snn_beta0.5_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [
+     "beta_slow",
+     "da_gain_init",
+     "da_mode",
+     "da_scale",
+     "da_source",
+     "iface_binary_input",
+     "iface_code_sd",
+     "iface_fold",
+     "iface_read_lags",
+     "iface_read_layers",
+     "iface_thr_in",
+     "mu_init",
+     "nm_a_init",
+     "nm_b_init",
+     "nm_gain_init",
+     "nm_pos_len",
+     "nm_source",
+     "nm_tau",
+     "noise_amp",
+     "noise_p",
+     "tf_kappa",
+     "tf_rolled",
+     "thr_log_init",
+     "w_init"
+    ],
+    "same_arm": true
+   },
+   "k1a": {
+    "reference": "e25_snn_d512_s0",
+    "differs_in": [
+     "arch",
+     "d_model",
+     "run_name",
+     "seed"
+    ],
+    "absent_from_reference_and_left_at_default": [],
+    "same_arm": true
+   },
+   "k3": {
+    "projected_20k_s_from_calibration": 2645.2,
+    "realised_train_wall_clock_s": 2546.4,
+    "realisation_factor_applied": 1.0475,
+    "note": "the projection is a 400-step per-step rate scaled by 20,000 and by the committed realisation factor; it excludes capture cost and the eight in-training evaluations, so a ratio slightly above 1 is expected and its size is the measurement",
+    "ratio_realised_over_projected": 0.9626
+   }
+  }
+ ],
+ "prereg_sha256_after_last_run": "1b7440f9b16e6c5b2034c59965a3b586400bf77180cf48cb362f396945ce91ee",
+ "prereg_unchanged": true
+}
