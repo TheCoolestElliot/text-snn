@@ -28,7 +28,7 @@ truncated to 300 steps, at a point where §2.6's own calibration says the dopami
 signal is still ~46x weaker than it will be at convergence. No prediction in §4
 was changed after they were seen.
 
-**Status:** PRE-REGISTERED — no results yet.
+**Status: CLOSED 2026-08-14 — T1 and T2 PASS; D1 UNRESOLVED by 3.6e-06 bpc in the direction of harm; D2 NOT RUN; D3, D5 MARKERS; D4 ENGAGED.** Sixteen runs, sixteen completed, zero diverged, 2.63 GPU-h. The corrected PAIRED test — measured because it hurts — says the arm costs 0.0062 bpc on 5/5 seeds. Results in §9; folded into `docs/reports/04_phase4_interim.md` §17.**
 **Phase:** 4 (controlled experiments).
 
 **What it costs:** sixteen training runs at the committed recipe

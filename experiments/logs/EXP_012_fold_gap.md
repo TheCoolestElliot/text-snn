@@ -2,7 +2,7 @@
 
 **Pre-registered:** 2026-08-05, before any measurement on the composed arm's fold
 beyond the two residuals `EXP_011` C4 already committed.
-**Status:** OPEN.
+**Status: CLOSED 2026-08-05 — Y1, Y2 and Y3 held; Y4, Y5 and Y6 FAILED.** The fold gap is a degeneracy: the flip count is set by how much probability mass the decision variable puts *at* the threshold. Results in §9; folded into `docs/reports/04_phase4_interim.md` §11.**
 **Phase:** 4 (controlled experiments). This is the second of the two things
 `EXP_011` §10 named as unsettled, and the one the Phase-4 report §10.5 says is
 **not** offered as evidence for decision #6 *until understood*.

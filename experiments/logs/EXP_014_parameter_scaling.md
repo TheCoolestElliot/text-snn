@@ -5,7 +5,7 @@ only wall-clock, VRAM and firing rates, and no bpc against any bar — and
 **before any ladder run is trained**. This file is committed before the first
 run, which `EXP_013` §0 promised and could not deliver; the hash mechanism in §8
 is kept anyway, because a commit proves ordering only if nobody amends it.
-**Status:** PRE-REGISTERED — no results yet.
+**Status: CLOSED 2026-08-08 — S1, S2, S3 and S4 all held, and the gate expected to pass is the one that FAILED (G1).** Width bought −0.25238 bpc at 54.75 transferred σ — more than every architectural arm of the phase — and it ran on the plain LIF. Results in §9; folded into `docs/reports/04_phase4_interim.md` §13.**
 **Phase:** 4 (controlled experiments). Candidate **#11** on
 `03_phase3_candidates.md` §6.3's ranked list, and **rank 2** of
 `04_phase4_interim.md` §7.1 since rev 6.

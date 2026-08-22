@@ -4,7 +4,7 @@
 was run, any checkpoint was probed, and any bpc existed for this arm.**
 **Committed before the first run.**
 
-**Status: PRE-REGISTERED — no results yet.**
+**Status: CLOSED 2026-08-11 — T1, T1b, T2, H1 and H2 held; H2b MARKER; H3 NOT RUN; H4 REACH REDUCED; H5 BREACH.** One detached token bounds the backward by 0.5, changes nothing in the forward, and the arm then trains at 5.0M (1.86290) under the recipe that killed the adopted one. ~2.0 GPU-h. Results in §9; folded into `docs/reports/04_phase4_interim.md` §16.**
 
 ---
 

@@ -168,8 +168,29 @@ PLACEHOLDERS = (
      "resolved as\nwritten, including the ones that fail.)*\n"),
     "",
 )
-STATUS_OPEN = "**Status: OPEN.**\n"
-STATUS_RE = re.compile(r"\*\*Status: CLOSED.*?\*\*\n", re.S)
+#: The status strings a pre-registration may have carried WHEN IT WAS STAMPED.
+#: The recipe route reconstructs the pre-results bytes from the live file, so a
+#: closed log's status has to be put back to whatever it was before closure --
+#: and this project uses more than one shape. `EXP_013` stamps
+#: `**Status:** PRE-REGISTERED ...` (bold closed after the label) while
+#: `EXP_015`-`EXP_017` stamp `**Status: PRE-REGISTERED ...**`.
+#:
+#: A SINGLE ENTRY HERE IS THE DEFECT THIS FILE KEEPS REDISCOVERING. It has now
+#: bitten three times: the `prereg_sha256_before` key, the `PLACEHOLDERS` table,
+#: and the status-block parser. Restoring only `**Status: OPEN.**` meant that
+#: correcting a stale header -- which eight closed logs need -- silently cost
+#: `EXP_013` its only verification route. These are SHAPES, not per-log entries,
+#: which is what keeps the list short enough to stay right.
+#:
+#: Adding candidates cannot manufacture a false positive: every one must still
+#: hash to the stamp under SHA-256.
+STATUS_RESTORES = (
+    "**Status: OPEN.**\n",
+    "**Status:** OPEN.\n",
+    "**Status: PRE-REGISTERED \u2014 no results yet.**\n",
+    "**Status:** PRE-REGISTERED \u2014 no results yet.\n",
+)
+STATUS_RE = re.compile(r"\*\*Status:.*?\*\*\n", re.S)
 
 
 def _first(mapping: dict, keys) -> str | None:
@@ -315,6 +336,11 @@ def live_matches_blob(sha: str, relpath: str, text: str) -> bool | None:
             == lines_above_results(text))
 
 
+def nl_of(s: str) -> str:
+    """The newline convention `s` uses, so a restored status keeps it."""
+    return "\r\n" if "\r\n" in s else "\n"
+
+
 def candidates(text: str):
     """Every plausible reconstruction of the pre-results bytes, with a label.
 
@@ -329,9 +355,11 @@ def candidates(text: str):
         return
     head = text[:text.index(HEADING)]
     heads = [("as-is", head)]
-    restored, n = STATUS_RE.subn(STATUS_OPEN, head, count=1)
-    if n:
-        heads.append(("status restored to OPEN", restored))
+    for st in STATUS_RESTORES:
+        want = st.replace(chr(10), nl_of(head))
+        restored, n = STATUS_RE.subn(want, head, count=1)
+        if n and restored != head:
+            heads.append((f"status restored to {st.strip()!r}", restored))
     for hlabel, h in heads:
         for i, ph in enumerate(PLACEHOLDERS):
             body = h + HEADING + ("\n\n" + ph if ph else "\n")

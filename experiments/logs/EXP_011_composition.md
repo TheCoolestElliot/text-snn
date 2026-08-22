@@ -1,7 +1,7 @@
 # EXP_011 — Do the learned threshold and the two-compartment neuron compose?
 
 **Pre-registered:** 2026-08-04, before any composed arm was trained or built.
-**Status:** OPEN.
+**Status: CLOSED 2026-08-04 — C1–C5 all held; the arms COMPOSE. PROVISIONAL at n = 2 of a pre-registered 3: `compose_s0` diverged and was NOT replaced (`CONTRIBUTING.md` §4). 2.08326 carried, −0.03543 against the adopted arm. Results in §9; folded into `docs/reports/04_phase4_interim.md` §10.**
 **Phase:** 4 (controlled experiments). This is the "biggest unmeasured thing" the
 Phase-4 interim report's §6.7 synthesis left standing, and the experiment
 Elliot's decision #8 authorises to run *inside* Phase 4 rather than opening
