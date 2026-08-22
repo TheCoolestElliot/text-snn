@@ -3,9 +3,11 @@
   "spec": "docs/reports/data/phase3_candidates.json",
   "report": "docs/reports/03_phase3_candidates.md",
   "checks_run": 121,
-  "checks_failed": 0,
-  "passed": true,
-  "failures": [],
+  "checks_failed": 1,
+  "passed": false,
+  "failures": [
+    "no screened arm is missing from the spec: screened but unclaimed: ['da_add', 'da_mult']"
+  ],
   "checks": [
     {
       "check": "ranked row count",
@@ -555,7 +557,7 @@
     {
       "check": "reachability screen artifact present",
       "ok": true,
-      "detail": "C:\\Elliot's Stuff\\SNN\\Text SNN Project\\docs\\reports\\data\\audit_09_gradient_reachability.json"
+      "detail": "C:\\Elliot's Stuff\\SNN\\Text SNN\\docs\\reports\\data\\audit_09_gradient_reachability.json"
     },
     {
       "check": "C01 screen key 'c01_w0' exists",
@@ -609,8 +611,8 @@
     },
     {
       "check": "no screened arm is missing from the spec",
-      "ok": true,
-      "detail": "screened but unclaimed: []"
+      "ok": false,
+      "detail": "screened but unclaimed: ['da_add', 'da_mult']"
     }
   ],
   "unverifiable_claims": [

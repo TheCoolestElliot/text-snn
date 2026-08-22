@@ -1,9 +1,28 @@
 # Phase 4 — controlled experiments: interim report
 
-**Revision 16, 2026-08-22.** Interim, not final: Phase 4 is open and this document
+**Revision 17, 2026-08-22.** Interim, not final: Phase 4 is open and this document
 is the running record of it. It exists because Phase 4 had produced six closed
 experiments and no report, and a phase whose findings live only in its experiment
 logs cannot be reviewed as a phase.
+
+> **Rev 17 adds §23, the exit criteria Phase 4 never had, and folds in no
+> experiment.** `CONTRIBUTING.md` §1 requires a phase to document its exit
+> criteria before its human gate; phases 1, 2 and 3 each carry such a section and
+> **Phase 4 did not.** The state it records: **19 experiments closed**, **~29.7 of
+> ~30 GPU-hours spent**, and **6 of 14 ranked candidates closed** — the one
+> criterion the phase does **not** meet. §23.3 is the account: **12 of the 19
+> closed experiments close no ranked candidate at all**, because the phase's own
+> evidence twice said the list was aimed at the wrong thing, and those twelve
+> include the three (§§14–16) that found the adopted arm does not train at width,
+> proved why, and fixed it. **Two gates do not pass and both are recorded rather
+> than repaired**: `EXP_020` and `EXP_021` remain UNVERIFIED with an entry
+> condition no later commit can supply, and `10_candidate_spec.py` now fails 1 of
+> 121 checks because a Phase-3 instrument outlived its scope — the regenerated
+> artifact is committed **showing** the failure. Gates that do pass, re-run on
+> this tree: ruff clean, **747 tests**, mutation campaign **59/59** against a
+> named commit, pre-registration audit **8/10** with **7/7** live files agreeing.
+> **The last box — Elliot's sign-off — is deliberately NOT ticked.** No decision
+> is ruled, no arm adopted, no phase authorised, and no row of §8 edited.
 
 > **Rev 16 folds in `EXP_025` as §22: the neuron buys REACH, the width buys
 > CAPACITY, and the plain LIF stops reading at nine characters.** The detached
@@ -282,7 +301,7 @@ unapplied.
 | GPU-hours spent | **~29.7 of ~30** (`EXP_012` cost ~0.2 and trained nothing; `EXP_013` cost ~1.9; **`EXP_014` cost ~1.5**; **`EXP_015` cost ~2.1** — 1.79 of ladder training (§14.1), ~0.09 of arch calibration, ~0.08 for the divergence chase, and ~0.1 for the evaluations, horizon, gap and state probes. **~0.7 of `EXP_015`'s training bought no number**: two legs ran 20,000 steps of which ~14,750 and ~18,000 computed NaN, and that is recorded as spent rather than netted off. **`EXP_016` cost ~0.8 and trained nothing** — five forward passes over committed checkpoints and two instrumented replays of one step — of which **~0.37 bought no number**, two aborted Leg B attempts whose defects are recorded in §15.5's source log. **`EXP_017` cost ~2.0** — 1.60 of training across seven runs, ~0.25 of probes and the horizon, and ~0.12 for running the mutation campaign **twice**, which is recorded as spent because the first run is what caught D09); **`EXP_018` cost ~2.9** — 2.63 of ladder training across sixteen runs, none of which diverged, plus ~0.3 of calibration, the systems probe, the §7.2 screen and the horizon sweep); **`EXP_020` cost ~1.9** — 16 runs at 6,658 s, none diverged, plus the frozen-feature probe, the §7.2 screen, the cost pre-flight and a 16-checkpoint horizon sweep; **`EXP_021` cost ~2.0** — 15 runs at 7,125 s, none diverged, plus the `tau` calibration, the screen, the pre-flight, an 18-checkpoint horizon sweep and 12 generalisation-gap evaluations. **Nothing in either bought no number.** 31 runs across the two, **zero divergences**; **`EXP_022` cost ~1.9** — 15 runs at 6,246 s, none diverged, plus a 21-checkpoint horizon sweep and 15 generalisation-gap evaluations; **`EXP_023` cost ~2.1** — 15 runs at 7,177 s, none diverged, plus a 24-checkpoint horizon sweep and 12 gap evaluations. **61 runs across the four, zero divergences, and nothing that bought no number**; **`EXP_025` cost ~5.17** — 4.858 of ladder across 12 runs, none diverged, plus a 12-checkpoint horizon sweep and the six-cell cost pre-flight, **against ~5.1 projected, the first Phase-4 estimate right to 0.4 %**. **73 runs across the five, zero divergences.** **The ~30 GPU-h budget is now essentially spent, and that is itself for Elliot** |
 | Unexplained divergences | **4, sharing 2 causes** — `twocomp_distill_s1` (§6.4) has its own; `compose_s0` (§10.4) and **both of `EXP_015`'s dead legs (§14.5)** share a signature: origin in layer 0's backward, forward and loss finite, fp32 and fp64 gradient norms equal, and the eager path producing an identical NaN in identical tensors. **It is now reproducible 138 steps from a committed checkpoint rather than 17,598**, and it blocks scaling the adopted arm. **At rev 10 the shared signature has a mechanism (§15)**: the first non-finite value is made *inside* layer 0's reverse recursion, on both dispatch paths, after an amplification of **10^41.62 within one backward pass** — and the plain LIF's recurrence is provably incapable of it. **At rev 11 there are 6, sharing 2 causes**: two *freshly trained* `twocomp` seeds at `d = 512` (§16.4) joined the shared signature, at the width the arm was adopted at, where the committed record holds seven clean seeds |
 | Phase-3 §9 sign-off | **signed off 2026-08-05** (decision #1), and **recorded as retrospective**: Phase 4 was opened without it on instruction and eight experiments ran before it |
-| Decisions open | **6 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add. **Rev 12 adds none and RESOLVES #3** — `EXP_018` handed it a fourth boundary case (a rank-1 broadcast from the head) and it was ruled on Elliot's instruction: **feedforward-driven modulators admitted, head-driven ones diagnostic-only**, extended in `01_reconnaissance.md` §4.6. **Rev 13 adds none and edits none**, and records fresh measured evidence for **#2** and a second independent measurement bearing on **#6** in prose beneath the table. **Rev 14 adds none and edits none either**, and records beneath the table a third measurement bearing on **#6**, a third instance of **#9**'s defect class, and a protocol deviation in §18's and §19's entry conditions. **Rev 15 adds none and edits none either.** It corrects rev 14's own note on the pre-registration audit — the record is **7/9, not 2/12** — and three things in `EXP_024`'s pre-registration, which is **not edited**. It bears on **#4** only by improving the record that decision will be taken on, and **takes no position on it**. **Rev 16 adds none and edits none either**, and `EXP_025` **engaged none of the six**: gate **G5** read the frozen recipe back out of all twelve `config.json`s, including all six at 5.0M, so **#11 was never engaged — mechanically rather than by assertion** — at the exact width where the adopted `twocomp` arm diverges |
+| Decisions open | **6 of 11** (§8). #8 resolved at rev 3, #1 at rev 5, #5 and #7 at rev 6; rev 6 adds #9, rev 8 adds #10 and **rev 9 adds #11**, all three open. **Rev 11 adds none and edits none**, and sets out beneath the §8 table the case for a twelfth it deliberately did not add. **Rev 12 adds none and RESOLVES #3** — `EXP_018` handed it a fourth boundary case (a rank-1 broadcast from the head) and it was ruled on Elliot's instruction: **feedforward-driven modulators admitted, head-driven ones diagnostic-only**, extended in `01_reconnaissance.md` §4.6. **Rev 13 adds none and edits none**, and records fresh measured evidence for **#2** and a second independent measurement bearing on **#6** in prose beneath the table. **Rev 14 adds none and edits none either**, and records beneath the table a third measurement bearing on **#6**, a third instance of **#9**'s defect class, and a protocol deviation in §18's and §19's entry conditions. **Rev 15 adds none and edits none either.** It corrects rev 14's own note on the pre-registration audit — the record is **7/9, not 2/12** — and three things in `EXP_024`'s pre-registration, which is **not edited**. It bears on **#4** only by improving the record that decision will be taken on, and **takes no position on it**. **Rev 16 adds none and edits none either**, and `EXP_025` **engaged none of the six**: gate **G5** read the frozen recipe back out of all twelve `config.json`s, including all six at 5.0M, so **#11 was never engaged — mechanically rather than by assertion** — at the exact width where the adopted `twocomp` arm diverges. **Rev 17 adds none and edits none either**, and §23 — the exit criteria — leaves its own sign-off box **unticked**: **#4 is the authorisation and it is open** |
 
 The phase has moved the project's answer to its own question twice, and both
 moves were away from the thing the ranking was built around.
@@ -4068,10 +4087,147 @@ no open decision, and **engaged none of the six** — G5 is the mechanical proof
 
 ---
 
-## 23. Changelog
+## 23. Exit criteria
+
+`CONTRIBUTING.md` §1: *"A phase ends at a human gate. Complete the deliverables,
+document the exit criteria, then stop and request review. Never auto-advance."*
+Phases 1, 2 and 3 each carry such a section (`01_reconnaissance.md` §11,
+`02_baseline_report.md` §8, `03_phase3_candidates.md` §9); **Phase 4 did not, and
+this is it.** It is written at rev 17, added by the author of the report and
+**not** signed off — the last box below is the gate and it is Elliot's.
+
+**Phase 4 is out of budget, not out of questions**, and the two are different
+sentences. `01_reconnaissance.md` §8.2 defines the phase as *"pre-registered,
+single-variable, ≥3 seeds per arm; negative results retained"* against the ranked
+list, at **~30 GPU-hours**. The hours are spent. The list is not finished.
+
+### 23.1 Against the phase's own definition
+
+- [x] **Pre-registered, single-variable, ≥3 seeds per arm.** **19 experiments
+      closed** — `EXP_004`–`EXP_009`, `EXP_011`–`EXP_018`, `EXP_020`–`EXP_023`,
+      `EXP_025`. Every one wrote its hypotheses and decision thresholds before its
+      runs. **Two exceptions to ≥3 seeds, both reported as reduced-n rather than
+      repaired:** `EXP_009` and `EXP_011` are **provisional at n = 2**, seeds
+      diverged and were **not replaced** (`CONTRIBUTING.md` §4).
+- [x] **Negative results retained, prominently.** They are most of the phase.
+      `EXP_013` is a null; `EXP_018`'s arm is worse than its own anchor on 5/5
+      seeds; **every arm in `EXP_020` lost**; `EXP_022`'s H1 and H4 failed;
+      `EXP_023`'s ladder is flat; `EXP_025`'s H5 failed. Nothing was withdrawn
+      after the fact.
+- [x] **Every reported figure traces to a committed artifact** under
+      `docs/reports/data/`, and every experiment's bars were fixed before its
+      runs were read.
+- [ ] **The ranked candidate list — 6 of 14 closed.** This is the criterion Phase 4
+      does **not** meet, and §23.3 is the account of why.
+- [x] **Budget: ~29.7 of ~30 GPU-hours.** `EXP_025`'s pre-flight was the first
+      estimate in the phase to be right (0.4 %); §7.1's rev-8 note records that the
+      column it descends from was formally withdrawn.
+- [ ] **Reviewed by Elliot — Phase 5 does not begin until this is signed off.**
+      **NOT SIGNED OFF.** Decision **#4** in §8 is the authorisation and it is open.
+
+### 23.2 Gates, at the close
+
+Re-run on the tree at this revision, not quoted from an earlier one:
+
+| gate | state |
+|---|---|
+| `ruff check .` | clean |
+| Full suite (GPU + corpus) | **747 passed**, 1 warning. Includes the `cuda`-marked tests CI **cannot** run — the fused kernels, CUDA-graph capture and determinism under replay |
+| Mutation campaign | **59/59 caught, 0 escaped**, source restored clean, verified against commit `e1c14c7` — and the artifact now records *which* tree it verified, which it could not before |
+| Pre-registration audit | **8/10** stamped (7 by commit, 1 by recipe); 4 manifests carry no stamp and are excluded from that denominator |
+| Live-file agreement above `## 9. Results` | **7/7** commit-verified logs agree |
+
+**Two gates do not pass, and both are recorded rather than repaired.**
+
+1. **`EXP_020` and `EXP_021` are UNVERIFIED**, and separately their §8 entry
+   condition — *resolver committed before any bpc is read* — **was not met**
+   (§20.7). No commit made later can supply that ordering. `EXP_022`, `EXP_023`
+   and `EXP_025` met it.
+2. **`scripts/audit/10_candidate_spec.py` now fails 1 of 121 checks.** The
+   committed artifact records `passed: true`; re-run today it reports *"screened
+   but unclaimed: `da_add`, `da_mult`"*. **The spec is not wrong and the report is
+   not wrong** — the check assumes every arm passing the §7.2 reachability screen
+   is one of Phase 3's 18 candidates, and that premise expired the moment Phase 4
+   screened arms that are deliberately **not** candidates (`EXP_018`'s dopamine
+   arms; §17 says so in terms). It is a Phase-3 instrument outliving its scope.
+   The regenerated artifact is committed showing the failure, because an artifact
+   claiming `passed: true` when the tool says otherwise is the one outcome this
+   project cannot have. **Rescoping the check is Phase 5's, not a silent fix
+   here.**
+
+### 23.3 Why 6 of 14, and the case that it is the right 6
+
+**Phase 4 spent its budget on questions the ranked list did not contain, because
+its own evidence twice said the list was aimed at the wrong thing** — §1 records
+that in the phase's opening sentence. The arithmetic is blunt: **12 of the 19
+closed experiments close no ranked candidate at all** — `EXP_011`, `EXP_012`,
+`EXP_013`, `EXP_015`, `EXP_016`, `EXP_017`, `EXP_018`, `EXP_020`, `EXP_021`,
+`EXP_022`, `EXP_023` and `EXP_025`, each saying so in its own section — and they
+consumed most of the hours.
+
+They were not a detour:
+
+* `EXP_015` found that **the adopted arm does not train at width** and opened
+  decision #11 — a Phase-5 blocker the ranked list could not have predicted.
+* `EXP_016` proved **why**, and `EXP_017` fixed it with a one-token change that
+  alters nothing in the forward.
+* `EXP_025` then put a **bar** on the result the whole architectural programme
+  rests on, and measured the complement of `EXP_014`'s: **width buys per-step
+  capacity and no reach; the neuron buys reach and pays capacity.**
+
+**Against that, the eight unclosed candidates are what §7.1 says they are.** Two
+are live and cheap — **#2 current normalisation (0.4 GPU-h, screened, unrun)** and
+**#13 training budget at 40k steps (0.7)**. Two are **blocked on their own
+screens**: #6's inits are both saddles and #10's is a saddle whose fallback no
+Phase-4 finding motivates. #5 is **partly subsumed** by the adopted arm. The
+remainder were displaced rather than refused.
+
+**No claim is made here that closing the other eight would have been worth more
+than what was measured instead.** That judgement is decision #4's and is
+Elliot's; §7.1 is *offered and not applied* and this section does not apply it
+either.
+
+### 23.4 What Phase 4 hands to Phase 5
+
+1. **The reach/capacity decomposition, measured on one tree** (§22.3). Phase 5's
+   plan was to *scale the adopted arm*; §14 showed that arm diverges at 5.0M and
+   that became **decision #11**. **§22 removes that blocker in practice** — the
+   detached arm trains **6/6 at 5.0M under the unchanged frozen recipe**, is
+   parameter-identical, and its checkpoint evaluates as `arch="twocomp"`
+   bit-identically. **Whether Phase 5's final run may use it is decision #5's
+   shape and is not ruled here.**
+2. **σ above 735K parameters, for the first time: 0.002070 at 5.0M**, 0.449× the
+   value `EXP_014` transferred. Bars at width are ~2.2× tighter than the plan
+   assumed, so Phase 5 buys more per seed than budgeted.
+3. **Two adopted arms and one provisional one.** The two-compartment neuron
+   (`EXP_004`) and the learned per-channel threshold (`EXP_008`, decision #5). The
+   composed arm (§10) is **provisional at n = 2** and is not "the project's best
+   model" until reseeded.
+4. **Six open decisions** — #2, #4, #6, #9, #10, #11 — carried forward unedited.
+   **Phase 4 ruled none of them**, and `EXP_025` deliberately **engaged** none:
+   its gate G5 read the frozen recipe back out of all twelve `config.json`s.
+5. **Two pre-registered experiments that did not run.** `EXP_019` (regional
+   census; ~0.7 GPU-h, **trains nothing**) and `EXP_024` (feedforward gated decay;
+   **not built**, its §8 item 1 R10 tax unresolved and its case weakened by §8's
+   rev-15 note). Both carry forward as written.
+6. **One missing Phase-5 deliverable already visible**: `docs/math_spec.md` does
+   not exist. `scripts/evaluate.py` and `README.md` do.
+
+### 23.5 What this section does not do
+
+It rules no open decision, adopts no arm, ranks no candidate, authorises no
+phase, and edits no row of §8. **It does not tick its own last box.** It records
+that the deliverables are complete except for the ranked list, that two gates
+fail and why, and that the hours are spent — which is the state a human gate
+exists to be reviewed in.
+
+---
+
+## 24. Changelog
 
 | Rev | Change |
 |---|---|
+| 17 | 2026-08-22. **§23, the exit criteria Phase 4 never had. No experiment folds in.** (a) **§23 added, pushing the changelog §23 → §24** — the same insertion slip every revision since 3 records for its own. (b) `CONTRIBUTING.md` §1 makes documenting exit criteria a precondition of the human gate, and **phases 1, 2 and 3 each carry such a section while Phase 4 did not**. (c) **19 experiments closed; ~29.7 of ~30 GPU-hours spent; 6 of 14 ranked candidates closed.** The ranked list is the one criterion the phase does not meet and the box is left **unticked**. (d) **12 of the 19 closed experiments close no ranked candidate at all**, each saying so in its own section, and they consumed most of the hours — §23.3 makes the case that they were not a detour, since three of them found the adopted arm does not train at width, proved why, and fixed it. (e) **Two gates fail and are recorded rather than repaired**: `EXP_020`/`EXP_021` UNVERIFIED with a resolver-ordering entry condition no later commit can supply, and `scripts/audit/10_candidate_spec.py` at **1 of 121 checks failing** because it assumes every §7.2-screened arm is a Phase-3 candidate — a premise that expired when Phase 4 screened `EXP_018`'s deliberately non-candidate dopamine arms. **The regenerated artifact is committed showing `passed: false`**, because an artifact claiming otherwise is the one outcome this project cannot have; rescoping the check is Phase 5's. (f) **Gates that pass, re-run on this tree**: ruff clean, **747 tests** including the `cuda`-marked ones CI cannot run, mutation campaign **59/59** against commit `e1c14c7`, pre-registration audit **8/10** with **7/7** live files agreeing. (g) **§23.4 hands Phase 5 five things**, of which the load-bearing one is that **§22 removes decision #11's Phase-5 blocker in practice** — the detached arm trains 6/6 at 5.0M under the unchanged frozen recipe — while **whether the final run may use it stays decision #5's and is not ruled**. (h) Also handed on: **σ at 5.0M is 0.449× the transferred value**, so bars at width are ~2.2× tighter than the plan assumed; two pre-registered experiments that did not run (`EXP_019`, `EXP_024`); and `docs/math_spec.md`, a Phase-5 deliverable that does not exist. **No open decision is ruled, no arm adopted, no candidate ranked, no phase authorised, and no §8 row edited.** |
 | 16 | 2026-08-22. **`EXP_025` folds in as §22: the neuron buys reach, the width buys capacity, and the plain LIF stops reading at nine characters.** (a) **§22 added, pushing the changelog §22 → §23** — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10, 11, 12 (a), 13 (a) and 14 (a) each record for their own. (b) **H1 HELD at −0.13426 bpc, 79.4 se**, 95 % CI [−0.13914, −0.12939], on 3 seeds per cell — the first bar this project has put on the two-compartment advantage at 5.0M, against §16.3's `n = 1, no bar`. (c) **H5 FAILED, and the failure is the result.** Zero-context and within-reach carry **−18.6 %** of the gain against a pre-registered ≥ 50 %; beyond-horizon carries **+118.6 %**, and the arm **pays −0.02504 within the baseline's own reach**. The curves cross at **context 9**, worst −0.04305 at c = 5. (d) **The integer horizon agrees on 3 of 3 seeds**: `snn` 7 → 9 across 6.8× the parameters, `twocomp_detach` 48 → **61**. §8's rev-15 note flagged positive beyond-horizon readings on *losing* arms as compression-suspect and said the record could not adjudicate them; **this arm wins by 0.12182**, so the flag does not apply. (e) **From c = 11 to c = 127 the plain LIF at 5.0M improves +0.00032 bpc**, flat to sd 0.000156 over 116 characters, against the detached arm's **+0.09956** — **311×**. (f) **The 118.6 % share is a property of the CUT and is reported as one** (94.7 % at cut 9, 49.9 % at 16, **4.7 %** at the arm's own horizon of 61); the share is cut-dependent, the finding is not. (g) **With §13's S4, the pair is now explicit and measured on one tree: width buys per-step capacity and no reach; the neuron buys reach and pays capacity.** (h) **H4 measures σ above 735,437 parameters for the first time in this project** — **0.002070**, **0.449×** the transferred 0.00461 — so §13's S1 was **~122 σ** rather than 54.75 and **`EXP_014`'s conclusion is strengthened**; σ falls with width on the plain LIF (0.37×) and is flat on the detached arm (1.00×). (i) **H2 UNRESOLVED because its own guard fired**: DoD **+0.00286**, primary margin says FLAT, the measured-σ margin says UNRESOLVED, and §3.0's disagreement rule resolves it UNRESOLVED — **the measurement that makes H4 hold is what denies H2 its verdict**. (j) **H3 HELD, 6/6, 95 % CI [0.610, 1.000]**, and the pre-registration's stated cross-tree Fisher p of 0.0048 is **wrong — 7/210 = 0.0333**, computed forward rather than repaired. (k) **Four `d = 512` runs reproduce committed runs BIT-FOR-BIT**, which nothing predicted: the 24 `Config` fields added since `EXP_017` and `three_factor_loss` at `tf_kappa = 0` changed nothing, the mirror of §13.7's G1 *failure*. (l) **Three defects in the experiment's own instruments**, all decision #9's class, **the first of them reaching a COMMITTED log**; and **a fourth was caught by the tool rev 15 repaired** — appending §9 also rewrote a sentence above it and `live_file_agrees_above_results` read False until reverted. (m) **All twelve runs green on K1a, K1b, G3, G4, K3 and G5**; **G5 is the mechanical proof that decision #11 was never engaged**, at the exact width where the adopted `twocomp` arm diverges; **K1a carries zero exemptions**. (n) **12 runs, 0 divergences, ~5.17 GPU-h against ~5.1 projected — the cost model was right to 0.4 %**, the first Phase-4 estimate that was, and **zero lines were added to `src/`**. **No arm is adopted, no candidate ranked, no hyperparameter changed, no phase authorised, and no §8 row edited.** |
 | 15 | 2026-08-21. **No experiment folds in; four corrections, and the first of them corrects rev 14's own §8 note.** (a) **The pre-registration audit was reading one key, one filename and one placeholder, and it had no second route.** `scripts/exp/verify_prereg_hash.py` read `prereg_sha256_before` while `EXP_013`–`EXP_018` stamp `prereg_sha256_before_first_run`; it parsed `exp_007_008_run_manifest.json` into a nonexistent id `007`; it counted three **unstamped** manifests in the denominator of *stamped* pre-registrations; and its `PLACEHOLDERS` table omitted the variant used by `EXP_013` — the one log `CONTRIBUTING.md` §2 names as the exemplar, which states that recipe verbatim at its own `:424-431`. **A tool written to catch this class contained two instances of it, and that is recorded rather than quietly repaired.** (b) **A second route is added and it is the stronger one**: if any commit in a log's history holds bytes that hash to the stamp, the pre-registration verifies against **an object in the repository** rather than a guess about layout, and the earliest such commit is named. **The record reads 7/9, not 2/12** — correcting the three defects alone gives 2/9, so the denominator and the numerator moved for different reasons. The four newly commit-verified blobs are the **pre-registration commits themselves**, §9 empty in all six, so **no false positive is possible in that set**. (c) **`EXP_020` and `EXP_021` are unchanged and rev 14's finding stands**, now with a mechanical reason: one commit each, and it already carried §9. (d) **Every commit-verified row also reports `live_file_agrees_above_results`, and all six read `True`** — a matching blob proves the *stamp* is honest and says nothing about the file on disk, which is the guarantee §2 wants. That check needed one fix first: `EXP_022`'s `**Status: CLOSED …**` wraps over **six** lines, so a first-line-only filter reported five continuation lines as an edited hypothesis and **would have convicted a clean log**. (e) **`EXP_024` §4's prose generalises to "any arm" a band the same document scopes correctly to six**, and on the wider committed record that is false: `scripts/audit/11_beyond_horizon_census.py` reads **41 blocks across 12 artifacts under both spellings, zero GPU**, and of **24 primary arm-gain readings 7 sit outside ±0.0016**, three clearing H1's own 2σ bar. **The cleanest counterexamples are not the largest**: `tokenshift` reads **+0.00565 on an arm that WON**. (f) **Two of the three largest are arms that LOST**, so the census flags them `compression_suspect` — **and checks the flag rather than leaving it standing**: the horizon marker moves for both (`[9, 10, 9]` and `[9, 8, 9]` against `[7, 7, 7]`), while `if_binin` lost more and read **−0.00477**. **Two markers agreeing is two markers agreeing**; the integer horizon has no σ anywhere in this project, and **it is left unresolved**. (g) **`EXP_024` modulates layer 1, that layer's firing rate at init is 2.98e-07, and the screen's silence guard is an exact equality** — so it clears, and every layer-1 parameter is stamped `in_silent_layer: false`. **§2.6's PASS is not disturbed**: `02_baseline_report` §5.3 measures the escape by step 50 and §5.4 already ruled that a resolved diagnostic does not warrant changing an init. What is missing is any mention of it in §§2.2, 2.6 or 6. The screen's layer-0 `k_gate` entry is a **harness** property — `build_screen_model` grafts every candidate onto all layers — and the gate holding the arm to one modulated layer is **G2**, not G4. (h) **§8's `1.0117` is `EXP_002`'s kernels-per-timestep, identical to the N0 baseline's** (both `kernels = 259`), not a step-time ratio; N1's `ms_vs_baseline` is 0.972 but is a **median of three** with 7.3 % spread and overlapping ranges, so **the honest reading is parity** and the ~1.1 GPU-h survives either way. (i) **`EXP_024_gated_decay.md` is NOT edited** — it is committed at `aff0d49`, and a commit rather than a stamp is what fixes it; it has no run manifest yet, so `git diff` is the only check available for that log today. (j) **The §9 gate table is not re-run**, on revs 5's and 7's precedent: this revision closes no experiment, adopts nothing, and touches no code any row in it describes. **No §8 row is edited, no decision is ruled, no bar is proposed, widened or repaired, and corrections 3 and 4 were found only because the census in correction 2 was built and run. None of the four required a GPU.** |
 | 14 | 2026-08-20. **`EXP_022` and `EXP_023` fold in as §20 and §21: the cost of a binary input was a cost of its DENSITY, and the modulator that won §19 wins just as well when its signal is a constant.** (a) **§20 and §21 added**, pushing the changelog **§20 → §22** — the same insertion slip revs 3 (f), 4 (g), 6 (h), 8 (f), 9, 10, 11, 12 (a) and 13 (a) each record for their own. (b) **The masthead is corrected from Revision 12 to Revision 14**: rev 13 shipped a rev-13 changelog row, rev-13 status text and two new sections behind a masthead still reading *Revision 12, 2026-08-14*, and it is the only revision since 7 that added no masthead blockquote. Recorded rather than quietly fixed. (c) **A fully binary input code costs 0.00955 bpc at `q = 0.05` against 0.04569 at `q = 0.50`** — 79 % of §18's binarity cost recovered at **identical parameter count** and **0.97× wall-clock**, on 3/3 seeds, H2 at 2.8× its bar and H3 at 3.9×. (d) **82.8 % of that cost sits at zero context and all three sparse rungs recover at exactly that component**; what separates them is what they give back within reach (−0.0314 / −0.0163 / −0.0001), and no bar was pre-registered on that gradient. (e) **The winning code is LOSSY** — 39–42 of 205 characters share a code and 26–28 emit the all-zero one — and it beats the code that distinguishes every character. (f) **`EXP_022` §6 item 3's diagnostic fired**: realised densities are 0.50 / 0.14 / 0.025 / 0.013, not the 0.50 / 0.34 / 0.10 / 0.05 asked for, with a named mechanism (weight decay against a one-sided threshold). (g) **H6 UNRESOLVED**: the all-layer readout is worth its parameters (H5, −0.0216, t = −8.49) and **not** worth more than the same parameters spent on width — but §20.5 shows the two reach the same total by opposite routes, and the readout's **+0.0431 within reach is the largest such movement of the phase**. (h) **§19's headline REPLICATES out of sample** at −0.02535 on three fresh seeds, t = −8.45. (i) **And a four-rung ladder takes its mechanism away for the second time**: `nm_const`, whose driving signal is a constant, is worth −0.02975 against `nm_local`'s −0.02953 — H2 at **+0.00022**, forty-two times below the bar and pointing the wrong way — so §5's pre-written cell fires: *EXP_021's arm is a learned per-channel gain, and the time-variation is free*. (j) **H3 FAILED and refutes the positional-leak explanation**: `nm_pos` is 0.011 WORSE than `nm_const`, 0/3 seeds. (k) **H4 was priced at n = 6 and n = 6 halved it** — −0.00221 against the n = 3 estimate of −0.00577, still unresolved. (l) **H7 flat at 1.1176 across four rungs** against `EXP_018`'s 26, with `sd(DA)` spanning 0.000 to 0.2283 — the optimiser buys the form, not the signal. (m) **Nothing on either ladder reaches beyond the horizon.** (n) **A confound found by audit after both experiments ran**: every `localdopamine` run used `nm_b_init = -0.7` (init `sech²` = 0.004) against the −2.97 `EXP_021` §2.6 certifies (0.777). Pinned by a test verified to fail, recorded in §21.6, **not changed**, and the re-run referred at ~0.6 GPU-h. (o) **A protocol deviation recorded beneath §8**: §18's and §19's resolvers were never committed before their bpc was read; §20's and §21's were. (p) **A resolver defect caught BEFORE commit** — H4's post-hoc replacement had its sign inverted and would have announced a gain on a pure cost; fixed free, gated by four tests, three verified to fail against the original. (q) **No row of §8 is edited, no rank is applied, no arm is adopted and no open decision is ruled.** |
