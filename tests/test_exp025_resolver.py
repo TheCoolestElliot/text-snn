@@ -152,6 +152,47 @@ def test_tost_is_unresolved_without_a_usable_standard_error():
 
 
 # ---------------------------------------------------------------------------
+# non_beyond_share -- H5's statistic
+# ---------------------------------------------------------------------------
+
+def _dec(zero: float, within: float, beyond: float) -> dict:
+    """`010.decompose` is additive: total = zero + within + beyond."""
+    return {"total_gain_bpc": zero + within + beyond,
+            "zero_context_gain_bpc": zero,
+            "within_reach_gain_bpc": within,
+            "beyond_horizon_gain_bpc": beyond}
+
+
+def test_non_beyond_share_is_one_minus_the_beyond_share():
+    r = _resolver()
+    d = _dec(0.02, 0.03, 0.01)
+    assert math.isclose(r.non_beyond_share(d),
+                        1.0 - d["beyond_horizon_gain_bpc"] / d["total_gain_bpc"],
+                        abs_tol=1e-12)
+
+
+def test_non_beyond_share_survives_components_of_opposite_sign():
+    """`io_mall` is the standing case: -0.02348 at zero context buying +0.04310
+    within reach. The absolute-value version returns 3.393 -- a 339 % share --
+    and would clear H5's 50 % bar on sign disagreement alone."""
+    r = _resolver()
+    d = _dec(-0.02348, 0.04310, 0.0)
+    got = r.non_beyond_share(d)
+    assert math.isclose(got, 1.0, abs_tol=1e-9), got
+    assert got <= 1.0 + 1e-9, "a share above 1 is not a share"
+
+
+def test_non_beyond_share_falls_below_the_bar_when_the_gain_is_beyond_horizon():
+    r = _resolver()
+    assert r.non_beyond_share(_dec(0.001, 0.001, 0.02)) < 0.5
+
+
+def test_non_beyond_share_is_none_on_a_zero_total_rather_than_dividing():
+    r = _resolver()
+    assert r.non_beyond_share(_dec(0.0, 0.0, 0.0)) is None
+
+
+# ---------------------------------------------------------------------------
 # The bar must not fire a verdict on absent data
 # ---------------------------------------------------------------------------
 

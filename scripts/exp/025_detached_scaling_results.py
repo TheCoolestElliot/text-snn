@@ -131,6 +131,27 @@ def fisher_exact_one_sided(a: int, b: int, c: int, d: int) -> float:
                for k in range(a, hi + 1)) / denom if lo <= a <= hi else float("nan")
 
 
+def non_beyond_share(dec: dict) -> float | None:
+    """H5's statistic: what fraction of the gain is NOT beyond the horizon.
+
+    `010.decompose` is additive by construction -- `total = zero + within +
+    beyond` -- so the three shares sum to 1 and this is exactly
+    `1 - beyond_horizon_share`.  **It must be computed from the SIGNED shares.**
+    The first version of this took `(|zero| + |within|) / |total|`, which on an
+    `io_mall`-shaped decomposition (zero and within of opposite sign) returns
+    **3.393** -- a "share" of 339 %, and a bar that would clear its 50 %
+    threshold on any arm whose components merely disagreed with each other.
+
+    Module level SO IT CAN BE TESTED, for the same reason
+    `fisher_exact_one_sided` is: the wrong version was an inline expression
+    inside `resolve_h5`, where nothing could assert on it.
+    """
+    total = dec["total_gain_bpc"]
+    if not total:
+        return None
+    return (dec["zero_context_gain_bpc"] + dec["within_reach_gain_bpc"]) / total
+
+
 def wilson_ci(k: int, n: int, z: float = 1.959963985) -> list[float]:
     """Wilson score interval.  §3's H3 reports a rate with its interval and its
     denominator, per `CONTRIBUTING.md` §3; Wilson is used because it is closed
@@ -443,11 +464,8 @@ def resolve_h5(cells: dict) -> dict:
     ref = r010.absolute_curve(blob, "e25_snn_d1481")
     arm = r010.absolute_curve(blob, "e25_detach_d1481")
     dec = r010.decompose(ref, arm)
-    total = dec.get("total_gain_bpc") or dec.get("total")
-    zero = dec.get("zero_context_gain_bpc") or dec.get("zero_context")
-    within = dec.get("within_reach_gain_bpc") or dec.get("within_reach")
-    beyond = dec.get("beyond_horizon_gain_bpc") or dec.get("beyond_horizon")
-    share = (abs(zero) + abs(within)) / abs(total) if total else None
+    beyond = dec["beyond_horizon_gain_bpc"]
+    share = non_beyond_share(dec)
     return {
         "statement": ("the gain at d=1481 is NOT predominantly a beyond-horizon "
                       "gain: zero-context and within-reach together carry "
@@ -503,6 +521,25 @@ def main(argv: list[str] | None = None) -> int:
              "repaired_in_prereg": False,
              "handled": "margin read as §3.0's pre-declared 0.010648; BOTH "
                         "readings emitted and disagreement resolves UNRESOLVED"},
+        ],
+        "resolver_defects_fixed_in_this_file": [
+            {"bar": "H3", "defect": "returned FAILED against an empty tree -- a "
+                                    "run that had not happened was counted as a "
+                                    "divergence, firing a verdict on absent data",
+             "found": "before the driver ran; before any bpc existed"},
+            {"bar": "H5", "defect": "the non-beyond-horizon share was computed "
+                                    "from ABSOLUTE components, which returns "
+                                    "3.393 on an io_mall-shaped decomposition "
+                                    "and would clear the 50 % threshold on any "
+                                    "arm whose components merely disagreed in "
+                                    "sign; now computed from the signed shares, "
+                                    "which are additive and sum to 1",
+             "found": "after the d=512 rung's bpc was read and BEFORE H5 had "
+                      "ever fired -- H5's input artifact "
+                      "(exp_025_memory_horizon.json) needs d=1481 checkpoints "
+                      "that did not exist. Recorded rather than slipped in, "
+                      "because the resolver's entry condition is that it was "
+                      "committed before any bpc was read and this edit is after."},
         ],
         "cells": {f"{a}_d{d}": {"n": cells[(a, d)]["n"],
                                 "missing": cells[(a, d)]["missing"],

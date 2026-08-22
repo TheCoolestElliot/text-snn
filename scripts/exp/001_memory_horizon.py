@@ -120,6 +120,28 @@ ARMS: dict[str, str] = {
     "tf_neg_s0": "tf_neg", "tf_neg_s1": "tf_neg", "tf_neg_s2": "tf_neg",
     "tf_pos_s0": "tf_pos", "tf_pos_s1": "tf_pos", "tf_pos_s2": "tf_pos",
     "tf_roll_s0": "tf_roll", "tf_roll_s1": "tf_roll", "tf_roll_s2": "tf_roll",
+    # EXP_025's two-rung ladder. Registry entries and nothing else -- the
+    # statistic, the k-sweep and the F1 tolerance are untouched, which is
+    # EXP_005's failure mode K5.
+    #
+    # WIDTH IS PART OF THE ARM LABEL HERE, and that is the whole point: every
+    # other entry above is one architecture at one width, so pooling seeds
+    # under a bare arch name was safe. EXP_025 runs the SAME two arches at two
+    # widths, and `e25_snn_d512` and `e25_snn_d1481` differ by 6.8x in
+    # parameters. Registering them under one label would average the two rungs
+    # of the ladder into a number describing neither -- which is exactly the
+    # "other"-bucket failure this registry exists to prevent, arriving by a new
+    # route.
+    "e25_snn_d512_s0": "e25_snn_d512", "e25_snn_d512_s1": "e25_snn_d512",
+    "e25_snn_d512_s2": "e25_snn_d512",
+    "e25_detach_d512_s0": "e25_detach_d512",
+    "e25_detach_d512_s1": "e25_detach_d512",
+    "e25_detach_d512_s2": "e25_detach_d512",
+    "e25_snn_d1481_s0": "e25_snn_d1481", "e25_snn_d1481_s1": "e25_snn_d1481",
+    "e25_snn_d1481_s2": "e25_snn_d1481",
+    "e25_detach_d1481_s0": "e25_detach_d1481",
+    "e25_detach_d1481_s1": "e25_detach_d1481",
+    "e25_detach_d1481_s2": "e25_detach_d1481",
     "snn_beta0.5_s0": "snn_beta0.5",
     "snn_beta0.5_s1": "snn_beta0.5",
     "snn_beta0.5_s2": "snn_beta0.5",
