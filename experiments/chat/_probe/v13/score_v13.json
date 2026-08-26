@@ -1,0 +1,120 @@
+{
+ "round": "v13",
+ "not_a_research_artifact": true,
+ "prediction": {
+  "path": "docs\\chat\\PREDICTION_v13.md",
+  "sha256": "027542a63da7db72c029e01d4f19759d7050dc4cbad0052ba99b01925f8f3107",
+  "matches_stamp": true
+ },
+ "bar_transcription": {
+  "n_replicates": 4,
+  "mean": 1.173973533179101,
+  "sd_seed": 0.0008903263061425847,
+  "se_diff": 0.0012591115370843835,
+  "recomputed_ok": true
+ },
+ "P1": {
+  "bar": "P1 -- held-out weighted bpc, det minus ctl, negative is better",
+  "control_weighted": 1.1745947500032048,
+  "detached_weighted": 1.1781794100922127,
+  "delta": 0.0035846600890079294,
+  "delta_in_sd_seed": 4.026350768289261,
+  "delta_in_se": 2.84700189739332,
+  "bar_2sigma": 0.0025182,
+  "control_band": [
+   1.1721929,
+   1.1757542
+  ],
+  "control_in_band": true,
+  "verdict": "worse",
+  "steps": {
+   "chat-v13-ctl": 14000,
+   "chat-v13-det": 14000
+  },
+  "wall_clock_s": {
+   "chat-v13-ctl": 2385.89,
+   "chat-v13-det": 2322.25
+  },
+  "n_divergences": {
+   "chat-v13-ctl": 0,
+   "chat-v13-det": 0
+  },
+  "per_source": {
+   "alpaca": {
+    "ctl": 1.6658541105486158,
+    "det": 1.668859450044893,
+    "delta": 0.0030053394962772373
+   },
+   "dolly": {
+    "ctl": 1.9613133872065196,
+    "det": 1.9756315161663511,
+    "delta": 0.014318128959831533
+   },
+   "oasst1": {
+    "ctl": 1.8979998011293122,
+    "det": 1.890678385026982,
+    "delta": -0.00732141610233028
+   },
+   "persona": {
+    "ctl": 0.2266277734130167,
+    "det": 0.2333542155346872,
+    "delta": 0.006726442121670478
+   },
+   "soda": {
+    "ctl": 1.1936581889088764,
+    "det": 1.1967584886258276,
+    "delta": 0.003100299716951138
+   },
+   "stories_topic": {
+    "ctl": 1.043541933957473,
+    "det": 1.046354062411016,
+    "delta": 0.0028121284535429503
+   },
+   "tinystories": {
+    "ctl": 1.0533244547569915,
+    "det": 1.0548597109179025,
+    "delta": 0.0015352561609109916
+   },
+   "weighted": {
+    "ctl": 1.1745947500032048,
+    "det": 1.1781794100922127,
+    "delta": 0.0035846600890079294
+   }
+  }
+ },
+ "probes": {
+  "p2": {
+   "chat-v13-ctl": {
+    "t2_holds": true,
+    "max_abs_g_L0": 10.220231056213379,
+    "max_abs_g_over_lif_bound_L0": 19.947377806764692,
+    "max_abs_w_times_vs": 21340.38671875,
+    "layers_over_1": 4,
+    "n_layers": 4
+   },
+   "chat-v13-det": {
+    "t2_holds": true,
+    "max_abs_g_L0": 10.380159378051758,
+    "max_abs_g_over_lif_bound_L0": 20.259518563677673,
+    "max_abs_w_times_vs": 14636.5244140625,
+    "layers_over_1": 4,
+    "n_layers": 4
+   }
+  },
+  "p3": {
+   "chat-v13-ctl": {
+    "l0_tau_median": 2.681695,
+    "l0_frac_under_tau8": 0.888671875,
+    "l0_input_gain_median": 20.888946,
+    "pinned_all_layers": 111
+   },
+   "chat-v13-det": {
+    "l0_tau_median": 2.675574,
+    "l0_frac_under_tau8": 0.888671875,
+    "l0_input_gain_median": 20.986012,
+    "pinned_all_layers": 107
+   }
+  },
+  "p2_readable": true
+ }
+}

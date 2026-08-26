@@ -25,6 +25,17 @@ the corpus and one initialisation, and changes nothing about the architecture.
 holds that claim up: it loads a chat model's `state_dict` into a model built by
 `snn.model.build_model` and asserts the logits are bit-identical.
 
+Since 2026-08-22 there is one **opt-in, off-by-default** exception to "changes
+nothing about the architecture", and it is narrower than it sounds:
+`arch="twocomp_threshold_detach"` trains through `EXP_017`'s bounded gradient
+estimator. It changes the **backward only** — same compiled forward kernel, same
+state dict, no parameter added — so a checkpoint trained with it still satisfies
+the test above, which
+`test_a_detached_chat_checkpoint_still_loads_as_the_research_arm` asserts
+separately. Nothing shipped uses it. See
+[`GRADIENT_BOUND_NOTE.md`](GRADIENT_BOUND_NOTE.md), including its §2.2, which is
+the measurement arguing the arch is **not** urgent.
+
 ### It has no context window
 
 This is a recurrent network, so the conversation lives in `[B, 2d]` of membrane
@@ -432,10 +443,27 @@ docs/chat/QUALITY_v8.md    the echo partition, lambda after it, canned_rate, mem
 docs/chat/QUALITY_v10.md   the decoder made 7x cheaper, n 32->128, steering rejected
 docs/chat/QUALITY_v11.md   coverage is conditioning; 3x less memory, n->256; echo bug
 docs/chat/REGIONAL_NOTE.md where the slow channels are; order vs recency; a fixed defect
+docs/chat/WEIGHT_DECAY_NOTE.md  what the regulariser does to the slow pole
+docs/chat/GRADIENT_BOUND_NOTE.md  what the BACKWARD does to it: every checkpoint is
+                           outside EXP_016's bound, and the arm that bounds it
+docs/chat/PREDICTION_v13.md  the bounded-estimator round, bars fixed in advance
+docs/chat/QUALITY_v13.md   it costs 0.0036 bpc and buys nothing visible -- and the
+                           instrument defect caught before it was reported
 docs/chat/transcript.md    the demo battery's output
 scripts/chat/echo_holdout.py  the held-out paired comparison       (QUALITY_v8 §4)
 scripts/chat/compare_holdout.py  two POOLS, paired per (prompt,seed) (QUALITY_v10 §3)
 scripts/chat/regional_profile.py  per-layer tau and |w|, no GPU    (REGIONAL_NOTE §2)
+scripts/chat/reset_jacobian_probe.py  is the backward inside EXP_016's
+                              unbounded region                (GRADIENT_BOUND_NOTE §2)
+scripts/chat/slow_channel_census.py  realised firing rate, input gain and
+                              |w*vs| per tau bucket           (GRADIENT_BOUND_NOTE §4)
+scripts/chat/estimator_gradient_compare.py  one checkpoint, both estimators,
+                              same batch: does the gradient differ?
+                                                            (GRADIENT_BOUND_NOTE §2.2)
+scripts/chat/reproduce_eval.py  does this tree still compute a committed run's
+                              held-out bpc?                    (PREDICTION_v13 §1)
+scripts/chat/session13_driver.py  the v13 round's two arms
+scripts/chat/score_v13.py     fires v13's bars; re-derives them from evidence
 scripts/chat/permutation_probe.py order vs recency, no training    (REGIONAL_NOTE §3)
 scripts/chat/subject_frequency.py asked vs seen, per noun         (QUALITY_v11 §1)
 scripts/chat/lambda_dodge.py   does lambda still pay for itself   (QUALITY_v11 §3)

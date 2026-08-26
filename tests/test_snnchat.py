@@ -333,6 +333,219 @@ def test_chat_model_is_a_research_arm_unchanged():
 
 
 # --------------------------------------------------------------------------
+# the bounded-gradient arch (EXP_017's estimator, opt-in, off by default)
+# --------------------------------------------------------------------------
+
+
+def _off_the_nesting_point(model, seed: int = 7):
+    """Move every per-channel parameter away from the value that nests a
+    simpler arm, IN PLACE.
+
+    Written because the first version of these tests did not, and a mutant
+    escaped through the gap: `thr_log_init = 0.0` makes `exp(-thr_log)` exactly
+    1.0, so `threshold_gain` is the identity on a freshly built model and a
+    version of `TwoCompThresholdDetachCharLM._scan` that dropped the gain
+    entirely passed all of them. That is `CONTRIBUTING.md` §5's rule arriving in
+    person -- a numerical contract is only guarded where the quantity it
+    constrains is actually observed, and at the nesting point there is nothing
+    to observe. A trained checkpoint is nowhere near this point:
+    `scripts/chat/slow_channel_census.py` reads the shipped model's layer-0
+    input gain at a median of 20.9.
+    """
+    g = torch.Generator().manual_seed(seed)
+    with torch.no_grad():
+        for k in range(model.n_layers):
+            model.w[k].copy_(torch.rand(model.w[k].shape, generator=g) * 0.8 + 0.2)
+            model.beta_s_raw[k].copy_(
+                torch.randn(model.beta_s_raw[k].shape, generator=g) * 1.5 + 2.0)
+            if hasattr(model, "thr_log"):
+                model.thr_log[k].copy_(
+                    torch.randn(model.thr_log[k].shape, generator=g) * 0.7)
+    return model
+
+
+def test_the_helper_that_guards_these_tests_actually_moves_the_gain():
+    """The gate on the gate. If `_off_the_nesting_point` ever stops biting,
+    every test below silently weakens to the version that let a mutant through.
+    """
+    model = _off_the_nesting_point(build_chat_model(_tiny_cfg(spread_tau=True)))
+    with torch.no_grad():
+        for k in range(model.n_layers):
+            gain = model.input_gain(k)
+            assert float((gain - 1.0).abs().max()) > 0.1, "threshold gain is ~identity"
+        tau = 1.0 / (1.0 - model.slow_decay(0).flatten().double())
+        assert float(tau.max() / tau.min()) > 2.0, "slow poles are ~uniform"
+
+
+def test_the_default_arch_is_still_the_shipped_one():
+    """The detached estimator is opt-in. If this ever flips, every checkpoint
+    trained after it would have been trained through a different backward than
+    every checkpoint before it, silently."""
+    assert ChatConfig().arch == "twocomp_threshold"
+
+
+def test_chat_detach_forward_is_bitwise_the_shipped_arm():
+    """The single variable is the BACKWARD.
+
+    `snn.twocomp_detach` imports `twocomp_forward_kernel` from `snn.twocomp`
+    rather than re-declaring it, so under `eval()` the two arches are the same
+    network on the same weights. Asserted at `== 0.0`, not at a tolerance --
+    there is nothing here to fold, so there is no residual to allow for.
+    """
+    cfg = _tiny_cfg(spread_tau=True)
+    torch.manual_seed(0)
+    shipped = _off_the_nesting_point(build_chat_model(cfg))
+    detached = build_chat_model(_tiny_cfg(spread_tau=True,
+                                          arch="twocomp_threshold_detach"))
+    detached.load_state_dict(shipped.state_dict())   # raises on any mismatch
+    shipped.eval()
+    detached.eval()
+
+    idx = torch.randint(0, cfg.vocab_size, (3, 24))
+    with torch.no_grad():
+        a, sa, _ = shipped(idx, None)
+        b, sb, _ = detached(idx, None)
+    assert torch.equal(a, b)
+    for va, vb in zip(sa, sb):
+        assert torch.equal(va, vb)
+
+
+def test_a_detached_chat_checkpoint_still_loads_as_the_research_arm():
+    """Extends `test_chat_model_is_a_research_arm_unchanged` to the new arch.
+
+    A checkpoint trained through the detached estimator has a
+    `twocomp_threshold` state dict verbatim -- no extra key, no missing key, no
+    translation step -- so `snn.evaluate` scores it as the arm Phase 4 measured.
+    This is the property that keeps the new arch from forking the architecture,
+    and it is the reason the arch adds no parameter.
+    """
+    from snn.config import Config
+    from snn.model import build_model
+
+    cfg = _tiny_cfg(spread_tau=True, arch="twocomp_threshold_detach")
+    # Off the nesting point, so this asserts about a model that has actually
+    # trained rather than about one where every per-channel parameter is still
+    # at the value that makes it a simpler arm.
+    chat = _off_the_nesting_point(build_chat_model(cfg))
+    research = build_model(Config(
+        arch="twocomp_threshold", d_model=cfg.d_model, n_layers=cfg.n_layers,
+        vocab_size=cfg.vocab_size, device="cpu", beta=cfg.beta,
+        threshold=cfg.threshold, surrogate_alpha=cfg.surrogate_alpha,
+        w_init=cfg.w_init, thr_log_init=cfg.thr_log_init,
+    ))
+    research.load_state_dict(chat.state_dict())   # raises on any mismatch
+    idx = torch.randint(0, cfg.vocab_size, (2, 16))
+    chat.eval()
+    research.eval()
+    with torch.no_grad():
+        a, _, _ = chat(idx, None)
+        b, _, _ = research(idx, None)
+    assert torch.equal(a, b)
+
+
+def test_the_detached_arch_adds_no_parameter():
+    """`param_count`'s shared row is a claim, and this is the check on it."""
+    from snnchat.model import param_count
+
+    cfg = _tiny_cfg(spread_tau=True)
+    shipped = build_chat_model(cfg)
+    detached = build_chat_model(_tiny_cfg(spread_tau=True,
+                                          arch="twocomp_threshold_detach"))
+    a = {k: tuple(v.shape) for k, v in shipped.state_dict().items()}
+    b = {k: tuple(v.shape) for k, v in detached.state_dict().items()}
+    assert a == b
+    closed = param_count(cfg.vocab_size, cfg.d_model, cfg.n_layers,
+                         "twocomp_threshold_detach")
+    assert closed == sum(p.numel() for p in detached.parameters())
+    assert closed == param_count(cfg.vocab_size, cfg.d_model, cfg.n_layers,
+                                 "twocomp_threshold")
+
+
+def test_the_two_arches_disagree_on_the_gradient_and_only_there():
+    """The point of the arm, stated as a test that can fail.
+
+    Same weights, same input, same loss. The forward agrees bitwise (asserted
+    above); the gradient must NOT, or the arch is doing nothing. `w` is the
+    parameter `EXP_016` identified as the one whose product with the un-reset
+    slow compartment breaks the bound, so it is the one checked.
+    """
+    cfg = _tiny_cfg(spread_tau=True)
+    torch.manual_seed(0)
+    shipped = _off_the_nesting_point(build_chat_model(cfg))
+    detached = build_chat_model(_tiny_cfg(spread_tau=True,
+                                          arch="twocomp_threshold_detach"))
+    detached.load_state_dict(shipped.state_dict())
+
+    idx = torch.randint(0, cfg.vocab_size, (4, 48), generator=torch.Generator().manual_seed(1))
+    grads = []
+    for model in (shipped, detached):
+        model.zero_grad(set_to_none=True)
+        logits, _, _ = model(idx[:, :-1], None)
+        loss = torch.nn.functional.cross_entropy(
+            logits.reshape(-1, cfg.vocab_size), idx[:, 1:].reshape(-1))
+        loss.backward()
+        grads.append(torch.cat([model.w[k].grad.flatten()
+                                for k in range(model.n_layers)]).clone())
+
+    assert torch.isfinite(grads[0]).all() and torch.isfinite(grads[1]).all()
+    assert not torch.equal(grads[0], grads[1]), (
+        "the detached arch produced the identical gradient, so the reset term "
+        "it is supposed to drop was never in the backward")
+
+
+def test_every_arch_that_has_a_learned_threshold_exposes_it_the_same_way():
+    """The property the offline diagnostics key on, asserted where it lives.
+
+    `scripts/chat/reset_jacobian_probe.py` and `slow_channel_census.py` have to
+    apply `threshold_gain` before scanning, or they measure a current the model
+    never sees. Both selected the path with `cfg.arch == "twocomp_threshold"`,
+    an exact string match, so `twocomp_threshold_detach` silently fell through:
+    the first v13 probe reported its layer-0 input gain as exactly **1.00** and
+    2,628 pinned channels, against a true 20.99 and 107, and would have read as
+    "the bounded estimator moves the model out of the unbounded region" when
+    `max|w*vs|` came back 578 instead of 14,637.
+
+    The scripts now key on `hasattr(model, "thr_log")`. This test is what makes
+    that sound: any arch carrying a learned threshold must expose it under the
+    same names, and the gain must actually reach the forward. A new arch that
+    breaks either half fails here rather than in a diagnostic's output.
+    """
+    from snnchat.model import ARCHS
+
+    for arch in ARCHS:
+        model = build_chat_model(_tiny_cfg(spread_tau=True, arch=arch))
+        if not hasattr(model, "thr_log"):
+            continue                      # plain `twocomp` has no threshold
+        assert hasattr(model, "input_gain"), arch
+        _off_the_nesting_point(model)
+        with torch.no_grad():
+            assert float((model.input_gain(0) - 1.0).abs().max()) > 0.1, arch
+
+        # The gain must be LOAD-BEARING on this arch: move it, and the forward
+        # must move. This is the half the escaped mutant violated.
+        idx = torch.randint(0, model.vocab_size, (2, 24),
+                            generator=torch.Generator().manual_seed(3))
+        model.eval()
+        with torch.no_grad():
+            before, _, _ = model(idx, None)
+            for k in range(model.n_layers):
+                model.thr_log[k].add_(0.5)
+            after, _, _ = model(idx, None)
+        assert not torch.equal(before, after), (
+            f"{arch}: perturbing thr_log did not change the forward, so a "
+            f"diagnostic that skipped threshold_gain would look correct")
+
+
+def test_build_rejects_an_unknown_arch_and_names_the_ones_it_has():
+    from snnchat.model import ARCHS
+
+    with pytest.raises(ValueError) as e:
+        build_chat_model(_tiny_cfg(arch="snn"))
+    for name in ARCHS:
+        assert name in str(e.value)
+
+
+# --------------------------------------------------------------------------
 # generation
 # --------------------------------------------------------------------------
 

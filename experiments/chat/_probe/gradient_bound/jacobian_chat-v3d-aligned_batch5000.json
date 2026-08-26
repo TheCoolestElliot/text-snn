@@ -1,0 +1,179 @@
+{
+ "script": "scripts/chat/reset_jacobian_probe.py",
+ "not_a_research_artifact": true,
+ "question": "is the chat model's backward-through-time inside the region EXP_016 proved unbounded?",
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "result": {
+  "run": "chat-v3d-aligned",
+  "arch": "twocomp_threshold",
+  "checkpoint": "ckpt_best.pt",
+  "step_of_checkpoint": -1,
+  "batch_step": 5000,
+  "d_model": 1024,
+  "n_layers": 4,
+  "params": 4417637,
+  "seq_len": 256,
+  "batch_size": 160,
+  "lr": 0.0005,
+  "constants": {
+   "alpha": 2.0,
+   "thr": 1.0,
+   "beta_f": 0.5
+  },
+  "lif_closed_form_bound": 0.5123596271760303,
+  "layers": [
+   {
+    "max_abs_g": 9.780153274536133,
+    "n_sites": 41943040,
+    "frac_over": {
+     "1.0": 0.0004651069641113281,
+     "2.0": 5.7744979858398435e-05,
+     "10.0": 0.0,
+     "100.0": 0.0
+    },
+    "frac_over_lif_bound": 0.034195995330810545,
+    "n_over_1": 19508,
+    "quantiles_abs_g": {
+     "q0.5": 0.5623413251903491,
+     "q0.9": 0.5623413251903491,
+     "q0.99": 0.5623413251903491,
+     "q0.999": 0.7079457843841402,
+     "q0.9999": 1.7782794100389228
+    },
+    "max_chain_log10_gain": -74.34946927400081,
+    "n_chains_expanding": 0,
+    "max_window_log10_gain": 1.865176327966567,
+    "n_chains_with_expanding_window": 6403,
+    "longest_consecutive_over_1": 4,
+    "n_chains": 163840,
+    "max_abs_w_times_vs": 15391.787109375,
+    "layer": 0,
+    "max_abs_g_over_lif_bound": 19.088454194647124,
+    "slow_pole_tau": {
+     "min": 1.38,
+     "median": 2.67,
+     "max": 7928.74
+    },
+    "max_abs_w": 5.945497512817383
+   },
+   {
+    "max_abs_g": 4.321918487548828,
+    "n_sites": 41943040,
+    "frac_over": {
+     "1.0": 0.0017653942108154298,
+     "2.0": 6.375312805175781e-05,
+     "10.0": 0.0,
+     "100.0": 0.0
+    },
+    "frac_over_lif_bound": 0.2271944284439087,
+    "n_over_1": 74046,
+    "quantiles_abs_g": {
+     "q0.5": 0.5623413251903491,
+     "q0.9": 0.5623413251903491,
+     "q0.99": 0.5623413251903491,
+     "q0.999": 1.1220184543019653,
+     "q0.9999": 1.7782794100389228
+    },
+    "max_chain_log10_gain": -67.97945650742898,
+    "n_chains_expanding": 0,
+    "max_window_log10_gain": 1.0451335208620756,
+    "n_chains_with_expanding_window": 20754,
+    "longest_consecutive_over_1": 6,
+    "n_chains": 163840,
+    "max_abs_w_times_vs": 6305.05029296875,
+    "layer": 1,
+    "max_abs_g_over_lif_bound": 8.435322102504294,
+    "slow_pole_tau": {
+     "min": 1.08,
+     "median": 12.97,
+     "max": 3123.09
+    },
+    "max_abs_w": 4.888639450073242
+   },
+   {
+    "max_abs_g": 4.131623268127441,
+    "n_sites": 41943040,
+    "frac_over": {
+     "1.0": 0.0030780792236328124,
+     "2.0": 9.407997131347657e-05,
+     "10.0": 0.0,
+     "100.0": 0.0
+    },
+    "frac_over_lif_bound": 0.18678700923919678,
+    "n_over_1": 129104,
+    "quantiles_abs_g": {
+     "q0.5": 0.5623413251903491,
+     "q0.9": 0.5623413251903491,
+     "q0.99": 0.7079457843841402,
+     "q0.999": 1.4125375446227613,
+     "q0.9999": 1.7782794100389228
+    },
+    "max_chain_log10_gain": -71.20385569814768,
+    "n_chains_expanding": 0,
+    "max_window_log10_gain": 1.7056879976782744,
+    "n_chains_with_expanding_window": 27250,
+    "longest_consecutive_over_1": 7,
+    "n_chains": 163840,
+    "max_abs_w_times_vs": 1081.0595703125,
+    "layer": 2,
+    "max_abs_g_over_lif_bound": 8.06391262890811,
+    "slow_pole_tau": {
+     "min": 1.09,
+     "median": 9.75,
+     "max": 428.25
+    },
+    "max_abs_w": 4.3733625411987305
+   },
+   {
+    "max_abs_g": 3.0975735187530518,
+    "n_sites": 41943040,
+    "frac_over": {
+     "1.0": 0.00037319660186767577,
+     "2.0": 3.6001205444335937e-06,
+     "10.0": 0.0,
+     "100.0": 0.0
+    },
+    "frac_over_lif_bound": 0.12891957759857178,
+    "n_over_1": 15653,
+    "quantiles_abs_g": {
+     "q0.5": 0.5623413251903491,
+     "q0.9": 0.5623413251903491,
+     "q0.99": 0.5623413251903491,
+     "q0.999": 0.8912509381337513,
+     "q0.9999": 1.4125375446227613
+    },
+    "max_chain_log10_gain": -73.45525220367747,
+    "n_chains_expanding": 0,
+    "max_window_log10_gain": 1.3539661496453632,
+    "n_chains_with_expanding_window": 3313,
+    "longest_consecutive_over_1": 8,
+    "n_chains": 163840,
+    "max_abs_w_times_vs": 61.3463249206543,
+    "layer": 3,
+    "max_abs_g_over_lif_bound": 6.04570179704816,
+    "slow_pole_tau": {
+     "min": 1.01,
+     "median": 7.18,
+     "max": 339.26
+    },
+    "max_abs_w": 1.6550825834274292
+   }
+  ],
+  "t2_spikes_bitwise_equal": [
+   true,
+   true,
+   true,
+   true
+  ],
+  "t2_state_max_abs_diff": [
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "t2_holds": true,
+  "any_layer_exceeds_lif_bound": true,
+  "any_layer_exceeds_one": true
+ }
+}
