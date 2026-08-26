@@ -21,6 +21,12 @@ hyperparameters rather than architecture:
     This changes no function class, adds no parameter, and touches no forward
     pass: it is the value an existing parameter starts at.
 
+A third became available on 2026-08-22 and is **opt-in and off by default**:
+`arch="twocomp_threshold_detach"`, which trains the same network through
+`EXP_017`'s bounded gradient estimator. It is not a hyperparameter and it is not
+a new network either; see `TwoCompThresholdDetachCharLM` below, which states
+exactly what it changes and what it provably does not.
+
 WHY (2) IS THE INTERESTING ONE
 ------------------------------
 Phase 4 measured the model's memory horizon -- how far back context still helps
@@ -60,9 +66,17 @@ import torch
 import torch.nn as nn
 
 from snn.model import TwoCompartmentCharLM, TwoCompThresholdCharLM, count_params
+from snn.prescan import threshold_gain
+from snn.twocomp_detach import twocomp_detach_scan
 from snnchat.tokenizer import VOCAB_VERSION, ChatTokenizer
 
-__all__ = ["ChatConfig", "build_chat_model", "spread_slow_poles", "describe_model"]
+__all__ = ["ChatConfig", "build_chat_model", "spread_slow_poles", "describe_model",
+           "TwoCompThresholdDetachCharLM", "ARCHS"]
+
+#: Every `arch` string `build_chat_model` accepts. The single-pole arms are
+#: absent on purpose -- `EXP_014`/`EXP_015` measure their memory horizon at 7-8
+#: characters, which cannot hold a turn.
+ARCHS = ("twocomp_threshold", "twocomp", "twocomp_threshold_detach")
 
 
 @dataclass
@@ -220,6 +234,89 @@ def spread_slow_poles(
     return [float(tau_min), float(tau_max)]
 
 
+class TwoCompThresholdDetachCharLM(TwoCompThresholdCharLM):
+    """The chat arm, trained through `EXP_017`'s **bounded** gradient estimator.
+
+    NOT A RESEARCH ARM AND NOT PRE-REGISTERED. It lives here rather than in
+    `snn.model` because `snnchat` is outside the Phase-1..5 protocol
+    (`snnchat/__init__.py`) and because putting it in the research package would
+    add an `arch` value that no pre-registration has asked for. Nothing under
+    `snn/` is modified by this class: it imports `snn.twocomp_detach` and
+    `snn.prescan` and composes them, which is the one-way dependency this
+    package is allowed.
+
+    WHAT IT CHANGES, EXACTLY
+    ------------------------
+    One thing: the **backward**. `TwoCompThresholdCharLM._scan` calls
+    `snn.twocomp.twocomp_scan`; this calls `snn.twocomp_detach.twocomp_detach_scan`
+    on the identical arguments. The two share the same compiled *forward* kernel
+    -- `twocomp_forward_kernel` is imported by `snn.twocomp_detach`, not
+    re-declared -- so under `model.eval()` the two classes are the same network,
+    and `test_chat_detach_forward_is_bitwise_the_shipped_arm` asserts that at
+    `== 0.0` rather than at a tolerance.
+
+    It adds **no parameter**, no state variable, no function, no kernel, no
+    hand-written backward of its own, and no inference cost. A checkpoint trained
+    here has a `twocomp_threshold` state dict verbatim, so it loads into
+    `snn.model.build_model(arch="twocomp_threshold")` and evaluates bit-identically
+    -- the property `tests/test_snnchat.py::test_chat_model_is_a_research_arm_unchanged`
+    exists to protect, extended to this arch by
+    `test_a_detached_chat_checkpoint_still_loads_as_the_research_arm`.
+
+    WHY IT IS HERE
+    --------------
+    `EXP_016` proved the two-compartment backward-through-time has a per-step
+    multiplier `beta_f*dv` bounded by **nothing** once `|w*vs| > 1`, because the
+    spike test is on the mixed membrane `vf + w*vs` while the reset lands on `vf`
+    alone and `vs` is never reset. The plain LIF's same multiplier is provably
+    bounded by 0.5123596 at any width. `EXP_015` is the run that died of the
+    difference; `EXP_017` is the fix, and `EXP_025`'s H3 held at 6 of 6 runs
+    completing 20,000 steps with zero non-finite losses -- **3/3 at each of two
+    rungs**, 735 K and 5.0 M, under the unchanged frozen recipe, where the
+    undetached arm at 5.0 M diverges deterministically. Quoted that way rather
+    than as "6/6 at 5.0 M", which `04_phase4_interim.md` §23.4 compresses it to
+    and which reads as six runs at one width.
+
+    **The chat model is on the wrong side of that line, measured rather than
+    assumed.** `scripts/chat/reset_jacobian_probe.py` reads the multiplier off
+    the checkpoints already on disk, gated on the local scan reproducing the
+    committed one bitwise. On `chat-v3d-aligned/ckpt_best.pt` -- the checkpoint
+    `experiments/chat/SHIPPED` names -- every one of the four layers exceeds 1.0,
+    layer 0 reaches **9.776, i.e. 19.1x the plain LIF's hard ceiling**, and
+    `max|w*vs|` reaches **14,454** against a crossover at ~1. Five checkpoints
+    were probed (`chat-v2`, `chat-v3d-aligned`, `chat-v6-scratch`,
+    `chat-v6-inst-a-s1`, `chat-v12-rare`) and **all five are inside the region**,
+    at every layer.
+
+    Detaching the reset sends `d vf_out / d v` to zero, which removes `vf` from
+    both entries of the 2x2 per-step Jacobian, leaving `diag(beta_f*(1 - s),
+    beta_s)` -- diagonal, so no non-normal transient, and bounded by
+    `beta_f = 0.5`. That is stricter than the plain LIF's own ceiling and it does
+    not depend on `w`, on `vs`, or on width.
+
+    THE COST, AND IT IS NOT HIDDEN
+    -------------------------------
+    The gradient is **biased**: the pathway "firing now lowers my own future
+    membrane" is dropped from the backward. `EXP_017` H3 measured what that costs
+    in bpc at 735 K on the research corpus and `EXP_025` measured it at 5.0 M;
+    **neither figure transfers to this corpus at this size, and none is quoted
+    here.** Whether it costs anything on the chat model is unmeasured, which is
+    why this arch is opt-in and why `twocomp_threshold` remains the default.
+    """
+
+    def _scan(self, cur, v0, layer):
+        return twocomp_detach_scan(
+            threshold_gain(cur, self.thr_log[layer]),
+            v0,
+            self.w[layer],
+            self.slow_decay(layer),   # one kernel per layer, NOT per timestep
+            self.beta,                # beta_f: the baseline's fixed fast pole
+            self.threshold,
+            self.surrogate_alpha,
+            self.fused,
+        )
+
+
 def build_chat_model(cfg: ChatConfig) -> nn.Module:
     """Construct the arm named by `cfg.arch`, on `cfg.device`.
 
@@ -246,14 +343,21 @@ def build_chat_model(cfg: ChatConfig) -> nn.Module:
             beta_slow=cfg.beta_slow, w_init=cfg.w_init,
             thr_log_init=cfg.thr_log_init, **common
         )
+    elif cfg.arch == "twocomp_threshold_detach":
+        # Same network, same forward kernel, same state dict; the single
+        # difference is the gradient estimator. See the class docstring.
+        model = TwoCompThresholdDetachCharLM(
+            beta_slow=cfg.beta_slow, w_init=cfg.w_init,
+            thr_log_init=cfg.thr_log_init, **common
+        )
     elif cfg.arch == "twocomp":
         model = TwoCompartmentCharLM(
             beta_slow=cfg.beta_slow, w_init=cfg.w_init, **common
         )
     else:
         raise ValueError(
-            "snnchat supports 'twocomp_threshold' and 'twocomp'; the single-pole "
-            f"arms have a 7-character memory horizon and cannot hold a turn. Got {cfg.arch!r}"
+            f"snnchat supports {ARCHS}; the single-pole arms have a 7-character "
+            f"memory horizon and cannot hold a turn. Got {cfg.arch!r}"
         )
 
     if cfg.spread_tau:
@@ -302,7 +406,12 @@ def param_count(vocab_size: int, d_model: int, n_layers: int, arch: str) -> int:
         + d_model * vocab_size
         + vocab_size
     )
-    per_channel = {"twocomp": 2, "twocomp_threshold": 3}[arch]
+    # `twocomp_threshold_detach` shares its row with `twocomp_threshold` because
+    # it IS that parameterisation -- the detached estimator adds no parameter, so
+    # a closed form that gave it its own number would be describing a network
+    # that does not exist.
+    per_channel = {"twocomp": 2, "twocomp_threshold": 3,
+                   "twocomp_threshold_detach": 3}[arch]
     return base + per_channel * n_layers * d_model
 
 

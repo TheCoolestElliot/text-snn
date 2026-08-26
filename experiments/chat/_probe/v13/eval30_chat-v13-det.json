@@ -1,0 +1,29 @@
+{
+ "script": "scripts/chat/reproduce_eval.py",
+ "not_a_research_artifact": true,
+ "run": "chat-v13-det",
+ "checkpoint": "ckpt_best.pt",
+ "baseline_run": "chat-v3d-aligned",
+ "eval_batches_override": 30,
+ "committed": {
+  "alpaca": 1.6660379026748378,
+  "dolly": 1.9443344445881836,
+  "oasst1": 1.8700833937931003,
+  "persona": 0.22944459126017322,
+  "soda": 1.1948112867208713,
+  "stories_topic": 1.0452434404919475,
+  "tinystories": 1.0545297660240587,
+  "weighted": 1.1742902997363112
+ },
+ "this_tree": {
+  "alpaca": 1.668859450044893,
+  "dolly": 1.9756315161663511,
+  "oasst1": 1.890678385026982,
+  "persona": 0.2333542155346872,
+  "soda": 1.1970654098200166,
+  "stories_topic": 1.0469101434706425,
+  "tinystories": 1.0559460584412608,
+  "weighted": 1.1785609980320033
+ },
+ "worst_abs_residual": 0.031297071578167523
+}

@@ -1,0 +1,162 @@
+{
+ "script": "scripts/chat/estimator_gradient_compare.py",
+ "not_a_research_artifact": true,
+ "question": "at one checkpoint's weights, how much does the detached estimator change the gradient the optimiser receives?",
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "result": {
+  "run": "chat-v3d-aligned",
+  "checkpoint": "ckpt_best.pt",
+  "step_of_checkpoint": -1,
+  "d_model": 1024,
+  "n_layers": 4,
+  "seq_len": 256,
+  "batch_size": 160,
+  "batches": [
+   0,
+   1000,
+   5000,
+   13999
+  ],
+  "numerator": "twocomp_threshold",
+  "denominator": "twocomp_threshold_detach",
+  "per_arch": {
+   "twocomp_threshold": [
+    {
+     "batch": 0,
+     "loss": 0.6775598526000977,
+     "global_norm": 0.19588723993638768,
+     "max_abs": 0.018228618428111076,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.04369343430872042,
+     "w_max": 0.008067470043897629,
+     "beta_s_raw_norm": 0.002590467574117163,
+     "beta_s_raw_max": 0.0004551107995212078
+    },
+    {
+     "batch": 1000,
+     "loss": 0.668838381767273,
+     "global_norm": 0.2021475327538892,
+     "max_abs": 0.01333847176283598,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.046302176828903745,
+     "w_max": 0.008279400877654552,
+     "beta_s_raw_norm": 0.002731701662227688,
+     "beta_s_raw_max": 0.0005388425197452307
+    },
+    {
+     "batch": 5000,
+     "loss": 0.6560046076774597,
+     "global_norm": 0.19334254009780802,
+     "max_abs": 0.00887349434196949,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.045408975751626716,
+     "w_max": 0.00887349434196949,
+     "beta_s_raw_norm": 0.0026312264096766996,
+     "beta_s_raw_max": 0.0006287905853241682
+    },
+    {
+     "batch": 13999,
+     "loss": 0.6702346801757812,
+     "global_norm": 0.20420797496186816,
+     "max_abs": 0.010141974315047264,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.0461518421690761,
+     "w_max": 0.010141974315047264,
+     "beta_s_raw_norm": 0.002928399633655917,
+     "beta_s_raw_max": 0.0005014840862713754
+    }
+   ],
+   "twocomp_threshold_detach": [
+    {
+     "batch": 0,
+     "loss": 0.6775598526000977,
+     "global_norm": 0.21617419867570395,
+     "max_abs": 0.015994712710380554,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.04864214569135217,
+     "w_max": 0.011178309097886086,
+     "beta_s_raw_norm": 0.002759573627006446,
+     "beta_s_raw_max": 0.00045538629638031125
+    },
+    {
+     "batch": 1000,
+     "loss": 0.668838381767273,
+     "global_norm": 0.2242114917185343,
+     "max_abs": 0.024072734639048576,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.05103652993333513,
+     "w_max": 0.015141095966100693,
+     "beta_s_raw_norm": 0.002757558974464541,
+     "beta_s_raw_max": 0.0003098842571489513
+    },
+    {
+     "batch": 5000,
+     "loss": 0.6560046076774597,
+     "global_norm": 0.2144286206642964,
+     "max_abs": 0.01691165380179882,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.051773726227300525,
+     "w_max": 0.01691165380179882,
+     "beta_s_raw_norm": 0.0027145722314458292,
+     "beta_s_raw_max": 0.0005823301034979522
+    },
+    {
+     "batch": 13999,
+     "loss": 0.6702346801757812,
+     "global_norm": 0.2236794142301963,
+     "max_abs": 0.009831035509705544,
+     "n_nonfinite": 0,
+     "n_params_with_grad": 23,
+     "w_norm": 0.049062132493086226,
+     "w_max": 0.007727860007435083,
+     "beta_s_raw_norm": 0.0029216720649255404,
+     "beta_s_raw_max": 0.0004914148594252765
+    }
+   ]
+  },
+  "ratios": [
+   {
+    "batch": 0,
+    "loss_bitwise_equal": true,
+    "global_norm_ratio": 0.9061545787443859,
+    "max_abs_ratio": 1.1396652605257935,
+    "w_norm_ratio": 0.8982628888529571,
+    "beta_s_raw_max_ratio": 0.9993950260223172
+   },
+   {
+    "batch": 1000,
+    "loss_bitwise_equal": true,
+    "global_norm_ratio": 0.9015930950036082,
+    "max_abs_ratio": 0.554090424824421,
+    "w_norm_ratio": 0.9072359913455033,
+    "beta_s_raw_max_ratio": 1.738850900987289
+   },
+   {
+    "batch": 5000,
+    "loss_bitwise_equal": true,
+    "global_norm_ratio": 0.9016638707036213,
+    "max_abs_ratio": 0.5246970193432918,
+    "w_norm_ratio": 0.8770660151496369,
+    "beta_s_raw_max_ratio": 1.0797837541750568
+   },
+   {
+    "batch": 13999,
+    "loss_bitwise_equal": true,
+    "global_norm_ratio": 0.9129493461195789,
+    "max_abs_ratio": 1.0316282862608674,
+    "w_norm_ratio": 0.9406815363270188,
+    "beta_s_raw_max_ratio": 1.0204902775180122
+   }
+  ],
+  "loss_bitwise_equal_on_every_batch": true,
+  "any_nonfinite_gradient": false
+ }
+}

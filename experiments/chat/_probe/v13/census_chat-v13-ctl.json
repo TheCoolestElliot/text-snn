@@ -1,0 +1,501 @@
+{
+ "script": "scripts/chat/slow_channel_census.py",
+ "not_a_research_artifact": true,
+ "question": "what did the chat model do with the timescales spread_slow_poles gave it?",
+ "trains_nothing": true,
+ "adopts_nothing": true,
+ "result": {
+  "run": "chat-v13-ctl",
+  "arch": "twocomp_threshold",
+  "checkpoint": "ckpt_best.pt",
+  "step_of_checkpoint": -1,
+  "d_model": 1024,
+  "n_layers": 4,
+  "seq_len": 256,
+  "batch_size": 160,
+  "tau_init_requested": [
+   3.0,
+   600.0
+  ],
+  "beta_slow_init": 0.95,
+  "pinned_cut": 0.01,
+  "layers": [
+   {
+    "layer": 0,
+    "d": 1024,
+    "tau": {
+     "q0.01": 1.6361,
+     "q0.25": 2.252157,
+     "q0.5": 2.681695,
+     "q0.75": 3.804692,
+     "q0.99": 316.262179
+    },
+    "tau_max": 7724.3,
+    "firing_rate": {
+     "q0.01": 0.004921,
+     "q0.25": 0.111041,
+     "q0.5": 0.178162,
+     "q0.75": 0.295819,
+     "q0.99": 0.502155
+    },
+    "n_pinned": 12,
+    "frac_pinned": 0.0117,
+    "abs_w": {
+     "q0.01": 0.002081,
+     "q0.25": 0.051348,
+     "q0.5": 0.137965,
+     "q0.75": 0.763795,
+     "q0.99": 3.30283
+    },
+    "input_gain_exp_minus_thr_log": {
+     "q0.01": 0.454096,
+     "q0.25": 8.323626,
+     "q0.5": 20.888946,
+     "q0.75": 30.639122,
+     "q0.99": 72.437712
+    },
+    "mean_abs_cur_pre_gain": 0.3726,
+    "mean_abs_cur_post_gain": 8.6297,
+    "typical_abs_w_vs": {
+     "q0.01": 0.045984,
+     "q0.25": 0.767445,
+     "q0.5": 1.432247,
+     "q0.75": 2.87243,
+     "q0.99": 12.659932
+    },
+    "max_abs_vs": 5355.55,
+    "by_tau": [
+     {
+      "tau": "<2",
+      "n_channels": 71,
+      "frac_of_layer": 0.0693,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.19805,
+      "median_abs_w": 0.1103,
+      "median_input_gain": 30.4968,
+      "median_typical_drive": 1.9107,
+      "max_typical_drive": 11.56
+     },
+     {
+      "tau": "2-8",
+      "n_channels": 839,
+      "frac_of_layer": 0.8193,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.19597,
+      "median_abs_w": 0.1186,
+      "median_input_gain": 22.1723,
+      "median_typical_drive": 1.5529,
+      "max_typical_drive": 12.91
+     },
+     {
+      "tau": "8-32",
+      "n_channels": 59,
+      "frac_of_layer": 0.0576,
+      "n_pinned": 1,
+      "frac_pinned": 0.001,
+      "median_firing_rate": 0.08491,
+      "median_abs_w": 1.0284,
+      "median_input_gain": 0.8316,
+      "median_typical_drive": 0.6716,
+      "max_typical_drive": 2.12
+     },
+     {
+      "tau": "32-128",
+      "n_channels": 38,
+      "frac_of_layer": 0.0371,
+      "n_pinned": 2,
+      "frac_pinned": 0.002,
+      "median_firing_rate": 0.1281,
+      "median_abs_w": 0.5079,
+      "median_input_gain": 0.8075,
+      "median_typical_drive": 0.5991,
+      "max_typical_drive": 137.24
+     },
+     {
+      "tau": "128-512",
+      "n_channels": 8,
+      "frac_of_layer": 0.0078,
+      "n_pinned": 4,
+      "frac_pinned": 0.0039,
+      "median_firing_rate": 0.00767,
+      "median_abs_w": 1.1857,
+      "median_input_gain": 3.3135,
+      "median_typical_drive": 5.1687,
+      "max_typical_drive": 7362.77
+     },
+     {
+      "tau": ">512",
+      "n_channels": 9,
+      "frac_of_layer": 0.0088,
+      "n_pinned": 5,
+      "frac_pinned": 0.0049,
+      "median_firing_rate": 0.00408,
+      "median_abs_w": 1.4153,
+      "median_input_gain": 4.5182,
+      "median_typical_drive": 38.4724,
+      "max_typical_drive": 9715.07
+     }
+    ]
+   },
+   {
+    "layer": 1,
+    "d": 1024,
+    "tau": {
+     "q0.01": 1.689461,
+     "q0.25": 4.458513,
+     "q0.5": 13.102906,
+     "q0.75": 24.823153,
+     "q0.99": 381.697788
+    },
+    "tau_max": 3119.6,
+    "firing_rate": {
+     "q0.01": 0.000103,
+     "q0.25": 0.044702,
+     "q0.5": 0.100879,
+     "q0.75": 0.187518,
+     "q0.99": 0.395604
+    },
+    "n_pinned": 84,
+    "frac_pinned": 0.082,
+    "abs_w": {
+     "q0.01": 0.005249,
+     "q0.25": 0.024191,
+     "q0.5": 0.096596,
+     "q0.75": 0.434658,
+     "q0.99": 3.418498
+    },
+    "input_gain_exp_minus_thr_log": {
+     "q0.01": 0.406018,
+     "q0.25": 1.335153,
+     "q0.5": 3.135601,
+     "q0.75": 3.794041,
+     "q0.99": 5.788567
+    },
+    "mean_abs_cur_pre_gain": 0.6036,
+    "mean_abs_cur_post_gain": 1.6986,
+    "typical_abs_w_vs": {
+     "q0.01": 0.082602,
+     "q0.25": 0.439572,
+     "q0.5": 0.761753,
+     "q0.75": 1.271654,
+     "q0.99": 255.808581
+    },
+    "max_abs_vs": 4506.96,
+    "by_tau": [
+     {
+      "tau": "<2",
+      "n_channels": 23,
+      "frac_of_layer": 0.0225,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.19785,
+      "median_abs_w": 0.3953,
+      "median_input_gain": 2.3988,
+      "median_typical_drive": 0.6038,
+      "max_typical_drive": 3.9
+     },
+     {
+      "tau": "2-8",
+      "n_channels": 364,
+      "frac_of_layer": 0.3555,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.18506,
+      "median_abs_w": 0.3787,
+      "median_input_gain": 3.3253,
+      "median_typical_drive": 1.0531,
+      "max_typical_drive": 4.9
+     },
+     {
+      "tau": "8-32",
+      "n_channels": 436,
+      "frac_of_layer": 0.4258,
+      "n_pinned": 9,
+      "frac_pinned": 0.0088,
+      "median_firing_rate": 0.07234,
+      "median_abs_w": 0.0298,
+      "median_input_gain": 3.4395,
+      "median_typical_drive": 0.6012,
+      "max_typical_drive": 35.09
+     },
+     {
+      "tau": "32-128",
+      "n_channels": 150,
+      "frac_of_layer": 0.1465,
+      "n_pinned": 41,
+      "frac_pinned": 0.04,
+      "median_firing_rate": 0.06956,
+      "median_abs_w": 0.0252,
+      "median_input_gain": 2.1019,
+      "median_typical_drive": 0.3996,
+      "max_typical_drive": 290.07
+     },
+     {
+      "tau": "128-512",
+      "n_channels": 48,
+      "frac_of_layer": 0.0469,
+      "n_pinned": 33,
+      "frac_pinned": 0.0322,
+      "median_firing_rate": 0.00276,
+      "median_abs_w": 0.3632,
+      "median_input_gain": 1.3743,
+      "median_typical_drive": 31.7249,
+      "max_typical_drive": 2278.25
+     },
+     {
+      "tau": ">512",
+      "n_channels": 3,
+      "frac_of_layer": 0.0029,
+      "n_pinned": 1,
+      "frac_pinned": 0.001,
+      "median_firing_rate": 0.04807,
+      "median_abs_w": 0.0644,
+      "median_input_gain": 0.6221,
+      "median_typical_drive": 19.5747,
+      "max_typical_drive": 21.89
+     }
+    ]
+   },
+   {
+    "layer": 2,
+    "d": 1024,
+    "tau": {
+     "q0.01": 2.194694,
+     "q0.25": 4.292431,
+     "q0.5": 9.723958,
+     "q0.75": 34.734345,
+     "q0.99": 185.003302
+    },
+    "tau_max": 428.3,
+    "firing_rate": {
+     "q0.01": 0.00303,
+     "q0.25": 0.114624,
+     "q0.5": 0.164661,
+     "q0.75": 0.20824,
+     "q0.99": 0.415819
+    },
+    "n_pinned": 14,
+    "frac_pinned": 0.0137,
+    "abs_w": {
+     "q0.01": 0.001198,
+     "q0.25": 0.021266,
+     "q0.5": 0.204828,
+     "q0.75": 0.522315,
+     "q0.99": 3.318428
+    },
+    "input_gain_exp_minus_thr_log": {
+     "q0.01": 0.292772,
+     "q0.25": 1.345574,
+     "q0.5": 2.291507,
+     "q0.75": 2.662974,
+     "q0.99": 3.931513
+    },
+    "mean_abs_cur_pre_gain": 0.4329,
+    "mean_abs_cur_post_gain": 0.9443,
+    "typical_abs_w_vs": {
+     "q0.01": 0.011208,
+     "q0.25": 0.238649,
+     "q0.5": 0.623015,
+     "q0.75": 0.927105,
+     "q0.99": 18.892358
+    },
+    "max_abs_vs": 1687.68,
+    "by_tau": [
+     {
+      "tau": "<2",
+      "n_channels": 6,
+      "frac_of_layer": 0.0059,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.20007,
+      "median_abs_w": 0.2025,
+      "median_input_gain": 1.9121,
+      "median_typical_drive": 0.1923,
+      "max_typical_drive": 0.51
+     },
+     {
+      "tau": "2-8",
+      "n_channels": 473,
+      "frac_of_layer": 0.4619,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.1812,
+      "median_abs_w": 0.3524,
+      "median_input_gain": 2.1191,
+      "median_typical_drive": 0.7877,
+      "max_typical_drive": 2.88
+     },
+     {
+      "tau": "8-32",
+      "n_channels": 265,
+      "frac_of_layer": 0.2588,
+      "n_pinned": 2,
+      "frac_pinned": 0.002,
+      "median_firing_rate": 0.1302,
+      "median_abs_w": 0.0476,
+      "median_input_gain": 2.411,
+      "median_typical_drive": 0.458,
+      "max_typical_drive": 13.7
+     },
+     {
+      "tau": "32-128",
+      "n_channels": 232,
+      "frac_of_layer": 0.2266,
+      "n_pinned": 8,
+      "frac_pinned": 0.0078,
+      "median_firing_rate": 0.16538,
+      "median_abs_w": 0.0186,
+      "median_input_gain": 2.3495,
+      "median_typical_drive": 0.2635,
+      "max_typical_drive": 74.2
+     },
+     {
+      "tau": "128-512",
+      "n_channels": 48,
+      "frac_of_layer": 0.0469,
+      "n_pinned": 4,
+      "frac_pinned": 0.0039,
+      "median_firing_rate": 0.18035,
+      "median_abs_w": 0.0238,
+      "median_input_gain": 2.2119,
+      "median_typical_drive": 0.3144,
+      "max_typical_drive": 535.94
+     },
+     {
+      "tau": ">512",
+      "n_channels": 0,
+      "frac_of_layer": 0.0,
+      "n_pinned": 0,
+      "frac_pinned": null,
+      "median_firing_rate": null,
+      "median_abs_w": null,
+      "median_input_gain": null,
+      "median_typical_drive": null,
+      "max_typical_drive": null
+     }
+    ]
+   },
+   {
+    "layer": 3,
+    "d": 1024,
+    "tau": {
+     "q0.01": 1.278373,
+     "q0.25": 3.164463,
+     "q0.5": 7.196809,
+     "q0.75": 27.019684,
+     "q0.99": 157.413601
+    },
+    "tau_max": 342.8,
+    "firing_rate": {
+     "q0.01": 0.070468,
+     "q0.25": 0.156213,
+     "q0.5": 0.24812,
+     "q0.75": 0.405151,
+     "q0.99": 0.754503
+    },
+    "n_pinned": 1,
+    "frac_pinned": 0.001,
+    "abs_w": {
+     "q0.01": 0.000514,
+     "q0.25": 0.013386,
+     "q0.5": 0.082596,
+     "q0.75": 0.276523,
+     "q0.99": 1.200109
+    },
+    "input_gain_exp_minus_thr_log": {
+     "q0.01": 0.275205,
+     "q0.25": 1.331874,
+     "q0.5": 1.750268,
+     "q0.75": 2.006495,
+     "q0.99": 2.47548
+    },
+    "mean_abs_cur_pre_gain": 0.5848,
+    "mean_abs_cur_post_gain": 0.9895,
+    "typical_abs_w_vs": {
+     "q0.01": 0.004228,
+     "q0.25": 0.109122,
+     "q0.5": 0.307365,
+     "q0.75": 0.575549,
+     "q0.99": 1.688692
+    },
+    "max_abs_vs": 164.89,
+    "by_tau": [
+     {
+      "tau": "<2",
+      "n_channels": 83,
+      "frac_of_layer": 0.0811,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.40447,
+      "median_abs_w": 0.3121,
+      "median_input_gain": 1.4943,
+      "median_typical_drive": 0.4315,
+      "max_typical_drive": 1.04
+     },
+     {
+      "tau": "2-8",
+      "n_channels": 459,
+      "frac_of_layer": 0.4482,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.305,
+      "median_abs_w": 0.1446,
+      "median_input_gain": 1.6316,
+      "median_typical_drive": 0.3713,
+      "max_typical_drive": 2.61
+     },
+     {
+      "tau": "8-32",
+      "n_channels": 254,
+      "frac_of_layer": 0.248,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.22886,
+      "median_abs_w": 0.0644,
+      "median_input_gain": 1.7304,
+      "median_typical_drive": 0.3573,
+      "max_typical_drive": 2.69
+     },
+     {
+      "tau": "32-128",
+      "n_channels": 209,
+      "frac_of_layer": 0.2041,
+      "n_pinned": 0,
+      "frac_pinned": 0.0,
+      "median_firing_rate": 0.14907,
+      "median_abs_w": 0.0058,
+      "median_input_gain": 2.0105,
+      "median_typical_drive": 0.1019,
+      "max_typical_drive": 1.98
+     },
+     {
+      "tau": "128-512",
+      "n_channels": 19,
+      "frac_of_layer": 0.0186,
+      "n_pinned": 1,
+      "frac_pinned": 0.001,
+      "median_firing_rate": 0.18279,
+      "median_abs_w": 0.0125,
+      "median_input_gain": 1.8579,
+      "median_typical_drive": 0.3326,
+      "max_typical_drive": 36.85
+     },
+     {
+      "tau": ">512",
+      "n_channels": 0,
+      "frac_of_layer": 0.0,
+      "n_pinned": 0,
+      "frac_pinned": null,
+      "median_firing_rate": null,
+      "median_abs_w": null,
+      "median_input_gain": null,
+      "median_typical_drive": null,
+      "max_typical_drive": null
+     }
+    ]
+   }
+  ]
+ }
+}
