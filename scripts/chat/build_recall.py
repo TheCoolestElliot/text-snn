@@ -29,6 +29,14 @@ The manifest is MERGED and written atomically, as `build_topic_stories.py` does
 it; `snnchat.build_corpus.build_all` records what happened the one time it was
 replaced instead.
 
+What a crash leaves behind follows from the second refusal. The bins are written
+before the manifest entry, so a pack that dies in between leaves `recall.bin` /
+`recall.val.bin` that no manifest lists: `snnchat.data.ChatCorpus` loads only
+what the manifest names and ignores them, and a re-run refuses because the files
+exist. Delete the two orphans by hand and pack again. A death between the
+manifest's temporary file and its `os.replace` leaves the manifest intact and a
+stray `manifest.json.tmp`, which nothing reads.
+
 WHAT --hazard-steps MEASURES
 ----------------------------
 `snnchat.data.MixtureSampler._windows` draws ONE `align_frac` decision per batch
