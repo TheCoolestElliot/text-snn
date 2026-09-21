@@ -28,10 +28,11 @@ Two blocks, asking two different questions:
 
   F  every mutation of campaign `08` that can reach the whole-scan path, imported
      from `08` rather than retyped, checked against that neuron's own R10 gate
-     restricted to its `[wholescan]` parametrisation (`-k wholescan`). This is the
-     claim "functor mutations flow into both paths automatically" turned from a
-     sentence into an artifact: with the per-timestep path deselected entirely,
-     the mutation must still be caught, THROUGH the new kernels alone. Four of
+     with its `[jiterator]` parametrisation deselected (`-k "not jiterator"`).
+     This is the claim "functor mutations flow into both paths automatically"
+     turned from a sentence into an artifact: with the per-timestep path
+     deselected entirely, the mutation must still be caught, by the new kernels
+     or by a test that belongs to neither implementation. Four of
      `08`'s entries are excluded and recorded as such: they mutate the Python of
      the per-timestep autograd Functions, which the whole-scan path does not
      execute. Their whole-scan counterparts are W04 / W09 / W08.
@@ -42,6 +43,30 @@ Two blocks, asking two different questions:
      "are they right?" are different questions with different gates, and a
      campaign that scored F-mutations against the bitwise gate would report 55
      escapes that are not holes.
+
+THE FIRST RUN OF THIS CAMPAIGN FIRED 86/87, AND THAT RESULT IS KEPT
+-----------------------------------------------------------------
+Block F was first selected with `-k wholescan`. Under that rule F-M23 ("eager
+atan_grad loses its factor of 1/2") ESCAPED, and the artifact of that run is
+committed unedited as `audit_12_wholescan_mutations_run1_k_wholescan.json`.
+
+The escape was the selector's, not the gate's, and that was established from
+committed evidence rather than assumed. `audit_08_mutation_campaign.json` records
+M23 as caught by exactly one test, `test_surrogate_matches_analytic` -- the gate's
+PREMISE test, unparametrised and CPU-only, so its id contains no implementation
+name and `-k wholescan` deselected it (63 selected, 68 deselected, all 63 passed).
+And it is the only test that CAN catch M23: `snn.surrogate.atan_grad` is called
+nowhere in `src/` outside its own module -- the eager scan's backward is autograd
+through `atan_value`, the fused kernels use the `ATAN_CUDA_GRAD` text -- so no
+fused-vs-eager comparison on either path can see it.
+
+`-k wholescan` therefore asked a narrower question than the one block F states. It
+dropped the per-timestep parametrisation AND every test that belongs to neither
+path. `-k "not jiterator"` drops only the former, which is the stated question, and
+is the rule now. No test NAME in the three gates contains "jiterator", so the
+keyword matches parametrisation ids only. The whole campaign was re-run under the
+corrected rule -- one run, one rule, not one mutation patched in -- and any escape
+in THAT run is reported as it fires.
 
 Machinery is `08`'s, by import: the process guard, the clean-tree assertion, the
 `git checkout --` restore, the lock file, the exactly-once anchor check. The
@@ -215,7 +240,8 @@ def build_plan(wanted: set[str]) -> list[dict]:
         if mid in NOT_APPLICABLE:
             continue
         plan.append({"id": f"F-{mid}", "block": "F", "description": desc, "path": path,
-                     "find": find, "replace": repl, "gate_args": [gate, "-k", "wholescan"]})
+                     "find": find, "replace": repl,
+                     "gate_args": [gate, "-k", "not jiterator"]})
     return [p for p in plan if not wanted or p["id"] in wanted]
 
 
