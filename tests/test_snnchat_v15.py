@@ -327,6 +327,72 @@ def test_the_probe_runs_on_cpu_and_pairs_every_row(mp2, tiny_model):
     assert mp2.summarise(two)["n"] == 1
 
 
+def test_each_arms_flags_come_from_that_arms_reply_at_the_same_sampler_seed(mp2, monkeypatch):
+    """The one assignment that decides the DIRECTION of every McNemar test, and
+    the one argument that makes the two arms a pair. A parrot stands in for the
+    model: it replies with exactly what it was sent, so the told arm names the
+    value, the untold arm cannot, and nothing about the real sampler is needed
+    to see which reply each flag was computed from."""
+    calls = []
+
+    def parrot(model, tok, device, params, rp, turns, establishing, targets):
+        calls.append((params.seed, tuple(turns), tuple(establishing)))
+        return {"reply": " / ".join(turns), "acks": [{"on": "", "off": "", "on_hit": False,
+                                                      "off_hit": False}] * len(establishing)}
+
+    monkeypatch.setattr(mp2, "converse", parrot)
+    seeds = [mp2.SEED_BASE, mp2.SEED_BASE + 1, mp2.SEED_BASE + 2]
+    rows = mp2.run_stratum(None, None, "cpu", "S1", seeds=seeds, rp=None, distances=(0, 2))
+    assert len(rows) == 2 * len(mp2.S1_ITEMS) * len(seeds) and len(calls) == 2 * len(rows)
+    for i, r in enumerate(rows):
+        told_call, control_call = calls[2 * i], calls[2 * i + 1]
+        assert told_call[0] == control_call[0] == r["seed"]          # paired on the seed
+        assert told_call[1] == tuple(r["told_turns"]) and told_call[2] == (0,)
+        assert control_call[1] == tuple(r["control_turns"]) and control_call[2] == ()
+        assert r["told"] == " / ".join(r["told_turns"])
+        assert r["control"] == " / ".join(r["control_turns"])
+        assert r["told_flags"]["hit"] and not r["control_flags"]["hit"], r
+    s = mp2.summarise([r for r in rows if r["distance"] == 0])
+    assert s["discordant"] == {"control_only": 0, "told_only": s["n"]}
+    assert s["told"]["hit"]["k"] == s["n"] and s["control"]["hit"]["k"] == 0
+
+    # S4's control holds the same words in exchanged roles, so a hit cannot tell
+    # the arms apart there; the reply text and the recomputed flags can.
+    calls.clear()
+    for r in mp2.run_stratum(None, None, "cpu", "S4", seeds=seeds[:1], rp=None):
+        assert r["told"] == " / ".join(r["told_turns"]) != r["control"]
+        assert r["control"] == " / ".join(r["control_turns"])
+        for arm in ("told", "control"):
+            assert r[arm + "_flags"] == mp2.classify(r[arm], r["slot"], tuple(r["targets"]),
+                                                     other_values=tuple(r["other_values"]))
+    assert {c[0] for c in calls} == {seeds[0]}
+
+
+def test_the_shipped_decoder_pass_really_uses_the_shipped_n(mp2, monkeypatch, tmp_path):
+    """`--shipped-decoder` is the only thing separating the n=256 artifact from
+    the plain one, and the scorer files whatever it is handed under `n256`."""
+    seen = {}
+
+    def fake_run(model, tok, device, stratum, *, seeds, rp, max_new, distances, items):
+        seen[stratum] = (rp.n, tuple(distances))
+        return []
+
+    monkeypatch.setattr(mp2, "run_stratum", fake_run)
+    monkeypatch.setattr(mp2, "summarise", lambda rows: {"n": 0})
+    monkeypatch.setattr(mp2, "_print", lambda *a: None)
+    monkeypatch.setattr(mp2, "load_chat_checkpoint",
+                        lambda path, device: (torch.nn.Identity(), None, None))
+    for flag, n in ((["--shipped-decoder"], mp2.SHIPPED_N), ([], mp2.PLAIN_N)):
+        out = tmp_path / f"n{n}.json"
+        assert mp2.main(["--ckpt", str(tmp_path / "x.pt"), "--device", "cpu",
+                         "--out", str(out), "--strata", "S1", "S2", *flag]) == 0
+        art = json.loads(out.read_text(encoding="utf-8"))
+        assert art["decoder"]["n"] == n == seen["S1"][0]
+        assert art["decoder"]["shipped_decoder"] is bool(flag)
+        assert seen["S2"][1] == ((0,) if flag else mp2.DISTANCES["S2"])
+    assert (mp2.SHIPPED_N, mp2.PLAIN_N) == (256, 8)
+
+
 # --------------------------------------------------------------------------
 # the binding probe
 # --------------------------------------------------------------------------
@@ -579,6 +645,24 @@ def test_a_missing_or_partial_artifact_is_never_a_pass(score):
     assert rolled["rolled_back"] and rolled["verdict"] == "ship-candidate"   # reported, not replaced
 
 
+def test_the_n256_column_is_only_filled_from_an_n256_artifact(score):
+    """Reported, not gated -- but a column headed "n256" that holds the plain
+    n=8 pass a second time is a wrong number with a decoder's name on it."""
+    run = score.RUNS[0]
+    cells = {"S1": {"0": _cell(told=11)}, "S2": {"0": _cell(told=44)}}
+    shipped = {"complete": True, "decoder": {"n": 256, "shipped_decoder": True},
+               "summary": cells}
+    got = score.score_seed(run, _artifacts(score, run, v2_shipped=shipped))["reported"]
+    assert got["n256_pass"] == {"S1_d0": score.fmt(11, 80), "S2_d0": score.fmt(44, 80)}
+
+    plain = {**shipped, "decoder": {"n": 8, "shipped_decoder": False}}
+    got = score.score_seed(run, _artifacts(score, run, v2_shipped=plain))["reported"]
+    assert list(got["n256_pass"]) == ["not_the_shipped_decoder"]
+    assert "n=8" in got["n256_pass"]["not_the_shipped_decoder"]
+    assert score.score_seed(run, _artifacts(score, run))["reported"]["n256_pass"] == {}
+    assert score.SHIPPED_DECODER_N == 256
+
+
 def test_both_seeds_must_clear_and_a_straddle_is_unresolved(score):
     o = score.overall
     assert o(["ship-candidate", "ship-candidate"]) == "ship-candidate"
@@ -701,12 +785,14 @@ def world(tmp_path, driver):
     return types.SimpleNamespace(chat=chat, data=data, out=out, argv=argv, tmp=tmp_path)
 
 
-def _fake_run(*, porcelain="", uncommitted=(), smi="", smi_rc=0):
-    """Stands in for `git` and `nvidia-smi`. Records what it was asked."""
+def _fake_run(*, porcelain="", code_porcelain="", uncommitted=(), smi="", smi_rc=0):
+    """Stands in for `git` and `nvidia-smi`. Records what it was asked, and how."""
     calls = []
+    kwargs = []
 
-    def run(cmd, **_kw):
+    def run(cmd, **kw):
         calls.append(cmd)
+        kwargs.append(kw)
 
         def done(out="", rc=0, err=""):
             return subprocess.CompletedProcess(cmd, rc, out, err)
@@ -714,7 +800,8 @@ def _fake_run(*, porcelain="", uncommitted=(), smi="", smi_rc=0):
         if cmd[0] == "nvidia-smi":
             return done(smi, smi_rc, "boom" if smi_rc else "")
         if cmd[:2] == ["git", "status"]:
-            return done(porcelain)
+            return done(code_porcelain if cmd[4:] == ["src/snnchat", "scripts/chat"]
+                        else porcelain)
         if cmd[:2] == ["git", "rev-parse"]:
             if cmd[2] == "HEAD":
                 return done("f" * 40 + "\n")
@@ -724,6 +811,7 @@ def _fake_run(*, porcelain="", uncommitted=(), smi="", smi_rc=0):
         raise AssertionError(f"unexpected command {cmd}")
 
     run.calls = calls
+    run.kwargs = kwargs
     return run
 
 
@@ -859,8 +947,9 @@ class _FakeChild:
     bad_exit: set = set()
     launched: list = []
 
-    def __init__(self, cmd, *, stdout, **_kw):
+    def __init__(self, cmd, *, stdout, **kw):
         type(self).launched.append(cmd)
+        type(self).kwargs = kw
 
         def arg(flag):
             return pathlib.Path(cmd[cmd.index(flag) + 1])
@@ -902,11 +991,13 @@ class _FakeChild:
         return self.rc
 
 
-def _execute(driver, world, *, run=None, fail=(), diverge=(), bad_exit=()):
+def _execute(driver, world, *, run=None, fail=(), diverge=(), bad_exit=(), **flags):
     _FakeChild.fail, _FakeChild.diverge, _FakeChild.launched = set(fail), set(diverge), []
     _FakeChild.bad_exit = set(bad_exit)
     args = types.SimpleNamespace(out_root=str(world.out), data_dir=str(world.data),
-                                 chat_root=str(world.chat), device="cpu", force=False)
+                                 chat_root=str(world.chat), device="cpu", force=False,
+                                 preflight_only=False, retrain_diverged=False)
+    vars(args).update(flags)
     plan = driver.build_plan(args, _REF_CFG)
     status = driver.Status(world.out / "status.json")
     rc = driver.execute(args, plan, _REF_CFG, status, run=run or _fake_run(), popen=_FakeChild)
@@ -1015,6 +1106,139 @@ def test_nothing_trains_past_a_refused_preflight_or_a_bad_smoke(driver, world, m
     assert rc == 2 and status["state"] == "FAILED"
     assert [pathlib.Path(c[2]).name for c in launched].count("train.py") == 1
     assert "recall" in status["stages"][-1]["error"]
+
+
+def test_a_run_without_its_best_checkpoint_is_not_complete(driver, tmp_path):
+    """Every probe loads `ckpt_best.pt`. A run skipped as complete on its
+    `summary.json` alone would fail all six of them an hour later."""
+    (tmp_path / "summary.json").write_text('{"steps": 14000}', encoding="utf-8")
+    assert not driver.complete(tmp_path, 14000)
+    (tmp_path / "ckpt_best.pt").write_bytes(b"")
+    assert driver.complete(tmp_path, 14000) and not driver.complete(tmp_path, 13999)
+    (tmp_path / "summary.json").write_text("{not json", encoding="utf-8")
+    assert not driver.complete(tmp_path, 14000)
+
+
+def test_no_child_is_given_a_console_window(driver, world):
+    """The driver runs detached, with no console; a console child of such a
+    parent gets a visible window of its own, and closing it kills the child."""
+    run = _fake_run()
+    rc, _status, launched = _execute(driver, world, run=run)
+    assert rc == 0 and launched
+    assert _FakeChild.kwargs["creationflags"] == driver._NO_WINDOW
+    assert {c[0] for c in run.calls} == {"git", "nvidia-smi"}
+    assert all(kw["creationflags"] == driver._NO_WINDOW for kw in run.kwargs)
+    if sys.platform == "win32":
+        assert driver._NO_WINDOW == subprocess.CREATE_NO_WINDOW != 0
+        # ... and a real child started this way still runs and is still captured.
+        r = subprocess.run([sys.executable, "-c", "print('alive')"], capture_output=True,
+                           text=True, creationflags=driver._NO_WINDOW)
+        assert (r.returncode, r.stdout.strip()) == (0, "alive")
+
+
+def test_preflight_only_runs_the_checks_in_the_foreground_and_nothing_else(driver, world,
+                                                                          monkeypatch, capsys):
+    rc, status, launched = _execute(driver, world, preflight_only=True)
+    assert rc == 0 and launched == []
+    assert [(s["stage"], s["result"]) for s in status["stages"]] == [("preflight", "ok")]
+    assert (world.out / "driver_record.json").exists()
+
+    refused = _fake_run(uncommitted=("docs/chat/PREDICTION_v15.md",))
+    rc, status, launched = _execute(driver, world, run=refused, preflight_only=True)
+    assert rc == 2 and launched == [] and status["state"] == "FAILED"
+    assert "PREDICTION_v15.md is not committed" in status["stages"][0]["error"]
+
+    # Through `main`: success must not read DONE, which is what a finished ROUND reads.
+    real = driver.execute
+    monkeypatch.setattr(driver, "execute", lambda args, plan, cfg, st: real(
+        args, plan, cfg, st, run=_fake_run(), popen=_FakeChild))
+    assert driver.main([*world.argv, "--preflight-only"]) == 0
+    blob = json.loads((world.out / "status.json").read_text(encoding="utf-8"))
+    assert blob["state"] == "PREFLIGHT_OK" and blob["finished"] is True
+    assert "PREFLIGHT_OK" in capsys.readouterr().out
+
+
+def test_preflight_refuses_modified_code_outside_the_pre_registration(driver):
+    assert driver.CODE_DIRS == ("src/snnchat", "scripts/chat")
+    with pytest.raises(driver.Refusal, match="HEAD does not describe"):
+        driver.check_prereg(_fake_run(code_porcelain=" M src/snnchat/data.py\n"))
+    with pytest.raises(driver.Refusal, match="train.py"):
+        driver.check_prereg(_fake_run(code_porcelain="M  scripts/chat/train.py\n"))
+    # An untracked file cannot be imported by tracked code that has not itself
+    # changed: recorded, not refused.
+    got = driver.check_prereg(_fake_run(code_porcelain="?? scripts/chat/scratch.py\n"))
+    assert got["untracked_code"] == ["?? scripts/chat/scratch.py"]
+    run = _fake_run()
+    assert driver.check_prereg(run)["untracked_code"] == []
+    assert run.calls[1] == ["git", "status", "--porcelain", "--", *driver.CODE_DIRS]
+
+
+def test_a_restart_keeps_what_the_attempt_before_it_reported(driver, world):
+    rc, first, _ = _execute(driver, world, fail={"chat-v15-recall-s0"},
+                            diverge={"chat-v15-recall-s0"})
+    assert rc == 1 and first["state"] == "FAILED" and first["previous"] == []
+    assert [a["state"] for a in first["alerts"]] == ["DIVERGED"]
+    head_then = json.loads((world.out / "driver_record.json")
+                           .read_text(encoding="utf-8"))["recorded"]
+
+    rc, second, _ = _execute(driver, world, fail={"chat-v15-recall-s0"},
+                             diverge={"chat-v15-recall-s0"})
+    assert len(second["previous"]) == 1
+    before = second["previous"][0]
+    assert before["state"] == "FAILED" and "previous" not in before
+    assert [a["state"] for a in before["alerts"]] == ["DIVERGED"]
+    rc, third, _ = _execute(driver, world, fail={"chat-v15-recall-s0"})
+    assert [p["started"] for p in third["previous"]] == [first["started"], second["started"]]
+    record = json.loads((world.out / "driver_record.json").read_text(encoding="utf-8"))
+    assert [h["head"] for h in record["history"]] == ["f" * 40] * 2
+    assert record["history"][0]["recorded"] == head_then
+
+
+def test_a_partial_run_that_diverged_is_not_silently_replaced(driver, world):
+    """The power rule: a rolled-back seed is reported and NOT replaced. The
+    recipe trains with `deterministic` off, so a re-train is a different seed."""
+    assert _REF_CFG["deterministic"] is False
+    rc, status, _ = _execute(driver, world, fail={"chat-v15-recall-s0"},
+                             diverge={"chat-v15-recall-s0"})
+    assert rc == 1
+    partial = world.out / "runs" / "chat-v15-recall-s0"
+    assert (partial / "ckpt_last.pt").read_bytes() == b"partial"
+
+    # Restarted with a trainer that would now succeed: the seed must stay failed.
+    rc, status, launched = _execute(driver, world)
+    results = {s["stage"]: s for s in status["stages"]}
+    assert rc == 1 and status["state"] == "FAILED"
+    assert "replace a failed seed" in results["train:chat-v15-recall-s0"]["error"]
+    assert (partial / "ckpt_last.pt").read_bytes() == b"partial"          # left as it was
+    assert results["score:chat-v15-recall-s0"]["result"] == "skipped"
+    assert results["train:chat-v15-recall-s1"]["result"] == "skipped-complete"
+    assert not any("chat-v15-recall-s0" in c for c in launched if c[2].endswith("train.py"))
+
+    # The override exists, and says what it did.
+    rc, status, launched = _execute(driver, world, retrain_diverged=True)
+    results = {s["stage"]: s for s in status["stages"]}
+    assert rc == 0 and results["train:chat-v15-recall-s0"]["result"] == "ok"
+    assert results["train:chat-v15-recall-s0"]["retrained_after_divergence"][0]["step"] == 700
+    assert any("--retrain-diverged" in a["message"] for a in status["alerts"])
+    # ... while a partial run that never diverged is still simply re-trained.
+    shutil.rmtree(world.out)
+    _execute(driver, world, fail={"chat-v15-recall-s1"})
+    rc, status, _ = _execute(driver, world)
+    assert rc == 0 and {s["result"] for s in status["stages"]} <= {"ok", "skipped-complete"}
+
+
+def test_a_plan_that_cannot_be_built_still_leaves_a_status_file(driver, world):
+    (world.chat / "SHIPPED").write_text("nowhere/ckpt_best.pt\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="cannot build the plan"):
+        driver.main(world.argv)
+    blob = json.loads((world.out / "status.json").read_text(encoding="utf-8"))
+    assert blob["state"] == "FAILED" and blob["finished"] is True
+    assert "nowhere" in blob["crash"]
+    # ... and a dry run still writes nothing at all.
+    shutil.rmtree(world.out)
+    with pytest.raises(SystemExit):
+        driver.main([*world.argv, "--dry-run"])
+    assert not world.out.exists()
 
 
 def test_a_changed_scorer_cannot_judge_a_checkpoint_that_predates_it(driver, world):

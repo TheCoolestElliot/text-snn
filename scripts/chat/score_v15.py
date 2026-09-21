@@ -121,6 +121,10 @@ COMMITTED_TOLD_MIN = 15.5
 COMMITTED_UNTOLD_MAX = 4.5
 #: (ii) S1 told at distance 0.
 S1_TOLD_MIN = 7.5
+#: The pool size `scripts/chat.py` ships with (`snnchat.rerank.DEFAULT_RERANK_N`),
+#: and so the one the `n256` artifacts must have been sampled at.
+SHIPPED_DECODER_N = 256
+
 #: HELDOUT selected at the shipped n=256 decoder: not resolved below this.
 HELDOUT_FLOOR = (60, 120)
 #: Battery, n=1 lambda=0 reading row.
@@ -493,10 +497,19 @@ def score_seed(run: str, art: dict) -> dict:
                     "control_categories": cell["control"]["category"],
                     "ack_echo": cell["ack_echo"],
                     "told_hit_by_ack": cell["told_hit_by_ack"]}
+    # Reported only -- but under a name that states a decoder, so the artifact's
+    # own header has to agree. `memory_probe_v2.py` run WITHOUT --shipped-decoder
+    # writes the same shape at n=8, and filing that here would print the plain
+    # pass twice and call one of them the shipped decoder.
     shipped = art.get("v2_shipped") or {}
-    rep["n256_pass"] = {
-        f"{s}_d0": fmt(c["0"]["told"]["hit"]["k"], c["0"]["n"])
-        for s, c in (shipped.get("summary") or {}).items() if "0" in c}
+    shipped_n = (shipped.get("decoder") or {}).get("n")
+    if shipped and shipped_n != SHIPPED_DECODER_N:
+        rep["n256_pass"] = {"not_the_shipped_decoder":
+                            f"artifact was sampled at n={shipped_n}, not {SHIPPED_DECODER_N}"}
+    else:
+        rep["n256_pass"] = {
+            f"{s}_d0": fmt(c["0"]["told"]["hit"]["k"], c["0"]["n"])
+            for s, c in (shipped.get("summary") or {}).items() if "0" in c}
     rep["binding"] = (art.get("binding") or {}).get("pooled")
     if com:
         rep["committed_d0"] = {"told": fmt(com["told"][0], LATTICE),
