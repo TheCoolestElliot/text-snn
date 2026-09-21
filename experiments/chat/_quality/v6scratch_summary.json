@@ -1,0 +1,368 @@
+{
+ "decoder": {
+  "n": 256,
+  "lam": 0.6,
+  "seeds": 6
+ },
+ "sets": {
+  "heldout": {
+   "v6_scratch": {
+    "selected": {
+     "k": 76,
+     "n": 120,
+     "rate": 0.6333,
+     "ci": [
+      0.5442,
+      0.7142
+     ],
+     "vs_incumbent_pooled": "above"
+    },
+    "oracle": {
+     "k": 82,
+     "n": 120,
+     "rate": 0.6833,
+     "ci": [
+      0.5955,
+      0.7598
+     ],
+     "vs_incumbent_pooled": "above"
+    },
+    "score_only": {
+     "k": 6,
+     "n": 120,
+     "rate": 0.05,
+     "ci": [
+      0.0231,
+      0.1048
+     ]
+    }
+   },
+   "incumbent_per_seed": {
+    "selected": [
+     60,
+     57,
+     59,
+     60
+    ],
+    "oracle": [
+     66,
+     64,
+     64,
+     67
+    ]
+   },
+   "incumbent_pooled": {
+    "selected": {
+     "k": 236,
+     "n": 480,
+     "rate": 0.4917,
+     "ci": [
+      0.4472,
+      0.5363
+     ]
+    },
+    "oracle": {
+     "k": 261,
+     "n": 480,
+     "rate": 0.5437,
+     "ci": [
+      0.499,
+      0.5878
+     ]
+    }
+   },
+   "shipped_checkpoint": {
+    "selected": {
+     "k": 60,
+     "n": 120,
+     "rate": 0.5,
+     "ci": [
+      0.4119,
+      0.5881
+     ]
+    },
+    "oracle": {
+     "k": 66,
+     "n": 120,
+     "rate": 0.55,
+     "ci": [
+      0.4608,
+      0.6361
+     ]
+    }
+   }
+  },
+  "fresh": {
+   "v6_scratch": {
+    "selected": {
+     "k": 26,
+     "n": 120,
+     "rate": 0.2167,
+     "ci": [
+      0.1524,
+      0.2985
+     ],
+     "vs_incumbent_pooled": "unresolved"
+    },
+    "oracle": {
+     "k": 28,
+     "n": 120,
+     "rate": 0.2333,
+     "ci": [
+      0.1667,
+      0.3166
+     ],
+     "vs_incumbent_pooled": "unresolved"
+    },
+    "score_only": {
+     "k": 0,
+     "n": 120,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.031
+     ]
+    }
+   },
+   "incumbent_per_seed": {
+    "selected": [
+     25,
+     20,
+     23,
+     24
+    ],
+    "oracle": [
+     25,
+     21,
+     25,
+     26
+    ]
+   },
+   "incumbent_pooled": {
+    "selected": {
+     "k": 92,
+     "n": 480,
+     "rate": 0.1917,
+     "ci": [
+      0.159,
+      0.2293
+     ]
+    },
+    "oracle": {
+     "k": 97,
+     "n": 480,
+     "rate": 0.2021,
+     "ci": [
+      0.1686,
+      0.2403
+     ]
+    }
+   },
+   "shipped_checkpoint": {
+    "selected": {
+     "k": 25,
+     "n": 120,
+     "rate": 0.2083,
+     "ci": [
+      0.1453,
+      0.2895
+     ]
+    },
+    "oracle": {
+     "k": 25,
+     "n": 120,
+     "rate": 0.2083,
+     "ci": [
+      0.1453,
+      0.2895
+     ]
+    }
+   }
+  },
+  "wide": {
+   "v6_scratch": {
+    "selected": {
+     "k": 125,
+     "n": 360,
+     "rate": 0.3472,
+     "ci": [
+      0.2999,
+      0.3978
+     ],
+     "vs_incumbent_pooled": "above"
+    },
+    "oracle": {
+     "k": 128,
+     "n": 360,
+     "rate": 0.3556,
+     "ci": [
+      0.3079,
+      0.4063
+     ],
+     "vs_incumbent_pooled": "above"
+    },
+    "score_only": {
+     "k": 0,
+     "n": 360,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.0106
+     ]
+    }
+   },
+   "incumbent_per_seed": {
+    "selected": [
+     69,
+     82,
+     65,
+     89
+    ],
+    "oracle": [
+     70,
+     87,
+     67,
+     91
+    ]
+   },
+   "incumbent_pooled": {
+    "selected": {
+     "k": 305,
+     "n": 1440,
+     "rate": 0.2118,
+     "ci": [
+      0.1915,
+      0.2337
+     ]
+    },
+    "oracle": {
+     "k": 315,
+     "n": 1440,
+     "rate": 0.2188,
+     "ci": [
+      0.1982,
+      0.2408
+     ]
+    }
+   },
+   "shipped_checkpoint": {
+    "selected": {
+     "k": 69,
+     "n": 360,
+     "rate": 0.1917,
+     "ci": [
+      0.1543,
+      0.2355
+     ]
+    },
+    "oracle": {
+     "k": 70,
+     "n": 360,
+     "rate": 0.1944,
+     "ci": [
+      0.1569,
+      0.2385
+     ]
+    }
+   }
+  }
+ },
+ "prestated_wide_oracle": {
+  "band": [
+   52,
+   106
+  ],
+  "of": 360,
+  "k": 128,
+  "verdict": "different-above"
+ },
+ "story_dodge": {
+  "v6_scratch": {
+   "k": 8,
+   "n": 72,
+   "rate": 0.1111,
+   "ci": [
+    0.0574,
+    0.2042
+   ]
+  },
+  "incumbent_per_seed": [
+   7,
+   8,
+   6,
+   7
+  ],
+  "incumbent_pooled": {
+   "k": 28,
+   "n": 288,
+   "rate": 0.0972,
+   "ci": [
+    0.0681,
+    0.1369
+   ]
+  },
+  "vs_incumbent_pooled": "unresolved"
+ },
+ "memory_probe": {
+  "0": {
+   "told": {
+    "k": 1,
+    "n": 80,
+    "rate": 0.0125,
+    "ci": [
+     0.0022,
+     0.0675
+    ]
+   },
+   "untold": {
+    "k": 1,
+    "n": 80,
+    "rate": 0.0125,
+    "ci": [
+     0.0022,
+     0.0675
+    ]
+   }
+  },
+  "1": {
+   "told": {
+    "k": 0,
+    "n": 80,
+    "rate": 0.0,
+    "ci": [
+     0.0,
+     0.0458
+    ]
+   },
+   "untold": {
+    "k": 1,
+    "n": 80,
+    "rate": 0.0125,
+    "ci": [
+     0.0022,
+     0.0675
+    ]
+   }
+  },
+  "2": {
+   "told": {
+    "k": 0,
+    "n": 80,
+    "rate": 0.0,
+    "ci": [
+     0.0,
+     0.0458
+    ]
+   },
+   "untold": {
+    "k": 0,
+    "n": 80,
+    "rate": 0.0,
+    "ci": [
+     0.0,
+     0.0458
+    ]
+   }
+  }
+ }
+}
