@@ -6,6 +6,8 @@ Pre-registered in `docs/chat/PREDICTION_v15.md`; scored by
 `experiments/chat/SHIPPED` and `build_corpus.DEFAULT_MIX` are edited under no
 outcome.
 
+    python scripts/chat/session15_driver.py --preflight-only \
+        --out-root <OUT_ROOT> --data-dir <PACKED CORPUS WITH recall>
     python scripts/launch.py --script scripts/chat/session15_driver.py \
         --run-name _v15_driver --out-dir <OUT_ROOT> \
         -- --out-root <OUT_ROOT> --data-dir <PACKED CORPUS WITH recall>
@@ -13,6 +15,14 @@ outcome.
 Everything this driver's own flags need goes AFTER the `--`. Its flags are
 deliberately not called `--out-dir` or `--run-name`: `launch.py` scans the
 forwarded arguments for those two to decide where ITS log goes.
+
+Run the first line before the second. `launch.py` prints a pid and exits 0
+whatever happens next, so a pre-flight refusal in the detached process looks,
+from the launching shell, exactly like a run that started: the chat-v15 review
+ran `check_prereg` while `PREDICTION_v15.md` was still unwritten and it refused,
+which detached would have cost a night. `--preflight-only` runs stage 0 in the
+foreground, prints the refusal, exits 2 on one, and leaves `status.json` at
+PREFLIGHT_OK (never DONE) on success.
 
 ONE VARIABLE
 ------------
@@ -43,7 +53,8 @@ STAGES, IN ORDER
    NAME: on this WDDM box `used_memory` reads N/A); the corpus has `recall` on
    disk and in the manifest; the pre-registration, the generator, both probes,
    the scorer and this file are COMMITTED and unmodified, with HEAD and each
-   file's blob recorded; the config gate above. On a restart, a recorded blob
+   file's blob recorded, and nothing else under `src/snnchat` or `scripts/chat`
+   is modified either; the config gate above. On a restart, a recorded blob
    that has changed while a v15 checkpoint exists is refused outright: the
    scorer must precede the checkpoints it scores.
 1. **floors** -- the committed probe, `memory_probe_v2` and the binding probe on
@@ -55,7 +66,11 @@ STAGES, IN ORDER
 3. **train** -- `chat-v15-recall-s0`, then `-s1`. Sequentially, never
    concurrently. A run whose `summary.json` records the full step count is
    skipped; a partial run directory is DELETED, never resumed, so no artifact
-   describes two runs at once.
+   describes two runs at once -- unless its log holds a divergence event, in
+   which case it is left alone and the seed is reported failed: the recipe
+   trains with `deterministic` off, so re-training it would be a new seed under
+   the old one's name, which the power rule forbids. `--retrain-diverged`
+   overrides and is recorded in the stage's status entry.
 4. **score** -- per checkpoint: committed probe, `memory_probe_v2` (n=8, all
    strata), its one n=256 pass at distance 0, the binding probe, the battery,
    HELDOUT at the shipped decoder. Each is cached on its artifact.
@@ -74,7 +89,16 @@ child runs: `state` is RUNNING, DONE, FAILED or DIVERGED, `finished` says
 whether the driver has exited, and each stage carries its start, finish, exit
 code, artifacts and error. A `divergence` event in a run's `log.jsonl` sets
 DIVERGED while the trainer is still rolling back, and a crash in this file
-writes FAILED with the traceback before it dies.
+writes FAILED with the traceback before it dies. A restart does not erase the
+attempt before it: the old file's contents move under `previous`.
+
+WHAT THE GPU CHECK CANNOT SEE
+-----------------------------
+It lists python processes that hold a compute context NOW. A session that owns
+the GPU for timed benchmarks and is between two of them holds none and is
+invisible: the chat-v15 review, and then the fix that followed it, each ran
+the check while exactly such a session was live, and both times it returned an
+empty list. Ask before launching; the check is a backstop, not a lock.
 
 `--dry-run` prints every command with every path resolved, and runs nothing.
 """
@@ -129,10 +153,23 @@ PREREGISTERED: tuple[str, ...] = (
 
 HEARTBEAT_S = 15.0
 
+#: Where the code that trains, samples and scores lives. `check_prereg` refuses
+#: an uncommitted modification anywhere under these, not only in PREREGISTERED.
+CODE_DIRS: tuple[str, ...] = ("src/snnchat", "scripts/chat")
+
 #: Nothing may train past a failure in one of these: a refused pre-flight, an
 #: instrument that cannot read the SHIPPED checkpoint, or a smoke run whose
 #: mixture is not the one that was asked for.
 _BLOCKING = frozenset({"preflight", "floors", "smoke"})
+
+#: `scripts/launch.py` starts this driver with DETACHED_PROCESS, so it has no
+#: console, and Windows gives a console child of a console-less parent a NEW,
+#: VISIBLE console window of its own. Closing such a window ends the child with
+#: STATUS_CONTROL_C_EXIT, which is the exit code `docs/chat/BUILD_NOTES.md`
+#: records for a session-7 child that died seven seconds in; whether that was
+#: the cause there is not known. Every child here is started without a window.
+#: Zero (no flag) where the platform has no such thing.
+_NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
 class Refusal(RuntimeError):
@@ -273,7 +310,7 @@ def gpu_python_processes(run=subprocess.run) -> list[tuple[int, str]]:
     """
     try:
         r = run(["nvidia-smi", "--query-compute-apps=pid,name", "--format=csv,noheader"],
-                capture_output=True, text=True, timeout=30)
+                capture_output=True, text=True, timeout=30, creationflags=_NO_WINDOW)
     except (OSError, subprocess.SubprocessError) as exc:
         raise Refusal(f"cannot ask nvidia-smi who holds the GPU: {exc}") from exc
     if r.returncode != 0:
@@ -316,7 +353,8 @@ def check_corpus(data_dir: Path, mix: dict) -> dict:
 
 
 def _git(args: list[str], run) -> subprocess.CompletedProcess:
-    return run(["git", *args], cwd=str(REPO), capture_output=True, text=True)
+    return run(["git", *args], cwd=str(REPO), capture_output=True, text=True,
+               creationflags=_NO_WINDOW)
 
 
 def check_prereg(run=subprocess.run) -> dict:
@@ -331,6 +369,18 @@ def check_prereg(run=subprocess.run) -> dict:
     if dirty.stdout.strip():
         raise Refusal("the pre-registration is not committed as it stands:\n"
                       + dirty.stdout.rstrip())
+    # The seven files above are the pre-registration; these two directories are
+    # everything that trains, samples and scores. A modified file in either is
+    # code the recorded HEAD does not describe. An UNTRACKED file is recorded
+    # and not refused: nothing tracked can import it without itself changing.
+    code = _git(["status", "--porcelain", "--", *CODE_DIRS], run)
+    if code.returncode != 0:
+        raise Refusal(f"git status failed: {code.stderr.strip()[:200]}")
+    lines = [ln for ln in code.stdout.splitlines() if ln.strip()]
+    modified = [ln for ln in lines if not ln.startswith("??")]
+    if modified:
+        raise Refusal(f"uncommitted changes under {' or '.join(CODE_DIRS)}; the run would "
+                      "train or score on code HEAD does not describe:\n" + "\n".join(modified))
     head = _git(["rev-parse", "HEAD"], run)
     if head.returncode != 0:
         raise Refusal(f"git rev-parse HEAD failed: {head.stderr.strip()[:200]}")
@@ -340,7 +390,7 @@ def check_prereg(run=subprocess.run) -> dict:
         if blob.returncode != 0 or not blob.stdout.strip():
             raise Refusal(f"{path} is not committed at HEAD")
         blobs[path] = blob.stdout.strip()
-    return {"head": head.stdout.strip(), "blobs": blobs}
+    return {"head": head.stdout.strip(), "blobs": blobs, "untracked_code": lines}
 
 
 def check_ordering(record_path: Path, prereg: dict, runs_root: Path) -> None:
@@ -433,7 +483,18 @@ class Status:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.data: dict = {"state": "RUNNING", "finished": False, "pid": os.getpid(),
-                           "started": _now(), "stage": None, "stages": [], "alerts": []}
+                           "started": _now(), "stage": None, "stages": [], "alerts": [],
+                           "previous": []}
+        # A restart must not erase what the attempt before it reported: a FAILED
+        # seed or a DIVERGED alert that vanishes from the file the lead polls is
+        # a failed seed quietly replaced. Oldest first; each without its own
+        # `previous`, which has been flattened into this one.
+        try:
+            old = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            old = None
+        if isinstance(old, dict):
+            self.data["previous"] = [*old.pop("previous", []), old]
 
     def write(self) -> None:
         self.data["updated"] = _now()
@@ -517,7 +578,7 @@ def run_child(cmd: list[str], stdout_path: Path, status: Status, *, watch: Path 
         fh.write(f"\n=== {_now()} === {' '.join(cmd)}\n")
         fh.flush()
         proc = popen(cmd, cwd=str(REPO), stdin=subprocess.DEVNULL, stdout=fh,
-                     stderr=subprocess.STDOUT)
+                     stderr=subprocess.STDOUT, creationflags=_NO_WINDOW)
         while True:
             try:
                 rc = proc.wait(timeout=HEARTBEAT_S)
@@ -575,7 +636,20 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
                 corpus = check_corpus(Path(args.data_dir), v15_mix(ref_cfg["mix"]))
                 first_train = next(s for s in plan if s["stage"].startswith("train:"))
                 recipe = check_recipe(ref_cfg, first_train["commands"][0][0])
+                # Rewritten on every restart, so the HEADs earlier pre-flights
+                # recorded -- one of which the checkpoints were trained under --
+                # are carried along instead of overwritten.
+                history: list = []
+                if record_path.exists():
+                    try:
+                        was = json.loads(record_path.read_text(encoding="utf-8"))
+                        history = [*was.get("history", []),
+                                   {"head": was.get("prereg", {}).get("head"),
+                                    "recorded": was.get("recorded")}]
+                    except ValueError:
+                        history = [{"head": None, "recorded": "unreadable driver_record.json"}]
                 record_path.write_text(json.dumps({
+                    "history": history,
                     "prereg": prereg, "corpus": corpus, "recipe_diff": recipe,
                     "reference": str(Path(args.chat_root) / REFERENCE_RUN / "config.json"),
                     "parent": str(Path(args.chat_root) / PARENT),
@@ -587,6 +661,9 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
                 log(f"  HEAD {prereg['head']}; config differs only in "
                     f"{sorted(recipe['differs'])}")
                 status.end(entry, "ok")
+                if getattr(args, "preflight_only", False):
+                    log("PREFLIGHT_OK (--preflight-only: nothing else was run)")
+                    return 0
                 continue
 
             if stage.startswith("score:") and run_name in failed_runs:
@@ -604,6 +681,22 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
                     status.end(entry, "skipped-complete")
                     continue
                 if run_dir.exists():
+                    # The pre-registered power rule: a rolled-back seed is
+                    # reported and NOT replaced. The reference recipe trains
+                    # with `deterministic` off, so re-training a partial run
+                    # that diverged draws a different trajectory -- a new seed
+                    # under the old one's name.
+                    events = divergences(run_dir / "log.jsonl")
+                    if events and stage != "smoke":
+                        if not getattr(args, "retrain_diverged", False):
+                            raise Refusal(
+                                f"{run_dir} is a partial run with {len(events)} divergence "
+                                "event(s); re-training it would replace a failed seed. It is "
+                                "left as it is. --retrain-diverged overrides, and is recorded.")
+                        entry["retrained_after_divergence"] = events
+                        status.alert("DIVERGED", f"{run_dir.name}: partial run with "
+                                                 f"{len(events)} divergence event(s) deleted "
+                                                 "and re-trained on --retrain-diverged")
                     log(f"  DELETE partial {run_dir}")
                     _safe_rmtree(run_dir, out_root)
             elif stage.startswith("score:"):
@@ -668,6 +761,13 @@ def main(argv: list[str] | None = None) -> int:
                     help="start even though another python process holds the GPU")
     ap.add_argument("--dry-run", action="store_true",
                     help="print every command with its paths resolved; run nothing")
+    ap.add_argument("--preflight-only", action="store_true",
+                    help="run the pre-flight checks in the FOREGROUND and stop: exit 0 if a "
+                         "detached launch would get past them, 2 with the refusal if not. "
+                         "scripts/launch.py returns 0 whatever this driver then does")
+    ap.add_argument("--retrain-diverged", action="store_true",
+                    help="delete and re-train a PARTIAL run whose log holds a divergence; "
+                         "without it such a run is left alone and its seed reported failed")
     args = ap.parse_args(argv)
     args.out_root = str(Path(args.out_root).resolve())
     args.data_dir = str(Path(args.data_dir).resolve())
@@ -677,9 +777,19 @@ def main(argv: list[str] | None = None) -> int:
     if Path(args.out_root).is_relative_to(main_tree):
         raise SystemExit(f"--out-root {args.out_root} is inside {main_tree}; this driver "
                          "writes nothing into the tree the checkpoints are read from")
-    ref_cfg = json.loads((Path(args.chat_root) / REFERENCE_RUN / "config.json")
-                         .read_text(encoding="utf-8"))
-    plan = build_plan(args, ref_cfg)
+    status = None if args.dry_run else Status(Path(args.out_root) / "status.json")
+    try:
+        ref_cfg = json.loads((Path(args.chat_root) / REFERENCE_RUN / "config.json")
+                             .read_text(encoding="utf-8"))
+        plan = build_plan(args, ref_cfg)
+    except (OSError, ValueError, Refusal) as exc:
+        # Before this existed a wrong --chat-root died with a traceback in a
+        # detached process and left no status.json at all for the lead to poll.
+        if status is not None:
+            status.data.update(state="FAILED", finished=True,
+                               crash=f"before the plan was built: {type(exc).__name__}: {exc}")
+            status.write()
+        raise SystemExit(f"cannot build the plan: {type(exc).__name__}: {exc}") from exc
 
     if args.dry_run:
         print(f"out-root  {args.out_root}\ndata-dir  {args.data_dir}\n"
@@ -694,7 +804,6 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  $ {' '.join(cmd)}\n      -> {artifact}")
         return 0
 
-    status = Status(Path(args.out_root) / "status.json")
     log(f"V15_START out-root {args.out_root}")
     try:
         rc = execute(args, plan, ref_cfg, status)
@@ -706,6 +815,8 @@ def main(argv: list[str] | None = None) -> int:
         raise
     if status.data["state"] == "RUNNING":
         status.data["state"] = "DONE" if rc == 0 else "FAILED"
+        if rc == 0 and args.preflight_only:
+            status.data["state"] = "PREFLIGHT_OK"      # nothing trained; never DONE
     status.data["finished"] = True
     status.data["stage"] = None
     status.write()
