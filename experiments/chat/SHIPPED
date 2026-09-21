@@ -1,4 +1,20 @@
-chat-v3d-aligned/ckpt_best.pt   # 2026-08-06 responsiveness round; see docs/chat/QUALITY.md
+chat-v6-scratch/ckpt_best.pt   # 2026-09-21, the owner's ruling; see docs/chat/V6_SCRATCH_NOTE.md
+# REPOINTED 2026-09-21 by Elliot's explicit "Yes" to the recommendation in
+# docs/chat/V6_SCRATCH_NOTE.md. Under the shipped n=256, lambda=0.6 decoder this
+# checkpoint's selected reply names the requested noun on 125/360 WIDE draws
+# [0.300, 0.398] against the previous ship's 69/360 [0.154, 0.236], and 76/120
+# against 60/120 on HELDOUT; the WIDE oracle 128/360 is outside the 52-106 band a
+# design panel fixed before any draw. FRESH is unresolved (26/120 vs 25/120), the
+# stories drift exactly as much, it remembers a told fact no better (1/80), and
+# it is the WORSE language model by bpc (weighted 1.2399 vs 1.1743). One training
+# seed: this is a ruling about this file, not about the from-scratch recipe.
+# Guards (story_dodge, social, identity, pool UER@200) were not resolved worse,
+# and were written after the topic result was seen -- the note says so.
+# To go back: restore the line below as the first line of this file.
+#
+# HISTORY. The ship from 2026-08-06 to 2026-09-21 was:
+# chat-v3d-aligned/ckpt_best.pt   # 2026-08-06 responsiveness round; see docs/chat/QUALITY.md
+# and every "this checkpoint" below refers to THAT file, not to the current ship.
 # Still the ship after the short-conversation round of the same day:
 # chat-v4a-short raised the window-coverage dose 3.4x and scored BELOW this
 # checkpoint on topic propensity (0.0723 vs 0.0908). See docs/chat/QUALITY_v4.md.
