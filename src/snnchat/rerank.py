@@ -79,6 +79,47 @@ selection changed had no topic hit under either rule -- the tier was decided by
 frame vocabulary. Over the whole run those sideways moves cost nothing (+9/-0 on
 the metric) but they are movement, not inertia.
 
+THE SUBJECT TIER, AND WHY THE WEIGHTED SUM STILL LETS THE FRAME WIN
+-------------------------------------------------------------------
+The tier above is the maximum over the pool of the weighted SUM over *all* the
+prompt's content words, and a sum can be won by two cheap words against one dear
+one. The weights are in the comment on `_FREQ_PATH`: for "tell me a story about
+a penguin" a draft that echoes `tell` (5.93) and `story` (5.20) carries 11.13
+and OUTRANKS a draft that echoes only `penguin` (10.34). The inverse document
+frequency separated the frame from the subject word by word; it did not stop the
+frame from adding up.
+
+Two consequences follow from the construction, neither of which needs a
+measurement to state. When the top tier holds one draft the anti-LM score
+decides nothing -- the tier has already decided -- so the reply is whichever
+draft happened to collect the most frame vocabulary, chosen with no regard to
+how well the model thinks it reads. And when no draft in the pool names the
+subject at all, a frame-word tier still forms and still hands the turn to a
+draft for saying "tell" and "story", which is evidence of nothing.
+
+`RerankParams.subject_tier` replaces the tier, for a turn whose subject is known,
+with a single question: does the returned text name the subject? If any draft
+does, those drafts are the tier and the score chooses among them. **If none
+does, the tier is the whole length-partitioned pool** -- not the frame-word tier
+-- so that the score chooses among everyone, which is what it would have done
+before the partition existed. The subject is supplied by the caller;
+`ChatSession` takes it from `snnchat.prime.prime_topic`, which returns None for
+anything that is not a "story about X" request, and None is the old rule.
+
+Off by default, and off nests the old behaviour exactly:
+`tests/test_snnchat.py::test_the_subject_tier_is_off_by_default_and_off_is_the_old_rule`.
+
+ONE FUNCTION DECIDES THE TIER, EVERYWHERE
+-----------------------------------------
+`echo_tier` is that function. It reads `.echo_weight` and `.subject_hit` off
+whatever it is handed and touches no tensor, so a replay script can call it on
+stand-in objects built from a stored pool. That is deliberate: a scorer that
+re-implements the partition by hand measures a selector that is only *believed*
+to be the shipped one, and the two drift the first time this file changes.
+`select` is everything `rerank` does after sampling, split out for the same
+reason -- one pool can be selected from twice, under two rules, without drawing
+it twice.
+
 WHAT IT CANNOT DO
 -----------------
 It selects among the replies the model would have produced anyway. If every one
@@ -131,6 +172,8 @@ __all__ = [
     "echo_weight",
     "word_weight",
     "steer_word",
+    "echo_tier",
+    "select",
     "rerank",
 ]
 
@@ -425,6 +468,32 @@ class RerankParams:
     #: the scored word is "paris") is the one battery column that is not
     #: circular, and it is a single arm at 28 draws.
     echo: bool = True
+    #: Build the echo tier from ONE question -- does the returned text name the
+    #: turn's subject? -- instead of from the weighted sum over every content
+    #: word of the prompt.
+    #:
+    #: THE DEFECT THIS IS AIMED AT
+    #: The tier is the pool's maximum of a SUM, and the request frame survives
+    #: `_FUNCTION_WORDS`, so two frame words can outweigh the subject. By the
+    #: weights quoted at `_FREQ_PATH`, a draft that echoes tell (5.93) + story
+    #: (5.20) = 11.13 OUTRANKS a draft that echoes only penguin (10.34). Two
+    #: things follow by construction. A top tier with one member is decided
+    #: before `score` is consulted, so the reply is the draft that collected the
+    #: most frame vocabulary and the anti-LM term -- the thing this module
+    #: exists for -- chose nothing. And when NO draft names the subject a
+    #: frame-word tier still forms, and hands the turn to a draft for having
+    #: said "tell" and "story".
+    #:
+    #: WHAT IT DOES INSTEAD
+    #: Drafts whose returned text names the subject are the tier. If there are
+    #: none the tier is the whole length-partitioned pool, NOT the frame-word
+    #: tier, so that `score` chooses among everyone. See `echo_tier`.
+    #:
+    #: False nests the old behaviour exactly -- not "a subject tier that matches
+    #: nothing", but the old code path. It also has no effect unless `echo` is
+    #: on and the caller passed a `subject`, so a prompt with no recognisable
+    #: subject is decided by the weighted tier as before.
+    subject_tier: bool = False
     #: Route the per-character forward through a captured CUDA graph. Pure
     #: speedup, asserted identical, and silently ignored where a graph cannot be
     #: captured -- see `snnchat.stepper`. Off is the old code path, kept because
@@ -461,6 +530,8 @@ class RerankParams:
         if self.temperature_spread > 0.0:
             out += f" spread={self.temperature_spread:g}"
         out += f" echo={'on' if self.echo else 'off'}"
+        if self.subject_tier:
+            out += " subject-tier"
         if self.steer_every:
             out += f" steer={self.steer_every}/{self.steer_frac:g}"
         return out
@@ -484,11 +555,26 @@ class Candidate:
     #: outside, so a candidate that was never scored reads 0.0 instead of
     #: raising on access.
     echo_weight: float = 0.0
+    #: Does the text this draft is RETURNED as name the turn's subject? Matched
+    #: by `echoes` on the same `final_ids` string the two fields above read, so
+    #: the three cannot disagree about which text was judged. False when no
+    #: subject was passed or the echo partition is off -- "not asked", exactly
+    #: as `echo` reads 0 -- and written whether or not
+    #: `RerankParams.subject_tier` is on, so a stored pool records what the
+    #: subject tier WOULD have seen under either rule.
+    subject_hit: bool = False
     #: False when the null-context pass was skipped because it could not change
     #: the winner. `logp_null` is then 0.0 because it was not measured, not
     #: because it was measured to be zero -- `fill_null_scores` is what turns
     #: one into the other, and `/candidates` calls it before displaying.
     null_scored: bool = True
+    #: The `RerankParams.null` that `logp_null` was measured under, or None if it
+    #: never was. Written by `_score_null` and by nothing else. `null_scored`
+    #: cannot serve: it defaults to True and is True at lambda = 0, so on a
+    #: candidate fresh from the sampler it says "measured" about a 0.0 nobody
+    #: measured. This is what lets `select` run twice on one pool and pay for
+    #: the null pass at most once per null context.
+    null_context: str | None = None
 
     @property
     def n_chars(self) -> int:
@@ -999,6 +1085,134 @@ def score_under_prefix(
     return (picked * mask).sum(dim=1).tolist()
 
 
+def echo_tier(pool, *, subject_tier: bool, has_subject: bool) -> list:
+    """The members of `pool` that `score` is allowed to choose between.
+
+    `pool` is the LENGTH-partitioned pool; this is the partition inside it. It
+    reads `.echo_weight` and `.subject_hit` and nothing else, and touches no
+    tensor, so it can be called on any stand-in object carrying those two
+    attributes -- a row of a stored pool, say.
+
+    ONE FUNCTION, BECAUSE A HAND COPY OF THIS IS A KNOWN HAZARD
+    -----------------------------------------------------------
+    `scripts/chat/echo_holdout.py` re-implements the weighted tier inline and
+    says of its own copy: "If this copy and `rerank` ever disagree, every number
+    in QUALITY_v8 describes a selector the REPL does not use." The tier now has
+    two rules and a fallback between them, which is more than a comment can keep
+    in step. `select` decides the tier by calling this and in no other way, so a
+    scorer that calls it too is measuring the REPL's selector by construction.
+
+    THE SUBJECT RULE (`subject_tier` and `has_subject`)
+    ---------------------------------------------------
+    The drafts with `subject_hit`. If there are none, `pool` UNCHANGED -- the
+    whole length-partitioned pool, and deliberately NOT the weighted tier below.
+    Falling back to the weighted tier would keep exactly the behaviour this rule
+    exists to remove: when nobody drafted the noun, the only nonzero weights in
+    the pool are frame words.
+
+    THE WEIGHTED RULE (otherwise)
+    -----------------------------
+    `best == 0` means no candidate echoed any content word, and then this is
+    the identity. Note that the frame counts as content ("tell", "story"), so
+    `best > 0` is NOT the same as "something on topic was drawn". Tiered on the
+    WEIGHTED sum, not the count: `Candidate.echo` is retained for `/candidates`
+    and for the artifacts, but it is not what decides.
+    """
+    if subject_tier and has_subject:
+        return [c for c in pool if c.subject_hit] or pool
+    best = max((c.echo_weight for c in pool), default=0.0)
+    if best > 0.0:
+        pool = [c for c in pool if c.echo_weight >= best - 1e-9]
+    return pool
+
+
+def select(
+    model,
+    cands: list[Candidate],
+    rp: RerankParams,
+    *,
+    device,
+    tok=None,
+    echo_words=None,
+    subject: str | None = None,
+) -> Candidate:
+    """Choose the winner among candidates that have ALREADY been drawn.
+
+    Everything `rerank` does after sampling: the echo annotation, the length
+    partition, `echo_tier`, the null pass if it can matter, the score. Split out
+    so that one pool can be selected from under two rules without being drawn
+    twice -- a paired comparison, with the draw removed as a source of variance.
+
+    SAFE TO CALL AGAIN ON THE SAME CANDIDATES WITH A DIFFERENT `rp`
+    ---------------------------------------------------------------
+    Nothing here trusts what an earlier call left behind. `echo`, `echo_weight`
+    and `subject_hit` are rewritten every call, and rewritten to their defaults
+    when this call's settings do not ask for them, so an `echo=False` pass over
+    a pool is not decided by the previous call's weights. `score` is recomputed.
+    `logp_null` is the one expensive field and is measured at most once per null
+    context -- see `Candidate.null_context`.
+
+    `model` is only used by the null pass, so it may be None at `rp.lam == 0`.
+
+    With fewer than two candidates there is nothing to select; `rerank` handles
+    that case itself and never gets here.
+    """
+    # `echo_words` alone is the condition this had before `subject` existed, so
+    # a caller that passes no subject annotates exactly when it used to.
+    annotate = bool(rp.echo and tok is not None and (echo_words or subject))
+    for c in cands:
+        if annotate:
+            # The text this draft BECOMES, not the draft. See `final_ids`.
+            text = tok.decode_visible(final_ids(c, tok, rp))
+            c.echo = echo_count(text, echo_words)
+            c.echo_weight = echo_weight(text, echo_words)
+            c.subject_hit = bool(subject) and echoes(subject, text.lower())
+        else:
+            c.echo, c.echo_weight, c.subject_hit = 0, 0.0, False
+
+    # The length guard is applied by PARTITION rather than by penalty: a reply
+    # of two characters is not a slightly worse reply, it is a different event
+    # (the model closing its turn immediately), and the mean-per-character score
+    # cannot compare the two. If every candidate is short, they are ranked among
+    # themselves rather than the turn being forced to produce text.
+    long_enough = [c for c in cands if c.n_chars >= rp.min_chars]
+    pool = long_enough or cands
+
+    # The echo partition is applied INSIDE the length partition, not before it.
+    # The other order would let a nine-character fragment that happens to name
+    # the topic beat a whole reply that also names it, which is the length
+    # pathology `min_chars` exists to prevent, reintroduced one level up. That
+    # holds for the subject rule exactly as for the weighted one.
+    pool = echo_tier(
+        pool, subject_tier=rp.subject_tier, has_subject=bool(annotate and subject)
+    )
+
+    # THE PARTITIONS ARE RESOLVED BEFORE THE NULL PASS, AND SOMETIMES INSTEAD OF IT
+    # -----------------------------------------------------------------------------
+    # `score` only ever decides between members of the surviving tier, so when
+    # the tier holds one candidate the anti-LM term cannot change the answer --
+    # and it is the second-largest cost in a turn, a teacher-forced pass over
+    # the full pool that runs the scan once per character all over again. Skipped
+    # rather than computed and discarded.
+    #
+    # This is an ordering change and not a behavioural one: the tier is built
+    # from lengths and echo weights, neither of which has ever read `score`.
+    # `test_skipping_the_null_pass_picks_the_same_winner` holds that.
+    decided = len(pool) == 1
+    if (rp.lam != 0.0 and not decided
+            and any(c.null_context != rp.null for c in cands)):
+        _score_null(model, cands, rp, device)
+    for c in cands:
+        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
+        # At lambda = 0 the term is not part of the score and was never measured
+        # before this change either, so there is nothing outstanding to fill.
+        # Otherwise the question is whether it HAS been measured, not whether
+        # this call measured it: an earlier `select` on the same pool may have.
+        c.null_scored = rp.lam == 0.0 or c.null_context == rp.null
+
+    return max(pool, key=lambda c: c.score)
+
+
 def rerank(
     model,
     logits: torch.Tensor,
@@ -1010,6 +1224,7 @@ def rerank(
     stop_ids=_STOP_IDS,
     tok=None,
     echo_words=None,
+    subject: str | None = None,
 ) -> tuple[Candidate, list[Candidate]]:
     """Draw `rp.n` candidates and return `(winner, all_candidates)`.
 
@@ -1021,6 +1236,12 @@ def rerank(
     the echo partition is skipped and the selection is exactly what it was
     before the partition existed, which is what makes every caller that has not
     been updated behave identically rather than subtly differently.
+
+    `subject` is the one word the turn is about, if the caller knows it, and is
+    optional in the same sense: None is the weighted tier, whatever
+    `rp.subject_tier` says. See `echo_tier`.
+
+    This is `sample_candidates` followed by `select`, and nothing else.
     """
     steer = None
     if rp.steer_every and echo_words and tok is not None:
@@ -1035,58 +1256,8 @@ def rerank(
         cands[0].score = cands[0].logp_cond / max(cands[0].n_chars, 1)
         return cands[0], cands
 
-    device = device or logits.device
-
-    if rp.echo and echo_words and tok is not None:
-        for c in cands:
-            # The text this draft BECOMES, not the draft. See `final_ids`.
-            text = tok.decode_visible(final_ids(c, tok, rp))
-            c.echo = echo_count(text, echo_words)
-            c.echo_weight = echo_weight(text, echo_words)
-
-    # The length guard is applied by PARTITION rather than by penalty: a reply
-    # of two characters is not a slightly worse reply, it is a different event
-    # (the model closing its turn immediately), and the mean-per-character score
-    # cannot compare the two. If every candidate is short, they are ranked among
-    # themselves rather than the turn being forced to produce text.
-    long_enough = [c for c in cands if c.n_chars >= rp.min_chars]
-    pool = long_enough or cands
-
-    # The echo partition is applied INSIDE the length partition, not before it.
-    # The other order would let a nine-character fragment that happens to name
-    # the topic beat a whole reply that also names it, which is the length
-    # pathology `min_chars` exists to prevent, reintroduced one level up.
-    #
-    # `best == 0` means no candidate echoed any content word, and then this line
-    # is the identity. Note that the frame counts as content ("tell", "story"),
-    # so `best > 0` is NOT the same as "something on topic was drawn".
-    # Tiered on the WEIGHTED sum, not the count. `c.echo` is retained for
-    # `/candidates` and for the artifacts, but it is not what decides.
-    best = max((c.echo_weight for c in pool), default=0.0)
-    if best > 0.0:
-        pool = [c for c in pool if c.echo_weight >= best - 1e-9]
-
-    # THE PARTITIONS ARE RESOLVED BEFORE THE NULL PASS, AND SOMETIMES INSTEAD OF IT
-    # -----------------------------------------------------------------------------
-    # `score` only ever decides between members of the surviving tier, so when
-    # the tier holds one candidate the anti-LM term cannot change the answer --
-    # and it is the second-largest cost in a turn, a teacher-forced pass over
-    # the full pool that runs the scan once per character all over again. Skipped
-    # rather than computed and discarded.
-    #
-    # This is an ordering change and not a behavioural one: the tier is built
-    # from lengths and echo weights, neither of which has ever read `score`.
-    # `test_skipping_the_null_pass_picks_the_same_winner` holds that.
-    decided = len(pool) == 1
-    if rp.lam != 0.0 and not decided:
-        _score_null(model, cands, rp, device)
-    for c in cands:
-        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
-        # At lambda = 0 the term is not part of the score and was never measured
-        # before this change either, so there is nothing outstanding to fill.
-        c.null_scored = rp.lam == 0.0 or not decided
-
-    winner = max(pool, key=lambda c: c.score)
+    winner = select(model, cands, rp, device=device or logits.device, tok=tok,
+                    echo_words=echo_words, subject=subject)
     return winner, cands
 
 
@@ -1097,6 +1268,7 @@ def _score_null(model, cands, rp: RerankParams, device) -> None:
     )
     for c, v in zip(cands, nulls):
         c.logp_null = float(v)
+        c.null_context = rp.null
 
 
 @torch.no_grad()

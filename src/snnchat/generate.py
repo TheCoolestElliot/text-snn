@@ -501,6 +501,7 @@ class ChatSession:
         """
         import dataclasses
 
+        from snnchat.prime import prime_topic
         from snnchat.rerank import final_ids, prompt_content_words
         from snnchat.rerank import rerank as _rerank
 
@@ -515,9 +516,15 @@ class ChatSession:
         # and `render_turn` normalises punctuation and case that this does not
         # want to depend on.
         echo_words = prompt_content_words(prompt) if rp.echo else None
+        # The subject tier needs to be told what the subject IS, and it is told
+        # by the same extractor `snnchat.prime` builds a story prime from, so
+        # the two cannot disagree about what a request was about. It returns
+        # None for anything that is not a "story about X" request, and None is
+        # the weighted tier -- so every other prompt is decided as before.
+        subject = prime_topic(prompt) if rp.echo and rp.subject_tier else None
         winner, cands = _rerank(self.sampler.model, logits, self._state, params, rp,
                                 device=self.sampler.device,
-                                tok=self.tok, echo_words=echo_words)
+                                tok=self.tok, echo_words=echo_words, subject=subject)
         self.sampler.record_spikes = recording
         self.last_candidates = cands
         self.last_winner = winner
