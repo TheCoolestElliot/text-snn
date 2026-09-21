@@ -228,15 +228,148 @@ def test_a_faithful_pool_loads_and_the_metrics_are_the_hand_computed_ones(tmp_pa
     info, draws = scorer.load_file(path, exploratory=False)
     assert info["checks"]["stored_echo_weight_mismatch"] == 0
     c = scorer.compare(draws, "lam0.6")
-    assert (c["P1_topic"]["shipped_only"], c["P1_topic"]["subject_only"]) == (0, 1)
-    assert c["P1_topic"]["verdict"] == "pass"
+    # Bare mention is reported and is NOT a bar: it carries no verdict to read.
+    assert (c["topic_mention"]["shipped_only"], c["topic_mention"]["subject_only"]) == (0, 1)
+    assert c["topic_mention"]["identity_violations"] == 0
+    assert "verdict" not in c["topic_mention"]
+    # NAMES introduces "a penguin" and says "The penguin" again; FRAME has none.
+    p1 = c["P1_anchored_topic"]
+    assert (p1["shipped"]["k"], p1["subject"]["k"]) == (0, 1)
+    assert (p1["shipped_only"], p1["subject_only"], p1["verdict"]) == (0, 1, "pass")
+    assert p1["mean_reply_chars"] == {"note": p1["mean_reply_chars"]["note"],
+                                      "shipped": len(FRAME), "subject": len(NAMES)}
     assert c["P2_logp_per_char"]["pooled"]["delta"] == pytest.approx(-60 / 285 + 110 / 278)
+    # Both picks HAVE a definite subject ("The pig was", "The penguin was"), so
+    # this draw is inside the bar's denominator, and it is a real fix.
     assert (c["P3_uer"]["fixed"], c["P3_uer"]["broken"]) == (1, 0)
     assert c["P3_uer"]["both_qualify"]["k"] == 1
+    assert (c["P3_uer"]["both_exposed"]["k"], c["P3_uer"]["both_exposed"]["n"]) == (1, 1)
+    aq = c["P3_uer"]["all_qualifying_draws"]
+    assert (aq["fixed"], aq["broken"]) == (1, 0)
+    assert aq["fixed_where_the_subject_pick_has_no_definite_subject"] == 0
     assert c["below_floor"]["shipped"]["k"] == 1 and c["below_floor"]["subject"]["k"] == 0
     assert c["tier_size"]["shipped"]["one_member"]["k"] == 1
     assert c["tier_size"]["subject"]["buckets"]["2-4"] == 1
     assert c["no_draft_names_subject"]["k"] == 0
+
+
+def _exposure_draw(seed: int) -> dict:
+    """Shipped returns FRAME ("The pig was", unintroduced). The subject rule
+    returns NAMES_TOO, which names the penguin and contains NO definite subject
+    at all in its first 200 characters -- clean because there is nothing to flag."""
+    return {"kind": "story", "expect": ["penguin"], "prompt": PROMPT, "seed": seed,
+            "subject": "penguin", "shipped_index": 0, "subject_index": 1,
+            "pool": [_cand(FRAME, -110.0, -100.0), _cand(NAMES_TOO, -50.0, -10.0)]}
+
+
+def test_p3_is_not_passed_by_picks_that_merely_contain_no_definite_subject(tmp_path):
+    """The review's finding, as a pool. Eight draws on which the subject pick
+    "fixes" an unintroduced entity only by containing no definite subject: the
+    all-draws count reads fixed 8, broken 0, McNemar p < 0.05 -- and the BAR
+    must not, because not one entity was introduced any more carefully.
+
+    Mutation: reading the bar over `qual` instead of `both` in `compare`.
+    """
+    assert scorer.definite_subjects(FRAME) == [("pig", False)]
+    assert scorer.definite_subjects(NAMES_TOO) == []
+    path = _write(tmp_path, "v14_heldout_x.json.gz",
+                  _blob([_exposure_draw(seed) for seed in range(6, 14)]))
+    _, draws = scorer.load_file(path, exploratory=False)
+    c = scorer.compare(draws, "lam0.6")
+    p3 = c["P3_uer"]
+
+    # NAMES_TOO says "penguin" ONCE: a mention, which is what the tier selected
+    # it for, and not an anchored topic, which needs the noun referred back to.
+    assert (c["topic_mention"]["subject"]["k"], c["topic_mention"]["subject_only"]) == (8, 8)
+    assert (c["P1_anchored_topic"]["subject"]["k"],
+            c["P1_anchored_topic"]["subject_only"]) == (0, 0)
+
+    aq = p3["all_qualifying_draws"]
+    assert (aq["fixed"], aq["broken"]) == (8, 0) and aq["mcnemar_p"] < scorer.P3_ALPHA
+    assert aq["fixed_where_the_subject_pick_has_no_definite_subject"] == 8
+    assert "verdict" not in aq
+
+    assert (p3["both_exposed"]["k"], p3["fixed"], p3["broken"]) == (0, 0, 0)
+    assert p3["verdict"] == "unresolved"
+
+    # The decomposition says what happened: exposure fell to nothing, and the
+    # rate among exposed replies has no subject-arm reading at all.
+    dec = p3["decomposition"]
+    assert (dec["shipped"]["exposure"]["k"], dec["shipped"]["exposure"]["n"]) == (8, 8)
+    assert (dec["subject"]["exposure"]["k"], dec["subject"]["exposure"]["n"]) == (0, 8)
+    assert dec["shipped"]["uer_given_exposed"]["rate"] == 1.0
+    assert dec["subject"]["uer_given_exposed"]["rate"] is None
+
+
+def test_sameness_has_a_bar_and_the_bar_is_in_overall():
+    """GUARD 2 is the one cost the exploratory replay measured; `overall` must
+    not be able to read `pass` over it, and bare mention must not be in it.
+
+    Mutations: `pooled_drop > bar` to `pooled_drop >= bar` in `guard2_verdict`;
+    dropping "GUARD2_sameness" from `IN_OVERALL`; adding "topic_mention" to it.
+    """
+    bar = scorer.GUARD2_MAX_DISTINCT2_DROP
+    every = {name: bar / 2 for name in scorer.P2_LISTS}
+    assert scorer.distinct2_drop({"value": 0.25}, {"value": 0.20}) == pytest.approx(0.2)
+    assert scorer.distinct2_drop({"value": None}, {"value": None}) is None
+    assert scorer.guard2_verdict(bar / 2, every)["verdict"] == "pass"
+    assert scorer.guard2_verdict(bar, every)["verdict"] == "pass"          # "at most"
+    assert scorer.guard2_verdict(bar * 1.01, every)["verdict"] == "fail"
+    assert scorer.guard2_verdict(-0.05, every)["verdict"] == "pass"        # it ROSE
+    assert scorer.guard2_verdict(bar / 2, {**every, "wide": bar * 2})["verdict"] == "unresolved"
+    assert scorer.guard2_verdict(bar / 2, {"heldout": 0.0})["verdict"] == "unresolved"
+    assert scorer.guard2_verdict(None, {})["verdict"] == "unresolved"
+
+    assert "GUARD2_sameness" in scorer.IN_OVERALL
+    assert "topic_mention" not in scorer.IN_OVERALL
+    passing = {name: {"verdict": "pass"} for name in scorer.IN_OVERALL}
+    g1 = {"verdict": "pass"}
+    assert scorer.overall(passing, g1) == "pass"
+    assert scorer.overall({**passing, "GUARD2_sameness": {"verdict": "fail"}}, g1) == "fail"
+    assert scorer.overall({**passing, "P3_uer": {"verdict": "unresolved"}}, g1) == "unresolved"
+    assert scorer.overall(passing, {"verdict": "fail"}) == "fail"
+    # A failing bare-mention row, if anyone ever gave it a verdict, is not read.
+    assert scorer.overall({**passing, "topic_mention": {"verdict": "fail"}}, g1) == "pass"
+
+
+def test_identical_picks_on_every_draw_fail_the_sameness_guard(tmp_path):
+    """End to end: the subject rule returning ONE reply for every draw while the
+    shipped rule returns varied ones is a fall in distinct-2 that `compare`
+    must bar, whatever P2 says."""
+    draws = []
+    for i, word in enumerate(("red", "blue", "green", "pink")):
+        varied = f"Let me tell you a story about the {word} kite and a {word} hat. " + _FILL
+        draws.append({"kind": "story", "expect": ["penguin"], "prompt": PROMPT, "seed": 6 + i,
+                      "subject": "penguin", "shipped_index": 0, "subject_index": 1,
+                      "pool": [_cand(varied, -110.0, -100.0), _cand(NAMES, -60.0, -100.0)]})
+    path = _write(tmp_path, "v14_heldout_x.json.gz", _blob(draws))
+    _, loaded = scorer.load_file(path, exploratory=False)
+    g2 = scorer.compare(loaded, "lam0.6")["GUARD2_sameness"]
+    assert g2["distinct_2"]["subject"]["value"] < g2["distinct_2"]["shipped"]["value"]
+    assert g2["relative_drop"] == pytest.approx(
+        1 - g2["distinct_2"]["subject"]["value"] / g2["distinct_2"]["shipped"]["value"])
+    assert g2["relative_drop"] > scorer.GUARD2_MAX_DISTINCT2_DROP
+    assert g2["relative_drop_per_list"] == {"heldout": g2["relative_drop"]}
+    assert g2["verdict"] == "fail"
+
+
+def test_the_corpus_reference_is_read_from_the_committed_artifact(tmp_path):
+    """`score_v14.py` prints each arm's exposure next to the corpus's, and takes
+    the corpus's from `coherence_v14.json` rather than recomputing it. Absent or
+    older artifact: None, not a crash and not a zero."""
+    ref = scorer.corpus_reference()
+    assert ref is not None and ref["source"] == "coherence_v14.json"
+    for key in ("exposure", "uer_given_exposed", "unintroduced_per_subject"):
+        assert set(ref[key]) == {"rate", "k", "n", "ci"}
+    # uer = exposure * uer_given_exposed, exactly, against the artifact's own UER.
+    committed = json.loads((scorer.QUALITY / "coherence_v14.json").read_text(encoding="utf-8"))
+    whole = committed["corpus"]["with_stoplist"]
+    assert ref["uer_given_exposed"]["k"] == whole["k"]
+    assert ref["exposure"]["n"] == whole["n"]
+    assert ref["uer_given_exposed"]["n"] == ref["exposure"]["k"]
+    assert scorer.corpus_reference(tmp_path) is None
+    (tmp_path / "coherence_v14.json").write_text('{"corpus": {"file": "x"}}', encoding="utf-8")
+    assert scorer.corpus_reference(tmp_path) is None
 
 
 @pytest.mark.parametrize("field,wrong", [("shipped_index", 1), ("subject_index", 2)])
@@ -534,6 +667,9 @@ def test_mcnemar_and_the_verdicts_on_tiny_inputs():
     assert scorer.p3_verdict(5, 1, scorer.mcnemar(1, 5), 100)["verdict"] == "unresolved"
     assert scorer.p3_verdict(4, 4, 1.0, 100)["verdict"] == "fail"
     assert scorer.p3_verdict(0, 0, 1.0, 0)["verdict"] == "unresolved"
+    # No draw with a definite subject in BOTH picks: nothing was compared,
+    # whatever the counts handed in say.
+    assert scorer.p3_verdict(20, 0, 1e-6, 0)["verdict"] == "unresolved"
 
 
 def test_sameness_helpers_on_tiny_inputs():

@@ -177,6 +177,18 @@ def _uer(texts, window, **kw) -> dict:
     return _tidy(coherence.uer(texts, window, **kw))
 
 
+def _decomposition(texts, window) -> dict:
+    """`coherence.uer_decomposition`, rounded like every other reading here.
+
+    UER is exposure times the rate among exposed replies, and an arm can lower
+    the first without touching the second (`snnchat.coherence`, "WHAT IT CANNOT
+    SEE" item 8). The corpus's own split is the reference `score_v14.py` prints
+    a selector's split against.
+    """
+    out = coherence.uer_decomposition(texts, window)
+    return {k: (_tidy(v) if isinstance(v, dict) else v) for k, v in out.items()}
+
+
 def _mutants(stories: list[str]) -> tuple[list[str], list[str]]:
     n = len(stories)
     partner = [stories[(i + PARTNER) % n] for i in range(n)]
@@ -204,6 +216,7 @@ def corpus_section(path: Path, window: int) -> dict:
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "n_story_turns": len(stories),
         "with_stoplist": _uer(stories, window),
+        "decomposition_with_stoplist": _decomposition(stories, window),
         "without_stoplist": _uer(stories, window, stoplist=False),
         "prototype_rule_literal": _prototype_reading(stories, window),
         "with_stoplist_prompt_as_context": _uer(stories, window, contexts=prompts),
@@ -398,6 +411,10 @@ def main() -> None:
     print(f"UER@{args.window} -- unintroduced-entity rate. NOT a coherence measure.")
     print(f"\ncorpus reference: {corpus['file']}, {corpus['n_story_turns']} story turns")
     print(_line("with stoplist", corpus["with_stoplist"]))
+    for name in ("exposure", "uer_given_exposed", "unintroduced_per_subject"):
+        r = corpus["decomposition_with_stoplist"][name]
+        print(f"    {name:<44} {r['rate']:.4f} ({r['k']}/{r['n']}), 95% CI "
+              f"[{r['ci'][0]:.4f}, {r['ci'][1]:.4f}]")
     print(_line("without stoplist", corpus["without_stoplist"]))
     print(_line("prototype rule, literal", corpus["prototype_rule_literal"]))
     print(_line("with stoplist, prompt as context", corpus["with_stoplist_prompt_as_context"]))

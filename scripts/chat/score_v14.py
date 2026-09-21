@@ -74,13 +74,54 @@ scores. Verdicts are `pass`, `fail` and `unresolved`. A near-miss is a fail
 estimate is on the passing side but the comparison was not decided, and it is
 not a pass.
 
+WHICH OF THESE CAN FAIL, AND WHICH CANNOT
+-----------------------------------------
+A review of the first version of this file found that every bar in `overall`
+was mechanically favoured and that the one measured cost had no bar. What each
+line is now, stated so that nobody reads an identity as a result:
+
+* `topic_mention` -- does the pick contain the requested noun. NOT A BAR, and
+  not in `overall`: the subject tier selects on `snnchat.rerank.echoes(subject,
+  text)` and this column scores `echo_holdout.hit(text, expect)`, the same
+  whole-word matcher, with `subject == expect[0]` on 98 of the 100 story
+  prompts (bakery/baker and firefighter/fireman are the two with a second
+  accepted word). The shipped pick is a member of the length pool, so if it
+  names the noun the subject tier is non-empty and every member names it:
+  `shipped_only` is zero BY CONSTRUCTION on those prompts, and `subject_only`
+  is the definitional gain `snnchat.coherence`'s docstring warns about. It is
+  reported as the identity it is, with a count of violations that must be 0.
+* P1 -- `snnchat.coherence.anchored_topic`, a topic measure the selector does
+  not read (introduced with "a"/"an" or in the first sentence, AND mentioned
+  twice). It can move in either direction. It is not windowed, so it inherits
+  the reply-length confound; mean reply length is printed next to it.
+* P2 -- the model's opinion of its own text, and the subject rule SELECTS on
+  it: wherever the subject tier is the whole length pool it is a maximum over
+  a superset of the shipped tier, so at lambda = 0 its delta is >= 0 by
+  construction on those draws. It is measured over the DRAFT (`n_scored`
+  characters), including an unclosed tail that `trim_to_sentence` removes
+  before the reader, P1 or P3 see the reply. A pass says the rule did what it
+  was built to do, not that replies improved.
+* P3 -- UER@200 is exposure times the rate among exposed replies
+  (`snnchat.coherence.uer_decomposition`), and likelier text has fewer definite
+  subjects, so the all-draws count tracks P2. The bar is therefore the paired
+  count over draws where BOTH picks contain a definite subject in the window,
+  which a change in exposure cannot move. The all-draws count is still
+  reported, with how many of its `fixed` draws are picks with no definite
+  subject at all, next to the decomposition of each arm and of the corpus.
+* GUARD 2 -- sameness, the one cost the exploratory replay measured. It has a
+  bar and is in `overall`.
+
 WHAT NONE OF THIS MEASURES
 --------------------------
 Whether a reply is any good. P2 is the model's opinion of its own text; P3 is a
 regex for one failure (`snnchat.coherence`: never validated against a human
-rating, blind to a plain interleave); P1 asks whether a noun occurs. GUARD 2 is
-here because the one way this change can read as WORSE is sameness, and nothing
-in P1-P3 would notice.
+rating, blind to a plain interleave); P1 asks whether a noun is introduced and
+repeated.
+
+`paired_delta`'s `delta` weights every DRAW equally and `se_by_prompt` is the
+standard error of the unweighted mean of per-prompt means. The two describe the
+same quantity when every prompt has the same number of draws, which is always
+true in confirmatory mode and is not true of an exploratory subset.
 
     python scripts/chat/score_v14.py --exploratory
     python scripts/chat/score_v14.py experiments/chat/_quality/v14_*.json.gz
@@ -101,7 +142,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from snnchat.coherence import WINDOW, unintroduced_entities, wilson_interval  # noqa: E402
+from snnchat.coherence import (  # noqa: E402
+    WINDOW,
+    anchored_topic,
+    definite_subjects,
+    uer_decomposition,
+    unintroduced_entities,
+    wilson_interval,
+)
 from snnchat.prime import tier_subject  # noqa: E402
 from snnchat.rerank import echo_tier, echo_weight, echoes, prompt_content_words  # noqa: E402
 
@@ -117,16 +165,29 @@ QUALITY = ROOT / "experiments" / "chat" / "_quality"
 # Nothing below is computed from the data being scored.
 # ---------------------------------------------------------------------------
 
-#: P1, topic non-inferiority: draws only the SHIPPED pick hits must not
-#: outnumber draws only the subject-tier pick hits. A bar on two counts.
-P1_RULE = "shipped_only <= subject_only"
+#: P1, topic non-inferiority ON `snnchat.coherence.anchored_topic`: draws only
+#: the SHIPPED pick satisfies must not outnumber draws only the subject-tier
+#: pick satisfies. A bar on two counts. It is NOT read on bare mention of the
+#: noun, which is what the subject tier selects on -- see the module docstring.
+P1_RULE = "anchored_topic: shipped_only <= subject_only"
 #: P2, fluency: pooled mean (subject - shipped) of the selected reply's
 #: per-character log-probability, in nats per character ...
 P2_POOLED_BAR = 0.05
 #: ... AND the difference is strictly positive on every one of these lists.
 P2_LISTS = ("heldout", "fresh", "wide")
-#: P3, unintroduced entities: fixed > broken, exact two-sided McNemar below this.
+#: P3, unintroduced entities, over draws where BOTH picks contain a definite
+#: subject in the window: fixed > broken, exact two-sided McNemar below this.
 P3_ALPHA = 0.05
+#: GUARD 2, sameness: the largest tolerated RELATIVE fall in distinct-2 from the
+#: shipped picks to the subject-tier picks of the same draws,
+#: `1 - subject / shipped`. Relative, because distinct-2 falls with the amount
+#: of text and the two selections of one set of draws are the only comparable
+#: pair. PROPOSED here and, like every bar in this block, fixed by
+#: `docs/chat/PREDICTION_v14.md` before a confirmatory pool is drawn. It was
+#: written down AFTER the exploratory replay read a fall of about a third on
+#: every checkpoint (`v14_exploratory.json`, `GUARD2_sameness` under `by_ckpt`),
+#: so on those pools this guard reads `fail`; it was not placed to be passed.
+GUARD2_MAX_DISTINCT2_DROP = 0.10
 
 #: The fluency floor: plain sampling's mean per-character log-probability on the
 #: battery (`scripts/chat.py`, the comment on the reranking defaults;
@@ -561,9 +622,10 @@ def p2_verdict(pooled: dict, per_list: dict[str, dict]) -> dict:
                    f">= {P2_POOLED_BAR:+.2f}; positive on every list"}
 
 
-def p3_verdict(fixed: int, broken: int, p: float, n_qualifying: int) -> dict:
-    if n_qualifying == 0:
-        return {"verdict": "unresolved", "why": "no draw where both replies qualify"}
+def p3_verdict(fixed: int, broken: int, p: float, n_both_exposed: int) -> dict:
+    if n_both_exposed == 0:
+        return {"verdict": "unresolved",
+                "why": "no draw where both replies have a definite subject in the window"}
     if fixed <= broken:
         return {"verdict": "fail", "why": f"fixed {fixed} <= broken {broken}"}
     if p >= P3_ALPHA:
@@ -573,6 +635,40 @@ def p3_verdict(fixed: int, broken: int, p: float, n_qualifying: int) -> dict:
     return {"verdict": "pass", "why": f"fixed {fixed} > broken {broken}, p = {p:.4g}"}
 
 
+def distinct2_drop(shipped: dict, subject: dict) -> float | None:
+    """`1 - subject / shipped` on two `distinct_2` readings of the SAME draws."""
+    if not shipped["value"] or subject["value"] is None:
+        return None
+    return 1.0 - subject["value"] / shipped["value"]
+
+
+def guard2_verdict(pooled_drop: float | None, per_list: dict[str, float | None]) -> dict:
+    """Fail on the pooled point estimate; pass only if every list agrees.
+
+    distinct-2 is a ratio of two set sizes over text that shares prompts, and
+    has no interval worth the name. The per-list readings stand in for one: a
+    pooled fall inside the bar with a list outside it is `unresolved`.
+    """
+    bar = GUARD2_MAX_DISTINCT2_DROP
+    if pooled_drop is None:
+        return {"verdict": "unresolved", "why": "no text to compare"}
+    if pooled_drop > bar:
+        return {"verdict": "fail",
+                "why": f"distinct-2 fell by {pooled_drop:.4f} of its shipped value, "
+                       f"more than {bar:.2f}"}
+    missing = [name for name in P2_LISTS if per_list.get(name) is None]
+    over = [name for name in P2_LISTS if name not in missing and per_list[name] > bar]
+    if over:
+        return {"verdict": "unresolved",
+                "why": f"pooled fall {pooled_drop:.4f} <= {bar:.2f} but it is larger "
+                       f"on {', '.join(over)}"}
+    if missing:
+        return {"verdict": "unresolved", "why": f"no draws from {', '.join(missing)}"}
+    return {"verdict": "pass",
+            "why": f"distinct-2 fell by {pooled_drop:.4f} of its shipped value, "
+                   f"<= {bar:.2f}, and on every list"}
+
+
 # ---------------------------------------------------------------------------
 # the comparison
 # ---------------------------------------------------------------------------
@@ -580,6 +676,15 @@ def p3_verdict(fixed: int, broken: int, p: float, n_qualifying: int) -> dict:
 
 def _flagged(text: str, context: str = "") -> bool:
     return bool(unintroduced_entities(text, WINDOW, context=context))
+
+
+def _exposed(text: str) -> bool:
+    """Does the reply contain a definite subject in the window, introduced or not?"""
+    return bool(definite_subjects(text, WINDOW))
+
+
+def _anchored(text: str, expect) -> bool:
+    return any(anchored_topic(text, w) for w in expect)
 
 
 def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
@@ -593,11 +698,22 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
         raise ValueError("compare() was handed a draw that is not replayable")
     n = len(draws)
 
-    # P1
+    # Bare mention: an identity, not a bar. See the module docstring.
     ha = [hit(x.text, d.expect) for x, d in zip(a, draws)]
     hb = [hit(x.text, d.expect) for x, d in zip(b, draws)]
     shipped_only = sum(1 for x, y in zip(ha, hb) if x > y)
     subject_only = sum(1 for x, y in zip(ha, hb) if y > x)
+    # Where the expected word IS the subject the selector was given, a draw
+    # only the shipped pick hits cannot exist. One that does means the matcher
+    # and the selector have come apart, and is counted rather than assumed.
+    violations = sum(1 for x, y, d in zip(ha, hb, draws)
+                     if x > y and d.expect == (d.subject,))
+
+    # P1, on a topic measure the selector does not read.
+    ta = [_anchored(x.text, d.expect) for x, d in zip(a, draws)]
+    tb = [_anchored(x.text, d.expect) for x, d in zip(b, draws)]
+    t_shipped_only = sum(1 for x, y in zip(ta, tb) if x and not y)
+    t_subject_only = sum(1 for x, y in zip(ta, tb) if y and not x)
 
     # P2
     la, lb = [x.logp_per_char for x in a], [x.logp_per_char for x in b]
@@ -608,13 +724,32 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
         per_list[name] = paired_delta([la[i] for i in idx], [lb[i] for i in idx],
                                       [draws[i].prompt for i in idx])
 
-    # P3, over the draws where BOTH selected replies reach the window.
+    # P3. `qual`: BOTH selected replies reach the window. The all-draws count
+    # over `qual` moves with exposure -- a pick with no definite subject scores
+    # clean -- so the BAR is read over `both`, the draws where both picks have
+    # one, which a change in exposure cannot move.
     qual = [i for i in range(n) if len(a[i].text) >= WINDOW and len(b[i].text) >= WINDOW]
     fa = [_flagged(a[i].text) for i in qual]
     fb = [_flagged(b[i].text) for i in qual]
-    fixed = sum(1 for x, y in zip(fa, fb) if x and not y)
-    broken = sum(1 for x, y in zip(fa, fb) if y and not x)
+    ea = [_exposed(a[i].text) for i in qual]
+    eb = [_exposed(b[i].text) for i in qual]
+    all_fixed = sum(1 for x, y in zip(fa, fb) if x and not y)
+    all_broken = sum(1 for x, y in zip(fa, fb) if y and not x)
+    fixed_unexposed = sum(1 for x, y, e in zip(fa, fb, eb) if x and not y and not e)
+    broken_unexposed = sum(1 for x, y, e in zip(fa, fb, ea) if y and not x and not e)
+    both = [j for j in range(len(qual)) if ea[j] and eb[j]]
+    fixed = sum(1 for j in both if fa[j] and not fb[j])
+    broken = sum(1 for j in both if fb[j] and not fa[j])
     p3_p = mcnemar(broken, fixed)
+
+    # GUARD 2
+    d2a, d2b = distinct_2(x.text for x in a), distinct_2(x.text for x in b)
+    d2_drop = distinct2_drop(d2a, d2b)
+    d2_lists = {}
+    for name in sorted({d.probe_set for d in draws}):
+        idx = [i for i, d in enumerate(draws) if d.probe_set == name]
+        d2_lists[name] = distinct2_drop(distinct_2(a[i].text for i in idx),
+                                        distinct_2(b[i].text for i in idx))
     ca = [_flagged(a[i].text, draws[i].prompt) for i in qual]
     cb = [_flagged(b[i].text, draws[i].prompt) for i in qual]
     c_fixed = sum(1 for x, y in zip(ca, cb) if x and not y)
@@ -624,12 +759,25 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
         "n_draws": n,
         "selection_changed": rate(sum(1 for x, y in zip(a, b) if x is not y), n),
         "no_draft_names_subject": rate(sum(1 for d in draws if d.names_subject == 0), n),
-        "P1_topic": {
-            "rule": P1_RULE,
+        "topic_mention": {
+            "note": "NOT A BAR. The subject tier selects on this matcher, so "
+                    "shipped_only is 0 by construction wherever the expected word "
+                    "is the subject; subject_only is a definitional gain",
             "shipped": rate(int(sum(ha)), n), "subject": rate(int(sum(hb)), n),
             "shipped_only": shipped_only, "subject_only": subject_only,
-            "mcnemar_p": mcnemar(shipped_only, subject_only),
-            **p1_verdict(shipped_only, subject_only, n),
+            "identity_violations": violations,
+        },
+        "P1_anchored_topic": {
+            "rule": P1_RULE,
+            "shipped": rate(sum(ta), n), "subject": rate(sum(tb), n),
+            "shipped_only": t_shipped_only, "subject_only": t_subject_only,
+            "mcnemar_p": mcnemar(t_shipped_only, t_subject_only),
+            "mean_reply_chars": {
+                "note": "anchored_topic is not windowed; a longer reply has more "
+                        "chances at a second mention",
+                "shipped": (sum(len(x.text) for x in a) / n) if n else None,
+                "subject": (sum(len(x.text) for x in b) / n) if n else None},
+            **p1_verdict(t_shipped_only, t_subject_only, n),
         },
         "P2_logp_per_char": {
             "rule": f"pooled delta >= {P2_POOLED_BAR:+.2f} and delta > 0 on each of "
@@ -639,13 +787,32 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
             **p2_verdict(pooled, per_list),
         },
         "P3_uer": {
-            "rule": f"fixed > broken, exact McNemar p < {P3_ALPHA}",
+            "rule": "over draws where BOTH picks have a definite subject in the "
+                    f"window: fixed > broken, exact McNemar p < {P3_ALPHA}",
             "window": WINDOW, "both_qualify": rate(len(qual), n),
-            "shipped": rate(sum(fa), len(qual)), "subject": rate(sum(fb), len(qual)),
+            "both_exposed": rate(len(both), len(qual)),
+            "shipped": rate(sum(1 for j in both if fa[j]), len(both)),
+            "subject": rate(sum(1 for j in both if fb[j]), len(both)),
             "fixed": fixed, "broken": broken, "mcnemar_p": p3_p,
-            **p3_verdict(fixed, broken, p3_p, len(qual)),
+            **p3_verdict(fixed, broken, p3_p, len(both)),
+            "all_qualifying_draws": {
+                "note": "NOT the bar: a pick with no definite subject in the window "
+                        "scores clean, so this count moves with exposure",
+                "shipped": rate(sum(fa), len(qual)), "subject": rate(sum(fb), len(qual)),
+                "fixed": all_fixed, "broken": all_broken,
+                "mcnemar_p": mcnemar(all_broken, all_fixed),
+                "fixed_where_the_subject_pick_has_no_definite_subject": fixed_unexposed,
+                "broken_where_the_shipped_pick_has_no_definite_subject": broken_unexposed,
+            },
+            "decomposition": {
+                "note": "uer = exposure * uer_given_exposed, exactly; each arm over "
+                        "its OWN qualifying picks, as snnchat.coherence.uer reads them",
+                "shipped": uer_decomposition(x.text for x in a),
+                "subject": uer_decomposition(x.text for x in b),
+            },
             "prompt_as_context": {
-                "note": "not the bar; the prompt's words count as introduced",
+                "note": "not the bar; all qualifying draws, with the prompt's words "
+                        "counted as introduced",
                 "shipped": rate(sum(ca), len(qual)), "subject": rate(sum(cb), len(qual)),
                 "fixed": c_fixed, "broken": c_broken,
                 "mcnemar_p": mcnemar(c_broken, c_fixed),
@@ -657,8 +824,11 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
             "subject": rate(sum(1 for v in lb if v < FLOOR), n),
         },
         "GUARD2_sameness": {
-            "distinct_2": {"shipped": distinct_2(x.text for x in a),
-                           "subject": distinct_2(x.text for x in b)},
+            "rule": f"1 - subject/shipped distinct-2 <= {GUARD2_MAX_DISTINCT2_DROP:.2f}, "
+                    f"pooled and on each of {', '.join(P2_LISTS)}",
+            "distinct_2": {"shipped": d2a, "subject": d2b},
+            "relative_drop": d2_drop, "relative_drop_per_list": d2_lists,
+            **guard2_verdict(d2_drop, d2_lists),
             "top_opening": {"chars": OPENING_CHARS,
                             "shipped": top_opening(x.text for x in a),
                             "subject": top_opening(x.text for x in b)},
@@ -682,6 +852,20 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
                 "per_ckpt": dict(zip(ckpts, deltas)), "mean": statistics.mean(deltas),
                 "sd_seed": statistics.stdev(deltas), "n_ckpts": len(ckpts)}
     return out
+
+
+#: What `overall` reads, and nothing else does. `topic_mention` is absent on
+#: purpose: it cannot fail (module docstring).
+IN_OVERALL = ("P1_anchored_topic", "P2_logp_per_char", "P3_uer", "GUARD2_sameness",
+              "GUARD1_identity")
+
+
+def overall(comparison: dict, guard_1: dict) -> str:
+    """`fail` if anything failed, else `unresolved` if anything is, else `pass`."""
+    verdicts = [guard_1["verdict"] if name == "GUARD1_identity"
+                else comparison[name]["verdict"] for name in IN_OVERALL]
+    return ("fail" if "fail" in verdicts else
+            "unresolved" if "unresolved" in verdicts else "pass")
 
 
 def guard1(draws: list[Draw], label_of) -> dict:
@@ -731,13 +915,22 @@ def _fmt_se(se: float | None) -> str:
 
 
 def print_comparison(title: str, c: dict) -> None:
-    p1, p2, p3 = c["P1_topic"], c["P2_logp_per_char"], c["P3_uer"]
+    tm, p1, p2, p3 = (c["topic_mention"], c["P1_anchored_topic"], c["P2_logp_per_char"],
+                      c["P3_uer"])
     g2, fl, ts = c["GUARD2_sameness"], c["below_floor"], c["tier_size"]
     print(f"\n=== {title}: {c['n_draws']} draws ===")
     print(f"  selection changed       {_fmt_rate(c['selection_changed'])}")
     print(f"  no draft names subject  {_fmt_rate(c['no_draft_names_subject'])}")
-    print(f"  P1 topic   shipped {_fmt_rate(p1['shipped'])}")
+    print(f"  mention    shipped {_fmt_rate(tm['shipped'])}")
+    print(f"  (no bar)   subject {_fmt_rate(tm['subject'])}")
+    print(f"             shipped-only {tm['shipped_only']}, subject-only "
+          f"{tm['subject_only']}: an identity, the tier selects on this matcher "
+          f"({tm['identity_violations']} violations)")
+    print(f"  P1 anchor  shipped {_fmt_rate(p1['shipped'])}")
     print(f"             subject {_fmt_rate(p1['subject'])}")
+    ln = p1["mean_reply_chars"]
+    if ln["shipped"] is not None:
+        print(f"             mean reply chars {ln['shipped']:.1f} -> {ln['subject']:.1f}")
     print(f"             shipped-only {p1['shipped_only']}, subject-only "
           f"{p1['subject_only']}, McNemar p = {p1['mcnemar_p']:.4g}"
           f"   -> {p1['verdict']} ({p1['why']})")
@@ -751,10 +944,24 @@ def print_comparison(title: str, c: dict) -> None:
             print(f"             {name:<8} delta {d['delta']:+.4f}  (n={d['n']})")
     print(f"             -> {p2['verdict']} ({p2['why']})")
     print(f"  P3 UER@{p3['window']} both qualify {_fmt_rate(p3['both_qualify'])}")
+    print(f"             both have a definite subject {_fmt_rate(p3['both_exposed'])}")
     print(f"             shipped {_fmt_rate(p3['shipped'])}")
     print(f"             subject {_fmt_rate(p3['subject'])}")
     print(f"             fixed {p3['fixed']}, broken {p3['broken']}, McNemar p = "
           f"{p3['mcnemar_p']:.4g}   -> {p3['verdict']} ({p3['why']})")
+    aq = p3["all_qualifying_draws"]
+    print("    all qualifying draws (no bar; moves with exposure):")
+    print(f"             shipped {_fmt_rate(aq['shipped'])}")
+    print(f"             subject {_fmt_rate(aq['subject'])}")
+    print(f"             fixed {aq['fixed']} (of which "
+          f"{aq['fixed_where_the_subject_pick_has_no_definite_subject']} because the "
+          f"subject pick has no definite subject), broken {aq['broken']}")
+    for key in ("shipped", "subject"):
+        dc = p3["decomposition"][key]
+        print(f"    {key:<8} exposure {_fmt_rate(dc['exposure'])}")
+        print(f"             UER | exposed {_fmt_rate(dc['uer_given_exposed'])}")
+        print(f"             unintroduced / definite subject "
+              f"{_fmt_rate(dc['unintroduced_per_subject'])}")
     pc = p3["prompt_as_context"]
     print(f"             (prompt as context: {pc['shipped']['k']} -> {pc['subject']['k']} of "
           f"{pc['shipped']['n']}, fixed {pc['fixed']}, broken {pc['broken']})")
@@ -765,6 +972,11 @@ def print_comparison(title: str, c: dict) -> None:
         print(f"  GUARD 2 {key:<8} distinct-2 {d2['value']:.4f} ({d2['distinct']}/{d2['total']})"
               f"   top {g2['top_opening']['chars']}-char opening {op['share']:.4f} "
               f"({op['k']}/{op['n']}) {op['opening']!r}")
+    if g2["relative_drop"] is not None:
+        print(f"  GUARD 2 distinct-2 fell by {g2['relative_drop']:.4f} of its shipped value"
+              f"   -> {g2['verdict']} ({g2['why']})")
+    else:
+        print(f"  GUARD 2 -> {g2['verdict']} ({g2['why']})")
     for key in ("shipped", "subject"):
         t = ts[key]
         print(f"  tier size {key:<8} one member {_fmt_rate(t['one_member'])}; whole pool "
@@ -783,6 +995,24 @@ def draw_rows(draws: list[Draw]) -> list[dict]:
                 row[f"{label}_{name}"] = [p.index, p.tier_size]
         rows.append(row)
     return rows
+
+
+def corpus_reference(quality_dir: Path = QUALITY) -> dict | None:
+    """The corpus's own UER decomposition, from `coherence_score.py`'s artifact.
+
+    Read from the committed JSON rather than recomputed: the corpus is not in
+    every tree and this script loads no data. A model's exposure and per-subject
+    rate mean nothing alone (`snnchat.coherence`); this is what they are read
+    against. None if the artifact is absent or predates the decomposition.
+    """
+    path = quality_dir / "coherence_v14.json"
+    try:
+        blob = json.loads(path.read_text(encoding="utf-8"))
+        ref = blob["corpus"]["decomposition_with_stoplist"]
+    except (OSError, ValueError, KeyError):
+        return None
+    return {"source": path.name, "sha256": _sha256(path),
+            "corpus_file": blob["corpus"]["file"], **ref}
 
 
 def expand(names: list[str]) -> list[Path]:
@@ -880,8 +1110,11 @@ def main(argv=None) -> int:
         "command": "CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py "
                    + " ".join(sys.argv[1:] if argv is None else argv),
         "bars": {"P1": P1_RULE, "P2_pooled_bar": P2_POOLED_BAR, "P2_lists": list(P2_LISTS),
-                 "P3_alpha": P3_ALPHA, "floor": FLOOR, "window": WINDOW,
-                 "opening_chars": OPENING_CHARS},
+                 "P3_alpha": P3_ALPHA,
+                 "GUARD2_max_distinct2_drop": GUARD2_MAX_DISTINCT2_DROP,
+                 "floor": FLOOR, "window": WINDOW, "opening_chars": OPENING_CHARS},
+        "in_overall": list(IN_OVERALL),
+        "uer_corpus_reference": corpus_reference(),
         "inputs": inputs,
         "checks": dict(checks),
         "n_story_draws": len(story),
@@ -895,11 +1128,7 @@ def main(argv=None) -> int:
         "rows": draw_rows(draws),
     }
     if not args.exploratory:
-        main_cmp = subsets[f"{label}_all"]
-        verdicts = [main_cmp["P1_topic"]["verdict"], main_cmp["P2_logp_per_char"]["verdict"],
-                    main_cmp["P3_uer"]["verdict"], blob["GUARD1_identity"]["verdict"]]
-        blob["overall"] = ("fail" if "fail" in verdicts else
-                           "unresolved" if "unresolved" in verdicts else "pass")
+        blob["overall"] = overall(subsets[f"{label}_all"], blob["GUARD1_identity"])
 
     print(f"\nmode: {blob['mode']}; {len(story)} story draws from {len(inputs)} files")
     print(f"checks: {dict(checks)}")
@@ -912,6 +1141,12 @@ def main(argv=None) -> int:
             s = c["P2_delta_across_ckpts"]
             print(f"  P2 delta across {s['n_ckpts']} checkpoints: mean {s['mean']:+.4f}, "
                   f"SD_seed {s['sd_seed']:.4f}")
+    ref = blob["uer_corpus_reference"]
+    if ref:
+        print(f"\ncorpus reference ({ref['corpus_file']}, from {ref['source']}):")
+        print(f"  exposure {_fmt_rate(ref['exposure'])}")
+        print(f"  UER | exposed {_fmt_rate(ref['uer_given_exposed'])}")
+        print(f"  unintroduced / definite subject {_fmt_rate(ref['unintroduced_per_subject'])}")
     g1 = blob["GUARD1_identity"]
     print(f"\nGUARD 1: {g1['verdict']} ({g1['why']})")
     for name, tm in blob["latency"].items():
@@ -921,8 +1156,10 @@ def main(argv=None) -> int:
         print(f"\nOVERALL: {blob['overall']}")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    # `newline="\n"`: on Windows the default would write CRLF, and the bytes of
+    # a committed artifact should not depend on the box that regenerated it.
     out_path.write_text(json.dumps(blob, indent=1, ensure_ascii=False) + "\n",
-                        encoding="utf-8")
+                        encoding="utf-8", newline="\n")
     print(f"\nwrote {out_path}")
     return 0
 

@@ -263,6 +263,85 @@ def test_uer_accepts_a_generator_and_checks_contexts_length():
         uer([text, text], contexts=["a story about a pig"])
 
 
+def test_a_reply_with_no_definite_subject_scores_clean_known_blindness():
+    """UER cannot tell "introduces its entities" from "has no definite subjects".
+
+    Pinned, like the interleave: a formulaic reply with no "the X was" in the
+    window is CLEAN, so an arm that writes more of them reads better with every
+    definite subject it does write exactly as unintroduced as before. This is
+    what `uer_decomposition` exists to show, and the v14 subject tier is the arm
+    that did it (`experiments/chat/_quality/v14_exploratory.json`).
+    """
+    drifting = _pad("There was a sheep. The pig was big.")
+    formulaic = _pad("Once upon a time, there was a little boy named Tim. Tim loved to play.")
+    assert unintroduced_entities(formulaic) == []
+    assert coherence.definite_subjects(formulaic) == []
+
+    before = [drifting] * 4
+    after = [drifting] * 2 + [formulaic] * 2         # half the replies went formulaic
+    assert (uer(before)["rate"], uer(after)["rate"]) == (1.0, 0.5)
+    b, a = coherence.uer_decomposition(before), coherence.uer_decomposition(after)
+    assert (b["exposure"]["rate"], a["exposure"]["rate"]) == (1.0, 0.5)
+    # ... and nothing about how entities are introduced moved at all.
+    assert b["uer_given_exposed"]["rate"] == a["uer_given_exposed"]["rate"] == 1.0
+    assert b["unintroduced_per_subject"]["rate"] == a["unintroduced_per_subject"]["rate"] == 1.0
+
+
+def test_definite_subjects_is_the_census_unintroduced_entities_filters():
+    text = _pad("There was a sheep. The sheep was small. The pig was big. The pig was pink.")
+    assert coherence.definite_subjects(text) == [
+        ("sheep", True), ("pig", False), ("pig", True)]
+    assert unintroduced_entities(text) == ["pig"]
+    # The same window rule: a subject that ENDS past the window is not read.
+    assert coherence.definite_subjects(text, window=30) == []
+    assert coherence.definite_subjects(text, context="a story about a pig") == [
+        ("sheep", True), ("pig", True), ("pig", True)]
+    # On every fixture story the filter and the census agree.
+    stories = _stories()
+    for story in stories:
+        for stoplist in (True, False):
+            census = coherence.definite_subjects(story, stoplist=stoplist)
+            assert unintroduced_entities(story, stoplist=stoplist) == [
+                h for h, introduced in census if not introduced]
+
+
+def test_uer_decomposition_multiplies_back_to_uer_exactly():
+    """`uer = exposure * uer_given_exposed`, on integers, with the same
+    qualifying rule as `uer` -- on the fixture and on its detected mutant."""
+    stories = _stories()
+    n = len(stories)
+    mutants = [coherence.replace_alternate_sentences(stories[i], stories[(i + PARTNER) % n])
+               for i in range(n)]
+    for texts in (stories, mutants, [s[:150] for s in stories], []):
+        whole, dec = uer(texts), coherence.uer_decomposition(texts)
+        assert set(dec) == {"exposure", "uer_given_exposed", "unintroduced_per_subject",
+                            "n_total", "window"}
+        assert dec["exposure"]["n"] == whole["n"] and dec["n_total"] == whole["n_total"]
+        assert dec["uer_given_exposed"]["k"] == whole["k"]
+        assert dec["uer_given_exposed"]["n"] == dec["exposure"]["k"]
+        assert dec["unintroduced_per_subject"]["k"] >= whole["k"]
+        assert dec["unintroduced_per_subject"]["n"] >= dec["exposure"]["k"]
+        for part in ("exposure", "uer_given_exposed", "unintroduced_per_subject"):
+            assert set(dec[part]) == {"rate", "k", "n", "ci"}
+            if dec[part]["n"] == 0:
+                assert dec[part]["rate"] is None, "no measurement is not a perfect score"
+    dec = coherence.uer_decomposition(mutants)
+    assert dec["exposure"]["k"] > 0 and dec["uer_given_exposed"]["k"] > 0
+
+    two = _pad("There was a sheep. The pig was big. The cow was sad. The sheep was glad.")
+    # One reply with two unintroduced subjects and an introduced one, one whose
+    # only definite subject IS introduced (exposed, not flagged), one with none.
+    careful = _pad("There was a sheep. The sheep was small.")
+    dec = coherence.uer_decomposition([two, careful, _pad("Tim ran home.")])
+    assert (dec["exposure"]["k"], dec["exposure"]["n"]) == (2, 3)
+    assert (dec["uer_given_exposed"]["k"], dec["uer_given_exposed"]["n"]) == (1, 2)
+    assert (dec["unintroduced_per_subject"]["k"], dec["unintroduced_per_subject"]["n"]) == (2, 4)
+    assert coherence.uer_decomposition([two], contexts=["a pig and a cow"])[
+        "unintroduced_per_subject"]["k"] == 0
+    with pytest.raises(ValueError, match="one prompt per text"):
+        coherence.uer_decomposition([two], contexts=[])
+
+
 def test_wilson_interval_matches_the_conventions_worked_example():
     """`docs/chat/CONVENTIONS.md` §1: 6/48 -> [0.059, 0.247]. The interval is
     inlined in `coherence` because `snnchat.quality` imports torch, so it is
@@ -483,6 +562,20 @@ def test_seed_section_sums_k_and_n_per_seed_and_takes_a_sample_sd(tmp_path):
     assert pool["mean"] == pytest.approx(statistics.fmean(rates), abs=1e-6)
     assert pool["sd_seed"] == pytest.approx(statistics.stdev(rates), abs=1e-6)
     assert out["chat-other"]["pool"]["sd_seed"] is None     # one seed has no spread
+
+
+def test_the_scorer_decomposes_the_same_reading_it_reports():
+    """`corpus.decomposition_with_stoplist` must split `corpus.with_stoplist`
+    and not some other reading: same stoplist, same window, rounded alike."""
+    stories = _stories()
+    whole, dec = scorer._uer(stories, 200), scorer._decomposition(stories, 200)
+    assert dec["uer_given_exposed"]["k"] == whole["k"]
+    assert dec["exposure"]["n"] == whole["n"] and dec["window"] == 200
+    assert dec["exposure"]["k"] == coherence.uer_decomposition(stories)["exposure"]["k"]
+    assert dec["exposure"]["rate"] == round(dec["exposure"]["k"] / whole["n"], 6)
+    raw = coherence.uer_decomposition(stories)["exposure"]["ci"]
+    assert dec["exposure"]["ci"] == [round(x, 6) for x in raw] != raw
+    assert scorer._decomposition(stories, 150)["window"] == 150
 
 
 def test_committed_artifact_is_what_the_instrument_says_about_a_committed_pool():
