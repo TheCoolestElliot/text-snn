@@ -24,6 +24,7 @@ import sys
 import pytest
 import torch
 
+from snnchat.generate import SamplingParams
 from snnchat.model import ChatConfig, build_chat_model
 from snnchat.prime import tier_subject
 from snnchat.rerank import (
@@ -618,6 +619,10 @@ def test_the_command_line_draws_a_pool_the_scorer_accepts(tiny_model, tmp_path, 
     assert blob["timing"]["n_draws"] == 12
     assert blob["timing"]["timing_pass_disagreements"] == 0
     assert len(blob["ckpt_sha256"]) == 64
+    # The header says what was drawn AND what the REPL would have drawn, so a
+    # pool at another length cannot be mistaken for one at the REPL's.
+    assert (blob["max_new"], blob["repl_max_new"]) == (32, SamplingParams().max_new)
+    assert "is not the REPL's" in capsys.readouterr().out
 
     # A wildcard is expanded by the scorer, sorted: PowerShell passes it through.
     assert scorer.expand([str(tmp_path / "v14_*_chat-tiny.json.gz")]) == sorted(outs.values())
@@ -631,6 +636,117 @@ def test_the_command_line_draws_a_pool_the_scorer_accepts(tiny_model, tmp_path, 
     assert (g1["verdict"], g1["n"], g1["identical"]) == ("pass", 12, 12)
     assert set(result["latency"]) == {p.name for p in outs.values()}
     assert "OVERALL" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# the pools describe the REPL, and the clause set
+# ---------------------------------------------------------------------------
+
+
+def test_a_pool_is_drawn_at_the_repl_defaults():
+    """`python scripts/chat.py` with no flags is the configuration a confirmatory
+    pool claims to describe. The first version of `v14_pools.py` drafted 300
+    characters where the REPL drafts 400, which changes both tiers' membership.
+
+    Mutation: `--max-new` defaulting to 300 again.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "chat_repl_for_v14", os.path.join(REPO, "scripts", "chat.py"))
+    repl = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(repl)
+    theirs = repl.build_parser().parse_args([])
+    ours = pools.build_parser().parse_args([])
+
+    assert ours.max_new == theirs.max_new == pools.REPL_MAX_NEW
+    assert (ours.n, ours.lam) == (theirs.rerank, theirs.rerank_lambda)
+    # What `main` does not expose it takes from the two dataclasses' defaults;
+    # the REPL passes its own flags, so those must be the same numbers.
+    sp, rp = SamplingParams(), RerankParams()
+    assert (sp.temperature, sp.top_p, sp.top_k, sp.min_p, sp.max_new) == (
+        theirs.temperature, theirs.top_p, theirs.top_k, theirs.min_p, theirs.max_new)
+    assert (rp.min_chars, rp.temperature_spread, rp.steer_every, rp.echo) == (
+        theirs.rerank_min_chars, theirs.rerank_spread, theirs.steer_every, theirs.rerank_echo)
+    assert theirs.prime is False
+
+
+def test_the_clause_set_is_half_cut_and_half_declined_and_never_bare():
+    """The set exists because every other probe list is a bare "about a X", on
+    which the subject extractor cannot be wrong. Mutation: `probes_for` giving
+    the clause set kind "story", which would pool it into the fixed bars."""
+    from snnchat.prime import prime_topic
+
+    rows = pools.probes_for("clause")
+    assert len(rows) == 12 and {kind for _, _, kind in rows} == {"story_clause"}
+    assert "clause" in pools.SET_NAMES
+    subjects = [tier_subject(prompt) for prompt, _, _ in rows]
+    assert sum(s is not None for s in subjects) == 6 == sum(s is None for s in subjects)
+    for (prompt, expect, _), subject in zip(rows, subjects):
+        assert subject in (None, expect[0]), prompt
+        # The last-word extractor is WRONG on every one: that is the set's point.
+        assert prime_topic(prompt) not in (None, expect[0]), prompt
+
+
+def test_a_recorded_pool_is_selected_on_the_subject_the_session_would_pass(tiny_model):
+    """`record` must tier on `tier_subject`, not on the last word after "about":
+    on "a penguin who loves fish" a tier built on "fish" picks the draft about a
+    fish, and on "a penguin and make it funny" there is no subject at all, so
+    the two recorded winners must be the same draft."""
+    tok = ChatTokenizer()
+    rp = RerankParams(n=3, lam=0.0, graph=False)
+    fish = "Let me tell you a story. A fish swam in the sea. " + _FILL
+    funny = "Let me tell you a story. It was a funny day. " + _FILL
+
+    def recorded(prompt, off_topic):
+        cands = _candidates(tok, [(FRAME, -110.0), (NAMES, -60.0), (off_topic, -20.0)])
+        shipped = select(None, cands, rp, device="cpu", tok=tok,
+                         echo_words=prompt_content_words(prompt))
+        return pools.record(tiny_model, tok, prompt, rp, cands, shipped, device="cpu",
+                            timing=False)
+
+    row = recorded("tell me a story about a penguin who loves fish", fish)
+    assert row["subject"] == "penguin"
+    assert [c["subject_hit"] for c in row["pool"]] == [False, True, False]
+    assert row["subject_index"] == 1
+
+    row = recorded("tell me a story about a penguin and make it funny", funny)
+    assert row["subject"] is None
+    assert not any(c["subject_hit"] for c in row["pool"])
+    assert row["subject_index"] == row["shipped_index"]
+
+
+def test_clause_draws_are_scored_apart_from_the_pooled_bars(tmp_path):
+    """A clause pool handed to the scorer beside a story pool gets its own
+    subset, and `overall` and the `_all` subset do not read it."""
+    prompt = "tell me a story about a penguin who loves fish"
+    assert tier_subject(prompt) == "penguin"
+    clause = {"kind": "story_clause", "expect": ["penguin"], "prompt": prompt, "seed": 6,
+              "subject": "penguin", "shipped_index": 0, "subject_index": 1,
+              "pool": [_cand(FRAME, -110.0, -100.0, prompt=prompt),
+                       _cand(NAMES, -60.0, -100.0, prompt=prompt)]}
+    a = _write(tmp_path, "v14_heldout_x.json.gz", _blob([_hand_draw()]))
+    b = _write(tmp_path, "v14_clause_x.json.gz", _blob([clause], probe_set="clause"))
+    out = tmp_path / "scored.json"
+    assert scorer.main([str(a), str(b), "--out", str(out)]) == 0
+    blob = json.loads(out.read_text(encoding="utf-8"))
+    assert blob["n_story_draws"] == 1
+    assert blob["subsets"]["lam0.6_all"]["n_draws"] == 1
+    got = blob["subsets"]["lam0.6_clause"]
+    assert (got["n_draws"], got["of"], got["draws_with_a_subject"]) == (1, 1, 1)
+    assert got["P1_anchored_topic"]["subject_only"] == 1
+    # The same run without the clause file says the same thing overall.
+    alone = tmp_path / "alone.json"
+    assert scorer.main([str(a), "--out", str(alone)]) == 0
+    assert json.loads(alone.read_text(encoding="utf-8"))["overall"] == blob["overall"]
+    assert "lam0.6_clause" not in json.loads(alone.read_text(encoding="utf-8"))["subsets"]
+
+    # A stored subject that is the clause's LAST word is refused: the pool was
+    # written by a selector that was told the wrong thing.
+    wrong = dict(clause, subject="fish")
+    c = _write(tmp_path, "v14_clause_y.json.gz", _blob([wrong], probe_set="clause"))
+    with pytest.raises(scorer.ReplayMismatch, match="stored subject"):
+        scorer.load_file(c, exploratory=False)
 
 
 # ---------------------------------------------------------------------------
