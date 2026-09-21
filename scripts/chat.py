@@ -94,6 +94,8 @@ commands
   /lambda <x>           how hard reranking punishes a generic reply (0..1.5)
   /spread <x>           draw the drafts over a range of temperatures (0 = off)
   /echo [on|off]        prefer drafts that mention what you asked about
+  /subject [on|off]     for a story about one thing, choose among the drafts
+                        that name it, or among everyone if none does (v14)
   /steer <n|off>        resample the drafts toward your subject every n chars
   /prime [on|off]       start a story reply with your topic (WE write that bit)
   /candidates           show what the last reply was chosen from
@@ -324,6 +326,14 @@ def build_parser() -> argparse.ArgumentParser:
                    help="rank drafts by the likelihood score alone, without first "
                         "preferring the ones that mention what you asked about "
                         "(the pre-2026-08-11 selection)")
+    p.add_argument("--subject-tier", dest="subject_tier", action="store_true",
+                   help="for a request about one simple noun phrase, choose among "
+                        "the drafts that name it, and among every draft when none "
+                        "does, instead of among the drafts echoing the most request "
+                        "words. OFF by default, and off is the shipped selection "
+                        "exactly. Pre-registered and not confirmed: on the pools "
+                        "already read it picks likelier text and replies look more "
+                        "alike (docs/chat/PREDICTION_v14.md sections 1 and 12)")
     p.add_argument("--no-fused", action="store_true",
                    help="force the eager reference scan (slower, sometimes clearer errors)")
     p.add_argument("--no-stream", action="store_true",
@@ -474,7 +484,8 @@ def run_chat(model, cfg, ck, args) -> int:
                               min_chars=args.rerank_min_chars,
                               temperature_spread=args.rerank_spread,
                               steer_every=args.steer_every,
-                              echo=bool(args.rerank_echo))
+                              echo=bool(args.rerank_echo),
+                              subject_tier=bool(args.subject_tier))
     session = ChatSession(model, tok, device=cfg.device, params=params,
                           rerank=rerank)
 
@@ -647,10 +658,15 @@ def _command(line: str, session: ChatSession, args) -> bool:
                 # object re-defaults every field that is not named here.
                 steer = (session.rerank.steer_every if session.rerank
                          else int(getattr(args, "steer_every", 0)))
+                # And `subject_tier`: `/subject on` then `/rerank 64` must not
+                # silently go back to the weighted tier.
+                subject_tier = (session.rerank.subject_tier if session.rerank
+                                else bool(getattr(args, "subject_tier", False)))
                 session.rerank = RerankParams(n=v, lam=lam, echo=echo,
                                               min_chars=args.rerank_min_chars,
                                               temperature_spread=spread,
-                                              steer_every=steer)
+                                              steer_every=steer,
+                                              subject_tier=subject_tier)
                 print(f"  reranking {session.rerank.describe()}")
     elif cmd == "/lambda":
         v = _num(float, 0.0, 1.5, "lambda")
@@ -685,6 +701,22 @@ def _command(line: str, session: ChatSession, args) -> bool:
             print("  echo on; drafts that mention what you asked about win ties")
         else:
             print("  echo off; drafts are ranked by the likelihood score alone")
+        if session.rerank is None:
+            print("  (reranking is off, so this takes effect at /rerank <n>)")
+    elif cmd == "/subject":
+        on = not (rest and rest[0] in ("off", "no", "0"))
+        # Recorded on `args` as well, for the reason `/echo` is: `/rerank 1`
+        # sets `session.rerank` to None and would otherwise forget the choice.
+        args.subject_tier = on
+        if session.rerank is not None:
+            session.rerank.subject_tier = on
+        if on:
+            print("  subject tier on; for a story about one thing, the reply is chosen")
+            print("  among the drafts that name it, or among everyone if none does.")
+            print("  Not confirmed; expect likelier text and more replies that look")
+            print("  alike -- PREDICTION_v14.md sections 1 and 12.")
+        else:
+            print("  subject tier off; the shipped selection")
         if session.rerank is None:
             print("  (reranking is off, so this takes effect at /rerank <n>)")
     elif cmd == "/steer":
