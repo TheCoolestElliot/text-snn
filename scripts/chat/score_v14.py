@@ -32,8 +32,9 @@ TWO MODES
 ---------
 Confirmatory (the default): `v14_pools.py` files only. Every draw carries a
 measured `logp_null` for every candidate, so both rules are replayable on every
-draw at the file's lambda. The bars below fire. Two refusals come first
-(`docs/chat/PREDICTION_v14.md` section 12, Amendment A):
+draw at the file's lambda. The bars below fire. Three refusals come first
+(`docs/chat/PREDICTION_v14.md` section 12, Amendment A; the third holds section
+2's design and was added after the amendment's review, before any pool):
 
 * THE STAMP. Nothing is scored unless the pre-registration hashes to
   `PREDICTION_STAMP`. The hash is over the file's bytes with CRLF normalised to
@@ -43,6 +44,11 @@ draw at the file's lambda. The bars below fire. Two refusals come first
   two checkpoints, and a wildcard like `v14_*.json.gz` matches both. A file
   list whose pools carry more than one `ckpt_sha256` is refused rather than
   pooled into one verdict, and the default output path names the checkpoint.
+* THE DRAWS ARE THE DESIGN'S. A draw at a sampler seed below 6 was read before
+  the rule existed, and a (prompt, seed) given twice is one draw counted twice;
+  either is refused on any checkpoint. On a REGISTERED checkpoint the file list
+  must be section 2's design exactly -- every prompt of the five sets at seeds
+  6-11, once: 600 story draws, 72 dodge, 72 clause, no more and no fewer.
 
 `--exploratory`: the COMMITTED `echo_holdout.py`-format pools,
 `experiments/chat/_quality/v12_{heldout,fresh,wide}_chat-v3d-aligned{,-s1,-s2,-s3}.json`,
@@ -137,7 +143,7 @@ standard error of the unweighted mean of per-prompt means. The two describe the
 same quantity when every prompt has the same number of draws, which is always
 true in confirmatory mode and is not true of an exploratory subset.
 
-    python scripts/chat/score_v14.py --exploratory
+    python scripts/chat/score_v14.py --exploratory --out <scratch>.json
     python scripts/chat/score_v14.py "experiments/chat/_quality/v14_*_chat-v6-scratch.json.gz"
 """
 from __future__ import annotations
@@ -169,7 +175,13 @@ from snnchat.rerank import echo_tier, echo_weight, echoes, prompt_content_words 
 
 sys.path.insert(0, str(ROOT / "scripts" / "chat"))
 from echo_holdout import hit, mcnemar  # noqa: E402
-from v14_pools import FORMAT, read_pool  # noqa: E402
+from v14_pools import (  # noqa: E402
+    COMMITTED_SEEDS,
+    FORMAT,
+    SET_NAMES,
+    probes_for,
+    read_pool,
+)
 
 QUALITY = ROOT / "experiments" / "chat" / "_quality"
 
@@ -227,6 +239,9 @@ REGISTERED_CHECKPOINTS = {
 #: The one `experiments/chat/SHIPPED` named when the amendment was written. Its
 #: verdict decides the default; the other's is reported beside it.
 DECIDING_CHECKPOINT = "chat-v6-scratch"
+#: Section 2's sampler seeds. Every prompt of every set in `v14_pools.SET_NAMES`
+#: is drawn once at each, per checkpoint: 600 story draws, 72 dodge, 72 clause.
+CONFIRMATORY_SEEDS = (6, 7, 8, 9, 10, 11)
 
 #: The fluency floor: plain sampling's mean per-character log-probability on the
 #: battery (`scripts/chat.py`, the comment on the reranking defaults;
@@ -1140,6 +1155,58 @@ def one_checkpoint(inputs: list[dict]) -> dict:
             "decides_the_default": registered and name == DECIDING_CHECKPOINT}
 
 
+def check_design(draws: list, checkpoint: dict) -> dict:
+    """Refuse draws that are not section 2's; say whether the list is the design.
+
+    Nothing in a pool file stops a confirmatory run from being handed a pool at
+    sampler seeds 0-5 (`v14_pools.py --allow-committed-seeds` draws one, and
+    chat-v6-scratch's are read), the same file twice, or one set alone. Each
+    would produce a verdict that looks like the registered one.
+
+    * a seed below `COMMITTED_SEEDS`: refused on any checkpoint;
+    * a (prompt, sampler seed) more than once -- one sampler seed gives one pool
+      whatever file it sits in: refused on any checkpoint;
+    * on a REGISTERED checkpoint, anything but every prompt of `SET_NAMES` at
+      `CONFIRMATORY_SEEDS`, once, under its own set's name: refused. An
+      unregistered checkpoint's verdict already confirms nothing and is scored,
+      with `is_the_registered_design` recorded.
+
+    Reads `source`, `probe_set`, `prompt` and `seed` of each draw, nothing else.
+    """
+    spent = sorted({(d.source, d.seed) for d in draws if d.seed < COMMITTED_SEEDS})
+    if spent:
+        listed = ", ".join(f"{source} seed {seed}" for source, seed in spent)
+        raise SystemExit(
+            f"sampler seeds 0..{COMMITTED_SEEDS - 1} were read before the subject rule "
+            f"existed and confirm nothing; nothing is scored ({listed}). Read such a "
+            "pool with --exploratory.")
+    seen = Counter((d.prompt, d.seed) for d in draws)
+    twice = sorted(key for key, k in seen.items() if k > 1)
+    if twice:
+        prompt, seed = twice[0]
+        raise SystemExit(
+            f"{len(twice)} (prompt, sampler seed) pairs were given more than once, e.g. "
+            f"{prompt!r} at seed {seed}; a draw counted twice is not two draws. "
+            "Nothing is scored.")
+    design = {(name, prompt, seed) for name in SET_NAMES
+              for prompt, _, _ in probes_for(name) for seed in CONFIRMATORY_SEEDS}
+    given = {(d.probe_set, d.prompt, d.seed) for d in draws}
+    missing, extra = design - given, given - design
+    if checkpoint["pre_registered"] and (missing or extra):
+        raise SystemExit(
+            f"{checkpoint['name']} is a registered checkpoint, and these {len(given)} "
+            f"draws are not the registered design: {len(missing)} of its {len(design)} "
+            f"draws are missing and {len(extra)} given draws are not in it "
+            f"(sets {', '.join(SET_NAMES)}; sampler seeds "
+            f"{CONFIRMATORY_SEEDS[0]}-{CONFIRMATORY_SEEDS[-1]}). PREDICTION_v14.md "
+            "section 2: no more and no fewer, and no pool is scored alone for a "
+            "verdict. Nothing is scored.")
+    return {"sampler_seeds": sorted({d.seed for d in draws}), "n_draws": len(given),
+            "registered_n_draws": len(design), "missing": len(missing),
+            "not_in_the_design": len(extra),
+            "is_the_registered_design": not missing and not extra}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1159,6 +1226,12 @@ def main(argv=None) -> int:
         names = [str(QUALITY / f) for f in EXPLORATORY_FILES]
     paths = expand(names)
     stamp = None if args.exploratory else check_stamp()
+    if args.exploratory and not args.out and (QUALITY / "v14_exploratory.json").exists():
+        # The committed artifact is the record PREDICTION_v14.md section 1 was
+        # sized from, written by the scorer at 8e5daad; section 12.3 says it is
+        # not to be overwritten, and this scorer would rewrite its GUARD 2 blocks.
+        raise SystemExit("v14_exploratory.json exists and is a committed record; give "
+                         "--out (name that file itself to replace it on purpose)")
 
     inputs, draws = [], []
     for path in paths:
@@ -1167,6 +1240,7 @@ def main(argv=None) -> int:
         draws.extend(got)
         print(f"read {path.name}: {len(got)} draws", flush=True)
     checkpoint = None if args.exploratory else one_checkpoint(inputs)
+    design = None if args.exploratory else check_design(draws, checkpoint)
     out_path = Path(args.out) if args.out else QUALITY / (
         "v14_exploratory.json" if args.exploratory
         else f"v14_confirmatory_{checkpoint['name']}.json")
@@ -1242,6 +1316,7 @@ def main(argv=None) -> int:
                        "recipe": "sha256 of the bytes with CRLF normalised to LF; "
                                  "None in exploratory mode, which checks nothing"},
         "checkpoint": checkpoint,
+        "design": design,
         "uer_corpus_reference": corpus_reference(),
         "inputs": inputs,
         "checks": dict(checks),
@@ -1283,12 +1358,16 @@ def main(argv=None) -> int:
     if "overall" in blob:
         print(f"\nOVERALL ({', '.join(IN_OVERALL)}): {blob['overall']}")
         print(f"  checkpoint {checkpoint['name']}, sha256 {checkpoint['sha256']}")
+        print(f"  {design['n_draws']} draws at sampler seeds {design['sampler_seeds']}; the "
+              f"registered design: {design['is_the_registered_design']}")
         if not checkpoint["pre_registered"]:
             print("  NOTE: not one of the two checkpoints PREDICTION_v14.md section 12 "
                   "registers; this verdict confirms nothing")
         elif checkpoint["decides_the_default"]:
             print("  this is the deciding checkpoint (PREDICTION_v14.md section 12.7): only "
-                  "`pass`, with SHIPPED still naming it, flips the default")
+                  "`pass`, with experiments/chat/SHIPPED in the owner's MAIN tree still "
+                  "naming it (section 12.2; this worktree's copy is not the one), flips "
+                  "the default")
         else:
             print("  reported beside the deciding checkpoint's verdict; it does not decide "
                   "the default")

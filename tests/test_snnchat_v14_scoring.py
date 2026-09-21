@@ -620,6 +620,98 @@ def test_pools_from_two_checkpoints_are_refused_and_the_output_names_the_one(
     assert (got["pre_registered"], got["decides_the_default"]) == (False, False)
 
 
+def test_a_confirmatory_file_list_must_be_the_draws_the_design_registers(tmp_path):
+    """Section 2: sampler seeds 6-11 on every prompt of the five sets, once --
+    600 story draws, 72 dodge, 72 clause, "no more and no fewer". Nothing in a
+    pool file enforces that: `v14_pools.py --allow-committed-seeds` draws a
+    v14-format pool at a READ seed, and chat-v6-scratch's seeds 0-5 are read.
+
+    Mutations: the `spent` refusal deleted (a seed-5 pool is scored); `twice`
+    keyed on `(source, prompt, seed)` (the same file under two paths is counted
+    twice); the design refusal deleted, or `pre_registered` ignored (one draw
+    decides the default); `CONFIRMATORY_SEEDS` ending at 12; `given` built
+    without the set's name (a draw filed under the wrong list passes).
+    """
+    from types import SimpleNamespace as D
+
+    other = {"name": "chat-tiny", "pre_registered": False}
+    deciding = {"name": "chat-v6-scratch", "pre_registered": True}
+    design = [D(source=f"v14_{name}.json.gz", probe_set=name, prompt=prompt, seed=seed)
+              for name in pools.SET_NAMES for prompt, _, _ in pools.probes_for(name)
+              for seed in range(6, 12)]
+    assert sum(1 for d in design if d.probe_set in scorer.P2_LISTS) == 600
+    assert scorer.check_design(design, deciding) == {
+        "sampler_seeds": [6, 7, 8, 9, 10, 11], "n_draws": 744, "registered_n_draws": 744,
+        "missing": 0, "not_in_the_design": 0, "is_the_registered_design": True}
+
+    first = design[0]
+    beyond = D(**{**vars(first), "seed": 12})
+    misfiled = D(**{**vars(first), "probe_set": "wide" if first.probe_set != "wide" else "fresh"})
+    for wrong, missing, extra in (
+            (design[1:], 1, 0),                                       # one draw short
+            (design + [beyond], 0, 1),                                # a seed past 11
+            ([d for d in design if d.probe_set == "clause"], 672, 0),  # one set alone
+            ([misfiled] + design[1:], 1, 1)):                         # under another list
+        with pytest.raises(SystemExit, match="not the registered design"):
+            scorer.check_design(wrong, deciding)
+        got = scorer.check_design(wrong, other)
+        assert (got["missing"], got["not_in_the_design"]) == (missing, extra)
+        assert got["is_the_registered_design"] is False
+
+    # Read seeds and repeats are refused whatever the checkpoint.
+    with pytest.raises(SystemExit, match="confirm nothing"):
+        scorer.check_design([D(**{**vars(first), "seed": 5})], other)
+    again = D(**{**vars(first), "source": "a_copy.json.gz"})
+    with pytest.raises(SystemExit, match="more than once"):
+        scorer.check_design([first, again], other)
+
+    # Through `main`, where each refusal must come before any artifact.
+    out = tmp_path / "out.json"
+    read = _write(tmp_path, "v14_heldout_read.json.gz", _blob([_hand_draw(5)]))
+    with pytest.raises(SystemExit, match="confirm nothing"):
+        scorer.main([str(read), "--out", str(out)])
+    fresh = _write(tmp_path, "v14_heldout_x.json.gz", _blob([_hand_draw()]))
+    copied = _write(tmp_path / "copy", "v14_heldout_x.json.gz", _blob([_hand_draw()]))
+    with pytest.raises(SystemExit, match="more than once"):
+        scorer.main([str(fresh), str(copied), "--out", str(out)])
+    sha = scorer.REGISTERED_CHECKPOINTS["chat-v6-scratch"]
+    alone = _write(tmp_path, "v14_heldout_chat-v6-scratch.json.gz", _blob(
+        [_hand_draw()], ckpt="C:/x/experiments/chat/chat-v6-scratch/ckpt_best.pt",
+        ckpt_sha256=sha))
+    with pytest.raises(SystemExit, match="not the registered design"):
+        scorer.main([str(alone), "--out", str(out)])
+    assert not out.exists()
+
+    assert scorer.main([str(fresh), "--out", str(out)]) == 0
+    got = json.loads(out.read_text(encoding="utf-8"))["design"]
+    assert (got["n_draws"], got["sampler_seeds"], got["is_the_registered_design"]) == (
+        1, [6], False)
+
+
+def test_exploratory_mode_does_not_overwrite_the_committed_artifact_by_default(
+        tmp_path, monkeypatch):
+    """`v14_exploratory.json` is the record section 1 was sized from, and section
+    12.3 says it is not to be overwritten; `--exploratory` with no `--out` used
+    to rewrite it in the amended format, and the test that re-derives it reads
+    inputs and rows only, so nothing would have noticed.
+
+    Mutation: the `exists()` refusal deleted (the sentinel is overwritten).
+    """
+    path = _write(tmp_path, "v14_heldout_x.json.gz", _blob([_hand_draw()]))
+    monkeypatch.setattr(scorer, "QUALITY", tmp_path / "quality")
+    record = tmp_path / "quality" / "v14_exploratory.json"
+    record.parent.mkdir()
+    record.write_text("the committed record\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="committed record"):
+        scorer.main([str(path), "--exploratory"])
+    assert record.read_text(encoding="utf-8") == "the committed record\n"
+    # Naming it is still allowed, and so is the default when nothing is there.
+    assert scorer.main([str(path), "--exploratory", "--out", str(record)]) == 0
+    assert json.loads(record.read_text(encoding="utf-8"))["mode"] == "exploratory"
+    record.unlink()
+    assert scorer.main([str(path), "--exploratory"]) == 0 and record.exists()
+
+
 # ---------------------------------------------------------------------------
 # the real selector on CPU, recorded by v14_pools and reproduced by the replay
 # ---------------------------------------------------------------------------
@@ -676,7 +768,9 @@ def test_recorded_pools_from_the_real_selector_replay_exactly(tiny_model, tmp_pa
     tok = ChatTokenizer()
     rp = RerankParams(n=4, lam=lam, graph=False)
     story, dodge = [], []
-    for prompt, spec in _POOLS.values():
+    # One sampler seed per pool: three of these share a prompt, and the scorer
+    # refuses a (prompt, seed) it is given twice.
+    for seed, (prompt, spec) in enumerate(_POOLS.values(), start=6):
         cands = _candidates(tok, spec)
         shipped = select(tiny_model, cands, rp, device="cpu", tok=tok,
                          echo_words=prompt_content_words(prompt))
@@ -686,7 +780,7 @@ def test_recorded_pools_from_the_real_selector_replay_exactly(tiny_model, tmp_pa
         assert row["timing_pass_agrees"]
         subject = tier_subject(prompt)
         assert row["subject"] == subject
-        full = {"kind": "story" if subject else "list", "prompt": prompt, "seed": 6,
+        full = {"kind": "story" if subject else "list", "prompt": prompt, "seed": seed,
                 "expect": [subject or "dog"], "rerank_seconds": 0.0, **row}
         (story if subject else dodge).append(full)
 
