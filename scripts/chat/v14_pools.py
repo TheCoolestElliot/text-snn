@@ -33,7 +33,7 @@ refused unless `--allow-committed-seeds` says the overlap is intended.
 THE NON-STORY GUARD SET
 -----------------------
 `--set dodge` draws the twelve non-narrative probes `lambda_dodge.py` uses.
-`snnchat.prime.prime_topic` returns None on every one of them
+`snnchat.prime.tier_subject` returns None on every one of them
 (`tests/test_snnchat_v14_scoring.py` holds that), and a turn with no subject
 takes the old weighted tier whatever `subject_tier` says. So on this set the two
 recorded winners must be the SAME index on every draw -- an identity, asserted
@@ -75,7 +75,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import torch  # noqa: E402
 
 from snnchat.generate import SamplingParams, load_chat_checkpoint  # noqa: E402
-from snnchat.prime import prime_topic  # noqa: E402
+from snnchat.prime import tier_subject  # noqa: E402
 from snnchat.quality import PROBES  # noqa: E402
 from snnchat.rerank import (  # noqa: E402
     RerankParams,
@@ -217,7 +217,7 @@ def record(model, tok, prompt: str, rp: RerankParams, cands, shipped, *, device,
     if rp.subject_tier:
         raise ValueError("`rp` is the SHIPPED rule; the subject rule is derived from it")
     echo_words = prompt_content_words(prompt)
-    subject = prime_topic(prompt)
+    subject = tier_subject(prompt)
     rp_subject = dataclasses.replace(rp, subject_tier=True)
     shipped_index = _index_of(cands, shipped)
 

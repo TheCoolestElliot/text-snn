@@ -102,7 +102,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from snnchat.coherence import WINDOW, unintroduced_entities, wilson_interval  # noqa: E402
-from snnchat.prime import prime_topic  # noqa: E402
+from snnchat.prime import tier_subject  # noqa: E402
 from snnchat.rerank import echo_tier, echo_weight, echoes, prompt_content_words  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "scripts" / "chat"))
@@ -370,12 +370,12 @@ def load_file(path: Path, *, exploratory: bool) -> tuple[dict, list[Draw]]:
 
     for row in rows:
         prompt = row["prompt"]
-        subject = prime_topic(prompt)
+        subject = tier_subject(prompt)
         if is_v14:
             pool = drafts_v14(row)
             if subject != row["subject"]:
                 mismatches.append(f"{prompt!r} seed {row['seed']}: stored subject "
-                                  f"{row['subject']!r}, prime_topic says {subject!r}")
+                                  f"{row['subject']!r}, tier_subject says {subject!r}")
         else:
             pool = drafts_v12(row, subject)
             if max(d.n_chars for d in pool) > V12_MAX_NEW:
@@ -687,7 +687,7 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
 def guard1(draws: list[Draw], label_of) -> dict:
     """Non-story turns must take the byte-identical old path. An identity.
 
-    A turn with no subject is one `prime_topic` returns None for, and `select`
+    A turn with no subject is one `tier_subject` returns None for, and `select`
     then uses the weighted tier whatever `subject_tier` says. So both rules must
     return the SAME candidate -- same index, hence the same text -- on every
     such draw. One exception is a failure; there is no rate to read.

@@ -25,7 +25,7 @@ import pytest
 import torch
 
 from snnchat.model import ChatConfig, build_chat_model
-from snnchat.prime import prime_topic
+from snnchat.prime import tier_subject
 from snnchat.rerank import (
     Candidate,
     RerankParams,
@@ -188,18 +188,18 @@ def test_when_no_draft_names_the_subject_the_tier_is_everyone_not_the_frame_tier
 
 
 def test_every_story_prompt_has_its_noun_as_subject_and_no_dodge_prompt_has_one():
-    """GUARD 1 is an identity only because `prime_topic` is None on the guard set.
+    """GUARD 1 is an identity only because `tier_subject` is None on the guard set.
 
     Mutation: `probes_for("dodge")` also admitting the battery's `topic` probes,
     which are story requests and do have a subject.
     """
     dodge = pools.probes_for("dodge")
     assert len(dodge) == 12
-    assert [prime_topic(p) for p, _, _ in dodge] == [None] * 12
+    assert [tier_subject(p) for p, _, _ in dodge] == [None] * 12
     assert {k for _, _, k in dodge} == {"list", "fact"}
     for name in ("heldout", "fresh", "wide"):
         for prompt, expect, kind in pools.probes_for(name):
-            assert prime_topic(prompt) == expect[0]
+            assert tier_subject(prompt) == expect[0]
             assert kind == "story"
 
 
@@ -383,7 +383,7 @@ def test_recorded_pools_from_the_real_selector_replay_exactly(tiny_model, tmp_pa
         assert all(c["logp_null"] != 0.0 for c in row["pool"])
         assert all(c["n_scored"] == c["n_chars"] + 1 and c["closed"] for c in row["pool"])
         assert row["timing_pass_agrees"]
-        subject = prime_topic(prompt)
+        subject = tier_subject(prompt)
         assert row["subject"] == subject
         full = {"kind": "story" if subject else "list", "prompt": prompt, "seed": 6,
                 "expect": [subject or "dog"], "rerank_seconds": 0.0, **row}
