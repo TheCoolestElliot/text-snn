@@ -78,9 +78,28 @@ ceiling on the RENDERED length (markers included), enforced by redrawing the
 phrasing, never the value, so the dose per value stays uniform.
 
 The other 25 % of windows start at a random offset and some of those do cut an
-establishing turn off. That hazard is real, it is measured rather than argued
-(`scripts/chat/build_recall.py --hazard-steps`), and it is not fixable from
-here without per-source alignment in `snnchat.data`.
+establishing turn off (`MixtureSampler._windows` draws the alignment decision
+once per batch row, for every source alike; there is no per-source setting).
+That hazard is real and it is measured rather than argued. On the default
+250,000-dialogue build (seed 0), replaying 2,000 steps of the real sampler at
+B160 x L256, `align_frac` 0.75, `align_lookahead` 1024:
+
+    trained answers whose establishing value is outside the window
+        52,686 / 424,599 = 0.1241
+    ... with no value-repeating acknowledgement inside it either
+        49,061 / 424,599 = 0.1155
+    of the 52,686, in random-offset windows: 52,685 (of 126,814 answers there)
+
+    python scripts/chat/build_recall.py --out-dir <an empty dir> --hazard-steps 2000
+
+The counts are over windows that overlap, so no interval is attached; the
+figure is a description of the sampler, not an estimate compared with a bar.
+Two things bound the damage without removing it. Every such answer lies BEFORE
+its window's first `<|bos|>` (a dialogue is shorter than a window, so a cut
+statement means the window opened inside that same dialogue), and no inference
+context lacks a `<|bos|>`; whether the model uses that cue is not measured
+here. And it is not fixable from this file: it needs per-source alignment in
+`snnchat.data`.
 
 WHY THE ACKNOWLEDGEMENT USUALLY DOES NOT REPEAT THE VALUE
 ---------------------------------------------------------
@@ -476,6 +495,13 @@ DOSE_RECIPE: dict[str, float] = {
 #: over one training run. Pre-registered by the design panel from the committed
 #: `subject_frequency.json`, whose rarely-asked nouns score at the floor however
 #: often they are read.
+#:
+#: Measured on the default build (250,000 dialogues, seed 0; mean rendered
+#: length 137.5, which makes the recipe's share of this source 1.00 passes over
+#: it): `expected_exposures` gives name 804, pet 730, food 965, animal 965,
+#: colour 3,215, object 2,433 per value, and the least-asked single value in the
+#: realised build is a pet name at 664. `scripts/chat/build_recall.py` prints
+#: both for whatever it packs and records them in the manifest entry.
 MIN_EXPOSURES = 600
 
 
