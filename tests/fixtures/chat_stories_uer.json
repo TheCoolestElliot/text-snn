@@ -1,0 +1,490 @@
+{
+ "_about": "UER fixture for tests/test_snnchat_coherence.py. CI has no data/ directory, so the instrument's can-fail and known-blindness tests run on this committed sample. Regenerate with scripts/chat/coherence_score.py --write-fixture.",
+ "source": "data/chat/stories_topic.val.bin, decoded with ChatTokenizer.decode_visible",
+ "source_sha256": "d80b2a9a5cd49b34e7d64be84c8b2dc14957f6185205e344c04943d63f26f0cf",
+ "selection": "the FIRST 120 conversations with a <|user|> and a <|bot|> turn, in file order. No story was chosen or dropped by content. Bare narratives are skipped.",
+ "truncation": "each story is cut at its last sentence end at or before 500 characters to keep the file small; every story still qualifies at window 200.",
+ "n": 120,
+ "rows": [
+  {
+   "prompt": "i want a story about a king",
+   "story": "Once upon a time, there was a king. He was a good king. Everyone liked him.\nBut one day, something bad happened. The king was very frustrated because he had a problem. He couldn't solve it. He tried and tried but he still couldn't do it.\nHe started to feel angry and he hated the problem. He wanted it to go away. He started to shout and stomp his feet. Everyone around him was very scared.\nBut then his friend came to see him. She was kind and clever."
+  },
+  {
+   "prompt": "write me a little story about an umbrella",
+   "story": "Once upon a time, in a small town, there was a little girl named Lily. Lily had a big, red umbrella that she loved very much. She would take it with her everywhere she went, even when the sun was shining.\nOne day, the sky turned dark and rain started to fall. The rain was harsh and wet everything around. Lily opened her red umbrella and walked outside. She saw a tiny bird shivering in the cold rain. The bird was wet and looked very sad.\nLily went to the bird and opened her umbrella over it."
+  },
+  {
+   "prompt": "make up a story about a bird",
+   "story": "Once upon a time, there was a wise driver named Tom. He drove a big bus. One day, he met a little bird with a hurt wing. The bird could not fly.\nTom said, \"I will support you, little bird. I will help you get better.\" The little bird was happy. But there was a problem. A big cat wanted to eat the little bird.\nThe cat said, \"Give me the bird!\" Tom was scared, but he was wise. He said, \"No, I will protect the bird. You can't have it.\" The cat was angry."
+  },
+  {
+   "prompt": "i want a story about a step",
+   "story": "Once upon a time, there was a bald man named Tom. Tom loved to dance. He would dance in the morning, and he would dance at night.\nOne day, Tom went outside to dance. He saw a big step. Tom thought, \"I can dance on the step!\" So, he climbed up and started to dance. He danced and danced, and he was so happy.\nSoon, a little bird came by. The bird saw Tom dancing on the step. The bird wanted to dance too. So, Tom and the bird danced together. They danced all day long, and they had lots of fun."
+  },
+  {
+   "prompt": "make up a story about a shelf",
+   "story": "Once upon a time, there was a boy named Tom. Tom had a toy named Sam. Sam lived on a shelf in Tom's room. Tom loved Sam very much.\nOne day, Sam saw a pretty doll named Sue on a distant shelf. Sam wanted to marry Sue. But Sam didn't know how to get to the distant shelf. So, Tom helped Sam by putting him next to Sue.\nSam and Sue were very happy. They got married and lived on the shelf together. Tom was happy too, because his toys were happy. And they all lived happily ever after."
+  },
+  {
+   "prompt": "make up a story about a slide",
+   "story": "Once upon a time, there was a big slide in the park. All the kids loved to play on it. But there was a bossy girl named Lily who always wanted to be first.\nOne sunny day, a new boy named Tim came to the park. He heard a song from far away. It was a happy song that made him want to dance. Tim wanted to play on the slide, but Lily was there being bossy again.\nTim had an idea. He started to sing the happy song he heard. Lily liked the song and started to dance with Tim."
+  },
+  {
+   "prompt": "please tell me a story about a pasta",
+   "story": "One day, a thoughtful boy named Tim went to the store with his mom. They wanted to buy pasta for dinner. Tim was very happy because he loved pasta. He knew that when they got home, his mom would ring the bell to tell everyone that dinner was ready.\nAt the store, Tim saw a big pasta box with a picture of a bell on it. He thought, \"This must be special pasta!\" He asked his mom if they could buy it. His mom said yes, and they went home to cook the pasta."
+  },
+  {
+   "prompt": "write me a little story about Tim",
+   "story": "Once upon a time, there was a little boy named Tim. Tim loved candy. He had a big bag of candy that he liked to eat every day. But one day, he could not find his candy. Tim was sad. He missed his candy so much.\nTim looked everywhere for his candy. He looked under his bed, in his toy box, and behind the couch. But he could not find it. Tim's big sister, Sue, saw him looking. She asked, \"What's wrong, Tim?\" Tim said, \"I miss my candy. I can't find it.\"\nSue wanted to help Tim find his candy."
+  },
+  {
+   "prompt": "tell me a story about a garden",
+   "story": "Once upon a time, there was a big onion. The big onion lived in a garden with many other plants. The big onion had lots of friends. One day, the big onion saw a new plant. The new plant was small and green.\nThe big onion said, \"Hi, I am a big onion. What are you?\" The small plant said, \"I am a little carrot. Nice to meet you, big onion.\" The big onion was happy to meet the little carrot.\nEvery day, the big onion and the little carrot would wave to each other."
+  },
+  {
+   "prompt": "can you tell me a story about a mall",
+   "story": "Once upon a time, there was a big mall. In the mall, there were many shops. One day, a little boy named Tim went to the mall with his mom. Tim was a weak boy, but he always wanted to help others.\nIn the mall, Tim saw an old lady. The old lady had many bags. She looked very tired. Tim wanted to help her. He went to the old lady and said, \"Can I help you with your bags?\" The old lady smiled and said, \"Thank you, Tim.\"\nTim carried the bags for the old lady. Although he was weak, he tried his best."
+  },
+  {
+   "prompt": "tell me a short story about Tim",
+   "story": "One day, a little boy named Tim wanted to have a party. He asked his mom, \"Can I have a party?\" His mom said, \"Yes, you can have a party, but you must help me make the cake.\"\nTim was very happy. He helped his mom make a big cake. They put sweet things in it, but also a bitter thing called a lemon. Tim tasted the lemon and made a funny face. His mom laughed and said, \"Don't worry, the cake will be yummy!\"\nOn the day of the party, Tim's friends came over. They played games and had fun."
+  },
+  {
+   "prompt": "tell me a story about a room",
+   "story": "One day, a little red car named Zoomy lived in a big room. Zoomy loved to zoom around the room all day. He had a big smile on his face because he was having so much fun.\nOne morning, Zoomy met a serious blue car named Blu. Blu did not like to zoom. Blu said, \"I do not like to zoom. It is too fast for me.\" Zoomy wanted Blu to have fun too, so he thought of a good idea.\nZoomy said, \"Let's play a game. We can take turns zooming around the room."
+  },
+  {
+   "prompt": "make up a story about a meadow",
+   "story": "Once upon a time there was a little bird. It loved to play in the meadow. One sunny day, the little bird felt an urge to fly. He wanted to soar high above the meadow and feel the wind in his feathers.\nThe little bird flapped his wings and tried to take off, but he just couldn't seem to get him and off the ground. He felt so lazy and tired, he just couldn't seem to find the right energy to fly.\nHis mother bird saw what was happening and she called out, \"Little bird, don't feel so lazy!"
+  },
+  {
+   "prompt": "a story about hands?",
+   "story": "Ben and Mia were twins. They liked to play together. They had a friend named Sam. Sam was deaf. He could not hear. He used his hands to talk.\nOne day, Ben and Mia wanted to surprise Sam. They decided to decorate their room for him. They found some paper, crayons, scissors and tape. They cut out shapes and letters. They wrote \"Welcome, Sam!\" on a big paper. They taped it on the wall. They also made some flowers and stars. They taped them on the window and the door."
+  },
+  {
+   "prompt": "can you tell me a story about Kate",
+   "story": "Once upon a time, there was a girl named Kate. Kate was very healthy and liked to go for long rides in her mom's automobile. She was so excited to get in the car and put her seatbelt on so she could go on an adventure. Every time she went for a ride, she liked to name the car, and each name was something silly and fun. Today she named the automobile \"Turbo Speed Racer\". She had the best time in her mom's car and loved feeling the wind in her hair."
+  },
+  {
+   "prompt": "can you tell me a story about Lily",
+   "story": "One day, a little girl named Lily went for a walk. She saw a small pebble on the ground. The pebble was alone and looked sad. Lily felt bad for the pebble, so she picked it up and put it in her pocket.\nAs she walked, she saw a big tree. Lily wanted to climb the tree, but she was scared. She took the little pebble out of her pocket and held it tight. It made her feel brave. Lily started to climb the tree. When she got to the top, she heard a snap. She looked down and saw a broken branch."
+  },
+  {
+   "prompt": "can you tell me a story about Mia",
+   "story": "One day, a little girl named Mia went to the store with her mom. They wanted to buy a toy. Mia was very excited. She held her mom's hand as they walked in the store.\nIn the store, Mia saw a toy bug. The bug was green and rough. She touched it and said, \"Mom, I like this bug. Can we buy it?\"\nHer mom smiled and said, \"Yes, Mia. We can buy the bug.\" Mia was very happy. They went to the man at the store and gave him money. The man said, \"Thank you. Have a nice day.\"\nMia and her mom went home."
+  },
+  {
+   "prompt": "tell me a story about Tim, please",
+   "story": "One day, a brave boy named Tim went to the beach with his mom. He loved playing in the sand and splashing in the water. Tim saw a little octopus in the water and wanted to catch it. He called out to his mom, \"Look, mom! An octopus! Can I catch it?\"\nHis mom said, \"Yes, Tim, you can try to catch the octopus, but be gentle with it.\" Tim was so excited. He ran into the water and tried to catch the octopus with his hands. The octopus was fast, but Tim was brave and did not give up."
+  },
+  {
+   "prompt": "could you make up a story about a cookie",
+   "story": "Once upon a time, there was a little girl named Mia. Mia loved cookies. One day, Mia saw a big, orange cookie on the table. She was very happy.\nMia wanted to eat the orange cookie. But first, she wanted to share it with her friend, Tim. So, Mia tried to tear the cookie in half. It was a bit hard, but she did it. Now, she had two pieces of the orange cookie.\nMia took one piece of the cookie and gave the other piece to Tim. They both ate their pieces and smiled. The orange cookie was very yummy."
+  },
+  {
+   "prompt": "i want a story about a brother",
+   "story": "Scooter smiled. His new orange scooter had just arrived. He put it on the floor, and then he started to push it around. He was having so much fun. Suddenly, his brother came along. He was laughing and sneering, pointing at Scooter's scooter and saying it was too orange. This made Scooter feel embarrassed.\nScooter looked at his brother. \"Why?\" he asked.\nHis brother laughed. \"It's just too orange! It looks silly!\"\nScooter felt a bit sad but he knew his brother was just teasing him."
+  },
+  {
+   "prompt": "can you tell me a story about a letter",
+   "story": "One day, a little boy named Tim was very tired. He had a special letter that he wanted to mail. This letter had a lot of value to him because it was for his grandma. Tim loved his grandma very much.\nTim walked to the mailbox with his mom. \"Mom, can I put the letter in the mailbox?\" he asked. His mom said, \"Yes, Tim. You can mail the letter to grandma.\"\nTim opened the mailbox and put the letter inside. He was so happy that his special letter was on its way to his grandma."
+  },
+  {
+   "prompt": "tell me another story",
+   "story": "One day, Tom went to the kitchen to make some sauce. He wanted to be generous and make a lot of sauce for his friends. He put all the things he needed in a big pot and started to cook.\nWhile Tom was waiting, he saw a big spoon. He thought, \"I should test the sauce to see if it is good.\" He took the big spoon and dipped it in the sauce. But when he tasted it, it was very bad! Tom was sad because the sauce did not taste good.\nThen, Tom's friend Sam came in."
+  },
+  {
+   "prompt": "could you make up a story about toys",
+   "story": "Once upon a time, in a big country, there lived a wealthy man. He had a big house and many toys. He liked to keep all his toys in a special room. Every day, he would play with his toys and have fun.\nOne day, the wealthy man saw a little boy who had no toys. The little boy was sad. The wealthy man thought, \"I have so many toys, I should share with the little boy.\" So, he gave the little boy one of his toys. The little boy was very happy."
+  },
+  {
+   "prompt": "tell me a bedtime story",
+   "story": "Once upon a time, there was a chubby cat named Tom. Tom liked to play outside in the sun. One day, Tom saw dark clouds in the sky. He knew it was going to rain soon.\nTom ran to his friend, the wise old owl. The owl told Tom that he needed to put his toys in order before the rain came. Tom listened to the owl and ran to put his toys away.\nJust as Tom finished putting his toys in order, the rain started to fall. Tom was happy he listened to the wise old owl. Now, Tom's toys were safe and dry."
+  },
+  {
+   "prompt": "tell me a story about a chubby, please",
+   "story": "One summer day, a chubby duck decided to go for a swim in the lake. As he paddled away, he noticed someone swimming near him. \n\"Hello!\" he quacked.\nThe other duck's eyes opened wide. \n\"Hi,\" she said. \"Who are you?\"\nThe chubby duck introduced himself. \"I'm Duck,\" he said.\n\"I'm Duck too!\" the other duck said.\nThe two quickly became friends and Duck invited his new friend to come back to his pond and meet his family."
+  },
+  {
+   "prompt": "could you make up a story about a pilot",
+   "story": "Once upon a time, there was a pilot named Tom. Tom was independent and loved to fly his big plane in the sky. Every day, he would go up and up, and see the world from high above.\nOne day, while Tom was flying, a big bird came and said, \"Stay with me, Tom! Let's be friends and fly together!\" Tom was surprised but happy to have a new friend. They flew and played together in the sky. It was so much fun!\nBut then, something unexpected happened. The big bird was really a magic bird!"
+  },
+  {
+   "prompt": "i'd like a story about a strawberry",
+   "story": "Anna and Ben are friends. They like to play in the garden. They see a big red strawberry on a green plant. They want to eat it.\nThey run to the plant and pick the strawberry. It is juicy and sweet. They break it in half and share it. They smile and say, \"Yum!\"\nThen they see a bee. The bee is yellow and black. It buzzes and flies around the strawberry plant. It wants some nectar. It lands on a flower.\nAnna and Ben are curious. They want to see the bee. They go closer and watch."
+  },
+  {
+   "prompt": "tell me a story about Lily",
+   "story": "Once upon a time, there was a chubby bunny named Lily. Lily had a daughter named Rose. They lived in a small house in the woods.\nOne day, Lily and Rose went out to play. They found a big tree with many leaves. Lily and Rose wanted to strike the leaves with their paws. They jumped and struck the leaves. The leaves fell down and they laughed.\nThey played all day and then went back to their small house. Lily and Rose were very happy. They hugged each other and went to sleep."
+  },
+  {
+   "prompt": "make up a story about a game",
+   "story": "There was a boy who loved to play chess. He played chess with his dad every day. The boy was very restless. He wanted to be the best chess player in his town.\nOne day, the boy went to a big chess game. Many people came to watch. The boy played chess with a girl. They were both very good. The game was very close. The boy and the girl both wanted to win.\nIn the end, the boy made a smart move. He raised his hand and said, \"I win!\" The girl smiled and said, \"Good game!\" The boy was very happy."
+  },
+  {
+   "prompt": "i'd like a story about a stranger",
+   "story": "One day, a boy named Tim went to the park. It was a hot day. Tim saw a stranger near a big tree. The stranger had a red ball. Tim liked red balls.\n\"Hi!\" said Tim. \"My name is Tim. Can I play with your red ball?\" The stranger smiled and said, \"Yes, you can play with my red ball. But first, let's play a game.\"\nTim and the stranger played a game. They ran and laughed. Tim was happy. The stranger was fun to play with.\nThen, something unexpected happened."
+  },
+  {
+   "prompt": "please tell me a story about an attic",
+   "story": "One day, a boy named Tim and his cat, Max, went to play in their house. They liked to play hide and seek. Tim thought of a new place to hide. He went to the attic. The attic was a room up high in the house. It was dark and full of old things.\nTim hid behind a big box. Max was a tough cat. He could find Tim anywhere. Max looked all around. He went to the attic and said, \"I will find you, Tim!\" Max looked behind the big box and found Tim."
+  },
+  {
+   "prompt": "tell me a tale",
+   "story": "Once upon a time there was a girl called Sara. She was only three years old and she loved exploring. One day, she went out to the park with her mom. They saw lots of flowers and trees. Her mom suggested that Sara should pick one of the fragrant flowers. Sara smiled and carefully chose a delicate flower with a beautiful smell. \nMom said that Sara should keep the flower to bring home and put it in her bedroom. Sara was so happy that she skipped all the way back home."
+  },
+  {
+   "prompt": "can you tell me a story about a mailbox",
+   "story": "Once upon a time, there was a unique mailbox. It was not like other mailboxes. It was big, red, and had a happy face. Everyone in the town loved the unique mailbox.\nOne day, a little girl named Lily wanted to send a letter to her grandma. She put the letter in the unique mailbox. The mailbox smiled and said, \"I will provide your letter to grandma.\"\nThe unique mailbox was very helpful. It always provided letters to the right people. The people in the town were happy."
+  },
+  {
+   "prompt": "tell me a bedtime story",
+   "story": "One day, a boy named Tim went to the store with his mom. They needed to buy food for dinner. Tim's mom said, \"We will make a salad tonight.\" Tim liked salad, so he was happy.\nAt the store, they picked up lettuce, tomatoes, and mild cheese. Tim's mom mentioned, \"We need some dressing too.\" Tim found a bottle of dressing and put it in the cart. They paid for the food and went home.\nWhen they got home, they started making the salad. Tim's mom opened the dressing bottle, but it was not dressing!"
+  },
+  {
+   "prompt": "please tell me a story about a dog",
+   "story": "Once upon a time, there was a dog named True. True was a very loyal dog. He loved his family very much. One day, True and his family went to a big park to play. True was so happy to run and play with his family.\nAt the park, True saw a big cake. The cake was for a party. True wanted to eat the cake, but he knew it was not his. A little boy saw True looking at the cake and said, \"Don't eat the cake, True. It will spoil the party.\" True listened to the boy and did not eat the cake."
+  },
+  {
+   "prompt": "could you make up a story about Max",
+   "story": "One day, a little dog named Max found a brush. He picked it up and started to brush his fur. It felt nice and made his fur look pretty. Max was very happy with his new brush.\nMax saw his friend, a cat named Luna. He wanted to show her his pretty fur. But when Luna saw Max, she started to tease him. \"You look terrible, Max!\" she said with a laugh. Max felt sad and didn't know what to do.\nMax went to his mom and told her what happened. His mom said, \"Don't worry, Max. You look great!"
+  },
+  {
+   "prompt": "tell me a story about a bird, please",
+   "story": "Once upon a time, there was a bird who loved to sing. The bird had many colors on its wings. It lived in a big tree with rough bark.\nOne sunny day, the bird met a little girl. The girl said, \"Hi, bird! I like your colors. Can you sing for me?\" The bird was happy and began to sing a pretty song.\nThe girl danced to the bird's song. They played and laughed all day. From that day on, the bird and the girl became best friends. They had lots of fun singing, dancing, and playing together."
+  },
+  {
+   "prompt": "could you make up a story about a boat",
+   "story": "Once upon a time, there was a big boat. The boat had a heavy anchor. One day, the boat came to a pretty island. On the island, there were many smart animals. They loved to play and learn.\nOne smart bird saw the boat come to the island. He knew the anchor was important. The bird told his friends, \"We must help the boat stay safe with the anchor.\" All the animals worked together to make the anchor strong.\nThe boat stayed safe and the animals were happy. They played with the boat every day."
+  },
+  {
+   "prompt": "could you make up a story about a thoughtful",
+   "story": "Once upon a time, in a big wild forest, there lived a thoughtful little bird named Betty. Betty had a lot of friends, but she was not like the other birds. She had a special skill - she could balance on one leg for a very long time.\nOne sunny day, Betty and her friends were playing near the river. They were having so much fun. Betty wanted to show her friends her balancing skill. She stood on one leg and started to balance. Her friends watched and clapped their wings."
+  },
+  {
+   "prompt": "a story about a honey?",
+   "story": "Once upon a time, there was a little bee named Buzzy. Buzzy loved to fly around and look for honey. One day, Buzzy found a big jar of honey in a garden. Buzzy was very happy and said, \"Wow! So much honey!\"\nBuzzy wanted to share the honey with his adorable friend, Lulu the ladybug. So, Buzzy flew to Lulu's house and knocked on her door. Lulu came out and Buzzy said, \"Look, Lulu! I found honey! Let's eat it together!\" Lulu was excited and said, \"Yay!"
+  },
+  {
+   "prompt": "i want a story",
+   "story": "Once upon a time, there was a little girl named Emma. Emma loved to eat tasty food. She liked apples, bananas, and cookies. One day, she found a big box in the kitchen. The box had a label on it. The label had a picture of a yummy cake.\nEmma wanted to eat the cake. She asked her mommy for help. Her mommy said, \"Okay, let's make the cake!\" Emma was so happy. They mixed all the things in a big bowl. Then they put it in the oven to get hot."
+  },
+  {
+   "prompt": "make up a story",
+   "story": "Once upon a time, there was a little girl named Amy. She was very impatient. One day, Amy lost her mitten. She looked everywhere for it, but she couldn't find it. Amy was sad.\nAmy asked her friend, Tom, \"Did you see my mitten?\" Tom said, \"Yes, I saw it by the big tree.\" Amy ran to the big tree and found her mitten. She was so happy!\nAmy and Tom played together. They were very good friends. They learned to share and yield to each other. They always had fun and were happy."
+  },
+  {
+   "prompt": "tell me a story about Tim",
+   "story": "One day, a little boy named Tim went to the park with his mom. They saw a big, messy tree with a trunk that looked like a face. Tim thought the face was frowning. He asked his mom, \"Why is the tree so sad?\"\nHis mom looked at the tree and said, \"I don't know, Tim. Maybe it's because it's so messy. Let's clean it up and see if the tree will be happy.\" So, they picked up the leaves and sticks around the tree. They also found a toy car that was lost in the grass."
+  },
+  {
+   "prompt": "make up a story about a car",
+   "story": "Once upon a time, there was a big car. The car needed fuel to go. The car had a friend named Tom. Tom was a little boy. Tom liked to help the car go.\nOne day, the car felt sorry. The car could not go because it had no fuel. Tom wanted to help the car. Tom spread his arms wide and said, \"I will find fuel for you, car!\"\nTom looked for fuel everywhere. He found some fuel in a can. Tom put the fuel in the car. The car was happy now. The car could go again. Tom and the car went to play."
+  },
+  {
+   "prompt": "i'd like a story about Jack",
+   "story": "Once there was a little boy called Jack. Every day he would see something wonderful in the park and mark it with his mind. One day, he was so lucky to find a shiny silver coin on the ground. He squealed with joy and picked up the coin.\nJack was full of wonder and he quickly ran back home to show his parents. When he arrived, he was so excited and he couldn't wait to tell them what he had discovered.\nJack's father smiled at him and said: \"Jack, that's a very lucky find, let's keep it safe\"."
+  },
+  {
+   "prompt": "make up a story about a note",
+   "story": "One day, a cute little dog named Max found a note on the ground. He could not read, but he knew it was important. Max decided to take the note to his friend, a smart bird named Sam.\nMax ran to Sam and said, \"Sam, I found a note. Can you read it for me?\" Sam looked at the note and started to shake. \"Oh no, Max! This note says a big storm is coming. We need to tell everyone!\"\nMax and Sam went around telling all their friends about the storm. They all worked together to find shelter and stay safe."
+  },
+  {
+   "prompt": "tell me a story about a picnic, please",
+   "story": "Once upon a time, a little girl named Lucy wanted to have a picnic. She was very sad because it was raining outside, and she felt miserable. Lucy sat by the window and started to imagine her perfect picnic.\nIn her mind, Lucy saw a big, sunny field with a soft, green grass. She had a big, red blanket to sit on, and lots of yummy food. Her best friend, Tommy, came to the picnic too. \"This is fun,\" said Tommy, \"I like the sun and the food.\"\nSuddenly, the rain stopped, and the sun came out."
+  },
+  {
+   "prompt": "tell me a story about Lisa",
+   "story": "Once there was a little girl named Lisa who loved to play outside. She was always looking for something fun to do. One day she was walking in the woods when she saw a big black drain. She was surprised, for she had never seen a drain in the woods.\nSuddenly a voice rang out from inside the drain. It said, \"Do you want to come in here? I have something special to offer you!\" Lisa was scared, but the voice sounded kind and friendly so she decided to go closer to the drain."
+  },
+  {
+   "prompt": "could you make up a story about Lisa",
+   "story": "One day, Lisa and her mommy took a ride in their jeep. It was fun! The wind blew their hair back and they laughed and sang together.\nWhen they arrived at the house, they found a generous surprise waiting. Someone had left a blanket with a big bird on it.\nLisa's mommy wrapped the blanket around Lisa to keep her warm and cozy. Lisa felt happy and safe.\nMommy gave Lisa a big hug. She whispered in Lisa's ear: \"This is a hug to make you feel comforted\". Mommy's hug was so warm and generous."
+  },
+  {
+   "prompt": "story please",
+   "story": "Once there was a little girl named Abigail. She wanted to do something special, but she didn't know how. She had been struggling to learn how to fly like a bird.\nOne day, her mum said, \"Abigail, why don't you get a tutor to show you how to fly?\"\nAbigail was excited and smiled widely. She agreed to the idea and soon found a graceful tutor. She began to train under the tutelage of the tutor."
+  },
+  {
+   "prompt": "tell me a story about Yellow",
+   "story": "Once there was a puppy called Yellow. Yellow was only 3 years old and loved to play. Every day Yellow would go out and play with his friends. But today Yellow wanted to play hide and seek. \nHe went up to his friends and asked them if they wanted to play. They all agreed, and one of his friends said that he would hide first. Yellow waited and waited but his friend didn't come out.\n\"Where are you?\" Yellow asked. \n\"I'm hiding!\" his friend replied. \nSo Yellow started to look around for his friend."
+  },
+  {
+   "prompt": "tell me a short story about a steel",
+   "story": "Once upon a time there was a very curious boy. Every day he went outside to play. One day he found something very strange. It was steel! He had never seen steel before and wondered what it could be. He touched it and it felt very cold and hard.\nThe curious boy asked his mom if he could keep the steel. She said he could, so he took it inside and kept it in his room. He wanted to play with it, but it was too hard and heavy. Sometimes he just looked at it and touched it."
+  },
+  {
+   "prompt": "story about a bird please",
+   "story": "Once upon a time, there was a noisy bird. The bird liked to sing all day. The bird lived in a big tree.\nOne day, the bird saw a book. The book was about history. The bird wanted to read the book. But the book was in a little boy's hand.\nThe noisy bird had an idea. It would steal the book from the boy. The bird flew down and took the book. The boy was sad.\nThe bird read the history book in the tree. The boy looked up and saw the bird. The bird felt bad for making the boy sad."
+  },
+  {
+   "prompt": "i'd like a story about a dull",
+   "story": "One day, a boy named Tim went for a jog. He liked to run in the park. The sun was shining, but the day was a bit dull. The sky was gray, and there were no birds singing. Tim felt a little sad.\nAs Tim jogged, he saw a girl sitting by a tree. She looked sad too. Tim stopped jogging and walked to the girl. He said, \"Hi, I am Tim. Why are you sad?\"\nThe girl looked up and said, \"Hi Tim, I am Sue. I am sad because I can't find the right word for my song."
+  },
+  {
+   "prompt": "tell me a short story about a car",
+   "story": "Once there was a big car with four thick tires. The car loved to go fast and play with its friends. One day, the car went to the park to race with other cars. All the cars were excited and ready to go.\nAs they started the race, the big car's thick tire went flat. It felt sad and thought the race was over. But then, a little bike came along. The little bike had a tire just like the big car's thick tire. The little bike wanted to help the big car and gave its tire to the big car."
+  },
+  {
+   "prompt": "a story about a car?",
+   "story": "Once upon a time, there was a green car. This car lived in a big garage. The garage was the car's home. Every day, the car would go outside and play with its friends.\nOne day, the green car found a big stick. The car wanted to poke things with the stick. It poked a ball, a tree, and a box. The green car was having so much fun poking things!\nThe green car went back to the garage. It showed its friends the big stick. They all took turns poking things with the stick."
+  },
+  {
+   "prompt": "could you make up a story about a match",
+   "story": "Once upon a time, there was a little boy named Tim. Tim had a toy box with many toys. One day, he found a match in the box. He knew it was not a toy, so he asked his mom what to do with it.\nHis mom told him, \"Tim, matches can rot if they get wet. So, we must keep them in a safe place.\" She took the match and put it in a high place where Tim could not reach. She told him, \"Matches are not for playing, they are only for when we need them.\"\nLater, Tim's mom showed him when to use a match."
+  },
+  {
+   "prompt": "tell me a short story about Daisy",
+   "story": "Once upon a time, there was a beautiful dog named Daisy. She loved to play and run in the park. One day, Daisy saw a big tree and decided to lean on it to rest.\nWhile resting, a little boy named Tim came up to Daisy. Tim said, \"Hi, beautiful dog! Can I play with you?\" Daisy wagged her tail and barked, \"Yes, let's play!\" So, they played and had lots of fun.\nBut then, it started to rain. The sky turned dark, and the wind blew hard. Daisy and Tim were sad."
+  },
+  {
+   "prompt": "tell me a short story about a treat",
+   "story": "One day, a boy named Tim and a girl named Sue went to the park. They saw a tasty treat on a table. They both wanted it. But there was only one treat left. They looked at each other and knew they had to hurry.\n\"Let's race to the treat!\" said Tim. Sue nodded and they started to run. They ran as fast as they could. Tim was fast, but Sue was faster. They were almost at the table.\nSuddenly, a big dog came. It saw the tasty treat too. The dog jumped and grabbed the treat in its mouth."
+  },
+  {
+   "prompt": "a story about a butterfly?",
+   "story": "Once upon a time, there was a beautiful butterfly. The butterfly had big, bright wings. It liked to play in the sun. One day, it saw a shadow on the ground. The shadow was big and scary. The butterfly was scared and hid behind a flower.\nA little girl named Lily saw the butterfly. She went close to the flower and whispered, \"Don't be scared, butterfly. The shadow is just a big tree. It will not hurt you.\" The butterfly listened to Lily and came out from behind the flower."
+  },
+  {
+   "prompt": "write me a little story about a park",
+   "story": "Once upon a time, there was a little dog named Ben. Ben loved to play with his friends in the park. One day, Ben met a new friend named Sam, who was a cat. Ben and Sam played together all day and had lots of fun.\nThe next day, Ben told his friend Tim, who was a rabbit, about Sam. Tim said, \"I don't like cats. I don't recommend playing with Sam.\" But Ben liked Sam and wanted to play with him again.\nSo, Ben and Sam played together every day. One day, they found a big box in the park."
+  },
+  {
+   "prompt": "tell me a story about a park, please",
+   "story": "Mama and Papa took Lisa to the park. Lisa screamed with joy when she saw the swings, but she was careful to watch out for the traffic.\nMama said,\"Let's go explore a little further.\" Lisa was so excited and began running ahead of her parents.\nSuddenly, something in the bushes revealed itself to them. It was a smelly animal! Lisa was scared and started to cry.\nMama said, \"It's okay, Lisa! Don't worry.\" But the animal jumped out and tried to bite them!"
+  },
+  {
+   "prompt": "a story about a design?",
+   "story": "Once upon a time, there was a giant. The giant was very high and he liked to design. One day, he met a little boy. The little boy was sad.\nThe giant asked the boy, \"Why are you sad?\" The little boy said, \"I want to fly high like a bird, but I can't.\" The giant wanted to help the boy, so he used his design skills to make big wings for the boy.\nThe boy put on the wings and flew high in the sky. He was very happy. The giant was happy too because he helped the boy."
+  },
+  {
+   "prompt": "please tell me a story about a piano",
+   "story": "Sally was a lazy girl. She liked to lay around the house all day and do nothing. One day, she was feeling particularly bored and didn't know what to do. She went into the living room and there was a piano in the corner. She was really interested in it and went over to take a closer look. She realized it was a special instrument that made music. She sat down in front of the piano and put her hands on the keys. She started playing and soon realized that playing the piano was really fun!"
+  },
+  {
+   "prompt": "could you make up a story about berries",
+   "story": "Once upon a time, there was a little girl named Sue. Sue loved to eat berries. She would always behave and listen to her mom. One day, Sue went to the park with her mom to play.\nWhile playing, Sue saw a big bush with red berries. She ran to the bush and started to eat the berries. After eating a lot of berries, Sue felt dizzy. She did not understand why she felt this way.\nSue's mom saw her and quickly came to her. She told Sue that those berries were not good to eat."
+  },
+  {
+   "prompt": "tell me a story about a motorcycle",
+   "story": "One day, a boy named Tom saw a motorcycle. He loved the motorcycle. It was big and shiny. Tom wanted to ride it. But, he did not know how to ride it. He was ignorant about motorcycles.\nTom asked his friend, Sam, to help him. Sam did not know how to ride a motorcycle either. But Sam wanted to try. They both got on the motorcycle. They did not know that it was dangerous.\nThey started to ride. At first, it was fun. But then, the motorcycle went too fast. They could not stop it."
+  },
+  {
+   "prompt": "make up a story",
+   "story": "Once upon a time, there was a fine cat named Bow. Bow loved to play all day. Bow had many friends like Dog, Bird, and Fish. They all liked to play together.\nOne week, Bow and his friends played new games. They played hide and seek, tag, and catch. Bow was very fast and good at the games. His friends were happy to play with him.\nAt the end of the week, Bow and his friends were tired but happy. They all said, \"Thank you, Bow, for the fun week!\" Bow was glad to have such good friends."
+  },
+  {
+   "prompt": "tell me a short story about a cat and a party",
+   "story": "Once upon a time, there was a bright cat. The cat had a lot of friends. The cat and its friends liked to play together. They would run, jump, and laugh all day long. The cat wanted to unite all its friends for a big party.\nOne day, the cat asked all its friends to come to its house. The friends said yes. They were excited for the big party. The cat got ready for the party. It put out food and toys for everyone to enjoy.\nBut on the day of the party, it rained very hard."
+  },
+  {
+   "prompt": "write me a little story about an ant and a swing",
+   "story": "Once upon a time, there was a mighty ant. The ant liked to march all day. One day, the ant saw a swing.\nThe ant wanted to play on the swing. So, the ant marched to the swing. The ant went up and down on the swing. It was fun!\nAfter playing, the mighty ant marched back home. The ant told all its friends about the swing. They all went to play on the swing together. They had a great day."
+  },
+  {
+   "prompt": "story about an uncle and famous please",
+   "story": "Once upon a time, there was a little boy named Tim. Tim loved to pretend he was a famous singer. His uncle, who was also famous, would come to visit him. They would sing and dance together.\nOne day, Tim's uncle came to visit. Tim said, \"Uncle, let's pretend we are famous singers!\" His uncle smiled and said, \"Yes, Tim! Let's sing and dance together.\"\nSo, Tim and his uncle sang and danced all day. They had so much fun pretending to be famous."
+  },
+  {
+   "prompt": "please tell me a story about a tree",
+   "story": "Once upon a time there was a cute monkey named Bobo. Bobo loved to swing from tree to tree and explore the jungle with his friends.\nOne day Bobo fell off a tree and hurt his arm. His friends knew his arm was hurt and took him to get an x-ray. Bobo was scared at first, but then he saw the x-ray machine and thought it was cool. He smiled when his friends explained what the machine does and he felt better."
+  },
+  {
+   "prompt": "story please",
+   "story": "Once upon a time, there was a little girl named Sue. Sue loved to eat pastry. One day, she found a big pastry in the kitchen. It was very yummy. Sue was very happy.\nSue's friend, Tom, was stubborn. He did not like pastry. Sue said, \"Tom, try this pastry. It is good.\" Tom said, \"No, I don't want to.\" Sue felt sad.\nOne day, Tom fell and hurt his leg. Sue wanted to help him heal. She gave him a pastry and said, \"Eat this. It will make you feel better.\" Tom ate the pastry and his leg healed."
+  },
+  {
+   "prompt": "tell me a story about a dirt",
+   "story": "Once upon a time, there was a little girl named Sue. Sue loved to play outside in the dirt. One day, she got very filthy from playing in the mud. Her clothes were dirty and her face was covered in dirt.\nSue's mom saw her and said, \"Sue, you need to freeze right now! You cannot come inside the house like that.\" Sue stopped and looked down at her muddy clothes. She knew her mom was right.\nSue went to the big hose in the yard. She turned it on and washed all the dirt off her clothes and face."
+  },
+  {
+   "prompt": "tell me a short story about Sue",
+   "story": "One day, a little girl named Sue went to the market with her mom. They wanted to buy some vegetables. Sue saw a big, clear bag to put the vegetables in. She was very excited.\nSue saw a man selling vegetables. He had a lot of them. There were green ones, red ones, and yellow ones. Sue wanted to help her mom pick the vegetables. She reached for a big, green one.\nSuddenly, Sue heard someone yell. It was her mom. \"Sue, be careful!\" her mom said. Sue almost dropped the green vegetable."
+  },
+  {
+   "prompt": "tell me a story about an acorn, please",
+   "story": "Once upon a time, in a wild forest, there was a little squirrel. The squirrel loved to find acorns to eat. One day, he found the biggest acorn he had ever seen. He was very happy and wanted to take it to his home.\nOn his way home, he saw a big, scary bird. The bird wanted the acorn too. The squirrel did not want to give the acorn to the bird. So, he tried to escape. He ran very fast, with the big acorn in his little paws.\nThe squirrel ran and ran until he reached his home. He was safe now."
+  },
+  {
+   "prompt": "can you tell me a story about a peanut",
+   "story": "One day, a little girl named Sally found a peanut on the ground. She wanted to eat it, but her friend Timmy said, \"No, Sally! That peanut looks terrible! It's dirty and old.\" Sally felt sad but knew that Timmy was right.\nLater, Sally and Timmy saw a squirrel on the ground. The squirrel looked hungry. Sally had an idea. She told Timmy, \"Let's give the terrible peanut to the squirrel. It might like it.\" Timmy thought it was a good idea. So, they went to the squirrel and urged it to eat the peanut."
+  },
+  {
+   "prompt": "a story about Tim?",
+   "story": "Once upon a time, there was a little boy named Tim. Tim loved to help his mom. One day, Tim's mom asked him to put his clothes on a hanger. Tim was very happy to help. He took the hanger and went to his room.\nIn his room, Tim saw a big box. It was not the original box that was always there. Tim was very curious. He opened the box and found a lot of hangers inside. Tim was very surprised. He did not know where the box came from.\nTim decided to use the new hangers to hang his clothes."
+  },
+  {
+   "prompt": "a story about a train?",
+   "story": "One day, a big train arrive at a small town. The train stop on the track. The town was not rich. The people there did not have much. The train was full of food and toys for the town.\nA man from the train said, \"We are here to help you. We brought food and toys for you all.\" The people were happy. They could not believe it. They never had so much before. They said, \"Thank you, thank you!\"\nBut then, a big wind came. It blew very hard. The wind took all the food and toys away. The people were sad."
+  },
+  {
+   "prompt": "please tell me a story about Tim",
+   "story": "One day, a little boy named Tim went outside to play. He noticed the warm sunshine on his face. Tim saw his friend, Sue, in her messy yard.\n\"Hi, Sue!\" said Tim. \"Let's play in the sunshine!\"\nSue smiled and said, \"Yes! Let's play with my toys!\"\nThey played with Sue's toys in the messy yard. They had fun in the sunshine. Tim and Sue laughed and played until it was time to go home."
+  },
+  {
+   "prompt": "tell me a story about a sack, please",
+   "story": "Once upon a time, in a gloomy forest, there was a big sack. The sack was full of yummy food. A little bird saw the sack and wanted to eat the food inside.\nOne day, a nice dog came to the forest. The dog was hungry too. The little bird and the dog became friends. They decided to eat the food from the sack together.\nBut when they opened the sack, they found toys instead of food! They were surprised but happy. The little bird and the dog played with the toys all day long and had a great time."
+  },
+  {
+   "prompt": "tell me a story about carrots, please",
+   "story": "One day, an ordinary rabbit named Bob was hopping in the forest. He saw a big tree with lots of yummy carrots. Bob wanted to eat the carrots, but they were too high up. He tried to jump, but he could not reach them.\nBob saw his friend, Tim the turtle. Tim was walking slowly near the tree. Bob said, \"Tim, help me get the carrots, please!\" Tim thought for a moment and said, \"Okay, let's kneel down and I will stand on your back.\"\nBob kneeled down and Tim climbed on his back."
+  },
+  {
+   "prompt": "write me a little story about a light",
+   "story": "Once upon a time, there was a little boy named Tom. Tom was very adventurous. He loved to explore and play outside. One day, he saw a pretty light in the sky. The light was bright and sparkly. Tom wanted to find the light.\nTom walked and walked until he found the light. The light was a beautiful butterfly. The butterfly was a little shy. Tom wanted to be friends with the butterfly. He tried to talk to the butterfly, but he felt embarrassed because he didn't know what to say."
+  },
+  {
+   "prompt": "tell me a story about a bee, please",
+   "story": "One day, a bee and a bird were friends. They liked to talk. The bee lived in a hive. The hive was new and modern. The bird lived in a tree.\nThe bee said, \"Let's discuss our homes.\" The bird said, \"Ok, I like my tree. My tree is big and green. What about your hive?\" The bee said, \"My hive is modern and nice. I like it too.\"\nOne day, they saw something strange. A big box was near the hive. The bee and the bird looked at it. They were scared. They did not know what it was."
+  },
+  {
+   "prompt": "write me a little story about a daisy",
+   "story": "Once upon a time, there was a little daisy. The daisy lived in a big field with many other flowers. They all loved the sun and rain that helped them grow. But one day, the rain did not come, and the flowers began to feel sad.\nThe little daisy was very selfish. It wanted all the rain for itself. So, it thought of a plan to get more rain. The daisy asked the clouds to rain only on it and not the other flowers. The clouds agreed and rained only on the little daisy."
+  },
+  {
+   "prompt": "could you make up a story about a meadow",
+   "story": "Once there was a girl. She was very young and she loved to explore. Everywhere she went she would look and learn. One day she was in a meadow and it was so calm. She sat in the grass and watched the clouds float by. \nShe felt very happy and peaceful, and soon she drifted off to a deep sleep. While she was sleeping, wonderful memories filled her head. She saw happy faces and she heard sweet music. When she awoke she felt so calm."
+  },
+  {
+   "prompt": "make up a story about a snake and a mother",
+   "story": "John was walking in the forest with his mother when he saw a snake. He was so scared, he stopped and held his mother's hand. They both looked up at the snake and then, John's mother said \"That snake is very high\", and John said \"Yes, it is.\"\nJohn's mother took his hand and said \"Come, let's walk away\". But then, the snake said \"Please forgive me, I did not mean to frighten you\"."
+  },
+  {
+   "prompt": "make up a story about an owl",
+   "story": "Once upon a time, there was a wise old owl who lived in a big oak tree. The oak tree was in a beautiful forest. Many animals lived in the forest too. The wise owl loved to help the animals when they had problems.\nOne day, a little squirrel came to the owl and said, \"Wise owl, my nuts are spoiled! I don't know what to do.\" The wise owl thought for a moment and said, \"Do not worry, little squirrel. I know how to help you."
+  },
+  {
+   "prompt": "could you make up a story about toys and a room",
+   "story": "Once upon a time, there was a little girl named Lily. She loved to organize her toys in her room. She had a big black box where she put all her toys when she was done playing with them. Lily liked to keep her room neat and tidy.\nOne day, Lily found a small statue in her backyard. It was a statue of a cute bunny. She was so happy to find it. Lily decided to take the statue inside and put it on her shelf with her other toys.\nEvery day, Lily would play with her toys and the bunny statue."
+  },
+  {
+   "prompt": "could you make up a story about an animal",
+   "story": "Once upon a time, there was a little boy named Tim. Yesterday, Tim went to the park with his mom. At the park, Tim saw a big, unknown animal. He was scared, but he wanted to find out what it was.\nTim went closer to the unknown animal. The animal had sharp teeth and a long tail. Tim's mom saw him and said, \"Be careful, Tim! That animal has sharp teeth and it might hurt you.\"\nTim listened to his mom and stayed away from the unknown animal. They went home and told dad about their adventure."
+  },
+  {
+   "prompt": "story about Ellie please",
+   "story": "Once upon a time, there was a little engine named Ellie. Ellie was a very reliable engine. Every day, she would turn on and go to work. She loved to help her friends.\nOne day, Ellie's friend, Tom the truck, was sad. \"I can't move,\" Tom said. \"My wheels are stuck.\" Ellie wanted to help Tom. She thought hard about what to do.\nEllie had an idea. She turned on her engine and pulled Tom out of the mud. \"Thank you, Ellie!\" Tom said with a big smile. Ellie was happy she could help her friend."
+  },
+  {
+   "prompt": "can you tell me a story about a cage",
+   "story": "Once upon a time, in a big forest, there was a sleepy bird named Blue. Blue lived in a small cage that hung from a tree. Every day, Blue would sing and laugh with his friends.\nOne day, Blue's friend, Red, came to visit. \"Hi Blue!\" said Red. \"Why are you in that cage? Come out and play with us!\" Blue shook his head and said, \"I can't, Red. I don't know how to open the door.\"\nRed thought for a moment and said, \"Don't worry, Blue."
+  },
+  {
+   "prompt": "tell me a story",
+   "story": "Once there was a little boy who wanted to hunt. He found a spear and went to the forest with it.\nAs soon as he got there, the boy started to look around. He pointed the spear at a tree and pretended he was hunting. Then he heard a noise. It was very noisy.\nThe little boy was scared so he stepped back very slowly. He was afraid that something bad was going to happen. But then he realized that the noise was only made by some animals."
+  },
+  {
+   "prompt": "i want a story about a glue and a room",
+   "story": "One day, a little boy named Tim found a bottle of glue. He thought it was very silly. Tim wanted to play with the glue, so he took it to his room.\nIn his room, Tim saw his toys and had an idea. He said to his teddy bear, \"I will use the glue to make you a friend.\" Tim started to glue his toys together to make a new toy. He was very happy with his work.\nLater, Tim's mom came into his room and saw the new toy. She said, \"Oh Tim, that is a silly toy!\" Tim smiled and knew his mom liked it too."
+  },
+  {
+   "prompt": "tell me a short story about twins",
+   "story": "Once upon a time, there was a boy and his twin sister. One day, the boy said to his twin, \"I want to buy something together!\" His sister agreed. \nThe twins held hands and went to the open market. They saw many colorful vegetables and fruits. The boy went to the vendor and said, \"I would like to buy an apple please!' The vendor gave him a big red apple.\nThe twins enjoyed the apple together. The boy said to his twin, \"Let's buy more stuff!\" Then, the twins bought a colorful balloon and a toy car."
+  },
+  {
+   "prompt": "tell me a short story about a ball",
+   "story": "One day, a boy named Tim went to the store with his mom. They wanted to buy a big, red ball for Tim to play with. Tim was very happy because he loved playing with balls.\nAt the store, Tim saw a big box. Inside the box, there was a deep hole. Tim put his hand in the hole and felt something soft. It was a rub. Tim took the rub out of the box and showed his mom. She said they could buy the rub too.\nTim and his mom bought the big, red ball and the rub."
+  },
+  {
+   "prompt": "read me a story",
+   "story": "Once upon a time, there was a regular boy named Tom. He liked to play with his toys and run in the park. One day, Tom found a mask on the ground. The mask was very pretty, and he wanted to keep it.\nThat night, Tom had a dream. In his dream, he wore the mask and became a superhero. He could fly high in the sky and help people. He felt very happy and strong.\nWhen Tom woke up, he put on the mask and pretended to be a superhero. He had fun playing with his new mask all day long."
+  },
+  {
+   "prompt": "make up a story about a glass and a park",
+   "story": "Once upon a time, there was a little boy named Danny. He had lots of dreams. Every night, he dreamt about playing in a big park with his friends.\nOne day, Danny was walking around the park. Suddenly, he saw a big glass. He was scared; the glass looked so shiny and sharp. Danny wanted a closer look, but he was still scared.\nHowever, he was brave and decided to take a closer look. He stepped closer, and then reached out and touched it. The glass felt cool and smooth. Danny smiled."
+  },
+  {
+   "prompt": "story about Sue please",
+   "story": "Once upon a time, there was a little girl named Sue. Sue liked to play with her toys in her room. One day, she found a big chest in her room. It was unusual because Sue did not know where it came from.\nSue opened the chest and saw many pretty things inside. She guessed that the chest was a gift from her mom and dad. Sue put on a pretty dress and a shiny hat from the chest. She looked so nice.\nSue showed her mom and dad her new dress and hat. They were happy to see her looking so nice."
+  },
+  {
+   "prompt": "make up a story about a stable",
+   "story": "Once upon a time, there was a stable. In the stable, there was a horse named Bob. Bob was a very expensive horse. He was big and strong. Bob lived with his friend, a little boy named Tim.\nOne day, Tim came to the stable to see Bob. Tim said, \"Bob, will you help me? I need to carry these heavy bags to my house.\" Bob nodded his head and let Tim put the bags on his back.\nTogether, they walked to Tim's house. Tim said, \"Thank you, Bob, for your help.\" Bob was happy to help his friend."
+  },
+  {
+   "prompt": "i want a story about a park",
+   "story": "Sam and his mom were walking in the park. Sam asked his mom, \"What's that smell?\" His mom replied, \"That's the flowers. Don't you like the smell?\"\n Sam said, \"Not really. It's smelly.\"\nAt the end of the park, they saw a pond. There were some ducks playing in the water. Sam said to his mom, \"Look, ducks! Can I pet one?\" His mom said, \"No, you don't understand. Those ducks live here. You can watch them, but don't touch them.\"\nSam watched the ducks for a while, then he saw something in the water."
+  },
+  {
+   "prompt": "please tell me a story about an ice",
+   "story": "Once upon a time, there was a popular ice-cream truck. It had many colors and was always playing happy music. Every day, kids would run to the truck to get their favorite ice-cream.\nOne sunny day, the ice-cream truck came to the park. The kids were very happy to see it. They all lined up to get their ice-cream. A little boy named Timmy was so excited that he began to slide on the grass.\n\"Look, I can slide!\" Timmy said to his friend, Sarah. Sarah laughed and clapped her hands."
+  },
+  {
+   "prompt": "please tell me a story about a cake",
+   "story": "Once upon a time, there was a little bird named Bobo. Bobo loved to fly in the sky. One day, Bobo saw a big cake on the ground. It was a sweet cake for a birthday party. Bobo wanted to celebrate too!\nBobo flew down and asked, \"Can I celebrate with you?\" The kids at the party said, \"Yes, come join us!\" They all had fun and ate the sweet cake together. But then, something unexpected happened.\nA big wind came and blew the cake away! The kids were sad. But Bobo had an idea."
+  },
+  {
+   "prompt": "write me a little story about a nut",
+   "story": "Once upon a time, there was a little boy called Jack. He was only 3 years old. One day, Jack's mommy gave him a nut to eat. She told him to be obedient and to behave. But Jack wasn't listening and he threw the nut away.\nSo, his mommy got angry and got very cross. \"Jack!\" She said, \"My word, why didn't you behave and listen to me?\" Jack was very sorry and started to cry.\nBut his mommy was still mad. She scolded Jack and said, \"You must be obedient."
+  },
+  {
+   "prompt": "write me a little story about a money",
+   "story": "One day, a boy named Tim went to the store with his mom. Tim's mom gave him money to buy a toy. Tim was very happy. He held the money tight in his hand.\nIn the store, Tim saw many toys. He could not choose which one he wanted. He looked and looked. Then, he noticed that he lost his money. Tim felt miserable. He looked for the money but could not find it."
+  },
+  {
+   "prompt": "a story about a bookshelf and books?",
+   "story": "Once upon a time, there was a wealthy man. He had a big house with a bookshelf. The bookshelf had many books. The man liked to read the books every day.\nOne day, the man saw a new book on the bookshelf. He wanted to read it, but he was very busy. He thought, \"I will read it tomorrow.\" But he did not read it the next day or the day after that.\nThe man began to regret not reading the new book. He felt sad. One day, the bookshelf fell down. All the books were gone."
+  },
+  {
+   "prompt": "please tell me a story about a dog",
+   "story": "Lily and Ben were playing in the park. They liked to run and jump and slide. But then they saw a big dog. The dog was black and brown and had sharp teeth. The dog barked loud and ran towards them.\n\"Help!\" Lily cried. \"The dog is bad!\"\nBen was scared too. But he wanted to protect Lily. He picked up a stick and waved it at the dog. \"Go away!\" he shouted. \"You are not nice!\"\nThe dog did not listen. It jumped at Ben and tried to bite him. Ben and the dog fought. They rolled on the ground."
+  },
+  {
+   "prompt": "i want a story",
+   "story": "Once upon a time, there was a young girl named Lucy. She was only three years old, and was full of adventure. Whenever she went outside, she liked to explore and discover new things.\nOne day, while she was running around outside, Lucy discovered a beautiful dress. It was pink and had sparkles all over it. She was so happy with her discovery!\nBut then, she noticed that someone had been careless with the dress. The seams were coming apart and it looked like it was about to fall apart."
+  },
+  {
+   "prompt": "tell me a story about a fireplace",
+   "story": "Once upon a time, there was a big house with a fireplace. A family lived in the house. Mom, Dad, and little Tim. They loved to sit by the fireplace when it was cold outside. It made them feel warm and happy.\nOne day, they saw a distant house. They wanted to see who lived there. They walked and walked until they reached the house. Inside, they found a big bird who could talk! The bird said, \"I can support you when you are sad.\"\nThe family was happy to meet the talking bird."
+  },
+  {
+   "prompt": "i'd like a story about Spot",
+   "story": "Once upon a time, there was a little dog named Spot. Spot was very lonely because he had no friends to play with. One day, he decided to go for a walk to find a friend.\nAs Spot walked, he met a funny cat named Joke. Joke liked to tell silly jokes and make others laugh. Spot and Joke started to play together and became best friends.\nOne day, while they were playing, Joke said, \"Stop! I have a joke to tell you.\" Spot stopped and listened to the joke. They both laughed and laughed."
+  },
+  {
+   "prompt": "a story about a river?",
+   "story": "Once upon a time, there was a bear named Jack. One day, Jack was walking through the woods when he saw a river. He wanted to take a swim, so he jumped in. But the river was cold, so Jack started to shiver. \nJust then, he noticed a fox nearby. The fox had traded his fur to the river and was slowly soaking it in the water. Jack asked the fox why he was doing that. The fox explained that he had been too fierce to the other animals in the woods and they were angry."
+  },
+  {
+   "prompt": "can you tell me a story about a trap and a ball",
+   "story": "One day, a calm cat named Tom went for a walk. Tom saw a big red ball. He wanted to play with it. So, he ran to the ball and tried to catch it. But, oh no! Tom fell into a trap. He was very sad and scared.\nTom's friend, a dog named Max, heard Tom call for help. Max ran to Tom and saw him in the trap. Max said, \"Don't worry, Tom! I will help you get out.\"\nMax tried to open the trap, but it was too hard. Then, something unexpected happened. A tiny ant walked by and saw Tom and Max."
+  },
+  {
+   "prompt": "story about a moon please",
+   "story": "Once upon a time, a kind boy named Tim went for a walk. He saw the big, round moon in the sky. Tim loved to look at the moon at night. It was so pretty and bright.\nOne night, while Tim was looking at the moon, he heard a scream. He was scared, but he wanted to help. He followed the sound and saw a little bird with a hurt wing. The bird was so sad and scared.\nTim was a compassionate boy. He wanted to help the little bird. He picked up the bird and took it home."
+  },
+  {
+   "prompt": "i'd like a story about a table",
+   "story": "Once upon a time, two friends named Jack and Ben were out for a walk. They saw a big and attractive table in the park. So they decided to poke the table. Suddenly, a booming voice shouted, \"Why are you poking my table?\" Jack and Ben were very scared and looked around. To their surprise, an old man was watching them. The old man said, \"If you want to poke something, first ask for permission. Otherwise you might get into trouble.\" \nJack and Ben learnt an important lesson from this experience."
+  },
+  {
+   "prompt": "write me a little story about streams",
+   "story": "Once upon a time two friends, Rose and John, were playing in a field. They loved to explore, but as they were walking around, they noticed something strange - two streams that were separate, not united. The streams were so messy! \nJohn and Rose decided to try to fix the streams. They worked together, getting dirt and rocks to build a bridge between them. They worked hard, and soon the bridge was built. The streams were united! \nJohn and Rose were so proud of their work."
+  },
+  {
+   "prompt": "please tell me a story about a rabbit",
+   "story": "Once upon a time there were two best friends: a turtle and a rabbit. Every day they would meet and play together in the forest. One day the rabbit found an envelope lying on the ground. He was excited and showed it to his friend the turtle. \"Lets open it!\" the rabbit said eagerly.\nThe turtle agreed and the two opened the envelope. Inside, they found a lot of wet money. \"Let's raise it!\" the rabbit said. But the turtle thought it was a bad idea and said: \"No, let's not raise the wet money."
+  },
+  {
+   "prompt": "make up a story about a cat",
+   "story": "Once upon a time, there was a little boy named Tim. Tim had a black dog named Spot. They liked to play in the wood near their home.\nOne day, while they were playing, a big cat came and took Tim's ball. Tim was sad and asked the cat to give his ball back. The cat said, \"No, it's mine now.\"\nTim had an idea. He would show the cat how to play with the ball too. So, Tim threw the ball and Spot ran after it. The cat saw how much fun they were having and wanted to join."
+  },
+  {
+   "prompt": "could you make up a story about a swan",
+   "story": "Once upon a time, there was a swan. The swan was very attractive. She had big, white wings and a long neck. She liked to swim in a pond with her friends.\nOne day, a little bird came to the pond. The bird did not look like the swan. It had small wings and a short tail. The bird wanted to be friends with the swan, but the swan did not want to be friends with the bird. The swan thought she was too attractive to be friends with the little bird.\nThe little bird was sad."
+  },
+  {
+   "prompt": "write me a little story about a race",
+   "story": "Once upon a time, there was a little boy named Tim. Tim loved to play games with his friends. One day, they decided to have a race. The winner would get a big, shiny trophy.\nBefore the race, Tim's mom said, \"Be careful, Tim. The trophy is delicate. Don't let it break.\" Tim nodded and said, \"I will be careful, Mom.\"\nThe race started, and all the kids ran as fast as they could. Tim was very fast and won the race. He was so happy to enter the finish line first. His friends cheered for him."
+  },
+  {
+   "prompt": "story about an engine please",
+   "story": "Once upon a time, there was a little engine. The engine was very tidy and liked to push things. It lived in a small town with many friends. The engine worked hard every day, pushing carts and helping people.\nOne day, the engine saw a big mess in the town. It wanted to help make the town tidy again. So, the engine started to push the mess away. But, it was too much for the little engine. It felt sad and thought it couldn't help.\nThen, a little girl came to the engine."
+  },
+  {
+   "prompt": "tell me a story about a toy and a car",
+   "story": "One day, a little boy named Tim found a rare toy in the park. It was a big, shiny car. He was very happy and wanted to take it home. But Tim did not know who the toy belonged to. He asked his friend, Sue, what to do.\nSue said, \"You should find out who lost the toy and give it back to them. It is the right thing to do.\" Tim agreed and they went to find the owner.\nThey asked everyone in the park if they lost a toy car."
+  }
+ ]
+}
