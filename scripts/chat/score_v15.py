@@ -125,6 +125,20 @@ S1_TOLD_MIN = 7.5
 #: and so the one the `n256` artifacts must have been sampled at.
 SHIPPED_DECODER_N = 256
 
+#: S1 items (1-based, as `memory_probe_v2._HELDOUT_PHRASING` lists them) whose
+#: reserved phrasing is absent from the generator's templates as a STRING and
+#: yet a word or two from a trained one. Item 10's statement "i've got {a} {v}
+#: {x}" is the trained "i have got {a} {v} {x}" with its contraction closed;
+#: item 3's "i've got a {x} called {v}" is the trained "i have a {x} called {v}"
+#: plus "got"; item 1 is near on both sides ("everyone calls me {v}" beside the
+#: trained "call me {v}", "do you remember my name?" beside "do you know my
+#: name?"). `snnchat.recall._check_tables` compares substrings and cannot see
+#: this; the chat-v15 review found it by word-level edit distance. The S1 bar is
+#: 8/80 and one item is 8 cells, so the bar as pre-registered can be cleared by
+#: a single near-trained item. The bar is NOT moved here. S1 is reported per
+#: item, and again without these three, so a reader can see which it was.
+NEAR_TRAINED_S1_ITEMS: tuple[int, ...] = (1, 3, 10)
+
 #: HELDOUT selected at the shipped n=256 decoder: not resolved below this.
 HELDOUT_FLOOR = (60, 120)
 #: Battery, n=1 lambda=0 reading row.
@@ -501,6 +515,21 @@ def score_seed(run: str, art: dict) -> dict:
     # own header has to agree. `memory_probe_v2.py` run WITHOUT --shipped-decoder
     # writes the same shape at n=8, and filing that here would print the plain
     # pass twice and call one of them the shipped decoder.
+    if _stratum(v2, "S1"):
+        s1_rows = [r for r in v2.get("rows") or []
+                   if r["stratum"] == "S1" and r["distance"] == 0]
+        per_item: dict[int, list[int]] = {}
+        for r in s1_rows:
+            k_n = per_item.setdefault(int(r["item"]) + 1, [0, 0])
+            k_n[0] += int(bool(r["told_flags"]["hit"]))
+            k_n[1] += 1
+        rest = [kn for item, kn in per_item.items() if item not in NEAR_TRAINED_S1_ITEMS]
+        rep["S1_d0_per_item"] = {
+            "told": {str(item): fmt(k, n) for item, (k, n) in sorted(per_item.items())},
+            "near_trained_items": list(NEAR_TRAINED_S1_ITEMS),
+            "told_without_near_trained": fmt(sum(k for k, _n in rest),
+                                             sum(n for _k, n in rest)) if rest else None,
+        }
     shipped = art.get("v2_shipped") or {}
     shipped_n = (shipped.get("decoder") or {}).get("n")
     if shipped and shipped_n != SHIPPED_DECODER_N:

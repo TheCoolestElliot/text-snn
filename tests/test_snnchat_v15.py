@@ -645,6 +645,35 @@ def test_a_missing_or_partial_artifact_is_never_a_pass(score):
     assert rolled["rolled_back"] and rolled["verdict"] == "ship-candidate"   # reported, not replaced
 
 
+def test_s1_is_reported_per_item_and_without_its_near_trained_items(score, mp2):
+    """The S1 bar is 8/80 and an item is 8 cells. Three S1 phrasings are a word
+    or two from a trained template; the bar stays where it was pre-registered
+    and the report says which items cleared it."""
+    run = score.RUNS[0]
+    art = _artifacts(score, run)
+    hits = {1: 8, 4: 3, 10: 1}                        # 1-based item -> told hits of 8
+    art["v2"]["rows"] = [
+        {"stratum": "S1", "distance": 0, "item": i, "seed": seed,
+         "told_flags": {"hit": seed < hits.get(i + 1, 0)}}
+        for i in range(len(mp2.S1_ITEMS)) for seed in range(8)]
+    art["v2"]["rows"] += [{"stratum": "S2", "distance": 0, "item": 0, "seed": 0,
+                           "told_flags": {"hit": True}},
+                          {"stratum": "S1", "distance": 2, "item": 1, "seed": 0,
+                           "told_flags": {"hit": True}}]
+    got = score.score_seed(run, art)["reported"]["S1_d0_per_item"]
+    assert got["told"]["1"] == score.fmt(8, 8) and got["told"]["4"] == score.fmt(3, 8)
+    assert got["told"]["2"] == score.fmt(0, 8) and len(got["told"]) == 10
+    assert got["near_trained_items"] == [1, 3, 10]
+    assert got["told_without_near_trained"] == score.fmt(3, 56)
+    # The three are what the comment says they are, in the probe's own tables.
+    statements = [st for st, _q in mp2._HELDOUT_PHRASING]
+    assert statements[0] == "everyone calls me {v}"
+    assert statements[2].replace("i've got", "i have") in recall.TRAIN_STATEMENTS["pet"]
+    assert statements[9].replace("i've", "i have") in recall.TRAIN_STATEMENTS["object"]
+    # Reported only: it gates nothing.
+    assert "S1_d0_per_item" not in score.score_seed(run, art)["guards"]
+
+
 def test_the_n256_column_is_only_filled_from_an_n256_artifact(score):
     """Reported, not gated -- but a column headed "n256" that holds the plain
     n=8 pass a second time is a wrong number with a decoder's name on it."""
