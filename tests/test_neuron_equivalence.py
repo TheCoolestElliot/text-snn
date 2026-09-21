@@ -63,6 +63,12 @@ requires_fused = pytest.mark.skipif(
     reason="needs a CUDA device with a working jiterator",
 )
 
+# Every CUDA test below runs TWICE: once with `lif_scan(..., fused=True)`
+# dispatching to the per-timestep jiterator Function and once to the whole-scan
+# NVRTC kernels (`snn.wholescan`; the fixture and its reason are in conftest.py).
+# Both are the fused path, and each is held to the eager reference on its own.
+pytestmark = pytest.mark.usefixtures("scan_impl")
+
 ALPHA = 2.0
 THR = 1.0  # spec §13 baseline; the sweeps below deliberately leave it
 
