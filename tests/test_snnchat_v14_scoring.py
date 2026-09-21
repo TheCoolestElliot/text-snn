@@ -87,8 +87,10 @@ def _replay(pool, *, lam=0.6, subject_tier, has_subject=True):
                          has_subject=has_subject)
 
 
-def _blob(draws: list[dict], probe_set: str = "heldout", lam: float = 0.6) -> dict:
-    return {"format": pools.FORMAT, "ckpt": "experiments/chat/none/ckpt_best.pt",
+def _blob(draws: list[dict], probe_set: str = "heldout", lam: float = 0.6,
+          ckpt: str = "experiments/chat/none/ckpt_best.pt",
+          ckpt_sha256: str | None = None) -> dict:
+    return {"format": pools.FORMAT, "ckpt": ckpt, "ckpt_sha256": ckpt_sha256,
             "probe_set": probe_set, "n": 4, "lam": lam, "min_chars": 12, "draws": draws}
 
 
@@ -302,12 +304,17 @@ def test_p3_is_not_passed_by_picks_that_merely_contain_no_definite_subject(tmp_p
     assert dec["subject"]["uer_given_exposed"]["rate"] is None
 
 
-def test_sameness_has_a_bar_and_the_bar_is_in_overall():
-    """GUARD 2 is the one cost the exploratory replay measured; `overall` must
-    not be able to read `pass` over it, and bare mention must not be in it.
+def test_sameness_is_reported_with_its_withdrawn_bar_and_is_not_in_overall():
+    """Amendment A (`PREDICTION_v14.md` section 12): the owner ruled that sameness
+    is not a bar. GUARD 2 is still measured, reads `reported` and nothing else,
+    and says what the withdrawn 0.10 bar WOULD have read through the unchanged
+    `guard2_verdict`; `overall` no longer reads it. P1, P2, P3 and GUARD 1 are
+    what `overall` reads, and bare mention is still not.
 
     Mutations: `pooled_drop > bar` to `pooled_drop >= bar` in `guard2_verdict`;
-    dropping "GUARD2_sameness" from `IN_OVERALL`; adding "topic_mention" to it.
+    "GUARD2_sameness" put back into `IN_OVERALL`; `guard2_reported` returning
+    `guard2_verdict`'s own verdict as its `verdict`; `would_have_read` hard-coded
+    to a pass; adding "topic_mention" to `IN_OVERALL`; dropping "P3_uer" from it.
     """
     bar = scorer.GUARD2_MAX_DISTINCT2_DROP
     every = {name: bar / 2 for name in scorer.P2_LISTS}
@@ -321,22 +328,43 @@ def test_sameness_has_a_bar_and_the_bar_is_in_overall():
     assert scorer.guard2_verdict(bar / 2, {"heldout": 0.0})["verdict"] == "unresolved"
     assert scorer.guard2_verdict(None, {})["verdict"] == "unresolved"
 
-    assert "GUARD2_sameness" in scorer.IN_OVERALL
-    assert "topic_mention" not in scorer.IN_OVERALL
+    # What the block carries now: never a pass/fail/unresolved of its own, and
+    # the old reading beside it, whichever way the old reading goes.
+    for drop, lists, old in ((bar * 3, every, "fail"), (bar / 2, every, "pass"),
+                             (bar / 2, {**every, "wide": bar * 2}, "unresolved"),
+                             (None, {}, "unresolved")):
+        got = scorer.guard2_reported(drop, lists)
+        assert got["verdict"] == "reported"
+        assert got["withdrawn_bar"] == bar == 0.10
+        assert got["would_have_read"] == scorer.guard2_verdict(drop, lists)
+        assert got["would_have_read"]["verdict"] == old
+        assert "As many as needed" in got["why"] and "2026-09-21" in got["why"]
+
+    assert scorer.IN_OVERALL == ("P1_anchored_topic", "P2_logp_per_char", "P3_uer",
+                                 "GUARD1_identity")
     passing = {name: {"verdict": "pass"} for name in scorer.IN_OVERALL}
     g1 = {"verdict": "pass"}
     assert scorer.overall(passing, g1) == "pass"
-    assert scorer.overall({**passing, "GUARD2_sameness": {"verdict": "fail"}}, g1) == "fail"
+    # The ruling removes a bar: a sameness reading of any kind moves nothing ...
+    for verdict in ("fail", "unresolved", "reported"):
+        assert scorer.overall({**passing, "GUARD2_sameness": {"verdict": verdict}}, g1) == "pass"
+    # ... and rescues nothing: every other bar still decides.
+    for name in ("P1_anchored_topic", "P2_logp_per_char", "P3_uer"):
+        assert scorer.overall({**passing, name: {"verdict": "fail"}}, g1) == "fail"
     assert scorer.overall({**passing, "P3_uer": {"verdict": "unresolved"}}, g1) == "unresolved"
     assert scorer.overall(passing, {"verdict": "fail"}) == "fail"
     # A failing bare-mention row, if anyone ever gave it a verdict, is not read.
     assert scorer.overall({**passing, "topic_mention": {"verdict": "fail"}}, g1) == "pass"
 
 
-def test_identical_picks_on_every_draw_fail_the_sameness_guard(tmp_path):
+def test_identical_picks_on_every_draw_are_reported_with_what_the_old_bar_read(tmp_path):
     """End to end: the subject rule returning ONE reply for every draw while the
-    shipped rule returns varied ones is a fall in distinct-2 that `compare`
-    must bar, whatever P2 says."""
+    shipped rule returns varied ones is a fall in distinct-2 that `compare` must
+    still MEASURE and show -- as `reported`, with the withdrawn bar's `fail`
+    beside it -- and that `overall` must not read (Amendment A).
+
+    Mutation: `compare` spreading `guard2_verdict` again instead of
+    `guard2_reported`."""
     draws = []
     for i, word in enumerate(("red", "blue", "green", "pink")):
         varied = f"Let me tell you a story about the {word} kite and a {word} hat. " + _FILL
@@ -351,7 +379,24 @@ def test_identical_picks_on_every_draw_fail_the_sameness_guard(tmp_path):
         1 - g2["distinct_2"]["subject"]["value"] / g2["distinct_2"]["shipped"]["value"])
     assert g2["relative_drop"] > scorer.GUARD2_MAX_DISTINCT2_DROP
     assert g2["relative_drop_per_list"] == {"heldout": g2["relative_drop"]}
-    assert g2["verdict"] == "fail"
+    assert g2["verdict"] == "reported"
+    assert (g2["withdrawn_bar"], g2["would_have_read"]["verdict"]) == (0.10, "fail")
+    assert (g2["top_opening"]["shipped"]["k"], g2["top_opening"]["subject"]["k"]) == (1, 4)
+
+    # Through `main`: the fall is in the artifact and `overall` is not `fail`
+    # because of it. One list of four draws leaves P2 short of its three lists.
+    out = tmp_path / "scored.json"
+    assert scorer.main([str(path), "--out", str(out)]) == 0
+    blob = json.loads(out.read_text(encoding="utf-8"))
+    assert "GUARD2_sameness" not in blob["in_overall"]
+    assert blob["bars"]["GUARD2_withdrawn_max_distinct2_drop"] == 0.10
+    got = blob["subsets"]["lam0.6_all"]
+    assert got["GUARD2_sameness"]["would_have_read"]["verdict"] == "fail"
+    assert blob["GUARD1_identity"]["verdict"] == "unresolved"
+    assert blob["overall"] == scorer.overall(got, blob["GUARD1_identity"])
+    assert "fail" not in (got[name]["verdict"] for name in
+                          ("P1_anchored_topic", "P2_logp_per_char", "P3_uer"))
+    assert blob["overall"] == "unresolved"
 
 
 def test_the_corpus_reference_is_read_from_the_committed_artifact(tmp_path):
@@ -451,6 +496,128 @@ def test_exploratory_mode_recovers_n_scored_and_reproduces_the_recorded_picks(tm
     assert d.picks["lam0.6"]["subject"].index is None       # needs a null term it lacks
     assert d.picks["lam0"]["subject"].index == 2
     assert d.names_subject == 2                             # SHORT is not in the length pool
+
+    # The same bytes gzip-compressed, which is how the chat-v6-scratch pools are
+    # committed (`v6scratch_*_n256.json.gz`), read the same. Mutation:
+    # `read_pool` no longer decompressing on the gzip magic.
+    zipped = tmp_path / "v12_like.json.gz"
+    zipped.write_bytes(gzip.compress(path.read_bytes(), mtime=0))
+    info_gz, draws_gz = scorer.load_file(zipped, exploratory=True)
+    assert info_gz["checks"] == checks and info_gz["format"] == "echo_holdout"
+    assert scorer.draw_rows(draws_gz) == [
+        {**row, "source": zipped.name} for row in scorer.draw_rows(draws)]
+
+
+# ---------------------------------------------------------------------------
+# Amendment A's two refusals: the stamp, and one checkpoint per verdict
+# ---------------------------------------------------------------------------
+
+
+def test_the_stamp_is_over_lf_bytes_and_a_changed_pre_registration_is_refused(tmp_path):
+    """`check_stamp` hashes with CRLF normalised to LF, so the committed LF blob
+    and a CRLF checkout agree -- `score_v13.py`'s raw-bytes recipe does not --
+    and anything else about the text changes the hash and stops the scorer.
+
+    The committed `PREDICTION_v14.md` must hash to `PREDICTION_STAMP`: editing
+    that file (appending results to it, say) turns this red, and the fix is to
+    put results in `QUALITY_v14.md`, not to restamp.
+
+    Mutations: `prediction_stamp` hashing the raw bytes (the CRLF copy no longer
+    agrees); `check_stamp` comparing `got` with `got` (the edited copy passes).
+    """
+    import hashlib
+
+    text = b"# a pre-registration\n\nthe bar is +0.05\n"
+    lf, crlf, edited = (tmp_path / n for n in ("lf.md", "crlf.md", "edited.md"))
+    lf.write_bytes(text)
+    crlf.write_bytes(text.replace(b"\n", b"\r\n"))
+    edited.write_bytes(text.replace(b"+0.05", b"+0.04"))
+    stamp = hashlib.sha256(text).hexdigest()
+    assert scorer.prediction_stamp(lf) == scorer.prediction_stamp(crlf) == stamp
+    assert scorer.check_stamp(crlf, stamp) == stamp
+    with pytest.raises(SystemExit, match="nothing is scored"):
+        scorer.check_stamp(edited, stamp)
+    with pytest.raises(SystemExit, match="cannot read"):
+        scorer.check_stamp(tmp_path / "absent.md", stamp)
+
+    assert scorer.check_stamp() == scorer.PREDICTION_STAMP
+    # The two checkpoints the scorer recognises are the two the document names.
+    registered = scorer.PREDICTION.read_text(encoding="utf-8")
+    assert sorted(scorer.REGISTERED_CHECKPOINTS) == ["chat-v3d-aligned", "chat-v6-scratch"]
+    for name, sha in scorer.REGISTERED_CHECKPOINTS.items():
+        assert len(sha) == 64 and sha in registered and name in registered
+
+
+def test_confirmatory_mode_scores_nothing_against_an_unstamped_pre_registration(
+        tmp_path, monkeypatch):
+    """Through `main`: a wrong stamp stops a confirmatory run before any file is
+    written, and does not stop `--exploratory`, which tests nothing.
+
+    Mutation: `main` not calling `check_stamp` (the confirmatory run writes its
+    artifact).
+    """
+    path = _write(tmp_path, "v14_heldout_x.json.gz", _blob([_hand_draw()]))
+    out = tmp_path / "out.json"
+    monkeypatch.setattr(scorer, "PREDICTION_STAMP", "0" * 64)
+    with pytest.raises(SystemExit, match="not the stamp"):
+        scorer.main([str(path), "--out", str(out)])
+    assert not out.exists()
+    assert scorer.main([str(path), "--exploratory", "--out", str(out)]) == 0
+    assert json.loads(out.read_text(encoding="utf-8"))["prediction"]["stamp"] is None
+
+
+def test_pools_from_two_checkpoints_are_refused_and_the_output_names_the_one(
+        tmp_path, monkeypatch):
+    """Amendment A draws the same sets from two checkpoints into one directory,
+    and `v14_*.json.gz` matches both. One verdict is about one checkpoint.
+
+    Mutations: `one_checkpoint` never raising (the glob is pooled and scored);
+    keying on the run name alone (two files with one name and two hashes pass);
+    the default output path back to `v14_confirmatory.json`.
+    """
+    old, new = "a" * 64, "b" * 64
+    kw_old = {"ckpt": "C:/x/experiments/chat/chat-old/ckpt_best.pt", "ckpt_sha256": old}
+    kw_new = {"ckpt": "C:/x/experiments/chat/chat-new/ckpt_best.pt", "ckpt_sha256": new}
+    _write(tmp_path, "v14_heldout_chat-old.json.gz", _blob([_hand_draw()], **kw_old))
+    _write(tmp_path, "v14_fresh_chat-old.json.gz",
+           _blob([_hand_draw(7)], probe_set="fresh", **kw_old))
+    _write(tmp_path, "v14_heldout_chat-new.json.gz", _blob([_hand_draw()], **kw_new))
+    monkeypatch.setattr(scorer, "QUALITY", tmp_path / "quality")
+
+    with pytest.raises(SystemExit, match="2 checkpoints"):
+        scorer.main([str(tmp_path / "v14_*.json.gz")])
+    assert not (tmp_path / "quality").exists()
+
+    # One name, two hashes: a checkpoint retrained in place is two checkpoints.
+    _write(tmp_path / "again", "v14_heldout_chat-old.json.gz",
+           _blob([_hand_draw()], **{**kw_old, "ckpt_sha256": new}))
+    with pytest.raises(SystemExit, match="2 checkpoints"):
+        scorer.main([str(tmp_path / "v14_heldout_chat-old.json.gz"),
+                     str(tmp_path / "again" / "v14_heldout_chat-old.json.gz")])
+
+    assert scorer.main([str(tmp_path / "v14_*_chat-old.json.gz")]) == 0
+    assert [f.name for f in (tmp_path / "quality").iterdir()] == [
+        "v14_confirmatory_chat-old.json"]
+    blob = json.loads((tmp_path / "quality" / "v14_confirmatory_chat-old.json")
+                      .read_text(encoding="utf-8"))
+    assert blob["checkpoint"] == {"name": "chat-old", "sha256": old,
+                                  "pre_registered": False, "decides_the_default": False}
+    assert blob["prediction"]["stamp"] == scorer.PREDICTION_STAMP
+    assert blob["n_story_draws"] == 2
+
+    # What the two registered checkpoints read as: only SHIPPED's decides.
+    def described(name, sha):
+        return scorer.one_checkpoint([{"ckpt": f"C:/t/{name}/ckpt_best.pt", "ckpt_sha256": sha}])
+
+    reg = scorer.REGISTERED_CHECKPOINTS
+    got = described("chat-v6-scratch", reg["chat-v6-scratch"])
+    assert (got["pre_registered"], got["decides_the_default"]) == (True, True)
+    got = described("chat-v3d-aligned", reg["chat-v3d-aligned"])
+    assert (got["pre_registered"], got["decides_the_default"]) == (True, False)
+    got = described("chat-v6-scratch", reg["chat-v3d-aligned"])
+    assert (got["pre_registered"], got["decides_the_default"]) == (False, False)
+    got = described("chat-v6-scratch", None)
+    assert (got["pre_registered"], got["decides_the_default"]) == (False, False)
 
 
 # ---------------------------------------------------------------------------
