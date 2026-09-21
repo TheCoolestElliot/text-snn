@@ -2398,3 +2398,287 @@ def test_the_wide_list_is_disjoint_from_every_published_list():
     for prompt, words in mod.WIDE:
         assert prompt.endswith(words[0]), prompt
     assert sorted(mod.SETS) == ["fresh", "heldout", "wide"]
+
+
+# --------------------------------------------------------------------------
+# the subject tier
+# --------------------------------------------------------------------------
+
+_SUBJECT_PROMPT = "tell me a story about a penguin"
+
+
+def _drafted(tok, text, logp_cond):
+    """A closed candidate that says `text`. Closed, so `final_ids` cannot trim it
+    and the text the tier reads is the text written here."""
+    from snnchat.rerank import Candidate
+
+    ids = [int(i) for i in tok.encode(text)]
+    return Candidate(ids=ids, scored=[*ids, EOT], logp_cond=logp_cond)
+
+
+def _frame_pool(tok):
+    """The defect, as a pool: the frame outweighs the subject, the score prefers
+    neither. Ranked at lambda = 0, so `score` is `logp_cond` per character and
+    is set here rather than measured."""
+    frame = _drafted(tok, "I will tell you a story now.", -60.0)
+    subject = _drafted(tok, "The penguin slid on the ice.", -50.0)
+    fluent = _drafted(tok, "Once there was a little bird.", -10.0)
+    return frame, subject, fluent
+
+
+def _select(cands, rp, *, subject, model=None):
+    from snnchat.rerank import prompt_content_words, select
+
+    return select(model, cands, rp, device=torch.device("cpu"), tok=ChatTokenizer(),
+                  echo_words=prompt_content_words(_SUBJECT_PROMPT), subject=subject)
+
+
+def _the_old_rule(cands, rp):
+    """The weighted tier as `rerank` had it before `echo_tier` existed, written
+    out again on purpose: this is the fixed point the new code is held to."""
+    pool = [c for c in cands if c.n_chars >= rp.min_chars] or cands
+    best = max((c.echo_weight for c in pool), default=0.0)
+    if best > 0.0:
+        pool = [c for c in pool if c.echo_weight >= best - 1e-9]
+    return max(pool, key=lambda c: c.score)
+
+
+def test_the_subject_tier_is_off_by_default_and_off_is_the_old_rule():
+    """`subject_tier=False` must be the old selector even when a subject is
+    passed, on a pool where the two rules disagree -- a pool where they agree
+    would pass with the flag wired backwards."""
+    from snnchat.rerank import RerankParams
+
+    assert RerankParams().subject_tier is False
+    assert "subject-tier" not in RerankParams().describe()
+    assert RerankParams(subject_tier=True).describe().endswith("echo=on subject-tier")
+
+    tok = ChatTokenizer()
+    frame, subject, _fluent = cands = _frame_pool(tok)
+    rp = RerankParams(n=3, lam=0.0)
+    won = _select(list(cands), rp, subject="penguin")
+    assert won is frame
+    assert won is _the_old_rule(cands, rp)
+    # The annotation is written under either rule; only the tier ignores it.
+    assert [c.subject_hit for c in cands] == [False, True, False]
+    # And the two rules really do differ here, or the above proves nothing.
+    assert _select(list(cands), RerankParams(n=3, lam=0.0, subject_tier=True),
+                   subject="penguin") is subject
+
+
+def test_the_subject_tier_without_a_subject_is_the_old_rule():
+    """`prime_topic` returns None for most prompts, and None must not mean "a
+    subject nobody matched" -- that would hand every non-story turn to the
+    score alone and silently switch the echo partition off."""
+    from snnchat.rerank import RerankParams, echo_tier
+
+    tok = ChatTokenizer()
+    frame, subject, _fluent = cands = _frame_pool(tok)
+    rp = RerankParams(n=3, lam=0.0, subject_tier=True)
+    # Selected from once WITH the subject first, so the passes below inherit a
+    # stale hit. A `subject_hit` that outlived the call that wrote it would make
+    # a stored pool claim a subject match for a turn that had no subject.
+    assert _select(list(cands), rp, subject="penguin") is subject
+    assert subject.subject_hit
+    for nothing in (None, ""):
+        assert _select(list(cands), rp, subject=nothing) is frame
+        assert not any(c.subject_hit for c in cands)
+    assert _select(list(cands), rp, subject=None) is _the_old_rule(cands, rp)
+
+    # The same statement about the pure function, on stand-ins: it reads two
+    # attributes and nothing else, which is what lets a replay script call it.
+    from types import SimpleNamespace as Row
+
+    rows = [Row(echo_weight=11.13, subject_hit=False),
+            Row(echo_weight=10.34, subject_hit=True),
+            Row(echo_weight=0.0, subject_hit=False)]
+    assert echo_tier(rows, subject_tier=True, has_subject=False) == [rows[0]]
+    assert echo_tier(rows, subject_tier=False, has_subject=True) == [rows[0]]
+    assert echo_tier(rows, subject_tier=True, has_subject=True) == [rows[1]]
+    assert echo_tier([], subject_tier=False, has_subject=False) == []
+
+
+def test_two_frame_words_outrank_the_subject_and_the_subject_tier_fixes_it():
+    """The defect itself. "tell" + "story" outweigh "penguin", so the weighted
+    tier is the one draft that is about nothing, and it is a tier of one -- the
+    score is never consulted."""
+    from snnchat.rerank import RerankParams, word_weight
+
+    # The premise, from the shipped table rather than from this docstring.
+    assert word_weight("tell") + word_weight("story") > word_weight("penguin")
+    assert word_weight("penguin") > max(word_weight("tell"), word_weight("story"))
+
+    tok = ChatTokenizer()
+    frame, subject, fluent = cands = _frame_pool(tok)
+    old = _select(list(cands), RerankParams(n=3, lam=0.0), subject="penguin")
+    assert frame.echo_weight > subject.echo_weight > fluent.echo_weight == 0.0
+    assert fluent.score > subject.score > frame.score, "the score disagrees with both"
+    assert old is frame
+
+    new = _select(list(cands), RerankParams(n=3, lam=0.0, subject_tier=True),
+                  subject="penguin")
+    assert new is subject
+
+
+def test_when_nobody_names_the_subject_the_score_chooses_among_everyone():
+    """The fallback is the whole length-partitioned pool, NOT the frame tier.
+    A draft that said "tell" and "story" is no more about a penguin than one
+    that said neither."""
+    from snnchat.rerank import RerankParams
+
+    tok = ChatTokenizer()
+    frame = _drafted(tok, "I will tell you a story now.", -60.0)
+    # Ran out of budget mid-sentence, so it is RETURNED as "The dog ran away."
+    # The subject is only in the tail the reader never sees -- see `final_ids`.
+    other = _drafted(tok, "The dog ran away. And then a penguin", -50.0)
+    other.scored = list(other.ids)
+    fluent = _drafted(tok, "Once there was a little bird.", -10.0)
+    fragment = _drafted(tok, "Hi.", -0.1)             # best score of all, and junk
+    cands = [frame, other, fluent, fragment]
+
+    assert _select(cands, RerankParams(n=4, lam=0.0), subject="penguin") is frame
+    won = _select(cands, RerankParams(n=4, lam=0.0, subject_tier=True), subject="penguin")
+    assert not other.closed and not any(c.subject_hit for c in cands)
+    assert fragment.score > fluent.score
+    assert won is fluent, "the whole pool, but still inside the length guard"
+
+
+def test_the_length_guard_still_outranks_the_subject_tier():
+    """A five-character draft that names the subject does not beat a whole reply
+    that also names it -- the same ordering the weighted tier is held to by
+    `test_echo_partition_beats_the_score_but_only_inside_the_length_guard`."""
+    from snnchat.rerank import RerankParams, select
+
+    tok = ChatTokenizer()
+    rp = RerankParams(n=3, lam=0.0, min_chars=12, subject_tier=True)
+    fragment = _drafted(tok, "a cat", -0.5)
+    on_topic = _drafted(tok, "The cat sat down on the mat.", -50.0)
+    fluent = _drafted(tok, "Once there was a little bird.", -10.0)
+    cands = [fragment, on_topic, fluent]
+    won = select(None, cands, rp, device=torch.device("cpu"), tok=tok,
+                 echo_words=["cat", "story", "tell"], subject="cat")
+    assert fragment.n_chars == 5 and fragment.subject_hit and on_topic.subject_hit
+    assert fragment.score > fluent.score > on_topic.score
+    assert won is on_topic
+
+    # If EVERY draft is short the guard stands down, as it always has, and the
+    # subject tier then applies among the short ones.
+    short = [fragment, _drafted(tok, "a dog", -0.1)]
+    assert select(None, short, rp, device=torch.device("cpu"), tok=tok,
+                  echo_words=["cat"], subject="cat") is fragment
+
+
+def test_the_subject_tier_skips_the_null_pass_exactly_when_it_is_decided(
+        tiny_model, monkeypatch):
+    """A subject tier of one is decided without the score, so the null pass is
+    skipped; a tier of two is not, so it runs -- once, however many times the
+    pool is selected from."""
+    import snnchat.rerank as rr
+
+    calls = []
+    real = rr._score_null
+
+    def spy(model, cands, rp, device):
+        calls.append(len(cands))
+        return real(model, cands, rp, device)
+
+    monkeypatch.setattr(rr, "_score_null", spy)
+    tok = ChatTokenizer()
+    rp = rr.RerankParams(n=4, lam=0.6, subject_tier=True)
+
+    one = list(_frame_pool(tok))
+    won = _select(one, rp, subject="penguin", model=tiny_model)
+    assert won is one[1] and calls == []
+    assert not any(c.null_scored for c in one)
+    assert all(c.null_context is None and c.logp_null == 0.0 for c in one)
+
+    # Two drafts name the subject. Under the OLD rule this pool is still a tier
+    # of one (the frame draft), so a null pass here is the subject tier's doing.
+    two = [*_frame_pool(tok), _drafted(tok, "A penguin swam in the sea.", -55.0)]
+    assert _select(two, rr.RerankParams(n=4, lam=0.6), subject="penguin",
+                   model=tiny_model) is two[0]
+    assert calls == []
+    won = _select(two, rp, subject="penguin", model=tiny_model)
+    assert calls == [4]
+    assert all(c.null_scored and c.null_context == "empty_user" for c in two)
+    assert all(c.logp_null < 0.0 for c in two)
+    assert won is max((two[1], two[3]), key=lambda c: c.score)
+
+    # Selected from again: measured already, not measured twice.
+    assert _select(two, rp, subject="penguin", model=tiny_model) is won
+    assert calls == [4]
+
+
+def test_selecting_twice_from_one_pool_is_two_independent_reranks(tiny_model):
+    """`select` run under the shipped rule and then under the subject rule, on
+    ONE pool, must return what two separate `rerank` calls return -- the second
+    call may trust nothing the first left on the candidates."""
+    import dataclasses
+
+    from snnchat.rerank import RerankParams, rerank, sample_candidates, select
+
+    tok = ChatTokenizer()
+    # The tiny model is untrained and drafts noise, so the "words" are letters:
+    # what matters is that some drafts contain them and some do not.
+    words, subject = ["e", "f", "g", "k"], "k"
+    prefix = [BOS, *tok.render_turn("user", "tell me a story about a rabbit"), BOT]
+    logits, state, _ = tiny_model(torch.tensor([prefix]), state=None)
+    last = logits[:, -1, :].float()
+    shipped = RerankParams(n=8, lam=0.6)
+    by_subject = dataclasses.replace(shipped, subject_tier=True)
+    off = dataclasses.replace(shipped, echo=False)
+    cpu = torch.device("cpu")
+
+    differed = 0
+    for seed in range(8):
+        params = SamplingParams(seed=seed, max_new=48)
+        want = [
+            rerank(tiny_model, last, state, params, rp, tok=tok, echo_words=words,
+                   subject=subject)[0].ids
+            for rp in (shipped, by_subject, off)
+        ]
+        differed += want[0] != want[1]
+
+        cands = sample_candidates(tiny_model, last, state, params, shipped.n)
+        got = [
+            list(select(tiny_model, cands, rp, device=cpu, tok=tok, echo_words=words,
+                        subject=subject).ids)
+            for rp in (shipped, by_subject, off)
+        ]
+        assert got == want, seed
+        # The last pass had the echo partition OFF, and must have been decided
+        # without the weights the two passes before it left on the candidates.
+        assert all(c.echo_weight == 0.0 and not c.subject_hit for c in cands), seed
+    assert differed, "no seed separated the two rules, so this compared nothing"
+
+
+def test_the_session_passes_a_subject_only_when_both_flags_are_on(tiny_model, monkeypatch):
+    """`ChatSession` is the one place the subject comes from. It must reach
+    `rerank` for a story request with both flags on, and be None otherwise --
+    including for a prompt `prime_topic` does not recognise."""
+    import snnchat.rerank as rr
+
+    seen = []
+    real = rr.rerank
+
+    def spy(*args, **kwargs):
+        seen.append(kwargs.get("subject", "<not passed>"))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(rr, "rerank", spy)
+    tok = ChatTokenizer()
+
+    def subject_for(prompt, **flags):
+        session = ChatSession(tiny_model, tok, device="cpu",
+                              params=SamplingParams(seed=5, max_new=16),
+                              rerank=rr.RerankParams(n=3, lam=0.0, **flags))
+        session.send(prompt)
+        return seen[-1]
+
+    story = "tell me a story about a rabbit"
+    assert subject_for(story, echo=True, subject_tier=True) == "rabbit"
+    assert subject_for(story, echo=True, subject_tier=False) is None
+    assert subject_for(story, echo=False, subject_tier=True) is None
+    assert subject_for(story) is None, "the default is off"
+    assert subject_for("what is the capital of france", echo=True, subject_tier=True) is None
+    assert len(seen) == 5
