@@ -1,6 +1,6 @@
 """Tests for `snnchat.coherence`: the unintroduced-entity rate (UER@200).
 
-CPU only, pure Python, and CI has no `data/` directory, so everything that needs
+CPU only, and CI has no `data/` directory, so everything that needs
 corpus text reads ONE committed fixture:
 
     tests/fixtures/chat_stories_uer.json
@@ -39,17 +39,26 @@ Not part of the research protocol; no number here is a reported figure.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
+import statistics
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 
 from snnchat import coherence
 from snnchat.coherence import anchored_topic, uer, unintroduced_entities
+from snnchat.tokenizer import BOS, EOT, ChatTokenizer
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+_SPEC = importlib.util.spec_from_file_location(
+    "coherence_score", os.path.join(REPO, "scripts", "chat", "coherence_score.py"))
+scorer = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(scorer)
 FIXTURE = os.path.join(REPO, "tests", "fixtures", "chat_stories_uer.json")
 
 #: The mutation partner of fixture story `i` is story `(i + PARTNER) % n` -- the
@@ -388,3 +397,114 @@ def test_importing_coherence_does_not_import_torch():
         [sys.executable, "-c", code], capture_output=True, text=True, cwd=REPO, timeout=120
     )
     assert out.returncode == 0, out.stdout + out.stderr
+
+
+# --------------------------------------------------------------------------
+# scripts/chat/coherence_score.py
+# --------------------------------------------------------------------------
+
+QUALITY = os.path.join(REPO, "experiments", "chat", "_quality")
+
+
+def test_story_turns_pairs_each_bot_turn_with_its_prompt_and_skips_narratives(tmp_path):
+    """The corpus reference is "the turns the model is trained to produce as
+    replies", so a bare narrative (BOS, text, EOT, no role markers) is not one,
+    and a prompt must never leak across a conversation boundary."""
+    tok = ChatTokenizer()
+    ids = tok.render_conversation([("user", "a story about a pig"), ("bot", "There was a pig.")])
+    ids += [BOS, *tok.encode("Once there was a narrative.").tolist(), EOT]
+    ids += tok.render_conversation([("user", "one"), ("bot", "First."),
+                                    ("user", "two"), ("bot", "Second.")])
+    # A bot turn with no user turn in its own conversation has no prompt.
+    ids += tok.render_conversation([("bot", "Orphan.")])
+    path = tmp_path / "toy.bin"
+    np.asarray(ids, dtype=np.uint8).tofile(path)
+    assert scorer.story_turns(path) == [
+        ("a story about a pig", "There was a pig."), ("one", "First."), ("two", "Second."),
+    ]
+
+
+def test_pool_files_reads_the_three_probe_lists_and_not_the_dodge_battery(tmp_path):
+    for name in ("v12_heldout_chat-x.json", "v12_fresh_chat-x-s1.json", "v12_wide_chat-x.json",
+                 "v12_dodge_chat-x.json", "v13_fresh_chat-x.json", "coherence_v14.json"):
+        (tmp_path / name).write_text("{}", encoding="utf-8")
+    assert [(a, b) for a, b, _ in scorer.pool_files(tmp_path)] == [
+        ("fresh", "chat-x-s1"), ("heldout", "chat-x"), ("wide", "chat-x"),
+    ]
+
+
+def _toy_pool_file(path, flagged: int, clean: int) -> None:
+    drift = _pad("There was a sheep. The pig was big.")
+    fine = _pad("There was a pig. The pig was big.")
+    pool = [{"text": drift}] * flagged + [{"text": fine}] * clean + [{"text": "Too short."}]
+    row = {"prompt": "tell me a story about a pig", "pool": pool,
+           "echo_text": drift, "base_text": fine}
+    path.write_text(json.dumps({"ckpt": "toy", "probe_set": "toy", "rows": [row]}),
+                    encoding="utf-8")
+
+
+def test_file_section_scores_pool_and_selected_and_refuses_a_window_past_the_truncation(tmp_path):
+    path = tmp_path / "v12_fresh_toy.json"
+    _toy_pool_file(path, flagged=3, clean=5)
+    sec = scorer.file_section(path, 200)
+    assert (sec["pool"]["k"], sec["pool"]["n"], sec["pool"]["n_total"]) == (3, 8, 9)
+    # The prompt introduced the pig, so with the prompt as context nothing is flagged.
+    assert sec["pool_prompt_as_context"]["k"] == 0
+    assert (sec["selected"]["k"], sec["selected"]["n"]) == (1, 1)
+    assert (sec["score_only_selected"]["k"], sec["score_only_selected"]["n"]) == (0, 1)
+    # echo_text is stored cut to 300 characters: a wider window would score the
+    # selected column over less text than the pool, so it is refused, not scored.
+    wide = scorer.file_section(path, 301)
+    assert wide["selected"] is None and "300" in wide["selected_refused"]
+    assert wide["pool"]["window"] == 301
+
+
+def test_seed_section_sums_k_and_n_per_seed_and_takes_a_sample_sd(tmp_path):
+    """A seed's rate pools its lists by SUMMING k and n (never a mean of rates,
+    which would weight a 10-reply list like a 1000-reply one), a recipe is the
+    run name with `-sN` removed, and SD_seed is the sample SD (ddof = 1)."""
+    spec = {
+        "v12_fresh_chat-r.json": (1, 9), "v12_wide_chat-r.json": (18, 2),
+        "v12_fresh_chat-r-s1.json": (2, 8),
+        "v12_fresh_chat-r-s2.json": (4, 6),
+        "v12_fresh_chat-other.json": (0, 10),
+    }
+    for name, (flagged, clean) in spec.items():
+        _toy_pool_file(tmp_path / name, flagged, clean)
+    index = scorer.pool_files(tmp_path)
+    files = {p.name: scorer.file_section(p, 200) for _, _, p in index}
+    out = scorer.seed_section(files, index)
+    assert set(out) == {"chat-r", "chat-other"}
+    pool = out["chat-r"]["pool"]
+    assert pool["n_seeds"] == 3
+    assert (pool["per_seed"]["chat-r"]["k"], pool["per_seed"]["chat-r"]["n"]) == (19, 30)
+    # 19/30, not the 0.5 that averaging the two lists' rates (0.1, 0.9) gives.
+    rates = [19 / 30, 2 / 10, 4 / 10]
+    assert pool["mean"] == pytest.approx(statistics.fmean(rates), abs=1e-6)
+    assert pool["sd_seed"] == pytest.approx(statistics.stdev(rates), abs=1e-6)
+    assert out["chat-other"]["pool"]["sd_seed"] is None     # one seed has no spread
+
+
+def test_committed_artifact_is_what_the_instrument_says_about_a_committed_pool():
+    """`coherence_v14.json` must trace to the committed draws AND to this tree's
+    instrument. Anyone who changes a stoplist or the pattern and does not re-run
+    `scripts/chat/coherence_score.py` turns this red -- which is the point: the
+    artifact describes one instrument, and it has to be the one in `src/`.
+    (The corpus half of the artifact cannot be held the same way: CI has no
+    `data/`. The fixture tests above are its stand-in.)"""
+    with open(os.path.join(QUALITY, "coherence_v14.json"), encoding="utf-8") as fh:
+        artifact = json.load(fh)
+    assert artifact["instrument"] == "unintroduced-entity rate (UER@200)"
+    name = "v12_fresh_chat-v3d-aligned.json"
+    fresh = scorer.file_section(scorer.Path(QUALITY) / name, artifact["window"])
+    assert fresh == artifact["files"][name]
+    # All 24 echo_holdout-format files are in it, and the incumbent's four
+    # training seeds are what SD_seed was taken over.
+    assert sorted(artifact["files"]) == [p.name for _, _, p in scorer.pool_files(
+        scorer.Path(QUALITY))]
+    incumbent = artifact["across_training_seeds"]["chat-v3d-aligned"]
+    assert incumbent["seeds"] == ["chat-v3d-aligned", "chat-v3d-aligned-s1",
+                                  "chat-v3d-aligned-s2", "chat-v3d-aligned-s3"]
+    rates = [v["rate"] for v in incumbent["pool"]["per_seed"].values()]
+    assert incumbent["pool"]["n_seeds"] == 4
+    assert incumbent["pool"]["sd_seed"] == pytest.approx(statistics.stdev(rates), abs=1e-5)

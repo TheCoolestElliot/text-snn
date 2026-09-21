@@ -1,0 +1,2916 @@
+{
+ "instrument": "unintroduced-entity rate (UER@200)",
+ "not_a_coherence_measure": "UER counts definite subjects whose head noun was never introduced, in a fixed window. It has never been validated against a human rating, it is blind to a plain sentence interleave of two stories (see corpus.mutations.interleave), and it must never be used inside snnchat.rerank. See src/snnchat/coherence.py.",
+ "window": 200,
+ "interval": "Wilson 95%; assumes independent replies, which pool draws are not",
+ "corpus": {
+  "file": "stories_topic.val.bin",
+  "sha256": "d80b2a9a5cd49b34e7d64be84c8b2dc14957f6185205e344c04943d63f26f0cf",
+  "n_story_turns": 1824,
+  "with_stoplist": {
+   "rate": 0.023026,
+   "k": 42,
+   "n": 1824,
+   "ci": [
+    0.01708,
+    0.030977
+   ],
+   "qualifying_fraction": 1.0,
+   "n_total": 1824,
+   "window": 200
+  },
+  "without_stoplist": {
+   "rate": 0.083882,
+   "k": 153,
+   "n": 1824,
+   "ci": [
+    0.072018,
+    0.097494
+   ],
+   "qualifying_fraction": 1.0,
+   "n_total": 1824,
+   "window": 200
+  },
+  "prototype_rule_literal": {
+   "rate": 0.086075,
+   "k": 157,
+   "n": 1824,
+   "ci": [
+    0.074057,
+    0.099832
+   ],
+   "qualifying_fraction": 1.0,
+   "n_total": 1824,
+   "window": 200
+  },
+  "with_stoplist_prompt_as_context": {
+   "rate": 0.020285,
+   "k": 37,
+   "n": 1824,
+   "ci": [
+    0.014752,
+    0.027834
+   ],
+   "qualifying_fraction": 1.0,
+   "n_total": 1824,
+   "window": 200
+  },
+  "mutations": {
+   "partner_offset": 7,
+   "replace_alternate": {
+    "with_stoplist": {
+     "rate": 0.233553,
+     "k": 426,
+     "n": 1824,
+     "ci": [
+      0.214709,
+      0.253517
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    },
+    "without_stoplist": {
+     "rate": 0.289474,
+     "k": 528,
+     "n": 1824,
+     "ci": [
+      0.269121,
+      0.310712
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    },
+    "prototype_rule_literal": {
+     "rate": 0.29057,
+     "k": 530,
+     "n": 1824,
+     "ci": [
+      0.270191,
+      0.311829
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    }
+   },
+   "interleave": {
+    "with_stoplist": {
+     "rate": 0.020833,
+     "k": 38,
+     "n": 1824,
+     "ci": [
+      0.015216,
+      0.028465
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    },
+    "without_stoplist": {
+     "rate": 0.055921,
+     "k": 102,
+     "n": 1824,
+     "ci": [
+      0.04628,
+      0.067429
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    },
+    "prototype_rule_literal": {
+     "rate": 0.056469,
+     "k": 103,
+     "n": 1824,
+     "ci": [
+      0.046779,
+      0.068024
+     ],
+     "qualifying_fraction": 1.0,
+     "n_total": 1824,
+     "window": 200
+    }
+   }
+  },
+  "flagged_heads_with_stoplist": [
+   [
+    "kids",
+    6
+   ],
+   [
+    "town",
+    5
+   ],
+   [
+    "birds",
+    4
+   ],
+   [
+    "animals",
+    3
+   ],
+   [
+    "people",
+    3
+   ],
+   [
+    "water",
+    2
+   ],
+   [
+    "girl",
+    2
+   ],
+   [
+    "winner",
+    1
+   ],
+   [
+    "flowers",
+    1
+   ],
+   [
+    "garden",
+    1
+   ],
+   [
+    "mail",
+    1
+   ],
+   [
+    "tickets",
+    1
+   ],
+   [
+    "farmer",
+    1
+   ],
+   [
+    "mop",
+    1
+   ],
+   [
+    "bell",
+    1
+   ],
+   [
+    "sunrise",
+    1
+   ],
+   [
+    "noise",
+    1
+   ],
+   [
+    "player",
+    1
+   ],
+   [
+    "tide",
+    1
+   ],
+   [
+    "dishwasher",
+    1
+   ],
+   [
+    "kingdom",
+    1
+   ],
+   [
+    "park",
+    1
+   ],
+   [
+    "mom",
+    1
+   ],
+   [
+    "forest",
+    1
+   ]
+  ],
+  "flagged_heads_without_stoplist": [
+   [
+    "and",
+    45
+   ],
+   [
+    "sun",
+    31
+   ],
+   [
+    "sky",
+    18
+   ],
+   [
+    "kids",
+    6
+   ],
+   [
+    "it",
+    6
+   ],
+   [
+    "town",
+    5
+   ],
+   [
+    "he",
+    5
+   ],
+   [
+    "animals",
+    4
+   ],
+   [
+    "birds",
+    4
+   ],
+   [
+    "they",
+    4
+   ],
+   [
+    "wind",
+    3
+   ],
+   [
+    "people",
+    3
+   ],
+   [
+    "she",
+    3
+   ],
+   [
+    "flowers",
+    2
+   ],
+   [
+    "water",
+    2
+   ],
+   [
+    "rain",
+    2
+   ],
+   [
+    "girl",
+    2
+   ],
+   [
+    "there",
+    1
+   ],
+   [
+    "winner",
+    1
+   ],
+   [
+    "or",
+    1
+   ],
+   [
+    "garden",
+    1
+   ],
+   [
+    "mail",
+    1
+   ],
+   [
+    "tickets",
+    1
+   ],
+   [
+    "one",
+    1
+   ],
+   [
+    "farmer",
+    1
+   ]
+  ]
+ },
+ "files": {
+  "v12_fresh_chat-v12-rare-s1.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s1/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.235537,
+    "k": 7231,
+    "n": 30700,
+    "ci": [
+     0.230824,
+     0.240317
+    ],
+    "qualifying_fraction": 0.999349,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.235277,
+    "k": 7223,
+    "n": 30700,
+    "ci": [
+     0.230565,
+     0.240055
+    ],
+    "qualifying_fraction": 0.999349,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.333333,
+    "k": 40,
+    "n": 120,
+    "ci": [
+     0.255317,
+     0.421689
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.325,
+    "k": 39,
+    "n": 120,
+    "ci": [
+     0.247759,
+     0.413098
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v12-rare-s2.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s2/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.210861,
+    "k": 6473,
+    "n": 30698,
+    "ci": [
+     0.206334,
+     0.21546
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.210209,
+    "k": 6453,
+    "n": 30698,
+    "ci": [
+     0.205688,
+     0.214803
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.233333,
+    "k": 28,
+    "n": 120,
+    "ci": [
+     0.166656,
+     0.316554
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.216667,
+    "k": 26,
+    "n": 120,
+    "ci": [
+     0.152367,
+     0.298544
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v12-rare-s3.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s3/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.225747,
+    "k": 6932,
+    "n": 30707,
+    "ci": [
+     0.221105,
+     0.230457
+    ],
+    "qualifying_fraction": 0.999577,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.225421,
+    "k": 6922,
+    "n": 30707,
+    "ci": [
+     0.220782,
+     0.230129
+    ],
+    "qualifying_fraction": 0.999577,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.275,
+    "k": 33,
+    "n": 120,
+    "ci": [
+     0.203029,
+     0.36093
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.225,
+    "k": 27,
+    "n": 120,
+    "ci": [
+     0.159492,
+     0.307569
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v12-rare.json": {
+   "ckpt": "experiments/chat/chat-v12-rare/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.218731,
+    "k": 6717,
+    "n": 30709,
+    "ci": [
+     0.214143,
+     0.223389
+    ],
+    "qualifying_fraction": 0.999642,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.218307,
+    "k": 6704,
+    "n": 30709,
+    "ci": [
+     0.213722,
+     0.222963
+    ],
+    "qualifying_fraction": 0.999642,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.166667,
+    "k": 20,
+    "n": 120,
+    "ci": [
+     0.11056,
+     0.243453
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.141667,
+    "k": 17,
+    "n": 120,
+    "ci": [
+     0.090369,
+     0.215195
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.058333,
+    "k": 7,
+    "n": 120,
+    "ci": [
+     0.028541,
+     0.115526
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.058333,
+    "k": 7,
+    "n": 120,
+    "ci": [
+     0.028541,
+     0.115526
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v3d-aligned-s1.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.212011,
+    "k": 6510,
+    "n": 30706,
+    "ci": [
+     0.207475,
+     0.216618
+    ],
+    "qualifying_fraction": 0.999544,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.211815,
+    "k": 6504,
+    "n": 30706,
+    "ci": [
+     0.207281,
+     0.216421
+    ],
+    "qualifying_fraction": 0.999544,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.133333,
+    "k": 16,
+    "n": 120,
+    "ci": [
+     0.083766,
+     0.205648
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.125,
+    "k": 15,
+    "n": 120,
+    "ci": [
+     0.077235,
+     0.196029
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.066667,
+    "k": 8,
+    "n": 120,
+    "ci": [
+     0.034165,
+     0.126051
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.066667,
+    "k": 8,
+    "n": 120,
+    "ci": [
+     0.034165,
+     0.126051
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v3d-aligned-s2.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.235488,
+    "k": 7229,
+    "n": 30698,
+    "ci": [
+     0.230774,
+     0.240267
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.234999,
+    "k": 7214,
+    "n": 30698,
+    "ci": [
+     0.230289,
+     0.239775
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.275,
+    "k": 33,
+    "n": 120,
+    "ci": [
+     0.203029,
+     0.36093
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.25,
+    "k": 30,
+    "n": 120,
+    "ci": [
+     0.181098,
+     0.334411
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.008403,
+    "k": 1,
+    "n": 119,
+    "ci": [
+     0.001485,
+     0.046068
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.008403,
+    "k": 1,
+    "n": 119,
+    "ci": [
+     0.001485,
+     0.046068
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v3d-aligned-s3.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.22224,
+    "k": 6823,
+    "n": 30701,
+    "ci": [
+     0.217625,
+     0.226925
+    ],
+    "qualifying_fraction": 0.999382,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.222045,
+    "k": 6817,
+    "n": 30701,
+    "ci": [
+     0.217431,
+     0.226729
+    ],
+    "qualifying_fraction": 0.999382,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.241667,
+    "k": 29,
+    "n": 120,
+    "ci": [
+     0.173858,
+     0.325501
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.216667,
+    "k": 26,
+    "n": 120,
+    "ci": [
+     0.152367,
+     0.298544
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_fresh_chat-v3d-aligned.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned/ckpt_best.pt",
+   "probe_set": "fresh",
+   "rows": 120,
+   "pool": {
+    "rate": 0.205329,
+    "k": 6304,
+    "n": 30702,
+    "ci": [
+     0.200847,
+     0.209884
+    ],
+    "qualifying_fraction": 0.999414,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.204905,
+    "k": 6291,
+    "n": 30702,
+    "ci": [
+     0.200427,
+     0.209457
+    ],
+    "qualifying_fraction": 0.999414,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.208333,
+    "k": 25,
+    "n": 120,
+    "ci": [
+     0.145284,
+     0.289477
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.191667,
+    "k": 23,
+    "n": 120,
+    "ci": [
+     0.13125,
+     0.271212
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v12-rare-s1.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s1/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.229148,
+    "k": 7036,
+    "n": 30705,
+    "ci": [
+     0.224481,
+     0.233883
+    ],
+    "qualifying_fraction": 0.999512,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.227846,
+    "k": 6996,
+    "n": 30705,
+    "ci": [
+     0.223188,
+     0.232571
+    ],
+    "qualifying_fraction": 0.999512,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.358333,
+    "k": 43,
+    "n": 120,
+    "ci": [
+     0.278161,
+     0.447295
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.308333,
+    "k": 37,
+    "n": 120,
+    "ci": [
+     0.232727,
+     0.39583
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v12-rare-s2.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s2/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.214251,
+    "k": 6576,
+    "n": 30693,
+    "ci": [
+     0.209697,
+     0.218877
+    ],
+    "qualifying_fraction": 0.999121,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.212589,
+    "k": 6525,
+    "n": 30693,
+    "ci": [
+     0.208048,
+     0.217202
+    ],
+    "qualifying_fraction": 0.999121,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.283333,
+    "k": 34,
+    "n": 120,
+    "ci": [
+     0.210406,
+     0.369702
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.225,
+    "k": 27,
+    "n": 120,
+    "ci": [
+     0.159492,
+     0.307569
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.033333,
+    "k": 4,
+    "n": 120,
+    "ci": [
+     0.013038,
+     0.08258
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v12-rare-s3.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s3/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.218608,
+    "k": 6713,
+    "n": 30708,
+    "ci": [
+     0.21402,
+     0.223265
+    ],
+    "qualifying_fraction": 0.999609,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.217826,
+    "k": 6689,
+    "n": 30708,
+    "ci": [
+     0.213245,
+     0.222478
+    ],
+    "qualifying_fraction": 0.999609,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.225,
+    "k": 27,
+    "n": 120,
+    "ci": [
+     0.159492,
+     0.307569
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.183333,
+    "k": 22,
+    "n": 120,
+    "ci": [
+     0.124303,
+     0.262009
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.041667,
+    "k": 5,
+    "n": 120,
+    "ci": [
+     0.017927,
+     0.093841
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v12-rare.json": {
+   "ckpt": "experiments/chat/chat-v12-rare/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.218194,
+    "k": 6699,
+    "n": 30702,
+    "ci": [
+     0.21361,
+     0.222849
+    ],
+    "qualifying_fraction": 0.999414,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.216794,
+    "k": 6656,
+    "n": 30702,
+    "ci": [
+     0.21222,
+     0.221438
+    ],
+    "qualifying_fraction": 0.999414,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.25,
+    "k": 30,
+    "n": 120,
+    "ci": [
+     0.181098,
+     0.334411
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.183333,
+    "k": 22,
+    "n": 120,
+    "ci": [
+     0.124303,
+     0.262009
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.033898,
+    "k": 4,
+    "n": 118,
+    "ci": [
+     0.01326,
+     0.083928
+    ],
+    "qualifying_fraction": 0.983333,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.033898,
+    "k": 4,
+    "n": 118,
+    "ci": [
+     0.01326,
+     0.083928
+    ],
+    "qualifying_fraction": 0.983333,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v3d-aligned-s1.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.214186,
+    "k": 6577,
+    "n": 30707,
+    "ci": [
+     0.209633,
+     0.21881
+    ],
+    "qualifying_fraction": 0.999577,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.212948,
+    "k": 6539,
+    "n": 30707,
+    "ci": [
+     0.208405,
+     0.217563
+    ],
+    "qualifying_fraction": 0.999577,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.241667,
+    "k": 29,
+    "n": 120,
+    "ci": [
+     0.173858,
+     0.325501
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.216667,
+    "k": 26,
+    "n": 120,
+    "ci": [
+     0.152367,
+     0.298544
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.016667,
+    "k": 2,
+    "n": 120,
+    "ci": [
+     0.004583,
+     0.058736
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v3d-aligned-s2.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.250106,
+    "k": 7676,
+    "n": 30691,
+    "ci": [
+     0.245292,
+     0.254982
+    ],
+    "qualifying_fraction": 0.999056,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.247955,
+    "k": 7610,
+    "n": 30691,
+    "ci": [
+     0.243156,
+     0.252818
+    ],
+    "qualifying_fraction": 0.999056,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.316667,
+    "k": 38,
+    "n": 120,
+    "ci": [
+     0.240228,
+     0.404479
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.275,
+    "k": 33,
+    "n": 120,
+    "ci": [
+     0.203029,
+     0.36093
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.076923,
+    "k": 9,
+    "n": 117,
+    "ci": [
+     0.040995,
+     0.13975
+    ],
+    "qualifying_fraction": 0.975,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.076923,
+    "k": 9,
+    "n": 117,
+    "ci": [
+     0.040995,
+     0.13975
+    ],
+    "qualifying_fraction": 0.975,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v3d-aligned-s3.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.225398,
+    "k": 6917,
+    "n": 30688,
+    "ci": [
+     0.220757,
+     0.230107
+    ],
+    "qualifying_fraction": 0.998958,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.223833,
+    "k": 6869,
+    "n": 30688,
+    "ci": [
+     0.219205,
+     0.228531
+    ],
+    "qualifying_fraction": 0.998958,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.275,
+    "k": 33,
+    "n": 120,
+    "ci": [
+     0.203029,
+     0.36093
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.241667,
+    "k": 29,
+    "n": 120,
+    "ci": [
+     0.173858,
+     0.325501
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.058824,
+    "k": 7,
+    "n": 119,
+    "ci": [
+     0.028783,
+     0.116456
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.058824,
+    "k": 7,
+    "n": 119,
+    "ci": [
+     0.028783,
+     0.116456
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_heldout_chat-v3d-aligned.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned/ckpt_best.pt",
+   "probe_set": "heldout",
+   "rows": 120,
+   "pool": {
+    "rate": 0.224622,
+    "k": 6895,
+    "n": 30696,
+    "ci": [
+     0.219988,
+     0.229325
+    ],
+    "qualifying_fraction": 0.999219,
+    "n_total": 30720,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.222635,
+    "k": 6834,
+    "n": 30696,
+    "ci": [
+     0.218016,
+     0.227323
+    ],
+    "qualifying_fraction": 0.999219,
+    "n_total": 30720,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.283333,
+    "k": 34,
+    "n": 120,
+    "ci": [
+     0.210406,
+     0.369702
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.216667,
+    "k": 26,
+    "n": 120,
+    "ci": [
+     0.152367,
+     0.298544
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.058333,
+    "k": 7,
+    "n": 120,
+    "ci": [
+     0.028541,
+     0.115526
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.058333,
+    "k": 7,
+    "n": 120,
+    "ci": [
+     0.028541,
+     0.115526
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 120,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v12-rare-s1.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s1/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.231937,
+    "k": 21363,
+    "n": 92107,
+    "ci": [
+     0.229222,
+     0.234674
+    ],
+    "qualifying_fraction": 0.999425,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.231774,
+    "k": 21348,
+    "n": 92107,
+    "ci": [
+     0.22906,
+     0.23451
+    ],
+    "qualifying_fraction": 0.999425,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.252778,
+    "k": 91,
+    "n": 360,
+    "ci": [
+     0.210655,
+     0.300121
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.241667,
+    "k": 87,
+    "n": 360,
+    "ci": [
+     0.200322,
+     0.288466
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.038889,
+    "k": 14,
+    "n": 360,
+    "ci": [
+     0.023304,
+     0.06421
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.038889,
+    "k": 14,
+    "n": 360,
+    "ci": [
+     0.023304,
+     0.06421
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v12-rare-s2.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s2/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.21376,
+    "k": 19686,
+    "n": 92094,
+    "ci": [
+     0.211124,
+     0.216419
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.213347,
+    "k": 19648,
+    "n": 92094,
+    "ci": [
+     0.210713,
+     0.216005
+    ],
+    "qualifying_fraction": 0.999284,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.211111,
+    "k": 76,
+    "n": 360,
+    "ci": [
+     0.172117,
+     0.256205
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.194444,
+    "k": 70,
+    "n": 360,
+    "ci": [
+     0.156876,
+     0.238465
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.044818,
+    "k": 16,
+    "n": 357,
+    "ci": [
+     0.027773,
+     0.071555
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.044818,
+    "k": 16,
+    "n": 357,
+    "ci": [
+     0.027773,
+     0.071555
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v12-rare-s3.json": {
+   "ckpt": "experiments/chat/chat-v12-rare-s3/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.218447,
+    "k": 20119,
+    "n": 92100,
+    "ci": [
+     0.215791,
+     0.221128
+    ],
+    "qualifying_fraction": 0.999349,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.218187,
+    "k": 20095,
+    "n": 92100,
+    "ci": [
+     0.215531,
+     0.220866
+    ],
+    "qualifying_fraction": 0.999349,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.219444,
+    "k": 79,
+    "n": 360,
+    "ci": [
+     0.179777,
+     0.265036
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.202778,
+    "k": 73,
+    "n": 360,
+    "ci": [
+     0.164483,
+     0.247348
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.027778,
+    "k": 10,
+    "n": 360,
+    "ci": [
+     0.015157,
+     0.05037
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.027778,
+    "k": 10,
+    "n": 360,
+    "ci": [
+     0.015157,
+     0.05037
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v12-rare.json": {
+   "ckpt": "experiments/chat/chat-v12-rare/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.217967,
+    "k": 20078,
+    "n": 92115,
+    "ci": [
+     0.215312,
+     0.220645
+    ],
+    "qualifying_fraction": 0.999512,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.217717,
+    "k": 20055,
+    "n": 92115,
+    "ci": [
+     0.215064,
+     0.220394
+    ],
+    "qualifying_fraction": 0.999512,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.213889,
+    "k": 77,
+    "n": 360,
+    "ci": [
+     0.174668,
+     0.259151
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.205556,
+    "k": 74,
+    "n": 360,
+    "ci": [
+     0.167025,
+     0.250303
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.039437,
+    "k": 14,
+    "n": 355,
+    "ci": [
+     0.023635,
+     0.0651
+    ],
+    "qualifying_fraction": 0.986111,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.039437,
+    "k": 14,
+    "n": 355,
+    "ci": [
+     0.023635,
+     0.0651
+    ],
+    "qualifying_fraction": 0.986111,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v3d-aligned-s1.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s1/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.214746,
+    "k": 19779,
+    "n": 92104,
+    "ci": [
+     0.212106,
+     0.21741
+    ],
+    "qualifying_fraction": 0.999392,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.214399,
+    "k": 19747,
+    "n": 92104,
+    "ci": [
+     0.21176,
+     0.217061
+    ],
+    "qualifying_fraction": 0.999392,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.2,
+    "k": 72,
+    "n": 360,
+    "ci": [
+     0.161945,
+     0.24439
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.180556,
+    "k": 65,
+    "n": 360,
+    "ci": [
+     0.144261,
+     0.223596
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.041667,
+    "k": 15,
+    "n": 360,
+    "ci": [
+     0.025411,
+     0.067601
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.041667,
+    "k": 15,
+    "n": 360,
+    "ci": [
+     0.025411,
+     0.067601
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v3d-aligned-s2.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s2/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.248249,
+    "k": 22865,
+    "n": 92105,
+    "ci": [
+     0.24547,
+     0.25105
+    ],
+    "qualifying_fraction": 0.999403,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.247945,
+    "k": 22837,
+    "n": 92105,
+    "ci": [
+     0.245167,
+     0.250745
+    ],
+    "qualifying_fraction": 0.999403,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.241667,
+    "k": 87,
+    "n": 360,
+    "ci": [
+     0.200322,
+     0.288466
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.219444,
+    "k": 79,
+    "n": 360,
+    "ci": [
+     0.179777,
+     0.265036
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.04507,
+    "k": 16,
+    "n": 355,
+    "ci": [
+     0.02793,
+     0.071951
+    ],
+    "qualifying_fraction": 0.986111,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.04507,
+    "k": 16,
+    "n": 355,
+    "ci": [
+     0.02793,
+     0.071951
+    ],
+    "qualifying_fraction": 0.986111,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v3d-aligned-s3.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned-s3/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.229789,
+    "k": 21164,
+    "n": 92102,
+    "ci": [
+     0.227083,
+     0.232517
+    ],
+    "qualifying_fraction": 0.999371,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.229572,
+    "k": 21144,
+    "n": 92102,
+    "ci": [
+     0.226867,
+     0.232299
+    ],
+    "qualifying_fraction": 0.999371,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.252778,
+    "k": 91,
+    "n": 360,
+    "ci": [
+     0.210655,
+     0.300121
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.230556,
+    "k": 83,
+    "n": 360,
+    "ci": [
+     0.190029,
+     0.276772
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.033613,
+    "k": 12,
+    "n": 357,
+    "ci": [
+     0.019331,
+     0.057826
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.033613,
+    "k": 12,
+    "n": 357,
+    "ci": [
+     0.019331,
+     0.057826
+    ],
+    "qualifying_fraction": 0.991667,
+    "n_total": 360,
+    "window": 200
+   }
+  },
+  "v12_wide_chat-v3d-aligned.json": {
+   "ckpt": "experiments/chat/chat-v3d-aligned/ckpt_best.pt",
+   "probe_set": "wide",
+   "rows": 360,
+   "pool": {
+    "rate": 0.216185,
+    "k": 19913,
+    "n": 92111,
+    "ci": [
+     0.213538,
+     0.218855
+    ],
+    "qualifying_fraction": 0.999468,
+    "n_total": 92160,
+    "window": 200
+   },
+   "pool_prompt_as_context": {
+    "rate": 0.215913,
+    "k": 19888,
+    "n": 92111,
+    "ci": [
+     0.213268,
+     0.218582
+    ],
+    "qualifying_fraction": 0.999468,
+    "n_total": 92160,
+    "window": 200
+   },
+   "selected": {
+    "rate": 0.21727,
+    "k": 78,
+    "n": 359,
+    "ci": [
+     0.177726,
+     0.262801
+    ],
+    "qualifying_fraction": 0.997222,
+    "n_total": 360,
+    "window": 200
+   },
+   "selected_prompt_as_context": {
+    "rate": 0.206128,
+    "k": 74,
+    "n": 359,
+    "ci": [
+     0.1675,
+     0.250979
+    ],
+    "qualifying_fraction": 0.997222,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected": {
+    "rate": 0.036111,
+    "k": 13,
+    "n": 360,
+    "ci": [
+     0.021223,
+     0.060795
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   },
+   "score_only_selected_prompt_as_context": {
+    "rate": 0.036111,
+    "k": 13,
+    "n": 360,
+    "ci": [
+     0.021223,
+     0.060795
+    ],
+    "qualifying_fraction": 1.0,
+    "n_total": 360,
+    "window": 200
+   }
+  }
+ },
+ "across_training_seeds": {
+  "chat-v12-rare": {
+   "seeds": [
+    "chat-v12-rare",
+    "chat-v12-rare-s1",
+    "chat-v12-rare-s2",
+    "chat-v12-rare-s3"
+   ],
+   "pool": {
+    "per_seed": {
+     "chat-v12-rare": {
+      "rate": 0.218165,
+      "k": 33494,
+      "n": 153526,
+      "ci": [
+       0.216106,
+       0.220238
+      ],
+      "qualifying_fraction": 0.999518,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s1": {
+      "rate": 0.232099,
+      "k": 35630,
+      "n": 153512,
+      "ci": [
+       0.229994,
+       0.234218
+      ],
+      "qualifying_fraction": 0.999427,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s2": {
+      "rate": 0.213278,
+      "k": 32735,
+      "n": 153485,
+      "ci": [
+       0.211236,
+       0.215335
+      ],
+      "qualifying_fraction": 0.999251,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s3": {
+      "rate": 0.219939,
+      "k": 33764,
+      "n": 153515,
+      "ci": [
+       0.217874,
+       0.222018
+      ],
+      "qualifying_fraction": 0.999447,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.22087,
+    "sd_seed": 0.007998
+   },
+   "pool_prompt_as_context": {
+    "per_seed": {
+     "chat-v12-rare": {
+      "rate": 0.21765,
+      "k": 33415,
+      "n": 153526,
+      "ci": [
+       0.215593,
+       0.219722
+      ],
+      "qualifying_fraction": 0.999518,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s1": {
+      "rate": 0.231689,
+      "k": 35567,
+      "n": 153512,
+      "ci": [
+       0.229585,
+       0.233806
+      ],
+      "qualifying_fraction": 0.999427,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s2": {
+      "rate": 0.212568,
+      "k": 32626,
+      "n": 153485,
+      "ci": [
+       0.210528,
+       0.214622
+      ],
+      "qualifying_fraction": 0.999251,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s3": {
+      "rate": 0.219562,
+      "k": 33706,
+      "n": 153515,
+      "ci": [
+       0.217498,
+       0.221639
+      ],
+      "qualifying_fraction": 0.999447,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.220367,
+    "sd_seed": 0.008104
+   },
+   "selected": {
+    "per_seed": {
+     "chat-v12-rare": {
+      "rate": 0.211667,
+      "k": 127,
+      "n": 600,
+      "ci": [
+       0.180868,
+       0.246134
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s1": {
+      "rate": 0.29,
+      "k": 174,
+      "n": 600,
+      "ci": [
+       0.255119,
+       0.327553
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s2": {
+      "rate": 0.23,
+      "k": 138,
+      "n": 600,
+      "ci": [
+       0.198108,
+       0.265327
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s3": {
+      "rate": 0.231667,
+      "k": 139,
+      "n": 600,
+      "ci": [
+       0.19968,
+       0.267068
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.240834,
+    "sd_seed": 0.034007
+   },
+   "selected_prompt_as_context": {
+    "per_seed": {
+     "chat-v12-rare": {
+      "rate": 0.188333,
+      "k": 113,
+      "n": 600,
+      "ci": [
+       0.159069,
+       0.221564
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s1": {
+      "rate": 0.271667,
+      "k": 163,
+      "n": 600,
+      "ci": [
+       0.237611,
+       0.308628
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s2": {
+      "rate": 0.205,
+      "k": 123,
+      "n": 600,
+      "ci": [
+       0.174623,
+       0.239131
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s3": {
+      "rate": 0.203333,
+      "k": 122,
+      "n": 600,
+      "ci": [
+       0.173063,
+       0.237378
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.217083,
+    "sd_seed": 0.037153
+   },
+   "score_only_selected": {
+    "per_seed": {
+     "chat-v12-rare": {
+      "rate": 0.042159,
+      "k": 25,
+      "n": 593,
+      "ci": [
+       0.028717,
+       0.061494
+      ],
+      "qualifying_fraction": 0.988333,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s1": {
+      "rate": 0.035,
+      "k": 21,
+      "n": 600,
+      "ci": [
+       0.023004,
+       0.052912
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s2": {
+      "rate": 0.040201,
+      "k": 24,
+      "n": 597,
+      "ci": [
+       0.027162,
+       0.05912
+      ],
+      "qualifying_fraction": 0.995,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v12-rare-s3": {
+      "rate": 0.028333,
+      "k": 17,
+      "n": 600,
+      "ci": [
+       0.017764,
+       0.044904
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.036423,
+    "sd_seed": 0.006182
+   }
+  },
+  "chat-v3d-aligned": {
+   "seeds": [
+    "chat-v3d-aligned",
+    "chat-v3d-aligned-s1",
+    "chat-v3d-aligned-s2",
+    "chat-v3d-aligned-s3"
+   ],
+   "pool": {
+    "per_seed": {
+     "chat-v3d-aligned": {
+      "rate": 0.215701,
+      "k": 33112,
+      "n": 153509,
+      "ci": [
+       0.21365,
+       0.217765
+      ],
+      "qualifying_fraction": 0.999408,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s1": {
+      "rate": 0.214087,
+      "k": 32866,
+      "n": 153517,
+      "ci": [
+       0.212042,
+       0.216146
+      ],
+      "qualifying_fraction": 0.99946,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s2": {
+      "rate": 0.246068,
+      "k": 37770,
+      "n": 153494,
+      "ci": [
+       0.24392,
+       0.248229
+      ],
+      "qualifying_fraction": 0.99931,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s3": {
+      "rate": 0.227401,
+      "k": 34904,
+      "n": 153491,
+      "ci": [
+       0.225311,
+       0.229505
+      ],
+      "qualifying_fraction": 0.99929,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.225814,
+    "sd_seed": 0.014748
+   },
+   "pool_prompt_as_context": {
+    "per_seed": {
+     "chat-v3d-aligned": {
+      "rate": 0.215056,
+      "k": 33013,
+      "n": 153509,
+      "ci": [
+       0.213008,
+       0.217118
+      ],
+      "qualifying_fraction": 0.999408,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s1": {
+      "rate": 0.213592,
+      "k": 32790,
+      "n": 153517,
+      "ci": [
+       0.211549,
+       0.215649
+      ],
+      "qualifying_fraction": 0.99946,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s2": {
+      "rate": 0.245358,
+      "k": 37661,
+      "n": 153494,
+      "ci": [
+       0.243212,
+       0.247517
+      ],
+      "qualifying_fraction": 0.99931,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s3": {
+      "rate": 0.226919,
+      "k": 34830,
+      "n": 153491,
+      "ci": [
+       0.22483,
+       0.229021
+      ],
+      "qualifying_fraction": 0.99929,
+      "n_total": 153600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.225231,
+    "sd_seed": 0.014685
+   },
+   "selected": {
+    "per_seed": {
+     "chat-v3d-aligned": {
+      "rate": 0.228715,
+      "k": 137,
+      "n": 599,
+      "ci": [
+       0.196871,
+       0.264015
+      ],
+      "qualifying_fraction": 0.998333,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s1": {
+      "rate": 0.195,
+      "k": 117,
+      "n": 600,
+      "ci": [
+       0.16528,
+       0.228601
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s2": {
+      "rate": 0.263333,
+      "k": 158,
+      "n": 600,
+      "ci": [
+       0.229677,
+       0.300001
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s3": {
+      "rate": 0.255,
+      "k": 153,
+      "n": 600,
+      "ci": [
+       0.221759,
+       0.291358
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.235512,
+    "sd_seed": 0.030775
+   },
+   "selected_prompt_as_context": {
+    "per_seed": {
+     "chat-v3d-aligned": {
+      "rate": 0.205342,
+      "k": 123,
+      "n": 599,
+      "ci": [
+       0.174919,
+       0.23952
+      ],
+      "qualifying_fraction": 0.998333,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s1": {
+      "rate": 0.176667,
+      "k": 106,
+      "n": 600,
+      "ci": [
+       0.148235,
+       0.209213
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s2": {
+      "rate": 0.236667,
+      "k": 142,
+      "n": 600,
+      "ci": [
+       0.2044,
+       0.272284
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s3": {
+      "rate": 0.23,
+      "k": 138,
+      "n": 600,
+      "ci": [
+       0.198108,
+       0.265327
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.212169,
+    "sd_seed": 0.027234
+   },
+   "score_only_selected": {
+    "per_seed": {
+     "chat-v3d-aligned": {
+      "rate": 0.04,
+      "k": 24,
+      "n": 600,
+      "ci": [
+       0.027025,
+       0.058828
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s1": {
+      "rate": 0.041667,
+      "k": 25,
+      "n": 600,
+      "ci": [
+       0.02838,
+       0.060785
+      ],
+      "qualifying_fraction": 1.0,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s2": {
+      "rate": 0.043993,
+      "k": 26,
+      "n": 591,
+      "ci": [
+       0.030197,
+       0.06368
+      ],
+      "qualifying_fraction": 0.985,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     },
+     "chat-v3d-aligned-s3": {
+      "rate": 0.040268,
+      "k": 24,
+      "n": 596,
+      "ci": [
+       0.027207,
+       0.059218
+      ],
+      "qualifying_fraction": 0.993333,
+      "n_total": 600,
+      "lists": [
+       "fresh",
+       "heldout",
+       "wide"
+      ]
+     }
+    },
+    "n_seeds": 4,
+    "mean": 0.041482,
+    "sd_seed": 0.001827
+   }
+  }
+ }
+}
