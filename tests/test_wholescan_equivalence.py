@@ -793,6 +793,20 @@ def _backward_sources(barrier: bool = True):
            ws.twocomp_backward_scan_source("twocomp_detach", barrier))
 
 
+def test_the_run_time_comparison_is_bitwise_not_numeric():
+    """`self_check` decides with `_bits_equal`, so it has to see what `==` cannot.
+
+    -0.0 == +0.0 is True and their bit patterns differ; a NaN is unequal to itself
+    and bit-identical to itself. `torch.equal` gets both backwards for this purpose.
+    """
+    pz, nz = torch.tensor([0.0, 1.5]), torch.tensor([-0.0, 1.5])
+    assert torch.equal(pz, nz) and not ws._bits_equal(pz, nz)
+    assert not _same_bits(pz, nz)
+    nan = torch.tensor([float("nan"), 2.0])
+    assert not torch.equal(nan, nan) and ws._bits_equal(nan, nan.clone())
+    assert not ws._bits_equal(torch.zeros(2, 3), torch.zeros(3, 2))
+
+
 def test_the_functor_text_is_the_committed_text():
     """Pasted, never retyped: the committed source appears verbatim, exactly once.
 
