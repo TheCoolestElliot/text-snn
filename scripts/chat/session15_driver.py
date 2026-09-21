@@ -61,7 +61,9 @@ STAGES, IN ORDER
    HELDOUT at the shipped decoder. Each is cached on its artifact.
 5. **verdict** -- `score_v15.py`, which uses no GPU.
 
-A seed that fails is reported as failed and the driver moves on to the next; it
+A failure in stages 0-2 stops the driver: nothing trains behind a refused
+pre-flight, a probe that cannot read SHIPPED, or a wrong mixture. After that, a
+seed that fails is reported as failed and the driver moves on to the next; it
 is not retried and not replaced.
 
 POLL THE STATUS FILE, NOT THE PROCESS
@@ -126,6 +128,11 @@ PREREGISTERED: tuple[str, ...] = (
 )
 
 HEARTBEAT_S = 15.0
+
+#: Nothing may train past a failure in one of these: a refused pre-flight, an
+#: instrument that cannot read the SHIPPED checkpoint, or a smoke run whose
+#: mixture is not the one that was asked for.
+_BLOCKING = frozenset({"preflight", "floors", "smoke"})
 
 
 class Refusal(RuntimeError):
@@ -557,6 +564,7 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
 
     for step in plan:
         stage = step["stage"]
+        run_name = stage.split(":", 1)[1] if ":" in stage else None
         entry = status.begin(stage)
         log(f"STAGE_START {stage}")
         try:
@@ -581,7 +589,6 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
                 status.end(entry, "ok")
                 continue
 
-            run_name = stage.split(":", 1)[1] if ":" in stage else None
             if stage.startswith("score:") and run_name in failed_runs:
                 status.end(entry, "skipped", f"{run_name} did not train to completion")
                 continue
@@ -602,6 +609,7 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
             elif stage.startswith("score:"):
                 check_written_config(ref_cfg, step["run_dir"] / "config.json")
 
+            errors = []
             for cmd, artifact in step["commands"]:
                 if stage != "smoke" and not stage.startswith("train:") \
                         and stage != "verdict" and artifact_ok(artifact):
@@ -615,9 +623,14 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
                 watch = step["run_dir"] / "log.jsonl" if is_train else None
                 rc = run_child(cmd, stdout, status, watch=watch, popen=popen)
                 if rc != 0 or not artifact.exists():
-                    raise RuntimeError(f"rc={rc}, artifact present={artifact.exists()}: "
-                                       f"see {stdout}")
+                    # One probe dying must not cost the stage its other readouts.
+                    errors.append(f"{Path(cmd[2]).name}: rc={rc}, artifact "
+                                  f"present={artifact.exists()}, see {stdout}")
+                    log(f"  FAILED {errors[-1]}")
+                    continue
                 entry["artifacts"].append(str(artifact))
+            if errors:
+                raise RuntimeError("; ".join(errors))
 
             if stage == "smoke":
                 entry["smoke"] = check_smoke(step["run_dir"], ref_cfg)
@@ -629,13 +642,13 @@ def execute(args, plan: list[dict], ref_cfg: dict, status: Status, *,
         except Refusal as exc:
             log(f"REFUSED at {stage}: {exc}")
             status.end(entry, "failed", f"refused: {exc}")
-            if stage in ("preflight", "smoke"):
-                return 2                       # nothing may train past these
+            if stage in _BLOCKING:
+                return 2
             failed_runs.add(run_name or stage)
         except Exception as exc:
             log(f"STAGE_FAILED {stage}: {exc}")
             status.end(entry, "failed", f"{type(exc).__name__}: {exc}")
-            if stage == "smoke":
+            if stage in _BLOCKING:
                 return 1
             failed_runs.add(run_name or stage)
     return 1 if failed_runs else 0
