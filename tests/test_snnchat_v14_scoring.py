@@ -893,6 +893,12 @@ def test_the_command_line_draws_a_pool_the_scorer_accepts(tiny_model, tmp_path, 
     assert scorer.main([str(tmp_path / "v14_*_chat-tiny.json.gz"), "--out", str(scored)]) == 0
     result = json.loads(scored.read_text(encoding="utf-8"))
     assert result["n_story_draws"] == 20
+    # What the REAL writer drew is inside the design the scorer holds a registered
+    # checkpoint to: 32 of its 744 draws, none outside it. Mutation: `check_design`
+    # keying `given` on `d.kind` instead of the set's name (32 outside).
+    assert result["design"] == {
+        "sampler_seeds": [6], "n_draws": 32, "registered_n_draws": 744, "missing": 712,
+        "not_in_the_design": 0, "is_the_registered_design": False}
     g1 = result["GUARD1_identity"]
     assert (g1["verdict"], g1["n"], g1["identical"]) == ("pass", 12, 12)
     assert set(result["latency"]) == {p.name for p in outs.values()}
