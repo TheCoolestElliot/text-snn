@@ -184,4 +184,33 @@ reproduce a number it did not produce", applied to a resample.
 | `scripts/chat/story_dodge_resample.py` | the resample, its fixed seed count and its superset gate |
 | `tests/test_snnchat.py` | `test_wilson_*`, `test_rate_ci_*`, `test_resolves_against_*`, `test_probe_index_*` |
 | `CONTRIBUTING.md` §3 | the one-line pointer here |
+
+## 7. Training rounds report the unintroduced-entity rate next to bpc
+
+**In force from 2026-09-21, for every round that trains a checkpoint.** Next to
+weighted bpc, report the **pool** unintroduced-entity rate, UER@200
+(`snnchat.coherence`, scored by `scripts/chat/coherence_score.py` on the
+round's `echo_holdout.py`-format pools, zero GPU), written as §1 requires and
+always with its **qualifying fraction** — the share of replies that reach the
+200-character window — because a rate over a shrinking subset flatters an arm
+that writes shorter replies. Read it against two things and never alone: the
+corpus reference from the same window and stoplist, **0.0230 (42/1824), 95 % CI
+[0.0171, 0.0310]**, and the incumbent recipe's spread across training seeds,
+**mean 0.2258, SD_seed 0.0147 (n = 4, ddof 1)** — not the pool's Wilson
+interval, which treats 256 drafts of one prompt as independent
+(`experiments/chat/_quality/coherence_v14.json`; regenerate with `python
+scripts/chat/coherence_score.py --data-dir <tree with data/chat>`). Quote a
+difference between two arms only with `uer_decomposition`'s two factors beside
+it, because a reply with no definite subject scores clean and likelier text has
+fewer of them. The instrument is named "unintroduced-entity rate (UER@200)" and
+never "coherence": it has not been validated against a human rating and is blind
+to a plain interleave. **UER must NEVER enter `snnchat/rerank.py`**, as a
+filter, a tier or a term of the score. The precedent is `QUALITY_v8.md` §4 and
+§7: once the echo partition selected on the matcher the `topic` column scores,
+a gain on that column became definitional and stopped being evidence. A selector
+that read UER would do the same to this instrument on the day it shipped.
+`test_importing_coherence_does_not_import_torch` holds one direction of that
+boundary (the instrument imports nothing from `snnchat.rerank`); the other
+direction is held by review, and a reviewer who sees `coherence` imported in
+`rerank.py` should stop the change there.
 </content>
