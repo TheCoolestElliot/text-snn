@@ -64,6 +64,7 @@ from snn.evaluate import _PROTOCOLS, evaluate
 from snn.metrics import bits_per_char
 from snn.model import build_model, count_params
 from snn.neuromod import three_factor_loss
+from snn.wholescan import scan_impl_record
 
 # Slot layout of the single static metrics tensor.  One small D2H transfer per
 # step instead of one sync per scalar.
@@ -660,6 +661,15 @@ class Trainer:
             "arch": self.cfg.arch,
             "fused": self.cfg.fused,
             "cuda_graph": self.cfg.cuda_graph,
+            # WHICH fused scan. The per-timestep jiterator Functions and the
+            # whole-scan NVRTC kernels are the same function bit for bit, so
+            # this is not a Config field (it would break K1 for every reference
+            # run and distinguish nothing) -- but they are not the same step
+            # time, and a run has to be able to say which it was. Verifying here
+            # rather than at first use also means every variant's bitwise
+            # self-check, which syncs, has already happened long before
+            # `_capture` (`snn.wholescan.scan_impl_record`).
+            "scan_impl": scan_impl_record(verify=self.is_cuda and self.cfg.fused),
         })
         _write_json(self.run_dir / "environment.json", env)
         self._log(env)

@@ -53,6 +53,7 @@ import torch
 import torch.nn.functional as F
 
 from snn.config import seed_everything
+from snn.wholescan import scan_impl_record
 from snnchat.data import ChatCorpus, MixtureSampler, SequentialEval
 from snnchat.model import ChatConfig, build_chat_model, describe_model
 from snnchat.tokenizer import ChatTokenizer
@@ -810,6 +811,10 @@ class ChatTrainer:
             "weight_decay": self.cfg.weight_decay,
             "params_exempt_from_decay": self._n_no_decay,
             "torch": torch.__version__,
+            # Same record, same reason, as `snn.train.Trainer`'s environment.json:
+            # which fused scan this run used, with every variant's bitwise
+            # self-check done here rather than left to first use.
+            "scan_impl": scan_impl_record(verify=self.is_cuda),
             **self.description,
         }
         if torch.cuda.is_available():
