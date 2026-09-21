@@ -32,7 +32,17 @@ TWO MODES
 ---------
 Confirmatory (the default): `v14_pools.py` files only. Every draw carries a
 measured `logp_null` for every candidate, so both rules are replayable on every
-draw at the file's lambda. The bars below fire.
+draw at the file's lambda. The bars below fire. Two refusals come first
+(`docs/chat/PREDICTION_v14.md` section 12, Amendment A):
+
+* THE STAMP. Nothing is scored unless the pre-registration hashes to
+  `PREDICTION_STAMP`. The hash is over the file's bytes with CRLF normalised to
+  LF, so a CRLF checkout and the committed LF blob agree; `score_v13.py` hashes
+  the raw bytes, and its stamp reproduces only on a CRLF checkout.
+* ONE CHECKPOINT PER VERDICT. The amended design draws the same five sets from
+  two checkpoints, and a wildcard like `v14_*.json.gz` matches both. A file
+  list whose pools carry more than one `ckpt_sha256` is refused rather than
+  pooled into one verdict, and the default output path names the checkpoint.
 
 `--exploratory`: the COMMITTED `echo_holdout.py`-format pools,
 `experiments/chat/_quality/v12_{heldout,fresh,wide}_chat-v3d-aligned{,-s1,-s2,-s3}.json`,
@@ -108,8 +118,12 @@ line is now, stated so that nobody reads an identity as a result:
   which a change in exposure cannot move. The all-draws count is still
   reported, with how many of its `fixed` draws are picks with no definite
   subject at all, next to the decomposition of each arm and of the corpus.
-* GUARD 2 -- sameness, the one cost the exploratory replay measured. It has a
-  bar and is in `overall`.
+* GUARD 2 -- sameness, the one cost the exploratory replay measured. REPORTED,
+  NOT A BAR, since Amendment A (2026-09-21): asked how much extra
+  repetitiveness he would accept, the owner answered "As many as needed". It
+  is measured exactly as before and its block says what the WITHDRAWN 0.10 bar
+  would have read (`would_have_read`), so nothing is hidden; it is not in
+  `overall`. That removes a bar. It does not move P1, P2, P3 or GUARD 1.
 
 WHAT NONE OF THIS MEASURES
 --------------------------
@@ -124,7 +138,7 @@ same quantity when every prompt has the same number of draws, which is always
 true in confirmatory mode and is not true of an exploratory subset.
 
     python scripts/chat/score_v14.py --exploratory
-    python scripts/chat/score_v14.py experiments/chat/_quality/v14_*.json.gz
+    python scripts/chat/score_v14.py "experiments/chat/_quality/v14_*_chat-v6-scratch.json.gz"
 """
 from __future__ import annotations
 
@@ -178,7 +192,9 @@ P2_LISTS = ("heldout", "fresh", "wide")
 #: P3, unintroduced entities, over draws where BOTH picks contain a definite
 #: subject in the window: fixed > broken, exact two-sided McNemar below this.
 P3_ALPHA = 0.05
-#: GUARD 2, sameness: the largest tolerated RELATIVE fall in distinct-2 from the
+#: GUARD 2, sameness. WITHDRAWN AS A BAR by Amendment A (`GUARD2_RULING` below);
+#: kept, with `guard2_verdict`, so that every artifact still says what it would
+#: have read. What it was: the largest tolerated RELATIVE fall in distinct-2 from the
 #: shipped picks to the subject-tier picks of the same draws,
 #: `1 - subject / shipped`. Relative, because distinct-2 falls with the amount
 #: of text and the two selections of one set of draws are the only comparable
@@ -188,6 +204,29 @@ P3_ALPHA = 0.05
 #: every checkpoint (`v14_exploratory.json`, `GUARD2_sameness` under `by_ckpt`),
 #: so on those pools this guard reads `fail`; it was not placed to be passed.
 GUARD2_MAX_DISTINCT2_DROP = 0.10
+#: Why GUARD 2 reads `reported` and never `pass`, `fail` or `unresolved`.
+GUARD2_RULING = (
+    "reported, not a bar: on 2026-09-21, asked how much extra repetitiveness he "
+    "would accept from the subject tier, the owner answered \"As many as needed\" "
+    "(docs/chat/PREDICTION_v14.md section 12, Amendment A, made before any seed "
+    "6-11 pool existed)")
+
+#: The pre-registration, and the sha256 of its bytes with CRLF normalised to LF
+#: at Amendment A. Confirmatory mode refuses to score against any other text.
+#: Results go to `docs/chat/QUALITY_v14.md`, never into that file, so this
+#: stays valid after scoring.
+PREDICTION = ROOT / "docs" / "chat" / "PREDICTION_v14.md"
+PREDICTION_STAMP = "83326a7cd92190f58e17d80c2395b57b491094df5b47d8d49ccc09bdd22ae0f1"
+
+#: The two checkpoints Amendment A confirms on, by the sha256 `v14_pools.py`
+#: records in every pool header. Each is scored alone into its own artifact.
+REGISTERED_CHECKPOINTS = {
+    "chat-v3d-aligned": "3deca3eb0265925e2471b5cb3ace4c800e5dc1f116df037a2699af8ba49ac86d",
+    "chat-v6-scratch": "e270b3a3c878b9253f92cb8d22f69f1e27f11ea2cc81b3e0854426929c62676f",
+}
+#: The one `experiments/chat/SHIPPED` named when the amendment was written. Its
+#: verdict decides the default; the other's is reported beside it.
+DECIDING_CHECKPOINT = "chat-v6-scratch"
 
 #: The fluency floor: plain sampling's mean per-character log-probability on the
 #: battery (`scripts/chat.py`, the comment on the reranking defaults;
@@ -669,6 +708,17 @@ def guard2_verdict(pooled_drop: float | None, per_list: dict[str, float | None])
                    f"<= {bar:.2f}, and on every list"}
 
 
+def guard2_reported(pooled_drop: float | None, per_list: dict[str, float | None]) -> dict:
+    """GUARD 2 since Amendment A: a reading, with the withdrawn bar's beside it.
+
+    The verdict is the constant `reported`. `would_have_read` is
+    `guard2_verdict`, unchanged, so the old reading stays in every artifact.
+    """
+    return {"verdict": "reported", "why": GUARD2_RULING,
+            "withdrawn_bar": GUARD2_MAX_DISTINCT2_DROP,
+            "would_have_read": guard2_verdict(pooled_drop, per_list)}
+
+
 # ---------------------------------------------------------------------------
 # the comparison
 # ---------------------------------------------------------------------------
@@ -824,11 +874,12 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
             "subject": rate(sum(1 for v in lb if v < FLOOR), n),
         },
         "GUARD2_sameness": {
-            "rule": f"1 - subject/shipped distinct-2 <= {GUARD2_MAX_DISTINCT2_DROP:.2f}, "
+            "rule": "REPORTED, NOT A BAR (Amendment A). The withdrawn bar was: "
+                    f"1 - subject/shipped distinct-2 <= {GUARD2_MAX_DISTINCT2_DROP:.2f}, "
                     f"pooled and on each of {', '.join(P2_LISTS)}",
             "distinct_2": {"shipped": d2a, "subject": d2b},
             "relative_drop": d2_drop, "relative_drop_per_list": d2_lists,
-            **guard2_verdict(d2_drop, d2_lists),
+            **guard2_reported(d2_drop, d2_lists),
             "top_opening": {"chars": OPENING_CHARS,
                             "shipped": top_opening(x.text for x in a),
                             "subject": top_opening(x.text for x in b)},
@@ -855,9 +906,9 @@ def compare(draws: list[Draw], label: str, *, breakdown: bool = True) -> dict:
 
 
 #: What `overall` reads, and nothing else does. `topic_mention` is absent on
-#: purpose: it cannot fail (module docstring).
-IN_OVERALL = ("P1_anchored_topic", "P2_logp_per_char", "P3_uer", "GUARD2_sameness",
-              "GUARD1_identity")
+#: purpose: it cannot fail (module docstring). `GUARD2_sameness` left with
+#: Amendment A, on the owner's ruling (`GUARD2_RULING`).
+IN_OVERALL = ("P1_anchored_topic", "P2_logp_per_char", "P3_uer", "GUARD1_identity")
 
 
 def overall(comparison: dict, guard_1: dict) -> str:
@@ -974,9 +1025,15 @@ def print_comparison(title: str, c: dict) -> None:
               f"({op['k']}/{op['n']}) {op['opening']!r}")
     if g2["relative_drop"] is not None:
         print(f"  GUARD 2 distinct-2 fell by {g2['relative_drop']:.4f} of its shipped value"
-              f"   -> {g2['verdict']} ({g2['why']})")
+              f"   -> {g2['verdict']}, no bar")
+        for name, drop in g2["relative_drop_per_list"].items():
+            if drop is not None:
+                print(f"             {name:<8} fell by {drop:.4f}")
     else:
-        print(f"  GUARD 2 -> {g2['verdict']} ({g2['why']})")
+        print(f"  GUARD 2 -> {g2['verdict']}, no bar")
+    old = g2["would_have_read"]
+    print(f"             the withdrawn {g2['withdrawn_bar']:.2f} bar would have read "
+          f"{old['verdict']} ({old['why']})")
     for key in ("shipped", "subject"):
         t = ts[key]
         print(f"  tier size {key:<8} one member {_fmt_rate(t['one_member'])}; whole pool "
@@ -1035,6 +1092,54 @@ def expand(names: list[str]) -> list[Path]:
     return out
 
 
+def prediction_stamp(path: Path = PREDICTION) -> str:
+    """sha256 of the pre-registration's bytes, with CRLF normalised to LF.
+
+    Normalised so that the committed LF blob (`git show
+    <commit>:docs/chat/PREDICTION_v14.md | sha256sum`), an LF checkout and a
+    CRLF checkout all give one answer. `score_v13.py` hashes the raw bytes, and
+    its stamp reproduces only on a CRLF checkout.
+    """
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def check_stamp(path: Path = PREDICTION, expected: str | None = None) -> str:
+    """Refuse to score against a pre-registration that is not the stamped one."""
+    expected = PREDICTION_STAMP if expected is None else expected
+    try:
+        got = prediction_stamp(path)
+    except OSError as exc:
+        raise SystemExit(f"cannot read the pre-registration {path}: {exc}") from exc
+    if got != expected:
+        raise SystemExit(
+            f"{Path(path).name} hashes to {got} (sha256, CRLF normalised to LF), not "
+            f"the stamp {expected} this scorer was committed with. The bars on disk "
+            "are not the bars that were registered; nothing is scored. Results "
+            "belong in docs/chat/QUALITY_v14.md, not in that file.")
+    return got
+
+
+def one_checkpoint(inputs: list[dict]) -> dict:
+    """The single checkpoint a confirmatory file list describes, or a refusal.
+
+    Amendment A draws the same sets from two checkpoints into one directory.
+    Pooling them would average two models into one verdict and nothing
+    downstream would notice, so more than one `ckpt_sha256` (or more than one
+    run name) stops here.
+    """
+    seen = sorted({(Path(i["ckpt"]).parent.name, i.get("ckpt_sha256")) for i in inputs},
+                  key=str)
+    if len(seen) != 1:
+        listed = "\n  ".join(f"{name}: {sha}" for name, sha in seen)
+        raise SystemExit(
+            f"these pools come from {len(seen)} checkpoints; a verdict is about one. "
+            f"Score each alone, e.g. \"v14_*_<run>.json.gz\".\n  {listed}")
+    name, sha = seen[0]
+    registered = sha is not None and REGISTERED_CHECKPOINTS.get(name) == sha
+    return {"name": name, "sha256": sha, "pre_registered": registered,
+            "decides_the_default": registered and name == DECIDING_CHECKPOINT}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1053,10 +1158,7 @@ def main(argv=None) -> int:
             ap.error("give at least one v14_pools.py file, or --exploratory")
         names = [str(QUALITY / f) for f in EXPLORATORY_FILES]
     paths = expand(names)
-    out_path = Path(args.out) if args.out else QUALITY / (
-        "v14_exploratory.json" if args.exploratory else "v14_confirmatory.json")
-    if not out_path.is_absolute():
-        out_path = ROOT / out_path
+    stamp = None if args.exploratory else check_stamp()
 
     inputs, draws = [], []
     for path in paths:
@@ -1064,6 +1166,12 @@ def main(argv=None) -> int:
         inputs.append(info)
         draws.extend(got)
         print(f"read {path.name}: {len(got)} draws", flush=True)
+    checkpoint = None if args.exploratory else one_checkpoint(inputs)
+    out_path = Path(args.out) if args.out else QUALITY / (
+        "v14_exploratory.json" if args.exploratory
+        else f"v14_confirmatory_{checkpoint['name']}.json")
+    if not out_path.is_absolute():
+        out_path = ROOT / out_path
 
     lam_of = {i["path"]: _lam_label(i["lam"]) for i in inputs}
     label_of = lambda d: lam_of[d.source]                      # noqa: E731
@@ -1120,14 +1228,20 @@ def main(argv=None) -> int:
         "note": ("EXPLORATORY: these pools were read before the subject rule existed. "
                  "The verdict fields show how each bar WOULD fire and test nothing."
                  if args.exploratory else
-                 "Bars fixed by docs/chat/PREDICTION_v14.md before these pools were drawn."),
+                 "Bars fixed by docs/chat/PREDICTION_v14.md, as amended in its section "
+                 "12, before these pools were drawn."),
         "command": "CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py "
                    + " ".join(sys.argv[1:] if argv is None else argv),
         "bars": {"P1": P1_RULE, "P2_pooled_bar": P2_POOLED_BAR, "P2_lists": list(P2_LISTS),
                  "P3_alpha": P3_ALPHA,
-                 "GUARD2_max_distinct2_drop": GUARD2_MAX_DISTINCT2_DROP,
+                 "GUARD2": GUARD2_RULING,
+                 "GUARD2_withdrawn_max_distinct2_drop": GUARD2_MAX_DISTINCT2_DROP,
                  "floor": FLOOR, "window": WINDOW, "opening_chars": OPENING_CHARS},
         "in_overall": list(IN_OVERALL),
+        "prediction": {"file": "docs/chat/PREDICTION_v14.md", "stamp": stamp,
+                       "recipe": "sha256 of the bytes with CRLF normalised to LF; "
+                                 "None in exploratory mode, which checks nothing"},
+        "checkpoint": checkpoint,
         "uer_corpus_reference": corpus_reference(),
         "inputs": inputs,
         "checks": dict(checks),
@@ -1167,7 +1281,17 @@ def main(argv=None) -> int:
         print(f"latency {name}: shipped {tm['mean_select_seconds_shipped']:.4f} s, subject "
               f"{tm['mean_select_seconds_subject']:.4f} s per turn ({tm['n_draws']} draws)")
     if "overall" in blob:
-        print(f"\nOVERALL: {blob['overall']}")
+        print(f"\nOVERALL ({', '.join(IN_OVERALL)}): {blob['overall']}")
+        print(f"  checkpoint {checkpoint['name']}, sha256 {checkpoint['sha256']}")
+        if not checkpoint["pre_registered"]:
+            print("  NOTE: not one of the two checkpoints PREDICTION_v14.md section 12 "
+                  "registers; this verdict confirms nothing")
+        elif checkpoint["decides_the_default"]:
+            print("  this is the deciding checkpoint (PREDICTION_v14.md section 12.7): only "
+                  "`pass`, with SHIPPED still naming it, flips the default")
+        else:
+            print("  reported beside the deciding checkpoint's verdict; it does not decide "
+                  "the default")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     # `newline="\n"`: on Windows the default would write CRLF, and the bytes of

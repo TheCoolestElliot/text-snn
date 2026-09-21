@@ -497,3 +497,439 @@ print("McNemar splits with p == 0.05, n <= 600:",
           if abs(mcnemar(b, n - b) - s.P3_ALPHA) < 1e-12))
 print("6 v 0:", mcnemar(0, 6), " 5 v 0:", mcnemar(0, 5))
 ```
+
+---
+
+## 12. Amendment A, 2026-09-21 — made before any seed 6–11 pool exists
+
+**Appended, not merged in.** §§0–11 and the Appendix above are byte-for-byte
+what commit `8e5daad` stamped; this section says which of their sentences it
+supersedes and leaves them standing as the record of what was registered first.
+It exists because §4 said how a change to a bar may be made — "as a dated
+amendment with a new stamp (§9) and the matching change to
+`score_v14.GUARD2_MAX_DISTINCT2_DROP`, BEFORE any seed 6–11 pool is drawn" — and
+two rulings by the owner arrived today.
+
+### 12.1 No confirmatory pool exists
+
+Taken in the worktree `C:/Elliot's Stuff/SNN-worktrees/chat-v14` on 2026-09-21
+at 18:37 EDT, before any edit of this amendment, and taken again immediately
+before the commit that adds this section (that commit's timestamp is the bound):
+
+```
+$ ls experiments/chat/_quality | grep -i v14
+coherence_v14.json
+v14_exploratory.json
+$ git log --all --oneline -- 'experiments/chat/_quality/v14_*.json.gz'
+$ find "C:/Elliot's Stuff/SNN-worktrees" "C:/Elliot's Stuff/SNN/Text SNN/experiments" -name "v14_*.json.gz"
+$ git log --oneline -3          # at 18:37
+8e5daad The v14 subject tier is pre-registered before any seed 6-11 pool exists, and it expects to fail its own sameness guard
+69da628 Training rounds now report pool UER@200 with its qualifying fraction next to bpc, and UER may never enter rerank.py
+7a1e0d0 A v14 pool is drawn at the REPL's 400 characters, and a clause set lets the confirmatory run see the subject extractor
+```
+
+The second and third commands print nothing: no `v14_*.json.gz` is in any
+branch's history, in any worktree, or under the main tree's `experiments/`. The
+listing taken again at 18:55 differs by one line,
+`v14_exploratory_chat-v6-scratch.json`: the zero-GPU replay of seeds 0–5 that
+§12.6 describes, a scorer artifact and not a pool. This
+worktree has no `experiments/runs/` directory, so `launch.py` has never started
+a pool from it, and nothing run while writing this amendment touched the GPU
+(every scorer and test command was run with `CUDA_VISIBLE_DEVICES=-1`). Between
+`8e5daad` and the commit that adds this section the branch gained `a45b2a4` (a
+merge of `chat/v6-scratch-diagnostic`, new files only, which brings the pools
+§12.6 reads) and `a611d99` (the REPL toggle, §12.8).
+
+### 12.2 The two rulings, verbatim
+
+Both were asked of the owner, Elliot, by the lead agent of the working session
+of 2026-09-21, and answered by him in that session. Provenance, as the agent
+writing this amendment has it: RULING 1's answer reached it as the owner's own
+relayed message; RULING 2's reached it through the lead's work order and is
+corroborated by `SHIPPED`'s header, which records "Elliot's explicit \"Yes\""
+at `a538bd3`.
+
+**RULING 1 (sameness).** Asked "how much extra repetitiveness you would accept
+from the new reply picker (v14) before I run its 15-minute confirmation", he
+answered:
+
+> As many as needed
+
+Sameness is therefore **not a bar for him**. §4 anticipated a *larger* bar; the
+answer sets none, so GUARD 2 is withdrawn as a bar rather than moved.
+
+**RULING 2 (the ship).** Asked whether to make `chat-v6-scratch` the model he
+talks to, he answered:
+
+> Yes
+
+`experiments/chat/SHIPPED` in the owner's main tree now names
+`chat-v6-scratch/ckpt_best.pt` (commit `a538bd3` on `phase-5-regional`; the
+evidence is `docs/chat/V6_SCRATCH_NOTE.md`, commit `d802e85`). **This round did
+not edit `SHIPPED` and still does not**; the owner's ruling did, separately.
+§2 pinned the confirmation to `chat-v3d-aligned` because that was the ship when
+§2 was written. The default this round decides about now applies to a different
+model, so the confirmation is drawn on both (§12.5).
+
+**WHAT RULING 1 DOES NOT DO.** P1, P2, P3 and GUARD 1 are untouched: the same
+constants, the same verdict functions, the same draws, byte-identical in
+`score_v14.py` to commit `8e5daad` (the amendment's commit message lists every
+hunk of the diff). **P3 was expected `unresolved` in §4 and still is**, so on
+`chat-v3d-aligned` the expected OVERALL moves from `fail` to `unresolved` — and
+`unresolved` does not flip the default (§3, §8). **The owner's ruling removes a
+bar; it does not rescue the rule.** On `chat-v6-scratch` the pools already read
+say something worse for the rule than that (§12.6).
+
+### 12.3 What is superseded, sentence by sentence
+
+Everything in §§0–11 and the Appendix that is not quoted here stands.
+
+**§0.** "`RerankParams.subject_tier` (`src/snnchat/rerank.py`), **default OFF**,
+no CLI flag." → Default OFF stands. There is now a flag and a command, both off
+unless asked for (§12.8).
+
+**§2**, the `checkpoint` row: "`chat-v3d-aligned/ckpt_best.pt`, the one
+`experiments/chat/SHIPPED` names; sha256 `3deca3eb…`" → **two checkpoints**,
+§12.5. `chat-v3d-aligned` is no longer the one `SHIPPED` names.
+
+**§2.** "**The sample size is fixed and honoured** …: 600 story draws, 72 dodge,
+72 clause, no more and no fewer." → the same, **per checkpoint**: 744 draws from
+each, 1,488 in all, no more and no fewer.
+
+**§2.** "One checkpoint: training-seed variability is not in any interval below,
+and the verdict is about this checkpoint's default, not the recipe." → Two
+checkpoints, each scored alone. They are not two seeds of one recipe:
+`experiments/chat/SHIPPED`'s history describes `chat-v6-scratch` as "a
+fresh-init 84,000-step run on this checkpoint's exact recipe (no --init-from)".
+One training seed each, so training-seed variability is still in no interval and
+each verdict is about one file.
+
+**§3.** "**These are the bars `score_v14.py` implements at commit `7a1e0d0`**"
+→ at the commit that adds this section; P1, P2, P3 and GUARD 1 are unchanged
+from `7a1e0d0`.
+
+**§3**, the GUARD 2 blockquote: "Relative fall in distinct-2 … <= 0.10 pooled
+and on each of HELDOUT, FRESH and WIDE. Pooled fall > 0.10 is `fail`; pooled
+within the bar but a list over it, or missing, is `unresolved`." → replaced by:
+
+> **GUARD 2 (sameness) — REPORTED, NOT A BAR.** Measured exactly as before:
+> distinct-2 of the shipped picks and of the subject-tier picks of the same 600
+> draws with both numerators and denominators, the relative fall
+> `1 − subject/shipped` pooled and on each of HELDOUT, FRESH and WIDE, and each
+> arm's top 60-character opening with its share and denominator. Its verdict
+> field reads `reported` and never `pass`, `fail` or `unresolved`. Beside it the
+> artifact carries `withdrawn_bar: 0.10` and `would_have_read`: what the
+> blockquote above would have returned, computed by the same function
+> (`score_v14.guard2_verdict`, unchanged). Nothing is hidden and nothing gates.
+
+**§3**, the OVERALL blockquote: "`fail` if any of P1, P2, P3, GUARD 1, GUARD 2
+is `fail`; otherwise `unresolved` if any is `unresolved`; otherwise `pass`." →
+
+> **OVERALL (amended).** `fail` if any of **P1, P2, P3, GUARD 1** is `fail`;
+> otherwise `unresolved` if any is `unresolved`; otherwise `pass`. Computed per
+> checkpoint. `score_v14.IN_OVERALL` is exactly those four.
+
+**§3**, the lattice bullet "**GUARD 2**'s statistic is a ratio of two ratios …
+the rule is `> 0.10` fails, so a fall of exactly 0.10 passes." and the paragraph
+"**GUARD 2's bar, and why 0.10.**" → both now describe the *withdrawn* bar, i.e.
+what `would_have_read` computes. They stand as that description.
+
+**§4**, the last two table rows: "GUARD 2 | **fail** (0.3006; 0.3283 pooled over
+four seeds) | **fail**" and "OVERALL | | **`fail`, through GUARD 2. The default
+is expected to stay OFF.**" → §12.6.
+
+**§4.** "This is a pre-registration whose author expects its own rule to fail
+its own guard. That is deliberate and is the point of having the guard." → The
+guard was the author's and the owner has withdrawn it, which is his to do. The
+author now expects the rule **not to pass for a different reason**: P3 (§12.6).
+
+**§4.** "**Whether that is worth a quarter of an hour of GPU is the owner's
+call**…" → about half an hour: two checkpoints (§12.9).
+
+**§8.** "**OVERALL `pass`** — P1, P2, P3 fire and both guards hold: the default
+flips **on the branch `chat/v14-subject-tier`**, in both places
+`scripts/chat.py` constructs `RerankParams` — `run_chat` (lines 473–477) and the
+`/rerank` command (lines 650–653)…" → §12.7. Both places already carry the field
+since `a611d99`, so the flip, if it happens, is a change to one default in
+`build_parser`.
+
+**§8.** "Under every outcome `experiments/chat/SHIPPED` is untouched, the
+verdict is about the shipped checkpoint's first turn on bare story requests" →
+`SHIPPED` is untouched *by this round* under every outcome; there are two
+verdicts, each about one checkpoint's first turn on bare story requests.
+
+**§9 item 1.** "One checkpoint, six sampler seeds, five sets, decided now and
+drawn whatever the first pool reads. The scorer is run **once**, on all five
+pools together." → **Two checkpoints**, six sampler seeds, five sets each, all
+ten pools drawn whatever the first reads. The scorer is run **once per
+checkpoint**, on that checkpoint's five pools together, and refuses a file list
+whose pools carry more than one `ckpt_sha256`.
+
+**§9 item 2.** "The prompt lists, `CLAUSE`, the bars and `IN_OVERALL` are frozen
+at commit `7a1e0d0`." → The prompt lists, `CLAUSE` and the bars P1, P2, P3 and
+GUARD 1 are as frozen at `7a1e0d0`; `IN_OVERALL` is frozen at the commit that
+adds this section. The rest of the item stands and applies from that commit.
+
+**§9 item 4.** "The stamp is in the message of the commit that adds this file.
+`score_v14.py` does not yet re-check it the way `score_v13.py` does; until it
+does, the runbook checks it by hand." → §12.10. It does now.
+
+**§10.** "Five pools, 744 draws. … a quarter of an hour in all" and the whole of
+"**The runbook.**", including "which writes
+`experiments/chat/_quality/v14_confirmatory.json`" → ten pools, 1,488 draws,
+about half an hour, and the runbook in §12.9. **No file named
+`v14_confirmatory.json` is written**; each artifact names its checkpoint.
+
+**§11.** "Appended to, never rewritten. `QUALITY_v14.md` carries the verdicts."
+→ **§11 stays empty, permanently.** Results, verdicts and any deviation go in a
+separate file, `docs/chat/QUALITY_v14.md`. This file is not edited after the
+commit that adds this section, so its stamp stays valid forever, and a scorer
+that finds it changed refuses to score.
+
+**Appendix, command A.** "differs from the committed artifact … in `command`
+only" → true of the scorer at `8e5daad`. Under the amended scorer the same
+command, written to a scratch `--out`, differs from the committed
+`v14_exploratory.json` (sha256 `f55a03e9…14e6`, **not regenerated and not to be
+overwritten**) in `command`, `bars`, `in_overall`, the new `prediction` and
+`checkpoint` keys, and in every `GUARD2_sameness` block's `rule`, `verdict`,
+`why`, `withdrawn_bar` and `would_have_read` — and in **no measured number**
+(command F, 127 differing leaves, all of those shapes).
+
+### 12.4 No bar sits on a lattice point — re-checked
+
+The amendment adds no bar and moves none, so §3's check carries over; it was
+re-run today rather than assumed (command F). **P1** compares two integers and
+its tie is defined. **P2**'s +0.05 is not a distinguished value of a mean of 600
+floating-point differences, and its per-list leg is a strict `> 0`. **P3**'s
+exact McNemar p is dyadic: enumerated again over every split of n <= 600
+discordant draws, **0** give p = 0.05. **GUARD 1** is an identity over 108
+draws. GUARD 2 no longer has a bar to sit anywhere. Nothing about a second
+checkpoint changes a denominator: every bar is read per checkpoint on the same
+600 + 72 + 72 draws.
+
+### 12.5 The two-checkpoint design
+
+| | `chat-v3d-aligned` | `chat-v6-scratch` |
+| --- | --- | --- |
+| file | `experiments/chat/chat-v3d-aligned/ckpt_best.pt` | `experiments/chat/chat-v6-scratch/ckpt_best.pt` |
+| sha256 | `3deca3eb0265925e2471b5cb3ace4c800e5dc1f116df037a2699af8ba49ac86d` | `e270b3a3c878b9253f92cb8d22f69f1e27f11ea2cc81b3e0854426929c62676f` |
+| why | exactly as §2 registered it: the original pre-registration's own reading | the checkpoint `SHIPPED` names since RULING 2; the REPL loads this |
+| role | **reported beside** | **decides the default** (§12.7) |
+| artifact | `v14_confirmatory_chat-v3d-aligned.json` | `v14_confirmatory_chat-v6-scratch.json` |
+
+Both sha256 values were computed today from the files in the owner's main tree
+(`sha256sum`); `v14_pools.py` records the hash in every pool header and
+`score_v14.REGISTERED_CHECKPOINTS` holds the same two. Everything else in §2 is
+**identical for both**: the five sets, sampler seeds 6–11, n = 256, λ = 0.6, 400
+drafted characters, the pairing, the bars. No pool of these five sets has been
+drawn from either checkpoint at a sampler seed above 5: every committed `v12_*`
+and `v6scratch_*` story and dodge pool is `--seeds 6`, seeds 0–5
+(`v6scratch_memory_probe.json` used 8 seeds, on different prompts, which are
+different draws). `v14_pools.py` needed no change: it takes `--ckpt` and names
+its output after the run.
+
+Each checkpoint is scored **separately**. In confirmatory mode the scorer
+refuses a file list whose pools carry more than one `ckpt_sha256` (a wildcard
+like `v14_*.json.gz` would otherwise pool two models into one verdict), names
+the checkpoint in its default output path, and says in the artifact
+(`checkpoint`) whether the pools' hash is one of the two above and whether it is
+the deciding one.
+
+### 12.6 The expected outcome, amended, written before the run
+
+**`chat-v6-scratch`'s seeds 0–5 pools are now READ.** They exist in
+`echo_holdout.py` format (n = 256, λ = 0.6, 300 drafted characters; the three
+story lists, 600 draws) as `experiments/chat/_quality/v6scratch_{heldout,fresh,wide}_n256.json.gz`
+(commit `d802e85`; the decompressed bytes equal the raw JSON backups by sha256),
+and the subject rule was replayed on them today (command E) into
+`experiments/chat/_quality/v14_exploratory_chat-v6-scratch.json`. As in §1,
+**none of this is a test of the rule**, the subsets are selected on the shipped
+rule's behaviour, and 300 characters is not the confirmed 400. The confirmation
+uses seeds 6–11, which are not read. `chat-v3d-aligned`'s column was regenerated
+with command B and agrees with §1.
+
+| exploratory, seeds 0–5 | `chat-v3d-aligned` (command B) | `chat-v6-scratch` (command E) |
+| --- | --- | --- |
+| `lam0.6_null_measured` / `lam0.6_replayable` / `lam0_all` | 318 / 393 / 600 of 600 | **371 / 449 / 600** of 600 |
+| no draft names the subject | 0.7400 (444/600), CI [0.7035, 0.7735] | 0.6100 (366/600), CI [0.5704, 0.6482] |
+| P1, shipped-only v subject-only | 0 v 0 on all three subsets: pass by tie | 0 v 0 on all three subsets: pass by tie (16/371 anchored under both rules) |
+| P2 Δ, null-measured | +0.0797, SE by prompt 0.0053, lower bound +0.0694: pass | **+0.0699**, SE by prompt 0.0059, lower bound +0.0583: pass |
+| P2 Δ, replayable | +0.0644, lower bound +0.0541: pass | **+0.0575**, lower bound +0.0467: **unresolved** |
+| P2 Δ, λ = 0, all 600 | +0.1056: pass | +0.0918, lower bound +0.0795: pass |
+| P2 Δ on HELDOUT (the weak list), same three subsets | +0.0511 (n = 61), +0.0390 (80), +0.0806 (120) | +0.0379 (n = 88), +0.0333 (100), +0.0531 (120) |
+| P3, both picks exposed | 26/318, 59/393, 57/599 | 65/370, 109/448, 105/599 |
+| P3, fixed v broken | 2 v 0, 2 v 0, 5 v 0: **unresolved** ×3 | **0 v 3, 1 v 3, 2 v 3: `fail` ×3** |
+| GUARD 2, fall in distinct-2 | 0.3006, 0.2209, 0.3802 | 0.2124, 0.1652, 0.3131 |
+| … per list, null-measured (heldout / fresh / wide) | 0.1439 / 0.2743 / 0.3162 | 0.0709 / 0.2266 / 0.2218 |
+| … top 60-char opening, null-measured | 0.0409 (13/318) → 0.1132 (36/318) | 0.0404 (15/371) → 0.0512 (19/371) |
+| … the withdrawn 0.10 bar would have read | `fail` ×3 | `fail` ×3 |
+| replies below −0.3934, null-measured | 0.0943 (30/318) → 0.0283 (9/318) | 0.1590 (59/371) → 0.0485 (18/371) |
+
+| bar | expected on `chat-v3d-aligned`, seeds 6–11 | expected on `chat-v6-scratch`, seeds 6–11 |
+| --- | --- | --- |
+| P1 | **pass by tie**, decided by 0–2 draws (§4, unchanged) | **pass by tie**, decided by 0–2 draws |
+| P2 | **pass** (§4, unchanged) | **pass, narrowly**; `unresolved` is a live outcome. The read effect is smaller (+0.0575 to +0.0918 against +0.0644 to +0.1056) and P2 resolves `pass` only from about +0.062 (below) |
+| P3 | **unresolved** (§4, unchanged) | **`fail`**, as it reads on all three subsets already seen; `unresolved` is the other live outcome; `pass` is not expected |
+| GUARD 1 | **pass** (§4, unchanged) | **pass**; an identity of the code, not of the checkpoint |
+| GUARD 2 | **reported**; a fall of 0.2–0.4, which the withdrawn bar would have read `fail` | **reported**; a fall of 0.15–0.3, which the withdrawn bar would have read `fail` |
+| **OVERALL** | **`unresolved`**, through P3 | **`fail`, through P3, or `unresolved`. Not `pass`.** |
+
+**The default is expected to STAY OFF.** On the deciding checkpoint the rule is
+expected to read `fail` or `unresolved`, and only `pass` flips it (§12.7). The
+author expects the two checkpoints to **disagree** — `unresolved` against `fail`
+— and §12.7 says what is done with that: it is stated, not resolved. The owner's
+way to use the rule anyway, whatever either verdict reads, is the toggle
+(§12.8); that is his call and needs no verdict.
+
+**Power, per `CONVENTIONS.md` §4 rule 3, per checkpoint.**
+
+* **P2.** `pass` needs `Δ − 1.96·max(SE) >= +0.05`. With the by-prompt SE read
+  at 0.0053–0.0055 (`chat-v3d-aligned`) and 0.0055–0.0063 (`chat-v6-scratch`)
+  over ~100 prompts, that is a pooled Δ of about **+0.061** and **+0.062** or
+  more; between +0.05 and that it reads `unresolved`; below +0.05, `fail`. The
+  per-list leg is still a sign read with no interval, and on `chat-v6-scratch`
+  HELDOUT is closer to zero than it was on `chat-v3d-aligned`.
+* **P3.** The denominator is the draws where both picks have a definite subject:
+  expect **some 50–90 of 600** on `chat-v3d-aligned` (§3) and **some 100–150 of
+  600** on `chat-v6-scratch` (0.1757 (65/370), 0.2433 (109/448), 0.1753
+  (105/599)), with **a handful of discordant draws on either** (2, 2, 5 and 3,
+  4, 5). The smallest counts that can pass are **6 fixed v 0 broken**
+  (p = 0.03125), **8 v 1** (p = 0.03906), **10 v 2** (p = 0.03857) and **12 v
+  3** (p = 0.03516); 5 v 0, 7 v 1, 9 v 2 and 11 v 3 are `unresolved` (command
+  F). With three broken draws already seen on `chat-v6-scratch` in each read
+  subset, a pass there would need about twelve fixed, against the 0–2 seen.
+  **P3's `fail` side has no interval**, and that is as registered in §3 and is
+  not changed here: `fixed <= broken` fails at any count — 0 v 3 (p = 0.25)
+  fails, and so does 0 v 0 when at least one draw has both picks exposed
+  (command F). A `fail` on three discordant draws is a fired bar and is
+  reported as one; it is weak evidence that the rule makes introduction
+  *worse*, and `QUALITY_v14.md` may not say more than the counts do.
+* **P1** and **GUARD 1**: as §3. `anchored_topic` holds on 0.0431 (16/371) of
+  `chat-v6-scratch`'s read picks under both rules, and one discordant draw
+  decides P1 either way.
+
+### 12.7 The amended decision rule
+
+* **The default flips on the branch `chat/v14-subject-tier` only if OVERALL =
+  `pass` on the checkpoint `experiments/chat/SHIPPED` names,
+  `chat-v6-scratch`** (sha256 `e270b3a3…2676f`), with OVERALL as amended in
+  §12.3. Landing it on the owner's main tree is still his call (§8).
+* `chat-v3d-aligned`'s verdict is **reported beside it**, as the original
+  pre-registration's own reading. It flips nothing.
+* **A disagreement between the two is stated as a disagreement.** It is not
+  resolved by choosing the more favourable checkpoint, by pooling the two, or by
+  drawing more seeds. `QUALITY_v14.md` reports both OVERALLs, each bar on each
+  checkpoint, and says in words that they differ.
+* OVERALL `unresolved` or `fail` on `chat-v6-scratch`: the default stays OFF,
+  exactly as §8 says for each, whatever `chat-v3d-aligned` reads — including
+  `pass`.
+* The deciding checkpoint is fixed here, by hash, and is not looked up at
+  scoring time. If `SHIPPED` names anything else by the time the pools are
+  scored, **no verdict of this round flips the default**: a `pass` would then be
+  about a model the REPL no longer loads, and what to do with it is the owner's
+  ruling.
+* Everything else in §8 stands, including that `QUALITY_v14.md` does not use the
+  words "more intelligent" or "coherence".
+
+### 12.8 The toggle (commit `a611d99`)
+
+`python scripts/chat.py --subject-tier`, and `/subject on|off` inside the REPL.
+**Default OFF, and off nests the old behaviour exactly**
+(`tests/test_snnchat.py::test_the_subject_tier_flag_is_off_by_default_and_reaches_the_session`).
+Both places `scripts/chat.py` constructs `RerankParams` carry the field, so
+`/subject on` followed by `/rerank 64` stays on
+(`test_subject_on_survives_a_rebuilt_rerank`) — the trap `/rerank` once fell
+into with `/echo off`. The toggle is outside every bar. It lets the owner try
+the rule on the model he talks to; nothing he sees there is a measurement.
+
+### 12.9 Cost, and the runbook that replaces §10's
+
+Ten pools, 1,488 draws. §10's arithmetic, doubled: **about a quarter of an hour
+per checkpoint, half an hour in all**, plus model load and graph capture for
+each of ten pools. An estimate from the committed 0.70 s turn
+(`scripts/chat.py`, the comment above `DEFAULT_RERANK_N`), not a measurement,
+and that turn time was measured on `chat-v3d-aligned`; the two checkpoints share
+an architecture. Scoring is zero-GPU and under a minute a checkpoint (§10).
+
+From the worktree root, on an **idle** GPU, one pool at a time, with `<RUN>` =
+`chat-v3d-aligned` first and then `chat-v6-scratch`, and within each `<SET>` =
+`clause`, then `heldout`, `fresh`, `wide`, `dodge`:
+
+```
+python scripts/launch.py --script scripts/chat/v14_pools.py --run-name v14_pools_<SET>_<RUN> -- --set <SET> --device cuda --ckpt "C:/Elliot's Stuff/SNN/Text SNN/experiments/chat/<RUN>/ckpt_best.pt" --out "C:/Elliot's Stuff/SNN-worktrees/chat-v14/experiments/chat/_quality/v14_<SET>_<RUN>.json.gz"
+```
+
+Completion is a line beginning `wrote ` in
+`experiments/runs/v14_pools_<SET>_<RUN>/stdout.log`; a `Traceback` there is a
+crash; the next pool is not launched until one or the other appears. After each
+checkpoint's `clause` pool, §10's smoke check with that pool's file name
+(`load_file` only: it replays and computes no bar); it must print 72 draws and
+`timing_pass_disagreements: 0`. Then, once per checkpoint, quoted so that the
+scorer and not the shell expands the wildcard:
+
+```
+CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py "experiments/chat/_quality/v14_*_chat-v3d-aligned.json.gz"
+CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py "experiments/chat/_quality/v14_*_chat-v6-scratch.json.gz"
+```
+
+Each checks this file's stamp first and refuses on a mismatch. All ten pools are
+drawn before either scoring command is run, so that no verdict is known while a
+pool is still to be drawn.
+
+### 12.10 The stamp
+
+* **Old stamp**, over §§0–11 and the Appendix as committed at `8e5daad`:
+  `b92f1af6938b05a33826e1cd1c277fd75afba0b29bd4e4b87c0deea89494ecf9`.
+  Re-derived today: `git show 8e5daad:docs/chat/PREDICTION_v14.md | sha256sum`.
+* **New stamp**, over this WHOLE file as amended. A file cannot contain its own
+  hash, so it is recorded outside it, in two places: `score_v14.PREDICTION_STAMP`
+  and the message of the commit that adds this section — one commit, document
+  and scorer together.
+* **Recipe.** sha256 of the file's bytes **with CRLF normalised to LF**
+  (`score_v14.prediction_stamp`). On the committed LF blob that is the plain
+  hash, so `git show <that commit>:docs/chat/PREDICTION_v14.md | sha256sum`
+  must print the new stamp, and a CRLF checkout agrees with it; `score_v13.py`'s
+  raw-bytes recipe does not have that property (§9 item 4).
+* **The check.** In confirmatory mode `score_v14.py` refuses to score unless
+  this file hashes to `PREDICTION_STAMP`
+  (`tests/test_snnchat_v14_scoring.py::test_confirmatory_mode_scores_nothing_against_an_unstamped_pre_registration`).
+  The check runs before anything is read. Because results go to
+  `QUALITY_v14.md` and §11 stays empty, this file never legitimately changes
+  again. A further amendment, if one is ever needed, is legitimate only before
+  the first seed 6–11 pool exists, as a further dated section with a new stamp.
+
+### 12.11 The commands behind §12's numbers
+
+All from the worktree root, zero GPU.
+
+**B** (Appendix), re-run today into a scratch `--out`: the `chat-v3d-aligned`
+columns.
+
+**E.** `CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py --exploratory
+experiments/chat/_quality/v6scratch_heldout_n256.json.gz
+experiments/chat/_quality/v6scratch_fresh_n256.json.gz
+experiments/chat/_quality/v6scratch_wide_n256.json.gz --out
+experiments/chat/_quality/v14_exploratory_chat-v6-scratch.json` — the
+`chat-v6-scratch` columns. Its checks came back clean: 153,600 candidates, 0
+`n_scored`, pick or stored-weight mismatches, 0 draws not replayable under the
+shipped rule. Re-run it into a scratch `--out`, not over the committed artifact.
+
+**F.** The lattice and the P3 pass counts, and the diff of command A against the
+committed artifact:
+
+```python
+import sys
+sys.path.insert(0, "scripts/chat")
+import score_v14 as s
+from echo_holdout import mcnemar
+
+print(sum(1 for n in range(601) for b in range(n + 1)
+          if abs(mcnemar(b, n - b) - s.P3_ALPHA) < 1e-12))
+for fixed, broken in ((6, 0), (5, 0), (8, 1), (7, 1), (10, 2), (9, 2), (11, 3), (12, 3)):
+    p = mcnemar(broken, fixed)
+    print(fixed, broken, round(p, 5), s.p3_verdict(fixed, broken, p, 100)["verdict"])
+print(s.p3_verdict(0, 0, mcnemar(0, 0), 100)["verdict"], s.IN_OVERALL)
+```
+
+and, for the diff, a recursive comparison of `v14_exploratory.json` with command
+A's scratch output that lists every differing key path.
