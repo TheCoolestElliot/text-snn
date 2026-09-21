@@ -59,6 +59,21 @@ WHAT IT CANNOT SEE -- READ THIS BEFORE QUOTING A NUMBER
     `context=` to count the prompt's words as introduced. Both readings are
     legitimate and they answer different questions; say which one a number is.
 
+8.  **A reply with NO definite subject in the window.** It scores clean, because
+    there is nothing in it to flag -- so UER is a product of two things, how
+    often a reply contains a definite subject at all (EXPOSURE) and how often
+    such a reply has an unintroduced one, and it falls when either does. An arm
+    that writes more formulaic openings ("Once upon a time, there was a little
+    boy named Tim. Tim loved ...") has fewer "the X was" constructions in its
+    first 200 characters and reads better without introducing one entity more
+    carefully. This is not hypothetical: it is what the v14 subject tier did on
+    the committed pools (`experiments/chat/_quality/v14_exploratory.json`,
+    `P3_uer.decomposition`: exposure fell, the rate among exposed replies did
+    not). And any selector that prefers likelier text lowers exposure, so UER is
+    NOT independent of a per-character log-probability measured on the same
+    picks. `uer_decomposition` reports the two factors and the per-subject rate
+    separately; a UER difference between two arms is never quoted without them.
+
 And it over-counts in one known way: a BRIDGING definite in subject position
 ("They went to school. The teacher was kind.") is flagged although no reader
 would object. The corpus reference rate is mostly this, which is why a model's
@@ -107,8 +122,10 @@ from collections.abc import Iterable, Sequence
 
 __all__ = [
     "WINDOW",
+    "definite_subjects",
     "unintroduced_entities",
     "uer",
+    "uer_decomposition",
     "anchored_topic",
     "wilson_interval",
     "split_sentences",
@@ -254,6 +271,28 @@ def _occurs(word: str, low: str) -> bool:
     )
 
 
+def definite_subjects(text: str, window: int = WINDOW, *, context: str = "",
+                      stoplist: bool = True) -> list[tuple[str, bool]]:
+    """`(head, introduced)` for EVERY definite subject in the window, in order.
+
+    The census `unintroduced_entities` filters. It exists because a rate of
+    flagged replies cannot tell "fewer unintroduced subjects" from "fewer
+    subjects": see "WHAT IT CANNOT SEE" item 8 in the module docstring, and
+    `uer_decomposition`. Arguments are `unintroduced_entities`'s.
+    """
+    pattern = _SUBJECT if stoplist else _SUBJECT_RAW
+    low = text.lower()
+    ctx = context.lower()
+    out: list[tuple[str, bool]] = []
+    for m in pattern.finditer(text):
+        if m.end() > window:
+            break
+        head = m.group(2).lower()
+        introduced = _occurs(head, low[: m.start()]) or bool(ctx and _occurs(head, ctx))
+        out.append((head, introduced))
+    return out
+
+
 def unintroduced_entities(text: str, window: int = WINDOW, *, context: str = "",
                           stoplist: bool = True) -> list[str]:
     """Head nouns of definite subjects in `text[:window]` that were never set up.
@@ -281,18 +320,9 @@ def unintroduced_entities(text: str, window: int = WINDOW, *, context: str = "",
     here: pronoun drift, name swaps, interleaved threads, anything past the
     window, definites that are not subjects.
     """
-    pattern = _SUBJECT if stoplist else _SUBJECT_RAW
-    low = text.lower()
-    ctx = context.lower()
-    out: list[str] = []
-    for m in pattern.finditer(text):
-        if m.end() > window:
-            break
-        head = m.group(2).lower()
-        if _occurs(head, low[: m.start()]) or (ctx and _occurs(head, ctx)):
-            continue
-        out.append(head)
-    return out
+    return [head for head, introduced in
+            definite_subjects(text, window, context=context, stoplist=stoplist)
+            if not introduced]
 
 
 def wilson_interval(k: int, n: int, *, z: float = Z95) -> tuple[float, float]:
@@ -357,6 +387,63 @@ def uer(texts: Iterable[str], window: int = WINDOW, *,
         "n": n,
         "ci": [lo, hi],
         "qualifying_fraction": (n / len(texts)) if texts else None,
+        "n_total": len(texts),
+        "window": window,
+    }
+
+
+def _rate(k: int, n: int) -> dict:
+    lo, hi = wilson_interval(k, n)
+    return {"rate": (k / n) if n else None, "k": k, "n": n, "ci": [lo, hi]}
+
+
+def uer_decomposition(texts: Iterable[str], window: int = WINDOW, *,
+                      contexts: Sequence[str] | None = None,
+                      stoplist: bool = True) -> dict:
+    """UER split into the two things that move it, plus the per-subject rate.
+
+    Over the QUALIFYING texts (`len(text) >= window`, as in `uer`):
+
+        exposure                  replies with >= 1 definite subject in the
+                                  window, introduced or not        / qualifying
+        uer_given_exposed         replies with >= 1 UNINTRODUCED one / exposed
+        unintroduced_per_subject  unintroduced definite subjects
+                                                    / all definite subjects
+
+    `uer = exposure * uer_given_exposed` EXACTLY -- a flagged reply is an exposed
+    one, so the numerators and denominators cancel -- which is what makes this a
+    decomposition and not three more numbers. A change in UER with
+    `uer_given_exposed` and `unintroduced_per_subject` unmoved is a change in
+    how often the arm writes "the X was" at all, and says nothing about whether
+    entities are introduced (module docstring, "WHAT IT CANNOT SEE" item 8).
+
+    Each is `{"rate", "k", "n", "ci"}` with a Wilson 95 % interval. The caveat
+    on `uer`'s interval applies to all three, and `unintroduced_per_subject`
+    has one more: two subjects in ONE reply are not independent draws, so its
+    interval is too narrow even over independent replies.
+    """
+    texts = list(texts)
+    if contexts is not None and len(contexts) != len(texts):
+        raise ValueError(
+            f"contexts has {len(contexts)} entries for {len(texts)} texts; "
+            "it is one prompt per text"
+        )
+    n = exposed = flagged = subjects = unintroduced = 0
+    for i, text in enumerate(texts):
+        if len(text) < window:
+            continue
+        n += 1
+        ctx = contexts[i] if contexts is not None else ""
+        found = definite_subjects(text, window, context=ctx, stoplist=stoplist)
+        missing = sum(1 for _head, introduced in found if not introduced)
+        exposed += bool(found)
+        flagged += bool(missing)
+        subjects += len(found)
+        unintroduced += missing
+    return {
+        "exposure": _rate(exposed, n),
+        "uer_given_exposed": _rate(flagged, exposed),
+        "unintroduced_per_subject": _rate(unintroduced, subjects),
         "n_total": len(texts),
         "window": window,
     }

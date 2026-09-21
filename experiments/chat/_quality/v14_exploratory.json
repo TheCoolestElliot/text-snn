@@ -3,7 +3,7 @@
  "note": "EXPLORATORY: these pools were read before the subject rule existed. The verdict fields show how each bar WOULD fire and test nothing.",
  "command": "CUDA_VISIBLE_DEVICES=-1 python scripts/chat/score_v14.py --exploratory",
  "bars": {
-  "P1": "shipped_only <= subject_only",
+  "P1": "anchored_topic: shipped_only <= subject_only",
   "P2_pooled_bar": 0.05,
   "P2_lists": [
    "heldout",
@@ -11,9 +11,51 @@
    "wide"
   ],
   "P3_alpha": 0.05,
+  "GUARD2_max_distinct2_drop": 0.1,
   "floor": -0.3934,
   "window": 200,
   "opening_chars": 60
+ },
+ "in_overall": [
+  "P1_anchored_topic",
+  "P2_logp_per_char",
+  "P3_uer",
+  "GUARD2_sameness",
+  "GUARD1_identity"
+ ],
+ "uer_corpus_reference": {
+  "source": "coherence_v14.json",
+  "sha256": "68fc1eaa6636cb7147cb235315ce10606dd5f981bf417382f81295809899e71b",
+  "corpus_file": "stories_topic.val.bin",
+  "exposure": {
+   "rate": 0.290022,
+   "k": 529,
+   "n": 1824,
+   "ci": [
+    0.269656,
+    0.31127
+   ]
+  },
+  "uer_given_exposed": {
+   "rate": 0.079395,
+   "k": 42,
+   "n": 529,
+   "ci": [
+    0.059273,
+    0.105582
+   ]
+  },
+  "unintroduced_per_subject": {
+   "rate": 0.050119,
+   "k": 42,
+   "n": 838,
+   "ci": [
+    0.037291,
+    0.067054
+   ]
+  },
+  "n_total": 1824,
+  "window": 200
  },
  "inputs": [
   {
@@ -466,8 +508,8 @@
      0.7993406378920693
     ]
    },
-   "P1_topic": {
-    "rule": "shipped_only <= subject_only",
+   "topic_mention": {
+    "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
     "shipped": {
      "k": 276,
      "n": 1252,
@@ -488,9 +530,38 @@
     },
     "shipped_only": 0,
     "subject_only": 3,
-    "mcnemar_p": 0.25,
+    "identity_violations": 0
+   },
+   "P1_anchored_topic": {
+    "rule": "anchored_topic: shipped_only <= subject_only",
+    "shipped": {
+     "k": 26,
+     "n": 1252,
+     "rate": 0.020766773162939296,
+     "ci": [
+      0.014210676376340044,
+      0.030254696564231926
+     ]
+    },
+    "subject": {
+     "k": 27,
+     "n": 1252,
+     "rate": 0.02156549520766773,
+     "ci": [
+      0.014862861479771419,
+      0.03119506917256627
+     ]
+    },
+    "shipped_only": 0,
+    "subject_only": 1,
+    "mcnemar_p": 1.0,
+    "mean_reply_chars": {
+     "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+     "shipped": 278.6517571884984,
+     "subject": 277.1845047923323
+    },
     "verdict": "pass",
-    "why": "shipped_only 0 <= subject_only 3"
+    "why": "shipped_only 0 <= subject_only 1"
    },
    "P2_logp_per_char": {
     "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -538,7 +609,7 @@
     "why": "pooled delta +0.0807, 95% lower bound +0.0732, >= +0.05; positive on every list"
    },
    "P3_uer": {
-    "rule": "fixed > broken, exact McNemar p < 0.05",
+    "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
     "window": 200,
     "both_qualify": {
      "k": 1250,
@@ -549,31 +620,131 @@
       0.9995618138489564
      ]
     },
-    "shipped": {
-     "k": 241,
+    "both_exposed": {
+     "k": 126,
      "n": 1250,
-     "rate": 0.1928,
+     "rate": 0.1008,
      "ci": [
-      0.17188502157150648,
-      0.21559734743362624
+      0.08531400007100401,
+      0.11873209923514502
+     ]
+    },
+    "shipped": {
+     "k": 107,
+     "n": 126,
+     "rate": 0.8492063492063492,
+     "ci": [
+      0.7764621251952817,
+      0.9012874996108018
      ]
     },
     "subject": {
-     "k": 134,
-     "n": 1250,
-     "rate": 0.1072,
+     "k": 104,
+     "n": 126,
+     "rate": 0.8253968253968254,
      "ci": [
-      0.09123736161361395,
-      0.1255695216715948
+      0.7497659983259423,
+      0.8817734247888173
      ]
     },
-    "fixed": 141,
-    "broken": 34,
-    "mcnemar_p": 1.0979594727348808e-16,
-    "verdict": "pass",
-    "why": "fixed 141 > broken 34, p = 1.098e-16",
+    "fixed": 7,
+    "broken": 4,
+    "mcnemar_p": 0.548828125,
+    "verdict": "unresolved",
+    "why": "fixed 7 > broken 4 but McNemar p = 0.5488 >= 0.05",
+    "all_qualifying_draws": {
+     "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+     "shipped": {
+      "k": 241,
+      "n": 1250,
+      "rate": 0.1928,
+      "ci": [
+       0.17188502157150648,
+       0.21559734743362624
+      ]
+     },
+     "subject": {
+      "k": 134,
+      "n": 1250,
+      "rate": 0.1072,
+      "ci": [
+       0.09123736161361395,
+       0.1255695216715948
+      ]
+     },
+     "fixed": 141,
+     "broken": 34,
+     "mcnemar_p": 1.0979594727348808e-16,
+     "fixed_where_the_subject_pick_has_no_definite_subject": 134,
+     "broken_where_the_shipped_pick_has_no_definite_subject": 30
+    },
+    "decomposition": {
+     "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+     "shipped": {
+      "exposure": {
+       "rate": 0.2539936102236422,
+       "k": 318,
+       "n": 1252,
+       "ci": [
+        0.2306595180376731,
+        0.2788327067384872
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7610062893081762,
+       "k": 242,
+       "n": 318,
+       "ci": [
+        0.711194583040424,
+        0.8045873196649163
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6329113924050633,
+       "k": 350,
+       "n": 553,
+       "ci": [
+        0.5919490401846309,
+        0.6720399241272647
+       ]
+      },
+      "n_total": 1252,
+      "window": 200
+     },
+     "subject": {
+      "exposure": {
+       "rate": 0.1416,
+       "k": 177,
+       "n": 1250,
+       "ci": [
+        0.12336923573225542,
+        0.16202686144039943
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7570621468926554,
+       "k": 134,
+       "n": 177,
+       "ci": [
+        0.6888588605828361,
+        0.8143443351524255
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6546762589928058,
+       "k": 182,
+       "n": 278,
+       "ci": [
+        0.5970179041681456,
+        0.7081181831905021
+       ]
+      },
+      "n_total": 1252,
+      "window": 200
+     }
+    },
     "prompt_as_context": {
-     "note": "not the bar; the prompt's words count as introduced",
+     "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
      "shipped": {
       "k": 216,
       "n": 1250,
@@ -619,6 +790,7 @@
     }
    },
    "GUARD2_sameness": {
+    "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
     "distinct_2": {
      "shipped": {
       "distinct": 10788,
@@ -631,6 +803,14 @@
       "value": 0.09975652173913044
      }
     },
+    "relative_drop": 0.32830793635440336,
+    "relative_drop_per_list": {
+     "fresh": 0.3134761752299682,
+     "heldout": 0.16717296279318727,
+     "wide": 0.3629224724260227
+    },
+    "verdict": "fail",
+    "why": "distinct-2 fell by 0.3283 of its shipped value, more than 0.10",
     "top_opening": {
      "chars": 60,
      "shipped": {
@@ -728,8 +908,8 @@
        0.890013751391472
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 37,
        "n": 264,
@@ -750,9 +930,38 @@
       },
       "shipped_only": 0,
       "subject_only": 2,
-      "mcnemar_p": 0.5,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 0,
+       "n": 264,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.01434228605835731
+       ]
+      },
+      "subject": {
+       "k": 0,
+       "n": 264,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.01434228605835731
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 279.10227272727275,
+       "subject": 276.0
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 2"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -782,7 +991,7 @@
       "why": "no draws from heldout, wide"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 263,
@@ -793,31 +1002,131 @@
         0.9993310331513472
        ]
       },
-      "shipped": {
-       "k": 41,
+      "both_exposed": {
+       "k": 17,
        "n": 263,
-       "rate": 0.155893536121673,
+       "rate": 0.06463878326996197,
        "ci": [
-        0.11704177226902938,
-        0.20465283695725223
+        0.04074545132247465,
+        0.10106706532293142
+       ]
+      },
+      "shipped": {
+       "k": 14,
+       "n": 17,
+       "rate": 0.8235294117647058,
+       "ci": [
+        0.5897054143116588,
+        0.9380887336237901
        ]
       },
       "subject": {
-       "k": 25,
-       "n": 263,
-       "rate": 0.09505703422053231,
+       "k": 15,
+       "n": 17,
+       "rate": 0.8823529411764706,
        "ci": [
-        0.0652166197788267,
-        0.13655659439353787
+        0.6566364940511412,
+        0.9671202262362074
        ]
       },
-      "fixed": 27,
-      "broken": 11,
-      "mcnemar_p": 0.013852965261321515,
-      "verdict": "pass",
-      "why": "fixed 27 > broken 11, p = 0.01385",
+      "fixed": 0,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "fail",
+      "why": "fixed 0 <= broken 1",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 41,
+        "n": 263,
+        "rate": 0.155893536121673,
+        "ci": [
+         0.11704177226902938,
+         0.20465283695725223
+        ]
+       },
+       "subject": {
+        "k": 25,
+        "n": 263,
+        "rate": 0.09505703422053231,
+        "ci": [
+         0.0652166197788267,
+         0.13655659439353787
+        ]
+       },
+       "fixed": 27,
+       "broken": 11,
+       "mcnemar_p": 0.013852965261321515,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 27,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 10
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.23484848484848486,
+         "k": 62,
+         "n": 264,
+         "ci": [
+          0.1877426777729875,
+          0.28956004968220195
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6612903225806451,
+         "k": 41,
+         "n": 62,
+         "ci": [
+          0.5371769954935818,
+          0.7665829812479109
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.5288461538461539,
+         "k": 55,
+         "n": 104,
+         "ci": [
+          0.43360208820409,
+          0.6220351413513454
+         ]
+        },
+        "n_total": 264,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.12167300380228137,
+         "k": 32,
+         "n": 263,
+         "ci": [
+          0.08751955599830202,
+          0.1667192685101513
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.78125,
+         "k": 25,
+         "n": 32,
+         "ci": [
+          0.6124500635075647,
+          0.8897616374739581
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6792452830188679,
+         "k": 36,
+         "n": 53,
+         "ci": [
+          0.545185201490326,
+          0.7890778592086491
+         ]
+        },
+        "n_total": 264,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 37,
         "n": 263,
@@ -863,6 +1172,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 3941,
@@ -875,6 +1185,12 @@
         "value": 0.17607642805015591
        }
       },
+      "relative_drop": 0.3134761752299682,
+      "relative_drop_per_list": {
+       "fresh": 0.3134761752299682
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3135 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -972,8 +1288,8 @@
        0.5209838883052278
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 150,
        "n": 279,
@@ -994,7 +1310,36 @@
       },
       "shipped_only": 0,
       "subject_only": 0,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 6,
+       "n": 279,
+       "rate": 0.021505376344086023,
+       "ci": [
+        0.009892493364172656,
+        0.04611576966326682
+       ]
+      },
+      "subject": {
+       "k": 6,
+       "n": 279,
+       "rate": 0.021505376344086023,
+       "ci": [
+        0.009892493364172656,
+        0.04611576966326682
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.83870967741933,
+       "subject": 278.4623655913978
+      },
       "verdict": "pass",
       "why": "shipped_only 0 <= subject_only 0"
      },
@@ -1026,7 +1371,7 @@
       "why": "pooled delta +0.0427 < +0.05"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 279,
@@ -1037,31 +1382,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 70,
+      "both_exposed": {
+       "k": 61,
        "n": 279,
-       "rate": 0.25089605734767023,
+       "rate": 0.21863799283154123,
        "ci": [
-        0.20364252724613588,
-        0.3049160815958644
+        0.17413925039313027,
+        0.27077946606869746
+       ]
+      },
+      "shipped": {
+       "k": 56,
+       "n": 61,
+       "rate": 0.9180327868852459,
+       "ci": [
+        0.8220533819707465,
+        0.9644804333931265
        ]
       },
       "subject": {
-       "k": 59,
-       "n": 279,
-       "rate": 0.2114695340501792,
+       "k": 55,
+       "n": 61,
+       "rate": 0.9016393442622951,
        "ci": [
-        0.16763784677995347,
-        0.26313867137516916
+        0.8015539278317405,
+        0.9541354241845295
        ]
       },
-      "fixed": 16,
-      "broken": 5,
-      "mcnemar_p": 0.02660369873046875,
-      "verdict": "pass",
-      "why": "fixed 16 > broken 5, p = 0.0266",
+      "fixed": 2,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 1 but McNemar p = 1 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 70,
+        "n": 279,
+        "rate": 0.25089605734767023,
+        "ci": [
+         0.20364252724613588,
+         0.3049160815958644
+        ]
+       },
+       "subject": {
+        "k": 59,
+        "n": 279,
+        "rate": 0.2114695340501792,
+        "ci": [
+         0.16763784677995347,
+         0.26313867137516916
+        ]
+       },
+       "fixed": 16,
+       "broken": 5,
+       "mcnemar_p": 0.02660369873046875,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 14,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 4
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2903225806451613,
+         "k": 81,
+         "n": 279,
+         "ci": [
+          0.24019475221293177,
+          0.3461459473159463
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8641975308641975,
+         "k": 70,
+         "n": 81,
+         "ci": [
+          0.7729693623122125,
+          0.9224453655826947
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7006802721088435,
+         "k": 103,
+         "n": 147,
+         "ci": [
+          0.622308268841548,
+          0.7688308812387594
+         ]
+        },
+        "n_total": 279,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.24372759856630824,
+         "k": 68,
+         "n": 279,
+         "ci": [
+          0.19705296414528783,
+          0.2973634463900075
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8676470588235294,
+         "k": 59,
+         "n": 68,
+         "ci": [
+          0.7671994025434227,
+          0.928777555897702
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6910569105691057,
+         "k": 85,
+         "n": 123,
+         "ci": [
+          0.6046520764682787,
+          0.7658892310583104
+         ]
+        },
+        "n_total": 279,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 57,
         "n": 279,
@@ -1107,6 +1552,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 3978,
@@ -1119,6 +1565,12 @@
         "value": 0.20546923555003108
        }
       },
+      "relative_drop": 0.16717296279318727,
+      "relative_drop_per_list": {
+       "heldout": 0.16717296279318727
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.1672 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -1216,8 +1668,8 @@
        0.8955711549124963
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 89,
        "n": 709,
@@ -1238,7 +1690,36 @@
       },
       "shipped_only": 0,
       "subject_only": 1,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 20,
+       "n": 709,
+       "rate": 0.028208744710860368,
+       "ci": [
+        0.01833382761782163,
+        0.04316856997451856
+       ]
+      },
+      "subject": {
+       "k": 21,
+       "n": 709,
+       "rate": 0.029619181946403384,
+       "ci": [
+        0.019453100699547886,
+        0.04485496984468367
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 1,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.41043723554304,
+       "subject": 277.12270803949224
+      },
       "verdict": "pass",
       "why": "shipped_only 0 <= subject_only 1"
      },
@@ -1270,7 +1751,7 @@
       "why": "no draws from heldout, fresh"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 708,
@@ -1281,31 +1762,131 @@
         0.9997509797915792
        ]
       },
-      "shipped": {
-       "k": 130,
+      "both_exposed": {
+       "k": 48,
        "n": 708,
-       "rate": 0.18361581920903955,
+       "rate": 0.06779661016949153,
        "ci": [
-        0.15683007651736797,
-        0.21381630204254276
+        0.051514471765677264,
+        0.08874352751705798
+       ]
+      },
+      "shipped": {
+       "k": 37,
+       "n": 48,
+       "rate": 0.7708333333333334,
+       "ci": [
+        0.6346073590999655,
+        0.8669217373308877
        ]
       },
       "subject": {
-       "k": 50,
-       "n": 708,
-       "rate": 0.07062146892655367,
+       "k": 34,
+       "n": 48,
+       "rate": 0.7083333333333334,
        "ci": [
-        0.05397643990629846,
-        0.09190078813929473
+        0.5682074019042831,
+        0.8175842107348348
        ]
       },
-      "fixed": 98,
-      "broken": 18,
-      "mcnemar_p": 1.6491055825052547e-14,
-      "verdict": "pass",
-      "why": "fixed 98 > broken 18, p = 1.649e-14",
+      "fixed": 5,
+      "broken": 2,
+      "mcnemar_p": 0.453125,
+      "verdict": "unresolved",
+      "why": "fixed 5 > broken 2 but McNemar p = 0.4531 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 130,
+        "n": 708,
+        "rate": 0.18361581920903955,
+        "ci": [
+         0.15683007651736797,
+         0.21381630204254276
+        ]
+       },
+       "subject": {
+        "k": 50,
+        "n": 708,
+        "rate": 0.07062146892655367,
+        "ci": [
+         0.05397643990629846,
+         0.09190078813929473
+        ]
+       },
+       "fixed": 98,
+       "broken": 18,
+       "mcnemar_p": 1.6491055825052547e-14,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 93,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 16
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2468265162200282,
+         "k": 175,
+         "n": 709,
+         "ci": [
+          0.21650990772550383,
+          0.2798717974099972
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7485714285714286,
+         "k": 131,
+         "n": 175,
+         "ci": [
+          0.6794258610309706,
+          0.8070385224161915
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6357615894039735,
+         "k": 192,
+         "n": 302,
+         "ci": [
+          0.5800982523293616,
+          0.6880145153646815
+         ]
+        },
+        "n_total": 709,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.10875706214689265,
+         "k": 77,
+         "n": 708,
+         "ci": [
+          0.08790026057911675,
+          0.13383655576505862
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6493506493506493,
+         "k": 50,
+         "n": 77,
+         "ci": [
+          0.5379942353978194,
+          0.7465132479593756
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.5980392156862745,
+         "k": 61,
+         "n": 102,
+         "ci": [
+          0.5010067361944007,
+          0.6879551339729594
+         ]
+        },
+        "n_total": 709,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 122,
         "n": 708,
@@ -1351,6 +1932,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 7601,
@@ -1363,6 +1945,12 @@
         "value": 0.11768029082334447
        }
       },
+      "relative_drop": 0.3629224724260227,
+      "relative_drop_per_list": {
+       "wide": 0.3629224724260227
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3629 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -1462,8 +2050,8 @@
        0.8485666348598687
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 60,
        "n": 314,
@@ -1484,7 +2072,36 @@
       },
       "shipped_only": 0,
       "subject_only": 0,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 5,
+       "n": 314,
+       "rate": 0.01592356687898089,
+       "ci": [
+        0.00682027922401761,
+        0.0367280321638388
+       ]
+      },
+      "subject": {
+       "k": 5,
+       "n": 314,
+       "rate": 0.01592356687898089,
+       "ci": [
+        0.00682027922401761,
+        0.0367280321638388
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 280.00955414012736,
+       "subject": 276.78025477707007
+      },
       "verdict": "pass",
       "why": "shipped_only 0 <= subject_only 0"
      },
@@ -1534,7 +2151,7 @@
       "why": "pooled delta +0.0929, 95% lower bound +0.0825, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 314,
@@ -1545,31 +2162,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 43,
+      "both_exposed": {
+       "k": 19,
        "n": 314,
-       "rate": 0.13694267515923567,
+       "rate": 0.06050955414012739,
        "ci": [
-        0.10328195206518977,
-        0.1793792814757026
+        0.03907644365074502,
+        0.09256610221454564
+       ]
+      },
+      "shipped": {
+       "k": 15,
+       "n": 19,
+       "rate": 0.7894736842105263,
+       "ci": [
+        0.5666572155618583,
+        0.9149232336708375
        ]
       },
       "subject": {
-       "k": 28,
-       "n": 314,
-       "rate": 0.08917197452229299,
+       "k": 17,
+       "n": 19,
+       "rate": 0.8947368421052632,
        "ci": [
-        0.062415201522639206,
-        0.12585935222100206
+        0.6860591728889099,
+        0.9706414397011299
        ]
       },
-      "fixed": 29,
-      "broken": 14,
-      "mcnemar_p": 0.03153949735315109,
-      "verdict": "pass",
-      "why": "fixed 29 > broken 14, p = 0.03154",
+      "fixed": 1,
+      "broken": 3,
+      "mcnemar_p": 0.625,
+      "verdict": "fail",
+      "why": "fixed 1 <= broken 3",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 43,
+        "n": 314,
+        "rate": 0.13694267515923567,
+        "ci": [
+         0.10328195206518977,
+         0.1793792814757026
+        ]
+       },
+       "subject": {
+        "k": 28,
+        "n": 314,
+        "rate": 0.08917197452229299,
+        "ci": [
+         0.062415201522639206,
+         0.12585935222100206
+        ]
+       },
+       "fixed": 29,
+       "broken": 14,
+       "mcnemar_p": 0.03153949735315109,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 28,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 11
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.19745222929936307,
+         "k": 62,
+         "n": 314,
+         "ci": [
+          0.15719312773781363,
+          0.24502456687959667
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6935483870967742,
+         "k": 43,
+         "n": 62,
+         "ci": [
+          0.5703278379461328,
+          0.7941841341436585
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.5392156862745098,
+         "k": 55,
+         "n": 102,
+         "ci": [
+          0.44281961379120005,
+          0.632765134275744
+         ]
+        },
+        "n_total": 314,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.11464968152866242,
+         "k": 36,
+         "n": 314,
+         "ci": [
+          0.08397306899752899,
+          0.1546410473046462
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7777777777777778,
+         "k": 28,
+         "n": 36,
+         "ci": [
+          0.6191529705388181,
+          0.8828366802420353
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6153846153846154,
+         "k": 32,
+         "n": 52,
+         "ci": [
+          0.4795987371581939,
+          0.7352953621978379
+         ]
+        },
+        "n_total": 314,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 39,
         "n": 314,
@@ -1615,6 +2332,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4514,
@@ -1627,6 +2345,14 @@
         "value": 0.16840998395041232
        }
       },
+      "relative_drop": 0.3168837381187307,
+      "relative_drop_per_list": {
+       "fresh": 0.2769870400503377,
+       "heldout": 0.15155512129988347,
+       "wide": 0.31643946275990587
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3169 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -1724,8 +2450,8 @@
        0.8188920065963246
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 66,
        "n": 298,
@@ -1746,7 +2472,36 @@
       },
       "shipped_only": 0,
       "subject_only": 1,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 6,
+       "n": 298,
+       "rate": 0.020134228187919462,
+       "ci": [
+        0.009259574805168102,
+        0.04322313874447911
+       ]
+      },
+      "subject": {
+       "k": 7,
+       "n": 298,
+       "rate": 0.02348993288590604,
+       "ci": [
+        0.011424124452767265,
+        0.04768458410702228
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 1,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.2248322147651,
+       "subject": 276.97986577181206
+      },
       "verdict": "pass",
       "why": "shipped_only 0 <= subject_only 1"
      },
@@ -1796,7 +2551,7 @@
       "why": "pooled delta +0.0783, 95% lower bound +0.0671, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 297,
@@ -1807,31 +2562,131 @@
         0.9994073899150995
        ]
       },
-      "shipped": {
-       "k": 73,
+      "both_exposed": {
+       "k": 45,
        "n": 297,
-       "rate": 0.24579124579124578,
+       "rate": 0.15151515151515152,
        "ci": [
-        0.20027624209521722,
-        0.2977982567058334
+        0.11520508829083431,
+        0.19672485377418203
+       ]
+      },
+      "shipped": {
+       "k": 37,
+       "n": 45,
+       "rate": 0.8222222222222222,
+       "ci": [
+        0.6867017537354023,
+        0.9070561048589585
        ]
       },
       "subject": {
-       "k": 40,
-       "n": 297,
-       "rate": 0.13468013468013468,
+       "k": 35,
+       "n": 45,
+       "rate": 0.7777777777777778,
        "ci": [
-        0.10048771049193347,
-        0.17820213215593392
+        0.6373070782524372,
+        0.8745531446737361
        ]
       },
-      "fixed": 38,
-      "broken": 5,
-      "mcnemar_p": 2.4995097192004323e-07,
-      "verdict": "pass",
-      "why": "fixed 38 > broken 5, p = 2.5e-07",
+      "fixed": 2,
+      "broken": 0,
+      "mcnemar_p": 0.5,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 0 but McNemar p = 0.5 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 73,
+        "n": 297,
+        "rate": 0.24579124579124578,
+        "ci": [
+         0.20027624209521722,
+         0.2977982567058334
+        ]
+       },
+       "subject": {
+        "k": 40,
+        "n": 297,
+        "rate": 0.13468013468013468,
+        "ci": [
+         0.10048771049193347,
+         0.17820213215593392
+        ]
+       },
+       "fixed": 38,
+       "broken": 5,
+       "mcnemar_p": 2.4995097192004323e-07,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 36,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 5
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.3422818791946309,
+         "k": 102,
+         "n": 298,
+         "ci": [
+          0.29072479087817577,
+          0.3978534436451349
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7156862745098039,
+         "k": 73,
+         "n": 102,
+         "ci": [
+          0.6215651983133917,
+          0.7941509160548005
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6187845303867403,
+         "k": 112,
+         "n": 181,
+         "ci": [
+          0.546255410225752,
+          0.6863763828489404
+         ]
+        },
+        "n_total": 298,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.18181818181818182,
+         "k": 54,
+         "n": 297,
+         "ci": [
+          0.14210852708392754,
+          0.22965359393195697
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7407407407407407,
+         "k": 40,
+         "n": 54,
+         "ci": [
+          0.6106910949571832,
+          0.8388134737397926
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6593406593406593,
+         "k": 60,
+         "n": 91,
+         "ci": [
+          0.5572871428187045,
+          0.7484863064786853
+         ]
+        },
+        "n_total": 298,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 66,
         "n": 297,
@@ -1877,6 +2732,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4223,
@@ -1889,6 +2745,14 @@
         "value": 0.1709947828125916
        }
       },
+      "relative_drop": 0.30156547271267053,
+      "relative_drop_per_list": {
+       "fresh": 0.25475079119823085,
+       "heldout": 0.12479216159503637,
+       "wide": 0.3360492651330065
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3016 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -1986,8 +2850,8 @@
        0.789841948767907
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 80,
        "n": 322,
@@ -2008,9 +2872,38 @@
       },
       "shipped_only": 0,
       "subject_only": 2,
-      "mcnemar_p": 0.5,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 4,
+       "n": 322,
+       "rate": 0.012422360248447204,
+       "ci": [
+        0.004841129508574226,
+        0.03150003733849145
+       ]
+      },
+      "subject": {
+       "k": 4,
+       "n": 322,
+       "rate": 0.012422360248447204,
+       "ci": [
+        0.004841129508574226,
+        0.03150003733849145
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 277.64906832298135,
+       "subject": 277.14906832298135
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 2"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -2058,7 +2951,7 @@
       "why": "pooled delta +0.0720, 95% lower bound +0.0603, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 321,
@@ -2069,31 +2962,131 @@
         0.9994515765795543
        ]
       },
-      "shipped": {
-       "k": 67,
+      "both_exposed": {
+       "k": 36,
        "n": 321,
-       "rate": 0.2087227414330218,
+       "rate": 0.11214953271028037,
        "ci": [
-        0.16783942360289783,
-        0.25649514046757016
+        0.08211618091467174,
+        0.1513560461096413
+       ]
+      },
+      "shipped": {
+       "k": 31,
+       "n": 36,
+       "rate": 0.8611111111111112,
+       "ci": [
+        0.713404696106438,
+        0.9391818499086717
        ]
       },
       "subject": {
-       "k": 38,
-       "n": 321,
-       "rate": 0.11838006230529595,
+       "k": 30,
+       "n": 36,
+       "rate": 0.8333333333333334,
        "ci": [
-        0.08747313993712645,
-        0.15831278625145462
+        0.6810920568872054,
+        0.9212955240498188
        ]
       },
-      "fixed": 38,
-      "broken": 9,
-      "mcnemar_p": 2.4904030624384177e-05,
-      "verdict": "pass",
-      "why": "fixed 38 > broken 9, p = 2.49e-05",
+      "fixed": 2,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 1 but McNemar p = 1 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 67,
+        "n": 321,
+        "rate": 0.2087227414330218,
+        "ci": [
+         0.16783942360289783,
+         0.25649514046757016
+        ]
+       },
+       "subject": {
+        "k": 38,
+        "n": 321,
+        "rate": 0.11838006230529595,
+        "ci": [
+         0.08747313993712645,
+         0.15831278625145462
+        ]
+       },
+       "fixed": 38,
+       "broken": 9,
+       "mcnemar_p": 2.4904030624384177e-05,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 36,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 8
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2515527950310559,
+         "k": 81,
+         "n": 322,
+         "ci": [
+          0.20727793799474142,
+          0.30168571390185256
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8395061728395061,
+         "k": 68,
+         "n": 81,
+         "ci": [
+          0.7445295089488065,
+          0.9037384577328867
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7050359712230215,
+         "k": 98,
+         "n": 139,
+         "ci": [
+          0.6245344788231865,
+          0.7745093315004737
+         ]
+        },
+        "n_total": 322,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.14330218068535824,
+         "k": 46,
+         "n": 321,
+         "ci": [
+          0.10918515964853173,
+          0.18585556319712157
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8260869565217391,
+         "k": 38,
+         "n": 46,
+         "ci": [
+          0.692766462836215,
+          0.9091420829775368
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7142857142857143,
+         "k": 50,
+         "n": 70,
+         "ci": [
+          0.5994980341827975,
+          0.8067777962128025
+         ]
+        },
+        "n_total": 322,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 58,
         "n": 321,
@@ -2139,6 +3132,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4380,
@@ -2151,6 +3145,14 @@
         "value": 0.1719900389779125
        }
       },
+      "relative_drop": 0.2701418140451005,
+      "relative_drop_per_list": {
+       "fresh": 0.23139673923066995,
+       "heldout": 0.11716752505350703,
+       "wide": 0.305281806329634
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2701 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -2248,8 +3250,8 @@
        0.8219230487201192
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 70,
        "n": 318,
@@ -2270,7 +3272,36 @@
       },
       "shipped_only": 0,
       "subject_only": 0,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 11,
+       "n": 318,
+       "rate": 0.03459119496855346,
+       "ci": [
+        0.01942300922045268,
+        0.060869501618217886
+       ]
+      },
+      "subject": {
+       "k": 11,
+       "n": 318,
+       "rate": 0.03459119496855346,
+       "ci": [
+        0.01942300922045268,
+        0.060869501618217886
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.72641509433964,
+       "subject": 277.811320754717
+      },
       "verdict": "pass",
       "why": "shipped_only 0 <= subject_only 0"
      },
@@ -2320,7 +3351,7 @@
       "why": "pooled delta +0.0797, 95% lower bound +0.0694, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 318,
@@ -2331,31 +3362,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 58,
+      "both_exposed": {
+       "k": 26,
        "n": 318,
-       "rate": 0.18238993710691823,
+       "rate": 0.08176100628930817,
        "ci": [
-        0.14382177512009883,
-        0.22854000592521015
+        0.056404744669529244,
+        0.11710136304360039
+       ]
+      },
+      "shipped": {
+       "k": 24,
+       "n": 26,
+       "rate": 0.9230769230769231,
+       "ci": [
+        0.7585844622837095,
+        0.9786449115277238
        ]
       },
       "subject": {
-       "k": 28,
-       "n": 318,
-       "rate": 0.0880503144654088,
+       "k": 22,
+       "n": 26,
+       "rate": 0.8461538461538461,
        "ci": [
-        0.061620891321319704,
-        0.12431369597507111
+        0.6646880067178652,
+        0.9384996627642165
        ]
       },
-      "fixed": 36,
-      "broken": 6,
-      "mcnemar_p": 2.8288777684792876e-06,
-      "verdict": "pass",
-      "why": "fixed 36 > broken 6, p = 2.829e-06",
+      "fixed": 2,
+      "broken": 0,
+      "mcnemar_p": 0.5,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 0 but McNemar p = 0.5 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 58,
+        "n": 318,
+        "rate": 0.18238993710691823,
+        "ci": [
+         0.14382177512009883,
+         0.22854000592521015
+        ]
+       },
+       "subject": {
+        "k": 28,
+        "n": 318,
+        "rate": 0.0880503144654088,
+        "ci": [
+         0.061620891321319704,
+         0.12431369597507111
+        ]
+       },
+       "fixed": 36,
+       "broken": 6,
+       "mcnemar_p": 2.8288777684792876e-06,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 34,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 6
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.22955974842767296,
+         "k": 73,
+         "n": 318,
+         "ci": [
+          0.18672878283770938,
+          0.27884659508205867
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7945205479452054,
+         "k": 58,
+         "n": 73,
+         "ci": [
+          0.6882634698485864,
+          0.8713302788898184
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.648854961832061,
+         "k": 85,
+         "n": 131,
+         "ci": [
+          0.563936441087627,
+          0.7252921117705883
+         ]
+        },
+        "n_total": 318,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.1289308176100629,
+         "k": 41,
+         "n": 318,
+         "ci": [
+          0.09648023255545823,
+          0.17023947203213047
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6829268292682927,
+         "k": 28,
+         "n": 41,
+         "ci": [
+          0.5301580035565572,
+          0.8043538610101142
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6153846153846154,
+         "k": 40,
+         "n": 65,
+         "ci": [
+          0.493842028060131,
+          0.7240499262499791
+         ]
+        },
+        "n_total": 318,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 53,
         "n": 318,
@@ -2401,6 +3532,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4491,
@@ -2413,6 +3545,14 @@
         "value": 0.16984952120383037
        }
       },
+      "relative_drop": 0.30059514682199173,
+      "relative_drop_per_list": {
+       "fresh": 0.27434812527673946,
+       "heldout": 0.14388942073611044,
+       "wide": 0.31624476256476053
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3006 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -2525,8 +3665,8 @@
      0.6387156080855677
     ]
    },
-   "P1_topic": {
-    "rule": "shipped_only <= subject_only",
+   "topic_mention": {
+    "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
     "shipped": {
      "k": 597,
      "n": 1582,
@@ -2547,9 +3687,38 @@
     },
     "shipped_only": 0,
     "subject_only": 12,
-    "mcnemar_p": 0.00048828125,
+    "identity_violations": 0
+   },
+   "P1_anchored_topic": {
+    "rule": "anchored_topic: shipped_only <= subject_only",
+    "shipped": {
+     "k": 34,
+     "n": 1582,
+     "rate": 0.021491782553729456,
+     "ci": [
+      0.015420042943189487,
+      0.029881748368357372
+     ]
+    },
+    "subject": {
+     "k": 35,
+     "n": 1582,
+     "rate": 0.022123893805309734,
+     "ci": [
+      0.01595030305052269,
+      0.03061264837818197
+     ]
+    },
+    "shipped_only": 0,
+    "subject_only": 1,
+    "mcnemar_p": 1.0,
+    "mean_reply_chars": {
+     "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+     "shipped": 278.3628318584071,
+     "subject": 277.29329962073325
+    },
     "verdict": "pass",
-    "why": "shipped_only 0 <= subject_only 12"
+    "why": "shipped_only 0 <= subject_only 1"
    },
    "P2_logp_per_char": {
     "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -2597,7 +3766,7 @@
     "why": "pooled delta +0.0638, 95% lower bound +0.0561, >= +0.05; positive on every list"
    },
    "P3_uer": {
-    "rule": "fixed > broken, exact McNemar p < 0.05",
+    "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
     "window": 200,
     "both_qualify": {
      "k": 1580,
@@ -2608,31 +3777,131 @@
       0.9996532361013248
      ]
     },
-    "shipped": {
-     "k": 354,
+    "both_exposed": {
+     "k": 258,
      "n": 1580,
-     "rate": 0.2240506329113924,
+     "rate": 0.16329113924050634,
      "ci": [
-      0.2041746178804344,
-      0.2452652265284379
+      0.14588574130647716,
+      0.18232984866031202
+     ]
+    },
+    "shipped": {
+     "k": 219,
+     "n": 258,
+     "rate": 0.8488372093023255,
+     "ci": [
+      0.8000312591331744,
+      0.887407623963111
      ]
     },
     "subject": {
-     "k": 245,
-     "n": 1580,
-     "rate": 0.1550632911392405,
+     "k": 214,
+     "n": 258,
+     "rate": 0.8294573643410853,
      "ci": [
-      0.13805407971774775,
-      0.17374572579334263
+      0.7788125542967973,
+      0.8704352797385836
      ]
     },
-    "fixed": 144,
-    "broken": 35,
-    "mcnemar_p": 6.672513536972345e-17,
-    "verdict": "pass",
-    "why": "fixed 144 > broken 35, p = 6.673e-17",
+    "fixed": 9,
+    "broken": 4,
+    "mcnemar_p": 0.266845703125,
+    "verdict": "unresolved",
+    "why": "fixed 9 > broken 4 but McNemar p = 0.2668 >= 0.05",
+    "all_qualifying_draws": {
+     "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+     "shipped": {
+      "k": 354,
+      "n": 1580,
+      "rate": 0.2240506329113924,
+      "ci": [
+       0.2041746178804344,
+       0.2452652265284379
+      ]
+     },
+     "subject": {
+      "k": 245,
+      "n": 1580,
+      "rate": 0.1550632911392405,
+      "ci": [
+       0.13805407971774775,
+       0.17374572579334263
+      ]
+     },
+     "fixed": 144,
+     "broken": 35,
+     "mcnemar_p": 6.672513536972345e-17,
+     "fixed_where_the_subject_pick_has_no_definite_subject": 135,
+     "broken_where_the_shipped_pick_has_no_definite_subject": 31
+    },
+    "decomposition": {
+     "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+     "shipped": {
+      "exposure": {
+       "rate": 0.28508217446270545,
+       "k": 451,
+       "n": 1582,
+       "ci": [
+        0.26337733443311306,
+        0.30782822573323565
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7871396895787139,
+       "k": 355,
+       "n": 451,
+       "ci": [
+        0.747018882260721,
+        0.8224103000999442
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6658322903629537,
+       "k": 532,
+       "n": 799,
+       "ci": [
+        0.6324006079156899,
+        0.6976770146192282
+       ]
+      },
+      "n_total": 1582,
+      "window": 200
+     },
+     "subject": {
+      "exposure": {
+       "rate": 0.1962025316455696,
+       "k": 310,
+       "n": 1580,
+       "ci": [
+        0.17736778531077205,
+        0.2165109424788121
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7903225806451613,
+       "k": 245,
+       "n": 310,
+       "ci": [
+        0.7415918621150617,
+        0.8319461295714947
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6877394636015326,
+       "k": 359,
+       "n": 522,
+       "ci": [
+        0.6467354661731697,
+        0.7260004539643745
+       ]
+      },
+      "n_total": 1582,
+      "window": 200
+     }
+    },
     "prompt_as_context": {
-     "note": "not the bar; the prompt's words count as introduced",
+     "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
      "shipped": {
       "k": 314,
       "n": 1580,
@@ -2678,6 +3947,7 @@
     }
    },
    "GUARD2_sameness": {
+    "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
     "distinct_2": {
      "shipped": {
       "distinct": 13346,
@@ -2690,6 +3960,14 @@
       "value": 0.1122917515443144
      }
     },
+    "relative_drop": 0.2296748822952075,
+    "relative_drop_per_list": {
+     "fresh": 0.25451413162482006,
+     "heldout": 0.1325973918994272,
+     "wide": 0.24482655254221108
+    },
+    "verdict": "fail",
+    "why": "distinct-2 fell by 0.2297 of its shipped value, more than 0.10",
     "top_opening": {
      "chars": 60,
      "shipped": {
@@ -2787,8 +4065,8 @@
        0.7747345986285943
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 81,
        "n": 309,
@@ -2809,9 +4087,38 @@
       },
       "shipped_only": 0,
       "subject_only": 3,
-      "mcnemar_p": 0.25,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 0,
+       "n": 309,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.012279251078725687
+       ]
+      },
+      "subject": {
+       "k": 0,
+       "n": 309,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.012279251078725687
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.9644012944984,
+       "subject": 276.3915857605178
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 3"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -2841,7 +4148,7 @@
       "why": "no draws from heldout, wide"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 308,
@@ -2852,31 +4159,131 @@
         0.9994284945127487
        ]
       },
-      "shipped": {
-       "k": 59,
+      "both_exposed": {
+       "k": 35,
        "n": 308,
-       "rate": 0.19155844155844157,
+       "rate": 0.11363636363636363,
        "ci": [
-        0.15151572892060539,
-        0.23920030762395106
+        0.08285116549876906,
+        0.15394050133072795
+       ]
+      },
+      "shipped": {
+       "k": 32,
+       "n": 35,
+       "rate": 0.9142857142857143,
+       "ci": [
+        0.7762072603410349,
+        0.9704176317330301
        ]
       },
       "subject": {
-       "k": 42,
-       "n": 308,
-       "rate": 0.13636363636363635,
+       "k": 32,
+       "n": 35,
+       "rate": 0.9142857142857143,
        "ci": [
-        0.10249195219368432,
-        0.1791943224693717
+        0.7762072603410349,
+        0.9704176317330301
        ]
       },
-      "fixed": 28,
-      "broken": 11,
-      "mcnemar_p": 0.009475304279476404,
-      "verdict": "pass",
-      "why": "fixed 28 > broken 11, p = 0.009475",
+      "fixed": 1,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "fail",
+      "why": "fixed 1 <= broken 1",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 59,
+        "n": 308,
+        "rate": 0.19155844155844157,
+        "ci": [
+         0.15151572892060539,
+         0.23920030762395106
+        ]
+       },
+       "subject": {
+        "k": 42,
+        "n": 308,
+        "rate": 0.13636363636363635,
+        "ci": [
+         0.10249195219368432,
+         0.1791943224693717
+        ]
+       },
+       "fixed": 28,
+       "broken": 11,
+       "mcnemar_p": 0.009475304279476404,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 27,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 10
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2588996763754045,
+         "k": 80,
+         "n": 309,
+         "ci": [
+          0.21323107623641613,
+          0.31048933933228984
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7375,
+         "k": 59,
+         "n": 80,
+         "ci": [
+          0.6318104033557184,
+          0.8214259851149064
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6268656716417911,
+         "k": 84,
+         "n": 134,
+         "ci": [
+          0.5425147139330706,
+          0.704145473001164
+         ]
+        },
+        "n_total": 309,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.16233766233766234,
+         "k": 50,
+         "n": 308,
+         "ci": [
+          0.12535792569619966,
+          0.2076364722052095
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.84,
+         "k": 42,
+         "n": 50,
+         "ci": [
+          0.7148578393696501,
+          0.916625793219666
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7710843373493976,
+         "k": 64,
+         "n": 83,
+         "ci": [
+          0.6699193229025606,
+          0.848266352592755
+         ]
+        },
+        "n_total": 309,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 51,
         "n": 308,
@@ -2922,6 +4329,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4525,
@@ -2934,6 +4342,12 @@
         "value": 0.18797077646259275
        }
       },
+      "relative_drop": 0.25451413162482006,
+      "relative_drop_per_list": {
+       "fresh": 0.25451413162482006
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2545 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -3031,8 +4445,8 @@
        0.4296573062763896
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 212,
        "n": 342,
@@ -3053,9 +4467,38 @@
       },
       "shipped_only": 0,
       "subject_only": 1,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 6,
+       "n": 342,
+       "rate": 0.017543859649122806,
+       "ci": [
+        0.008064686467213554,
+        0.037740865228967926
+       ]
+      },
+      "subject": {
+       "k": 6,
+       "n": 342,
+       "rate": 0.017543859649122806,
+       "ci": [
+        0.008064686467213554,
+        0.037740865228967926
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.56140350877195,
+       "subject": 278.2894736842105
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 1"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -3085,7 +4528,7 @@
       "why": "pooled delta +0.0350 < +0.05"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 342,
@@ -3096,31 +4539,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 94,
+      "both_exposed": {
+       "k": 87,
        "n": 342,
-       "rate": 0.27485380116959063,
+       "rate": 0.2543859649122807,
        "ci": [
-        0.23023674190264193,
-        0.32447251555557605
+        0.21113308255609767,
+        0.3030951983074129
+       ]
+      },
+      "shipped": {
+       "k": 80,
+       "n": 87,
+       "rate": 0.9195402298850575,
+       "ci": [
+        0.8431181100907793,
+        0.9604797289101311
        ]
       },
       "subject": {
-       "k": 83,
-       "n": 342,
-       "rate": 0.24269005847953215,
+       "k": 79,
+       "n": 87,
+       "rate": 0.9080459770114943,
        "ci": [
-        0.20027511994540878,
-        0.2908211742925546
+        0.8289143521052874,
+        0.9526671077449133
        ]
       },
-      "fixed": 16,
-      "broken": 5,
-      "mcnemar_p": 0.02660369873046875,
-      "verdict": "pass",
-      "why": "fixed 16 > broken 5, p = 0.0266",
+      "fixed": 2,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 1 but McNemar p = 1 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 94,
+        "n": 342,
+        "rate": 0.27485380116959063,
+        "ci": [
+         0.23023674190264193,
+         0.32447251555557605
+        ]
+       },
+       "subject": {
+        "k": 83,
+        "n": 342,
+        "rate": 0.24269005847953215,
+        "ci": [
+         0.20027511994540878,
+         0.2908211742925546
+        ]
+       },
+       "fixed": 16,
+       "broken": 5,
+       "mcnemar_p": 0.02660369873046875,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 14,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 4
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.3128654970760234,
+         "k": 107,
+         "n": 342,
+         "ci": [
+          0.26603363853961737,
+          0.3638545754516288
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8785046728971962,
+         "k": 94,
+         "n": 107,
+         "ci": [
+          0.8031678343823965,
+          0.9276056583323826
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7373737373737373,
+         "k": 146,
+         "n": 198,
+         "ci": [
+          0.6719787825216692,
+          0.7937332696464876
+         ]
+        },
+        "n_total": 342,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.27485380116959063,
+         "k": 94,
+         "n": 342,
+         "ci": [
+          0.23023674190264193,
+          0.32447251555557605
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8829787234042553,
+         "k": 83,
+         "n": 94,
+         "ci": [
+          0.8024979953786057,
+          0.9333863717172325
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.735632183908046,
+         "k": 128,
+         "n": 174,
+         "ci": [
+          0.6655292638910788,
+          0.7955555728155028
+         ]
+        },
+        "n_total": 342,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 77,
         "n": 342,
@@ -3166,6 +4709,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 4800,
@@ -3178,6 +4722,12 @@
         "value": 0.21072641557256552
        }
       },
+      "relative_drop": 0.1325973918994272,
+      "relative_drop_per_list": {
+       "heldout": 0.1325973918994272
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.1326 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -3275,8 +4825,8 @@
        0.6944653732886583
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 304,
        "n": 931,
@@ -3297,9 +4847,38 @@
       },
       "shipped_only": 0,
       "subject_only": 8,
-      "mcnemar_p": 0.0078125,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 28,
+       "n": 931,
+       "rate": 0.03007518796992481,
+       "ci": [
+        0.020888778719415982,
+        0.04312363563818465
+       ]
+      },
+      "subject": {
+       "k": 29,
+       "n": 931,
+       "rate": 0.031149301825993556,
+       "ci": [
+        0.021774415471369858,
+        0.04437739908198483
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 1,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.09022556390977,
+       "subject": 277.2266380236305
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 8"
+      "why": "shipped_only 0 <= subject_only 1"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -3329,7 +4908,7 @@
       "why": "no draws from heldout, fresh"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 930,
@@ -3340,31 +4919,131 @@
         0.9998103673599277
        ]
       },
-      "shipped": {
-       "k": 201,
+      "both_exposed": {
+       "k": 136,
        "n": 930,
-       "rate": 0.2161290322580645,
+       "rate": 0.14623655913978495,
        "ci": [
-        0.19087177718149737,
-        0.24372175578630725
+        0.12498260467455818,
+        0.17040100269819836
+       ]
+      },
+      "shipped": {
+       "k": 107,
+       "n": 136,
+       "rate": 0.7867647058823529,
+       "ci": [
+        0.7105454397049724,
+        0.847229061918414
        ]
       },
       "subject": {
-       "k": 120,
-       "n": 930,
-       "rate": 0.12903225806451613,
+       "k": 103,
+       "n": 136,
+       "rate": 0.7573529411764706,
        "ci": [
-        0.10900303837404905,
-        0.15211351039069565
+        0.6788821453520602,
+        0.8216847150791842
        ]
       },
-      "fixed": 100,
-      "broken": 19,
-      "mcnemar_p": 1.8142381309559084e-14,
-      "verdict": "pass",
-      "why": "fixed 100 > broken 19, p = 1.814e-14",
+      "fixed": 6,
+      "broken": 2,
+      "mcnemar_p": 0.2890625,
+      "verdict": "unresolved",
+      "why": "fixed 6 > broken 2 but McNemar p = 0.2891 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 201,
+        "n": 930,
+        "rate": 0.2161290322580645,
+        "ci": [
+         0.19087177718149737,
+         0.24372175578630725
+        ]
+       },
+       "subject": {
+        "k": 120,
+        "n": 930,
+        "rate": 0.12903225806451613,
+        "ci": [
+         0.10900303837404905,
+         0.15211351039069565
+        ]
+       },
+       "fixed": 100,
+       "broken": 19,
+       "mcnemar_p": 1.8142381309559084e-14,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 94,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 17
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.28356605800214824,
+         "k": 264,
+         "n": 931,
+         "ci": [
+          0.2555486342836172,
+          0.31336222627194066
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7651515151515151,
+         "k": 202,
+         "n": 264,
+         "ci": [
+          0.710439950317798,
+          0.8122573222270124
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6466809421841542,
+         "k": 302,
+         "n": 467,
+         "ci": [
+          0.602291941039024,
+          0.6886764888506056
+         ]
+        },
+        "n_total": 931,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.17849462365591398,
+         "k": 166,
+         "n": 930,
+         "ci": [
+          0.15522153515357354,
+          0.2044128071092052
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7228915662650602,
+         "k": 120,
+         "n": 166,
+         "ci": [
+          0.650350446117743,
+          0.7853500036653907
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.630188679245283,
+         "k": 167,
+         "n": 265,
+         "ci": [
+          0.5705918607254142,
+          0.6860649819456414
+         ]
+        },
+        "n_total": 931,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 186,
         "n": 930,
@@ -3410,6 +5089,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 9638,
@@ -3422,6 +5102,12 @@
         "value": 0.13515991989968745
        }
       },
+      "relative_drop": 0.24482655254221108,
+      "relative_drop_per_list": {
+       "wide": 0.24482655254221108
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2448 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -3521,8 +5207,8 @@
        0.6697687556783901
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 149,
        "n": 407,
@@ -3543,9 +5229,38 @@
       },
       "shipped_only": 0,
       "subject_only": 4,
-      "mcnemar_p": 0.125,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 9,
+       "n": 407,
+       "rate": 0.022113022113022112,
+       "ci": [
+        0.011676483470705023,
+        0.041486259362964344
+       ]
+      },
+      "subject": {
+       "k": 9,
+       "n": 407,
+       "rate": 0.022113022113022112,
+       "ci": [
+        0.011676483470705023,
+        0.041486259362964344
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 279.7346437346437,
+       "subject": 277.3931203931204
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 4"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -3593,7 +5308,7 @@
       "why": "pooled delta +0.0715, 95% lower bound +0.0612, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 407,
@@ -3604,31 +5319,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 71,
+      "both_exposed": {
+       "k": 51,
        "n": 407,
-       "rate": 0.17444717444717445,
+       "rate": 0.12530712530712532,
        "ci": [
-        0.14066941335529112,
-        0.21431291788101317
+        0.09660643101835299,
+        0.1610147426687143
+       ]
+      },
+      "shipped": {
+       "k": 42,
+       "n": 51,
+       "rate": 0.8235294117647058,
+       "ci": [
+        0.6974585747569192,
+        0.9042759653087368
        ]
       },
       "subject": {
-       "k": 56,
-       "n": 407,
-       "rate": 0.1375921375921376,
+       "k": 44,
+       "n": 51,
+       "rate": 0.8627450980392157,
        "ci": [
-        0.10749961798255023,
-        0.1744618450918263
+        0.7427830774241833,
+        0.9318889826494312
        ]
       },
-      "fixed": 30,
-      "broken": 15,
-      "mcnemar_p": 0.035697803555194696,
-      "verdict": "pass",
-      "why": "fixed 30 > broken 15, p = 0.0357",
+      "fixed": 1,
+      "broken": 3,
+      "mcnemar_p": 0.625,
+      "verdict": "fail",
+      "why": "fixed 1 <= broken 3",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 71,
+        "n": 407,
+        "rate": 0.17444717444717445,
+        "ci": [
+         0.14066941335529112,
+         0.21431291788101317
+        ]
+       },
+       "subject": {
+        "k": 56,
+        "n": 407,
+        "rate": 0.1375921375921376,
+        "ci": [
+         0.10749961798255023,
+         0.1744618450918263
+        ]
+       },
+       "fixed": 30,
+       "broken": 15,
+       "mcnemar_p": 0.035697803555194696,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 29,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 12
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2334152334152334,
+         "k": 95,
+         "n": 407,
+         "ci": [
+          0.19492893438701242,
+          0.2768867859083764
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7473684210526316,
+         "k": 71,
+         "n": 95,
+         "ci": [
+          0.6515543870202924,
+          0.8239545801759682
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6337209302325582,
+         "k": 109,
+         "n": 172,
+         "ci": [
+          0.5595294943837877,
+          0.7020697911800696
+         ]
+        },
+        "n_total": 407,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.16953316953316952,
+         "k": 69,
+         "n": 407,
+         "ci": [
+          0.1362090841168621,
+          0.20903713136451846
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8115942028985508,
+         "k": 56,
+         "n": 69,
+         "ci": [
+          0.7038706411837159,
+          0.8864525167564403
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7142857142857143,
+         "k": 85,
+         "n": 119,
+         "ci": [
+          0.6274168162477649,
+          0.7877524636485469
+         ]
+        },
+        "n_total": 407,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 65,
         "n": 407,
@@ -3674,6 +5489,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 5688,
@@ -3686,6 +5502,14 @@
         "value": 0.187081074157879
        }
       },
+      "relative_drop": 0.2218111437103697,
+      "relative_drop_per_list": {
+       "fresh": 0.2431803937121424,
+       "heldout": 0.12061646762110112,
+       "wide": 0.20303612228188983
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2218 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -3783,8 +5607,8 @@
        0.6687945844010458
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 138,
        "n": 372,
@@ -3805,9 +5629,38 @@
       },
       "shipped_only": 0,
       "subject_only": 3,
-      "mcnemar_p": 0.25,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 6,
+       "n": 372,
+       "rate": 0.016129032258064516,
+       "ci": [
+        0.007412504646732909,
+        0.03473680711467057
+       ]
+      },
+      "subject": {
+       "k": 7,
+       "n": 372,
+       "rate": 0.01881720430107527,
+       "ci": [
+        0.00914429753261376,
+        0.03832640694122637
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 1,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 277.78225806451616,
+       "subject": 276.85215053763443
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 3"
+      "why": "shipped_only 0 <= subject_only 1"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -3855,7 +5708,7 @@
       "why": "pooled delta +0.0628, 95% lower bound +0.0524, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 371,
@@ -3866,31 +5719,131 @@
         0.9995253139135868
        ]
       },
-      "shipped": {
-       "k": 97,
+      "both_exposed": {
+       "k": 77,
        "n": 371,
-       "rate": 0.261455525606469,
+       "rate": 0.20754716981132076,
        "ci": [
-        0.2193482727625632,
-        0.3084520923388112
+        0.1693797229407902,
+        0.25170886026258965
+       ]
+      },
+      "shipped": {
+       "k": 61,
+       "n": 77,
+       "rate": 0.7922077922077922,
+       "ci": [
+        0.6887958540760097,
+        0.8678492220576328
        ]
       },
       "subject": {
-       "k": 63,
-       "n": 371,
-       "rate": 0.16981132075471697,
+       "k": 58,
+       "n": 77,
+       "rate": 0.7532467532467533,
        "ci": [
-        0.13503500397330936,
-        0.21135533190147432
+        0.6464664787254468,
+        0.83595925392371
        ]
       },
-      "fixed": 39,
-      "broken": 5,
-      "mcnemar_p": 1.4051624930289108e-07,
-      "verdict": "pass",
-      "why": "fixed 39 > broken 5, p = 1.405e-07",
+      "fixed": 3,
+      "broken": 0,
+      "mcnemar_p": 0.25,
+      "verdict": "unresolved",
+      "why": "fixed 3 > broken 0 but McNemar p = 0.25 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 97,
+        "n": 371,
+        "rate": 0.261455525606469,
+        "ci": [
+         0.2193482727625632,
+         0.3084520923388112
+        ]
+       },
+       "subject": {
+        "k": 63,
+        "n": 371,
+        "rate": 0.16981132075471697,
+        "ci": [
+         0.13503500397330936,
+         0.21135533190147432
+        ]
+       },
+       "fixed": 39,
+       "broken": 5,
+       "mcnemar_p": 1.4051624930289108e-07,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 36,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 5
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.3602150537634409,
+         "k": 134,
+         "n": 372,
+         "ci": [
+          0.31308903262855564,
+          0.4101985463247388
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7238805970149254,
+         "k": 97,
+         "n": 134,
+         "ci": [
+          0.6427464230451554,
+          0.7925362597799643
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6271186440677966,
+         "k": 148,
+         "n": 236,
+         "ci": [
+          0.5638495122153859,
+          0.686315744012713
+         ]
+        },
+        "n_total": 372,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.23180592991913745,
+         "k": 86,
+         "n": 371,
+         "ci": [
+          0.19174702188520004,
+          0.27736186317227735
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7325581395348837,
+         "k": 63,
+         "n": 86,
+         "ci": [
+          0.6305495916710698,
+          0.8146791537774222
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6506849315068494,
+         "k": 95,
+         "n": 146,
+         "ci": [
+          0.5703887370171796,
+          0.7232549604367544
+         ]
+        },
+        "n_total": 372,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 87,
         "n": 371,
@@ -3936,6 +5889,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 5106,
@@ -3948,6 +5902,14 @@
         "value": 0.18500610271336024
        }
       },
+      "relative_drop": 0.22142359281146007,
+      "relative_drop_per_list": {
+       "fresh": 0.1959735877261649,
+       "heldout": 0.09622247266804318,
+       "wide": 0.24993855296654854
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2214 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -4045,8 +6007,8 @@
        0.632045482904176
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 166,
        "n": 410,
@@ -4067,9 +6029,38 @@
       },
       "shipped_only": 0,
       "subject_only": 4,
-      "mcnemar_p": 0.125,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 7,
+       "n": 410,
+       "rate": 0.01707317073170732,
+       "ci": [
+        0.00829431613374815,
+        0.03481750468656345
+       ]
+      },
+      "subject": {
+       "k": 7,
+       "n": 410,
+       "rate": 0.01707317073170732,
+       "ci": [
+        0.00829431613374815,
+        0.03481750468656345
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 277.39756097560974,
+       "subject": 277.1219512195122
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 4"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -4117,7 +6108,7 @@
       "why": "pooled delta +0.0565 meets the bar but its 95% lower bound +0.0461 does not"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 409,
@@ -4128,31 +6119,131 @@
         0.9995693224800525
        ]
       },
-      "shipped": {
-       "k": 100,
+      "both_exposed": {
+       "k": 71,
        "n": 409,
-       "rate": 0.24449877750611246,
+       "rate": 0.17359413202933985,
        "ci": [
-        0.20534970284123644,
-        0.2884026916081467
+        0.13996932209283094,
+        0.2132933062228882
+       ]
+      },
+      "shipped": {
+       "k": 64,
+       "n": 71,
+       "rate": 0.9014084507042254,
+       "ci": [
+        0.8101927775940715,
+        0.9514171762760307
        ]
       },
       "subject": {
-       "k": 70,
-       "n": 409,
-       "rate": 0.17114914425427874,
+       "k": 62,
+       "n": 71,
+       "rate": 0.8732394366197183,
        "ci": [
-        0.1377490575666768,
-        0.2106690960547781
+        0.7763089172134625,
+        0.9318547241043516
        ]
       },
-      "fixed": 39,
-      "broken": 9,
-      "mcnemar_p": 1.5221826110689562e-05,
-      "verdict": "pass",
-      "why": "fixed 39 > broken 9, p = 1.522e-05",
+      "fixed": 3,
+      "broken": 1,
+      "mcnemar_p": 0.625,
+      "verdict": "unresolved",
+      "why": "fixed 3 > broken 1 but McNemar p = 0.625 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 100,
+        "n": 409,
+        "rate": 0.24449877750611246,
+        "ci": [
+         0.20534970284123644,
+         0.2884026916081467
+        ]
+       },
+       "subject": {
+        "k": 70,
+        "n": 409,
+        "rate": 0.17114914425427874,
+        "ci": [
+         0.1377490575666768,
+         0.2106690960547781
+        ]
+       },
+       "fixed": 39,
+       "broken": 9,
+       "mcnemar_p": 1.5221826110689562e-05,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 36,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 8
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.28292682926829266,
+         "k": 116,
+         "n": 410,
+         "ci": [
+          0.24149902414220248,
+          0.3283845720851093
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8706896551724138,
+         "k": 101,
+         "n": 116,
+         "ci": [
+          0.7975686759498692,
+          0.9200460864728124
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7475247524752475,
+         "k": 151,
+         "n": 202,
+         "ci": [
+          0.6833781917310034,
+          0.8024325898915109
+         ]
+        },
+        "n_total": 410,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.1980440097799511,
+         "k": 81,
+         "n": 409,
+         "ci": [
+          0.16230856487426168,
+          0.23939881038410019
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8641975308641975,
+         "k": 70,
+         "n": 81,
+         "ci": [
+          0.7729693623122125,
+          0.9224453655826947
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7633587786259542,
+         "k": 100,
+         "n": 131,
+         "ci": [
+          0.6837273045732117,
+          0.8279847504836308
+         ]
+        },
+        "n_total": 410,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 87,
         "n": 409,
@@ -4198,6 +6289,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 5495,
@@ -4210,6 +6302,14 @@
         "value": 0.18803709691142687
        }
       },
+      "relative_drop": 0.1920735472104116,
+      "relative_drop_per_list": {
+       "fresh": 0.19065863469709898,
+       "heldout": 0.0995322829099311,
+       "wide": 0.19816563217290994
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.1921 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -4307,8 +6407,8 @@
        0.6772658049598741
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 144,
        "n": 393,
@@ -4329,9 +6429,38 @@
       },
       "shipped_only": 0,
       "subject_only": 1,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 12,
+       "n": 393,
+       "rate": 0.030534351145038167,
+       "ci": [
+        0.017551636960274734,
+        0.052605999551372615
+       ]
+      },
+      "subject": {
+       "k": 12,
+       "n": 393,
+       "rate": 0.030534351145038167,
+       "ci": [
+        0.017551636960274734,
+        0.052605999551372615
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
       "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.49872773536896,
+       "subject": 277.78625954198475
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 1"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -4379,7 +6508,7 @@
       "why": "pooled delta +0.0644, 95% lower bound +0.0541, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 393,
@@ -4390,31 +6519,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 86,
+      "both_exposed": {
+       "k": 59,
        "n": 393,
-       "rate": 0.21882951653944022,
+       "rate": 0.15012722646310434,
        "ci": [
-        0.18078177023348155,
-        0.26232077087512023
+        0.11820760717020576,
+        0.18882044172058834
+       ]
+      },
+      "shipped": {
+       "k": 52,
+       "n": 59,
+       "rate": 0.8813559322033898,
+       "ci": [
+        0.7747635960001831,
+        0.9413241722420971
        ]
       },
       "subject": {
-       "k": 56,
-       "n": 393,
-       "rate": 0.14249363867684478,
+       "k": 50,
+       "n": 59,
+       "rate": 0.847457627118644,
        "ci": [
-        0.1113887670264314,
-        0.18051989384016182
+        0.7348201621622644,
+        0.9176153600140352
        ]
       },
-      "fixed": 36,
-      "broken": 6,
-      "mcnemar_p": 2.8288777684792876e-06,
-      "verdict": "pass",
-      "why": "fixed 36 > broken 6, p = 2.829e-06",
+      "fixed": 2,
+      "broken": 0,
+      "mcnemar_p": 0.5,
+      "verdict": "unresolved",
+      "why": "fixed 2 > broken 0 but McNemar p = 0.5 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 86,
+        "n": 393,
+        "rate": 0.21882951653944022,
+        "ci": [
+         0.18078177023348155,
+         0.26232077087512023
+        ]
+       },
+       "subject": {
+        "k": 56,
+        "n": 393,
+        "rate": 0.14249363867684478,
+        "ci": [
+         0.1113887670264314,
+         0.18051989384016182
+        ]
+       },
+       "fixed": 36,
+       "broken": 6,
+       "mcnemar_p": 2.8288777684792876e-06,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 34,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 6
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2697201017811705,
+         "k": 106,
+         "n": 393,
+         "ci": [
+          0.2282266214540431,
+          0.3156718398158979
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8113207547169812,
+         "k": 86,
+         "n": 106,
+         "ci": [
+          0.7264590172606393,
+          0.8744070009860667
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.656084656084656,
+         "k": 124,
+         "n": 189,
+         "ci": [
+          0.5858603181789133,
+          0.7200904890842632
+         ]
+        },
+        "n_total": 393,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.18829516539440203,
+         "k": 74,
+         "n": 393,
+         "ci": [
+          0.1527299944958144,
+          0.22989499451598397
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7567567567567568,
+         "k": 56,
+         "n": 74,
+         "ci": [
+          0.6479367133123634,
+          0.8402350215921953
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.626984126984127,
+         "k": 79,
+         "n": 126,
+         "ci": [
+          0.539959647403448,
+          0.7064947616169459
+         ]
+        },
+        "n_total": 393,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 75,
         "n": 393,
@@ -4460,6 +6689,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 5429,
@@ -4472,6 +6702,14 @@
         "value": 0.18555742495351102
        }
       },
+      "relative_drop": 0.2208570530041929,
+      "relative_drop_per_list": {
+       "fresh": 0.21382306753574798,
+       "heldout": 0.11023756995254808,
+       "wide": 0.2383361348310824
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2209 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -4584,8 +6822,8 @@
      0.7445316134263353
     ]
    },
-   "P1_topic": {
-    "rule": "shipped_only <= subject_only",
+   "topic_mention": {
+    "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
     "shipped": {
      "k": 633,
      "n": 2400,
@@ -4606,9 +6844,38 @@
     },
     "shipped_only": 0,
     "subject_only": 22,
-    "mcnemar_p": 4.76837158203125e-07,
+    "identity_violations": 0
+   },
+   "P1_anchored_topic": {
+    "rule": "anchored_topic: shipped_only <= subject_only",
+    "shipped": {
+     "k": 34,
+     "n": 2400,
+     "rate": 0.014166666666666666,
+     "ci": [
+      0.010155454378335213,
+      0.019730650862539938
+     ]
+    },
+    "subject": {
+     "k": 35,
+     "n": 2400,
+     "rate": 0.014583333333333334,
+     "ci": [
+      0.010504491217140813,
+      0.020213615648742165
+     ]
+    },
+    "shipped_only": 2,
+    "subject_only": 3,
+    "mcnemar_p": 1.0,
+    "mean_reply_chars": {
+     "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+     "shipped": 278.33875,
+     "subject": 277.34125
+    },
     "verdict": "pass",
-    "why": "shipped_only 0 <= subject_only 22"
+    "why": "shipped_only 2 <= subject_only 3"
    },
    "P2_logp_per_char": {
     "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -4656,7 +6923,7 @@
     "why": "pooled delta +0.1061, 95% lower bound +0.0969, >= +0.05; positive on every list"
    },
    "P3_uer": {
-    "rule": "fixed > broken, exact McNemar p < 0.05",
+    "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
     "window": 200,
     "both_qualify": {
      "k": 2393,
@@ -4667,31 +6934,131 @@
       0.9985864459344517
      ]
     },
-    "shipped": {
-     "k": 525,
+    "both_exposed": {
+     "k": 260,
      "n": 2393,
-     "rate": 0.21938988717091518,
+     "rate": 0.10865022983702466,
      "ci": [
-      0.203266142906986,
-      0.23641310869408164
+      0.09680311434435335,
+      0.12175179127649535
+     ]
+    },
+    "shipped": {
+     "k": 213,
+     "n": 260,
+     "rate": 0.8192307692307692,
+     "ci": [
+      0.7679161926128967,
+      0.8612495220627984
      ]
     },
     "subject": {
-     "k": 242,
-     "n": 2393,
-     "rate": 0.10112829084830756,
+     "k": 205,
+     "n": 260,
+     "rate": 0.7884615384615384,
      "ci": [
-      0.08968047535187591,
-      0.11385466337220317
+      0.7348040116239687,
+      0.8337192245287677
      ]
     },
-    "fixed": 324,
-    "broken": 41,
-    "mcnemar_p": 9.97865818561327e-56,
-    "verdict": "pass",
-    "why": "fixed 324 > broken 41, p = 9.979e-56",
+    "fixed": 12,
+    "broken": 4,
+    "mcnemar_p": 0.076812744140625,
+    "verdict": "unresolved",
+    "why": "fixed 12 > broken 4 but McNemar p = 0.07681 >= 0.05",
+    "all_qualifying_draws": {
+     "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+     "shipped": {
+      "k": 525,
+      "n": 2393,
+      "rate": 0.21938988717091518,
+      "ci": [
+       0.203266142906986,
+       0.23641310869408164
+      ]
+     },
+     "subject": {
+      "k": 242,
+      "n": 2393,
+      "rate": 0.10112829084830756,
+      "ci": [
+       0.08968047535187591,
+       0.11385466337220317
+      ]
+     },
+     "fixed": 324,
+     "broken": 41,
+     "mcnemar_p": 9.97865818561327e-56,
+     "fixed_where_the_subject_pick_has_no_definite_subject": 312,
+     "broken_where_the_shipped_pick_has_no_definite_subject": 37
+    },
+    "decomposition": {
+     "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+     "shipped": {
+      "exposure": {
+       "rate": 0.2867861609003752,
+       "k": 688,
+       "n": 2399,
+       "ci": [
+        0.26904064902753466,
+        0.3052134091232329
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7645348837209303,
+       "k": 526,
+       "n": 688,
+       "ci": [
+        0.7314159620295724,
+        0.7947161385538051
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6430976430976431,
+       "k": 764,
+       "n": 1188,
+       "ci": [
+        0.6154335684808834,
+        0.6698392733754688
+       ]
+      },
+      "n_total": 2400,
+      "window": 200
+     },
+     "subject": {
+      "exposure": {
+       "rate": 0.13700918964076858,
+       "k": 328,
+       "n": 2394,
+       "ci": [
+        0.12381535343629294,
+        0.151366083765655
+       ]
+      },
+      "uer_given_exposed": {
+       "rate": 0.7378048780487805,
+       "k": 242,
+       "n": 328,
+       "ci": [
+        0.68764970177329,
+        0.7824543067927173
+       ]
+      },
+      "unintroduced_per_subject": {
+       "rate": 0.6566604127579737,
+       "k": 350,
+       "n": 533,
+       "ci": [
+        0.6153578697906744,
+        0.6957209361697613
+       ]
+      },
+      "n_total": 2400,
+      "window": 200
+     }
+    },
     "prompt_as_context": {
-     "note": "not the bar; the prompt's words count as introduced",
+     "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
      "shipped": {
       "k": 477,
       "n": 2393,
@@ -4737,6 +7104,7 @@
     }
    },
    "GUARD2_sameness": {
+    "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
     "distinct_2": {
      "shipped": {
       "distinct": 18108,
@@ -4749,6 +7117,14 @@
       "value": 0.07793346913034338
      }
     },
+    "relative_drop": 0.4009563930426683,
+    "relative_drop_per_list": {
+     "fresh": 0.4017800049284995,
+     "heldout": 0.275217142742223,
+     "wide": 0.4181477358188894
+    },
+    "verdict": "fail",
+    "why": "distinct-2 fell by 0.4010 of its shipped value, more than 0.10",
     "top_opening": {
      "chars": 60,
      "shipped": {
@@ -4846,8 +7222,8 @@
        0.8314094731769998
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 92,
        "n": 480,
@@ -4868,9 +7244,38 @@
       },
       "shipped_only": 0,
       "subject_only": 5,
-      "mcnemar_p": 0.0625,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 0,
+       "n": 480,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.007939499087277936
+       ]
+      },
+      "subject": {
+       "k": 0,
+       "n": 480,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.007939499087277936
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 279.70625,
+       "subject": 278.2375
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 5"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -4900,7 +7305,7 @@
       "why": "no draws from heldout, wide"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 480,
@@ -4911,31 +7316,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 101,
+      "both_exposed": {
+       "k": 40,
        "n": 480,
-       "rate": 0.21041666666666667,
+       "rate": 0.08333333333333333,
        "ci": [
-        0.17632396930633806,
-        0.24910765724837705
+        0.06179325475620216,
+        0.11148966114986279
+       ]
+      },
+      "shipped": {
+       "k": 38,
+       "n": 40,
+       "rate": 0.95,
+       "ci": [
+        0.8349612263085903,
+        0.9861793326138516
        ]
       },
       "subject": {
-       "k": 46,
-       "n": 480,
-       "rate": 0.09583333333333334,
+       "k": 35,
+       "n": 40,
+       "rate": 0.875,
        "ci": [
-        0.07261781263406997,
-        0.12546661579481305
+        0.738878801611489,
+        0.945404997490546
        ]
       },
-      "fixed": 66,
-      "broken": 11,
-      "mcnemar_p": 1.0539880077661144e-10,
-      "verdict": "pass",
-      "why": "fixed 66 > broken 11, p = 1.054e-10",
+      "fixed": 3,
+      "broken": 0,
+      "mcnemar_p": 0.25,
+      "verdict": "unresolved",
+      "why": "fixed 3 > broken 0 but McNemar p = 0.25 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 101,
+        "n": 480,
+        "rate": 0.21041666666666667,
+        "ci": [
+         0.17632396930633806,
+         0.24910765724837705
+        ]
+       },
+       "subject": {
+        "k": 46,
+        "n": 480,
+        "rate": 0.09583333333333334,
+        "ci": [
+         0.07261781263406997,
+         0.12546661579481305
+        ]
+       },
+       "fixed": 66,
+       "broken": 11,
+       "mcnemar_p": 1.0539880077661144e-10,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 63,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 11
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.26458333333333334,
+         "k": 127,
+         "n": 480,
+         "ci": [
+          0.22710330384569075,
+          0.3058015436412359
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7952755905511811,
+         "k": 101,
+         "n": 127,
+         "ci": [
+          0.716926658497512,
+          0.8562861493998719
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6788990825688074,
+         "k": 148,
+         "n": 218,
+         "ci": [
+          0.6142833289743078,
+          0.7373191190741627
+         ]
+        },
+        "n_total": 480,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.11458333333333333,
+         "k": 55,
+         "n": 480,
+         "ci": [
+          0.08909763826791334,
+          0.14618905894519674
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8363636363636363,
+         "k": 46,
+         "n": 55,
+         "ci": [
+          0.7173625426094283,
+          0.9114457966390772
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.7659574468085106,
+         "k": 72,
+         "n": 94,
+         "ci": [
+          0.6709730100166705,
+          0.8400578004665503
+         ]
+        },
+        "n_total": 480,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 93,
         "n": 480,
@@ -4981,6 +7486,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 6338,
@@ -4993,6 +7499,12 @@
         "value": 0.1354452301919469
        }
       },
+      "relative_drop": 0.4017800049284995,
+      "relative_drop_per_list": {
+       "fresh": 0.4017800049284995
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.4018 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -5090,8 +7602,8 @@
        0.5383481021740859
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 236,
        "n": 480,
@@ -5112,9 +7624,38 @@
       },
       "shipped_only": 0,
       "subject_only": 7,
-      "mcnemar_p": 0.015625,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 4,
+       "n": 480,
+       "rate": 0.008333333333333333,
+       "ci": [
+        0.003245305949041889,
+        0.021228534820114747
+       ]
+      },
+      "subject": {
+       "k": 4,
+       "n": 480,
+       "rate": 0.008333333333333333,
+       "ci": [
+        0.003245305949041889,
+        0.021228534820114747
+       ]
+      },
+      "shipped_only": 1,
+      "subject_only": 1,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.35,
+       "subject": 277.6125
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 7"
+      "why": "shipped_only 1 <= subject_only 1"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -5144,7 +7685,7 @@
       "why": "no draws from fresh, wide"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 478,
@@ -5155,31 +7696,131 @@
         0.9988566050467862
        ]
       },
-      "shipped": {
-       "k": 116,
+      "both_exposed": {
+       "k": 82,
        "n": 478,
-       "rate": 0.24267782426778242,
+       "rate": 0.17154811715481172,
        "ci": [
-        0.20639618908390595,
-        0.2830624378219555
+        0.14040432472516362,
+        0.20792904457744005
+       ]
+      },
+      "shipped": {
+       "k": 67,
+       "n": 82,
+       "rate": 0.8170731707317073,
+       "ci": [
+        0.7198781157085605,
+        0.8858897814635709
        ]
       },
       "subject": {
-       "k": 72,
-       "n": 478,
-       "rate": 0.1506276150627615,
+       "k": 68,
+       "n": 82,
+       "rate": 0.8292682926829268,
        "ci": [
-        0.12135450060542255,
-        0.18547143999034058
+        0.733582609118571,
+        0.8954840533294116
        ]
       },
-      "fixed": 50,
-      "broken": 6,
-      "mcnemar_p": 1.0182093779231849e-09,
-      "verdict": "pass",
-      "why": "fixed 50 > broken 6, p = 1.018e-09",
+      "fixed": 1,
+      "broken": 2,
+      "mcnemar_p": 1.0,
+      "verdict": "fail",
+      "why": "fixed 1 <= broken 2",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 116,
+        "n": 478,
+        "rate": 0.24267782426778242,
+        "ci": [
+         0.20639618908390595,
+         0.2830624378219555
+        ]
+       },
+       "subject": {
+        "k": 72,
+        "n": 478,
+        "rate": 0.1506276150627615,
+        "ci": [
+         0.12135450060542255,
+         0.18547143999034058
+        ]
+       },
+       "fixed": 50,
+       "broken": 6,
+       "mcnemar_p": 1.0182093779231849e-09,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 49,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 4
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.30416666666666664,
+         "k": 146,
+         "n": 480,
+         "ci": [
+          0.2646994554359899,
+          0.3467435150398606
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8013698630136986,
+         "k": 117,
+         "n": 146,
+         "ci": [
+          0.7292972468986941,
+          0.8579901480091737
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6766917293233082,
+         "k": 180,
+         "n": 266,
+         "ci": [
+          0.6183115449088131,
+          0.7300411523038922
+         ]
+        },
+        "n_total": 480,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.19246861924686193,
+         "k": 92,
+         "n": 478,
+         "ci": [
+          0.1596340633155132,
+          0.23020673469393102
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.782608695652174,
+         "k": 72,
+         "n": 92,
+         "ci": [
+          0.6879299890322917,
+          0.854632703980183
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.675,
+         "k": 108,
+         "n": 160,
+         "ci": [
+          0.5990613789197846,
+          0.7427324527701887
+         ]
+        },
+        "n_total": 480,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 100,
         "n": 478,
@@ -5225,6 +7866,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 6157,
@@ -5237,6 +7879,12 @@
         "value": 0.16046343229543808
        }
       },
+      "relative_drop": 0.275217142742223,
+      "relative_drop_per_list": {
+       "heldout": 0.275217142742223
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.2752 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -5334,8 +7982,8 @@
        0.801838282437511
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 305,
        "n": 1440,
@@ -5356,9 +8004,38 @@
       },
       "shipped_only": 0,
       "subject_only": 10,
-      "mcnemar_p": 0.001953125,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 30,
+       "n": 1440,
+       "rate": 0.020833333333333332,
+       "ci": [
+        0.014631612025674832,
+        0.029584779206669173
+       ]
+      },
+      "subject": {
+       "k": 31,
+       "n": 1440,
+       "rate": 0.021527777777777778,
+       "ci": [
+        0.01520711390218988,
+        0.030394470966049275
+       ]
+      },
+      "shipped_only": 1,
+      "subject_only": 2,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 277.87916666666666,
+       "subject": 276.95208333333335
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 10"
+      "why": "shipped_only 1 <= subject_only 2"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -5388,7 +8065,7 @@
       "why": "no draws from heldout, fresh"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 1435,
@@ -5399,31 +8076,131 @@
         0.998515990086258
        ]
       },
-      "shipped": {
-       "k": 308,
+      "both_exposed": {
+       "k": 138,
        "n": 1435,
-       "rate": 0.2146341463414634,
+       "rate": 0.09616724738675958,
        "ci": [
-        0.19416812920129495,
-        0.23662391881817874
+        0.08197382059546779,
+        0.11251700193758479
+       ]
+      },
+      "shipped": {
+       "k": 108,
+       "n": 138,
+       "rate": 0.782608695652174,
+       "ci": [
+        0.7066450273829521,
+        0.8432647144408545
        ]
       },
       "subject": {
-       "k": 124,
-       "n": 1435,
-       "rate": 0.08641114982578398,
+       "k": 102,
+       "n": 138,
+       "rate": 0.7391304347826086,
        "ci": [
-        0.07295559212178485,
-        0.10207512948885658
+        0.66010103650439,
+        0.8052072065772924
        ]
       },
-      "fixed": 208,
-      "broken": 24,
-      "mcnemar_p": 9.092274804087166e-38,
-      "verdict": "pass",
-      "why": "fixed 208 > broken 24, p = 9.092e-38",
+      "fixed": 8,
+      "broken": 2,
+      "mcnemar_p": 0.109375,
+      "verdict": "unresolved",
+      "why": "fixed 8 > broken 2 but McNemar p = 0.1094 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 308,
+        "n": 1435,
+        "rate": 0.2146341463414634,
+        "ci": [
+         0.19416812920129495,
+         0.23662391881817874
+        ]
+       },
+       "subject": {
+        "k": 124,
+        "n": 1435,
+        "rate": 0.08641114982578398,
+        "ci": [
+         0.07295559212178485,
+         0.10207512948885658
+        ]
+       },
+       "fixed": 208,
+       "broken": 24,
+       "mcnemar_p": 9.092274804087166e-38,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 200,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 22
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2883947185545518,
+         "k": 415,
+         "n": 1439,
+         "ci": [
+          0.2655762922472739,
+          0.31233991172861836
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7421686746987952,
+         "k": 308,
+         "n": 415,
+         "ci": [
+          0.6979956646629185,
+          0.7818995218497616
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6193181818181818,
+         "k": 436,
+         "n": 704,
+         "ci": [
+          0.5828948520090942,
+          0.6544464309950093
+         ]
+        },
+        "n_total": 1440,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.12604456824512536,
+         "k": 181,
+         "n": 1436,
+         "ci": [
+          0.1098698441094115,
+          0.14421469872653206
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6850828729281768,
+         "k": 124,
+         "n": 181,
+         "ci": [
+          0.6141656011179868,
+          0.7483071927425806
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6093189964157706,
+         "k": 170,
+         "n": 279,
+         "ci": [
+          0.5509544607856519,
+          0.6647140633915997
+         ]
+        },
+        "n_total": 1440,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 284,
         "n": 1435,
@@ -5469,6 +8246,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 13227,
@@ -5481,6 +8259,12 @@
         "value": 0.09229558796828663
        }
       },
+      "relative_drop": 0.4181477358188894,
+      "relative_drop_per_list": {
+       "wide": 0.4181477358188894
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.4181 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -5580,8 +8364,8 @@
        0.754440036996526
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 159,
        "n": 600,
@@ -5602,9 +8386,38 @@
       },
       "shipped_only": 0,
       "subject_only": 9,
-      "mcnemar_p": 0.00390625,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 8,
+       "n": 600,
+       "rate": 0.013333333333333334,
+       "ci": [
+        0.006771354149386743,
+        0.026087368170615282
+       ]
+      },
+      "subject": {
+       "k": 8,
+       "n": 600,
+       "rate": 0.013333333333333334,
+       "ci": [
+        0.006771354149386743,
+        0.026087368170615282
+       ]
+      },
+      "shipped_only": 1,
+      "subject_only": 1,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 279.3,
+       "subject": 277.655
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 9"
+      "why": "shipped_only 1 <= subject_only 1"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -5652,7 +8465,7 @@
       "why": "pooled delta +0.1063, 95% lower bound +0.0957, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 600,
@@ -5663,31 +8476,131 @@
         1.0
        ]
       },
-      "shipped": {
-       "k": 114,
+      "both_exposed": {
+       "k": 57,
        "n": 600,
-       "rate": 0.19,
+       "rate": 0.095,
        "ci": [
-        0.1606200129971531,
-        0.22332424163134137
+        0.07404809033012902,
+        0.12110488749096857
+       ]
+      },
+      "shipped": {
+       "k": 47,
+       "n": 57,
+       "rate": 0.8245614035087719,
+       "ci": [
+        0.7063264717030607,
+        0.9018114776029004
        ]
       },
       "subject": {
-       "k": 60,
-       "n": 600,
-       "rate": 0.1,
+       "k": 47,
+       "n": 57,
+       "rate": 0.8245614035087719,
        "ci": [
-        0.07848166958806388,
-        0.1266076912228967
+        0.7063264717030607,
+        0.9018114776029004
        ]
       },
-      "fixed": 68,
-      "broken": 14,
-      "mcnemar_p": 1.1349339471612943e-09,
-      "verdict": "pass",
-      "why": "fixed 68 > broken 14, p = 1.135e-09",
+      "fixed": 1,
+      "broken": 1,
+      "mcnemar_p": 1.0,
+      "verdict": "fail",
+      "why": "fixed 1 <= broken 1",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 114,
+        "n": 600,
+        "rate": 0.19,
+        "ci": [
+         0.1606200129971531,
+         0.22332424163134137
+        ]
+       },
+       "subject": {
+        "k": 60,
+        "n": 600,
+        "rate": 0.1,
+        "ci": [
+         0.07848166958806388,
+         0.1266076912228967
+        ]
+       },
+       "fixed": 68,
+       "broken": 14,
+       "mcnemar_p": 1.1349339471612943e-09,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 67,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 13
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.25333333333333335,
+         "k": 152,
+         "n": 600,
+         "ci": [
+          0.22017772693261672,
+          0.28962737890080903
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.75,
+         "k": 114,
+         "n": 152,
+         "ci": [
+          0.6755747457209713,
+          0.8121003606025841
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6091954022988506,
+         "k": 159,
+         "n": 261,
+         "ci": [
+          0.5488259532642765,
+          0.6663971475818444
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.12666666666666668,
+         "k": 76,
+         "n": 600,
+         "ci": [
+          0.10240739498691152,
+          0.15567600843665172
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7894736842105263,
+         "k": 60,
+         "n": 76,
+         "ci": [
+          0.6850436020610325,
+          0.8660485329012565
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.725,
+         "k": 87,
+         "n": 120,
+         "ci": [
+          0.6390703417242319,
+          0.7969710333873515
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 103,
         "n": 600,
@@ -5733,6 +8646,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 7520,
@@ -5745,6 +8659,14 @@
         "value": 0.1362126245847176
        }
       },
+      "relative_drop": 0.36733583091821587,
+      "relative_drop_per_list": {
+       "fresh": 0.3414158467718461,
+       "heldout": 0.2440102757998508,
+       "wide": 0.3734429541682458
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3673 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -5842,8 +8764,8 @@
        0.7798222730673834
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 147,
        "n": 600,
@@ -5864,9 +8786,38 @@
       },
       "shipped_only": 0,
       "subject_only": 5,
-      "mcnemar_p": 0.0625,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 7,
+       "n": 600,
+       "rate": 0.011666666666666667,
+       "ci": [
+        0.005662583797877487,
+        0.023884010858836874
+       ]
+      },
+      "subject": {
+       "k": 9,
+       "n": 600,
+       "rate": 0.015,
+       "ci": [
+        0.007911242967693506,
+        0.028259607015596183
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 2,
+      "mcnemar_p": 0.5,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.015,
+       "subject": 276.465
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 5"
+      "why": "shipped_only 0 <= subject_only 2"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -5914,7 +8865,7 @@
       "why": "pooled delta +0.1143, 95% lower bound +0.1037, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 596,
@@ -5925,31 +8876,131 @@
         0.9974044987484852
        ]
       },
-      "shipped": {
-       "k": 143,
+      "both_exposed": {
+       "k": 80,
        "n": 596,
-       "rate": 0.23993288590604026,
+       "rate": 0.1342281879194631,
        "ci": [
-        0.20738344218436702,
-        0.27581333349454473
+        0.10918968353509685,
+        0.16395158806492105
+       ]
+      },
+      "shipped": {
+       "k": 58,
+       "n": 80,
+       "rate": 0.725,
+       "ci": [
+        0.6185594135898548,
+        0.810822428119158
        ]
       },
       "subject": {
-       "k": 65,
-       "n": 596,
-       "rate": 0.10906040268456375,
+       "k": 57,
+       "n": 80,
+       "rate": 0.7125,
        "ci": [
-        0.08649347389583746,
-        0.13663458244730087
+        0.6053965378701002,
+        0.8001307570773007
        ]
       },
-      "fixed": 88,
-      "broken": 10,
-      "mcnemar_p": 9.940659465123946e-17,
-      "verdict": "pass",
-      "why": "fixed 88 > broken 10, p = 9.941e-17",
+      "fixed": 3,
+      "broken": 2,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "why": "fixed 3 > broken 2 but McNemar p = 1 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 143,
+        "n": 596,
+        "rate": 0.23993288590604026,
+        "ci": [
+         0.20738344218436702,
+         0.27581333349454473
+        ]
+       },
+       "subject": {
+        "k": 65,
+        "n": 596,
+        "rate": 0.10906040268456375,
+        "ci": [
+         0.08649347389583746,
+         0.13663458244730087
+        ]
+       },
+       "fixed": 88,
+       "broken": 10,
+       "mcnemar_p": 9.940659465123946e-17,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 85,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 8
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.33666666666666667,
+         "k": 202,
+         "n": 600,
+         "ci": [
+          0.2999991284980691,
+          0.3754123604997399
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7079207920792079,
+         "k": 143,
+         "n": 202,
+         "ci": [
+          0.6418004752170058,
+          0.7662805813459063
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6071428571428571,
+         "k": 221,
+         "n": 364,
+         "ci": [
+          0.5561022065559903,
+          0.6559456693144167
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.1593959731543624,
+         "k": 95,
+         "n": 596,
+         "ci": [
+          0.13220311549504563,
+          0.19095137136185172
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6842105263157895,
+         "k": 65,
+         "n": 95,
+         "ci": [
+          0.5851346840006258,
+          0.7689677383795684
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.5987261146496815,
+         "k": 94,
+         "n": 157,
+         "ci": [
+          0.5205813242382572,
+          0.6721550524851022
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 130,
         "n": 596,
@@ -5995,6 +9046,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 7269,
@@ -6007,6 +9059,14 @@
         "value": 0.12773637633907778
        }
       },
+      "relative_drop": 0.3888897752692573,
+      "relative_drop_per_list": {
+       "fresh": 0.38254079812170316,
+       "heldout": 0.22274431227797542,
+       "wide": 0.40905560236651584
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3889 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -6104,8 +9164,8 @@
        0.73689871165183
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 173,
        "n": 600,
@@ -6126,9 +9186,38 @@
       },
       "shipped_only": 0,
       "subject_only": 6,
-      "mcnemar_p": 0.03125,
-      "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 6"
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 8,
+       "n": 600,
+       "rate": 0.013333333333333334,
+       "ci": [
+        0.006771354149386743,
+        0.026087368170615282
+       ]
+      },
+      "subject": {
+       "k": 7,
+       "n": 600,
+       "rate": 0.011666666666666667,
+       "ci": [
+        0.005662583797877487,
+        0.023884010858836874
+       ]
+      },
+      "shipped_only": 1,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.0233333333333,
+       "subject": 277.2866666666667
+      },
+      "verdict": "fail",
+      "why": "shipped_only 1 > subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -6176,7 +9265,7 @@
       "why": "pooled delta +0.0984, 95% lower bound +0.0869, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 598,
@@ -6187,31 +9276,131 @@
         0.9990854033131954
        ]
       },
-      "shipped": {
-       "k": 140,
+      "both_exposed": {
+       "k": 66,
        "n": 598,
-       "rate": 0.23411371237458195,
+       "rate": 0.11036789297658862,
        "ci": [
-        0.2019382328913549,
-        0.2696834120795321
+        0.08769743037409362,
+        0.13801227577821248
+       ]
+      },
+      "shipped": {
+       "k": 58,
+       "n": 66,
+       "rate": 0.8787878787878788,
+       "ci": [
+        0.7786256097735968,
+        0.9372815440040234
        ]
       },
       "subject": {
-       "k": 64,
-       "n": 598,
-       "rate": 0.10702341137123746,
+       "k": 56,
+       "n": 66,
+       "rate": 0.8484848484848485,
        "ci": [
-        0.08470640966167588,
-        0.13435702787391185
+        0.7430709513021234,
+        0.9155636301732872
        ]
       },
-      "fixed": 85,
-      "broken": 9,
-      "mcnemar_p": 1.1976554450525877e-16,
-      "verdict": "pass",
-      "why": "fixed 85 > broken 9, p = 1.198e-16",
+      "fixed": 3,
+      "broken": 1,
+      "mcnemar_p": 0.625,
+      "verdict": "unresolved",
+      "why": "fixed 3 > broken 1 but McNemar p = 0.625 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 140,
+        "n": 598,
+        "rate": 0.23411371237458195,
+        "ci": [
+         0.2019382328913549,
+         0.2696834120795321
+        ]
+       },
+       "subject": {
+        "k": 64,
+        "n": 598,
+        "rate": 0.10702341137123746,
+        "ci": [
+         0.08470640966167588,
+         0.13435702787391185
+        ]
+       },
+       "fixed": 85,
+       "broken": 9,
+       "mcnemar_p": 1.1976554450525877e-16,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 82,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 8
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.295,
+         "k": 177,
+         "n": 600,
+         "ci": [
+          0.25990668214519635,
+          0.332701615270421
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7966101694915254,
+         "k": 141,
+         "n": 177,
+         "ci": [
+          0.7313061466340207,
+          0.8493129253682041
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6840390879478827,
+         "k": 210,
+         "n": 307,
+         "ci": [
+          0.6300330863220164,
+          0.7334962846592944
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.1354515050167224,
+         "k": 81,
+         "n": 598,
+         "ci": [
+          0.110339827590596,
+          0.1652168931870981
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.7901234567901234,
+         "k": 64,
+         "n": 81,
+         "ci": [
+          0.6893461803165967,
+          0.8646282639386685
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.732824427480916,
+         "k": 96,
+         "n": 131,
+         "ci": [
+          0.651212375133185,
+          0.8011707460040237
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 127,
         "n": 598,
@@ -6257,6 +9446,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 7303,
@@ -6269,6 +9459,14 @@
         "value": 0.13654700060945527
        }
       },
+      "relative_drop": 0.3504715522152724,
+      "relative_drop_per_list": {
+       "fresh": 0.3324819669370457,
+       "heldout": 0.24394283425087304,
+       "wide": 0.3547667987249731
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3505 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {
@@ -6366,8 +9564,8 @@
        0.7734920783530586
       ]
      },
-     "P1_topic": {
-      "rule": "shipped_only <= subject_only",
+     "topic_mention": {
+      "note": "NOT A BAR. The subject tier selects on this matcher, so shipped_only is 0 by construction wherever the expected word is the subject; subject_only is a definitional gain",
       "shipped": {
        "k": 154,
        "n": 600,
@@ -6388,9 +9586,38 @@
       },
       "shipped_only": 0,
       "subject_only": 2,
-      "mcnemar_p": 0.5,
+      "identity_violations": 0
+     },
+     "P1_anchored_topic": {
+      "rule": "anchored_topic: shipped_only <= subject_only",
+      "shipped": {
+       "k": 11,
+       "n": 600,
+       "rate": 0.018333333333333333,
+       "ci": [
+        0.010267306165938218,
+        0.032527799143926804
+       ]
+      },
+      "subject": {
+       "k": 11,
+       "n": 600,
+       "rate": 0.018333333333333333,
+       "ci": [
+        0.010267306165938218,
+        0.032527799143926804
+       ]
+      },
+      "shipped_only": 0,
+      "subject_only": 0,
+      "mcnemar_p": 1.0,
+      "mean_reply_chars": {
+       "note": "anchored_topic is not windowed; a longer reply has more chances at a second mention",
+       "shipped": 278.01666666666665,
+       "subject": 277.9583333333333
+      },
       "verdict": "pass",
-      "why": "shipped_only 0 <= subject_only 2"
+      "why": "shipped_only 0 <= subject_only 0"
      },
      "P2_logp_per_char": {
       "rule": "pooled delta >= +0.05 and delta > 0 on each of heldout, fresh, wide",
@@ -6438,7 +9665,7 @@
       "why": "pooled delta +0.1056, 95% lower bound +0.0949, >= +0.05; positive on every list"
      },
      "P3_uer": {
-      "rule": "fixed > broken, exact McNemar p < 0.05",
+      "rule": "over draws where BOTH picks have a definite subject in the window: fixed > broken, exact McNemar p < 0.05",
       "window": 200,
       "both_qualify": {
        "k": 599,
@@ -6449,31 +9676,131 @@
         0.9997057317991506
        ]
       },
-      "shipped": {
-       "k": 128,
+      "both_exposed": {
+       "k": 57,
        "n": 599,
-       "rate": 0.21368948247078465,
+       "rate": 0.09515859766277128,
        "ci": [
-        0.1827414563079201,
-        0.2482863952419846
+        0.07417294950531814,
+        0.12130375020810394
+       ]
+      },
+      "shipped": {
+       "k": 50,
+       "n": 57,
+       "rate": 0.8771929824561403,
+       "ci": [
+        0.7675355156482598,
+        0.9392193984100191
        ]
       },
       "subject": {
-       "k": 53,
-       "n": 599,
-       "rate": 0.08848080133555926,
+       "k": 45,
+       "n": 57,
+       "rate": 0.7894736842105263,
        "ci": [
-        0.06828181832429203,
-        0.11392439396172258
+        0.6671387891680949,
+        0.8752545169696542
        ]
       },
-      "fixed": 83,
-      "broken": 8,
-      "mcnemar_p": 7.57684143871343e-17,
-      "verdict": "pass",
-      "why": "fixed 83 > broken 8, p = 7.577e-17",
+      "fixed": 5,
+      "broken": 0,
+      "mcnemar_p": 0.0625,
+      "verdict": "unresolved",
+      "why": "fixed 5 > broken 0 but McNemar p = 0.0625 >= 0.05",
+      "all_qualifying_draws": {
+       "note": "NOT the bar: a pick with no definite subject in the window scores clean, so this count moves with exposure",
+       "shipped": {
+        "k": 128,
+        "n": 599,
+        "rate": 0.21368948247078465,
+        "ci": [
+         0.1827414563079201,
+         0.2482863952419846
+        ]
+       },
+       "subject": {
+        "k": 53,
+        "n": 599,
+        "rate": 0.08848080133555926,
+        "ci": [
+         0.06828181832429203,
+         0.11392439396172258
+        ]
+       },
+       "fixed": 83,
+       "broken": 8,
+       "mcnemar_p": 7.57684143871343e-17,
+       "fixed_where_the_subject_pick_has_no_definite_subject": 78,
+       "broken_where_the_shipped_pick_has_no_definite_subject": 8
+      },
+      "decomposition": {
+       "note": "uer = exposure * uer_given_exposed, exactly; each arm over its OWN qualifying picks, as snnchat.coherence.uer reads them",
+       "shipped": {
+        "exposure": {
+         "rate": 0.2621035058430718,
+         "k": 157,
+         "n": 599,
+         "ci": [
+          0.2284807820915427,
+          0.29875810330706626
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.8152866242038217,
+         "k": 128,
+         "n": 157,
+         "ci": [
+          0.7473129043199105,
+          0.8682000406998502
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.6796875,
+         "k": 174,
+         "n": 256,
+         "ci": [
+          0.6202359049379224,
+          0.73382614665903
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       },
+       "subject": {
+        "exposure": {
+         "rate": 0.12666666666666668,
+         "k": 76,
+         "n": 600,
+         "ci": [
+          0.10240739498691152,
+          0.15567600843665172
+         ]
+        },
+        "uer_given_exposed": {
+         "rate": 0.6973684210526315,
+         "k": 53,
+         "n": 76,
+         "ci": [
+          0.5866579842518127,
+          0.7890866532224752
+         ]
+        },
+        "unintroduced_per_subject": {
+         "rate": 0.584,
+         "k": 73,
+         "n": 125,
+         "ci": [
+          0.49635008136364206,
+          0.666640932493359
+         ]
+        },
+        "n_total": 600,
+        "window": 200
+       }
+      },
       "prompt_as_context": {
-       "note": "not the bar; the prompt's words count as introduced",
+       "note": "not the bar; all qualifying draws, with the prompt's words counted as introduced",
        "shipped": {
         "k": 117,
         "n": 599,
@@ -6519,6 +9846,7 @@
       }
      },
      "GUARD2_sameness": {
+      "rule": "1 - subject/shipped distinct-2 <= 0.10, pooled and on each of heldout, fresh, wide",
       "distinct_2": {
        "shipped": {
         "distinct": 7427,
@@ -6531,6 +9859,14 @@
         "value": 0.1324760332493411
        }
       },
+      "relative_drop": 0.38023263076860025,
+      "relative_drop_per_list": {
+       "fresh": 0.33446817086780944,
+       "heldout": 0.24965772344053994,
+       "wide": 0.3956746113227566
+      },
+      "verdict": "fail",
+      "why": "distinct-2 fell by 0.3802 of its shipped value, more than 0.10",
       "top_opening": {
        "chars": 60,
        "shipped": {

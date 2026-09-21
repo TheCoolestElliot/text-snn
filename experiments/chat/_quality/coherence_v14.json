@@ -19,6 +19,37 @@
    "n_total": 1824,
    "window": 200
   },
+  "decomposition_with_stoplist": {
+   "exposure": {
+    "rate": 0.290022,
+    "k": 529,
+    "n": 1824,
+    "ci": [
+     0.269656,
+     0.31127
+    ]
+   },
+   "uer_given_exposed": {
+    "rate": 0.079395,
+    "k": 42,
+    "n": 529,
+    "ci": [
+     0.059273,
+     0.105582
+    ]
+   },
+   "unintroduced_per_subject": {
+    "rate": 0.050119,
+    "k": 42,
+    "n": 838,
+    "ci": [
+     0.037291,
+     0.067054
+    ]
+   },
+   "n_total": 1824,
+   "window": 200
+  },
   "without_stoplist": {
    "rate": 0.083882,
    "k": 153,
