@@ -455,6 +455,51 @@ def test_draw_samples_a_pool_on_cpu_and_stores_every_field(tiny_model):
         pools.draw(tiny_model, tok, PROMPT, 6, RerankParams(n=1), max_new=8, device="cpu")
 
 
+def test_the_command_line_draws_a_pool_the_scorer_accepts(tiny_model, tmp_path, capsys):
+    """`v14_pools.py` to `score_v14.py`, end to end, as the lead will run them.
+
+    A saved (untrained) checkpoint named by ABSOLUTE path, the real `rerank` on
+    sampled drafts, the dodge set and a story set, then the confirmatory scorer
+    over both files: it must find nothing to disagree with, GUARD 1 must hold on
+    all twelve non-story draws, and the seeds must be the fresh ones.
+
+    Mutation: `record` storing `shipped_index + 1` (modulo the pool) -- the
+    scorer aborts with `ReplayMismatch` instead of scoring.
+    """
+    cfg = ChatConfig(d_model=32, n_layers=2, vocab_size=ChatTokenizer().vocab_size,
+                     device="cpu", spread_tau=True)
+    ckpt = tmp_path / "chat-tiny" / "ckpt_best.pt"
+    ckpt.parent.mkdir()
+    torch.save({"format": 1, "kind": "snnchat", "step": 0, "model": tiny_model.state_dict(),
+                "optimizer": {}, "chat_config": cfg.to_dict(), "vocab_version": 1}, ckpt)
+
+    outs = {}
+    for name in ("dodge", "fresh"):
+        outs[name] = tmp_path / f"v14_{name}_chat-tiny.json.gz"
+        assert pools.main(["--ckpt", str(ckpt), "--set", name, "--seeds", "1", "--n", "6",
+                           "--max-new", "32", "--device", "cpu", "--no-graph",
+                           "--out", str(outs[name])]) == 0
+    blob = pools.read_pool(outs["dodge"])
+    assert blob["format"] == pools.FORMAT and blob["sampler_seeds"] == [6]
+    assert blob["n_draws"] == 12 and len(blob["draws"][0]["pool"]) == 6
+    assert blob["timing"]["n_draws"] == 12
+    assert blob["timing"]["timing_pass_disagreements"] == 0
+    assert len(blob["ckpt_sha256"]) == 64
+
+    # A wildcard is expanded by the scorer, sorted: PowerShell passes it through.
+    assert scorer.expand([str(tmp_path / "v14_*_chat-tiny.json.gz")]) == sorted(outs.values())
+    with pytest.raises(SystemExit, match="no pool file"):
+        scorer.expand([str(tmp_path / "v15_*.json.gz")])
+    scored = tmp_path / "scored.json"
+    assert scorer.main([str(tmp_path / "v14_*_chat-tiny.json.gz"), "--out", str(scored)]) == 0
+    result = json.loads(scored.read_text(encoding="utf-8"))
+    assert result["n_story_draws"] == 20
+    g1 = result["GUARD1_identity"]
+    assert (g1["verdict"], g1["n"], g1["identical"]) == ("pass", 12, 12)
+    assert set(result["latency"]) == {p.name for p in outs.values()}
+    assert "OVERALL" in capsys.readouterr().out
+
+
 # ---------------------------------------------------------------------------
 # statistics helpers
 # ---------------------------------------------------------------------------

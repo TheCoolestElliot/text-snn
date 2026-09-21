@@ -785,6 +785,26 @@ def draw_rows(draws: list[Draw]) -> list[dict]:
     return rows
 
 
+def expand(names: list[str]) -> list[Path]:
+    """ROOT-relative unless absolute, with `*` expanded here and sorted.
+
+    PowerShell hands a wildcard through unexpanded, and an order that depended
+    on the shell would reorder `inputs` and `rows` in the artifact.
+    """
+    out: list[Path] = []
+    for name in names:
+        p = Path(name)
+        p = p if p.is_absolute() else ROOT / p
+        if "*" in p.name:
+            found = sorted(p.parent.glob(p.name))
+            if not found:
+                raise SystemExit(f"no pool file matches {name}")
+            out.extend(found)
+        else:
+            out.append(p)
+    return out
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -802,7 +822,7 @@ def main(argv=None) -> int:
         if not args.exploratory:
             ap.error("give at least one v14_pools.py file, or --exploratory")
         names = [str(QUALITY / f) for f in EXPLORATORY_FILES]
-    paths = [p if p.is_absolute() else ROOT / p for p in map(Path, names)]
+    paths = expand(names)
     out_path = Path(args.out) if args.out else QUALITY / (
         "v14_exploratory.json" if args.exploratory else "v14_confirmatory.json")
     if not out_path.is_absolute():
