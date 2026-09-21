@@ -10,7 +10,7 @@ checks the property by a route that does NOT go through the generator's own
 guard -- a guard and a test that share an implementation share its bugs.
 
 Every test here was run against a deliberately broken generator and seen to
-fail; the mutation each one caught is in the chat-v15 B1 hand-off.
+fail; the mutation each one caught is in the chat-v15 B1 and B4 hand-offs.
 
 Not part of the research protocol.
 """
@@ -23,6 +23,7 @@ import importlib.util
 import json
 import pathlib
 import re
+import statistics
 import sys
 
 import numpy as np
@@ -232,15 +233,25 @@ def test_shapes_have_the_turn_structure_they_claim(dialogues):
         if d.shape == "single":
             assert len(d.turns) == 4 and d.statement_turn == 0 and d.answer_turn == 3
         elif d.shape == "filler":
-            assert len(d.turns) == 6 and users[1] in fillers and d.answer_turn == 5
+            assert d.fillers in (1, 2) and len(d.turns) == 4 + 2 * d.fillers
+            between = users[1:-1]
+            assert len(between) == d.fillers == len(set(between)) and set(between) <= fillers
+            assert d.statement_turn == 0 and d.answer_turn == len(d.turns) - 1
         elif d.shape == "two_fact":
             assert len(d.turns) in (4, 6) and len(d.told) == 2
             assert d.told[0][0] != d.told[1][0]                 # two DIFFERENT slots
         elif d.shape == "untold":
-            assert len(d.turns) in (2, 4) and d.value is None and d.statement_turn is None
+            assert len(d.turns) in (2, 4, 6) and d.value is None and d.statement_turn is None
         else:
             assert d.shape == "contrast" and len(d.turns) == 6
+        if d.shape not in ("filler", "untold"):
+            assert d.fillers == 0 and not (set(users) & fillers)
         assert d.turns[d.answer_turn][0] == "bot"
+    # The probe sweeps distances 0, 1 and 2, and its decision rule reads distance
+    # 2 against distance 0. A distance the generator never emits cannot be told
+    # apart from a distance the model cannot reach, so BOTH are trained, evenly.
+    filler = [d for d in dialogues if d.shape == "filler"]
+    assert 0.45 < sum(d.fillers == 2 for d in filler) / len(filler) < 0.55
 
 
 def test_told_answers_carry_the_asked_value_and_only_that_one(dialogues):
@@ -288,6 +299,7 @@ def test_acknowledgement_repeats_the_value_in_at_most_half(dialogues):
 
 def test_untold_dialogues_never_contain_a_value_for_the_asked_slot(dialogues):
     untold = [d for d in dialogues if d.shape == "untold"]
+    fillers = {u for u, _b in recall.TRAIN_FILLERS}
     cold = 0
     for d in untold:
         legal = recall.VALUES[d.slot] + recall.HELDOUT_VALUES[d.slot]
@@ -297,9 +309,26 @@ def test_untold_dialogues_never_contain_a_value_for_the_asked_slot(dialogues):
         assert recall.UNTOLD_MARKER in reply and d.answer_turn == len(d.turns) - 1
         assert all(slot != d.slot for slot, _v, _a in d.told)
         cold += len(d.turns) == 2
-    # Half cold (the probe's control condition), half after a fact about
-    # something else -- so "a fact is in context" is not the cue for a value.
-    assert 0.4 < cold / len(untold) < 0.6
+        if d.fillers:
+            # The probe's untold control at distances 1 and 2: filler exchanges,
+            # then the question, and NO statement anywhere.
+            users = [t for r, t in d.turns if r == "user"]
+            assert not d.told and len(d.turns) == 2 + 2 * d.fillers
+            assert set(users[:-1]) <= fillers and len(set(users[:-1])) == d.fillers
+        else:
+            assert len(d.turns) == 2 + 2 * len(d.told) and len(d.told) <= 1
+    # Half after a fact about something else -- so "a fact is in context" is not
+    # the cue for a value -- a quarter cold (the probe's control at distance 0)
+    # and a quarter after fillers, so that "a filler is in context" is not the
+    # cue either: in the `filler` shape it is ALWAYS followed by a told answer.
+    assert (recall.UNTOLD_AFTER_FACT, recall.UNTOLD_COLD) == (0.5, 0.25)
+    assert 0.20 < cold / len(untold) < 0.30
+    assert 0.45 < sum(bool(d.told) for d in untold) / len(untold) < 0.55
+    after = [d.fillers for d in untold if d.fillers]
+    assert 0.20 < len(after) / len(untold) < 0.30
+    assert 0.4 < after.count(2) / len(after) < 0.6
+    told_after_filler = sum(d.shape == "filler" for d in dialogues)
+    assert len(after) / (len(after) + told_after_filler) > 0.15
 
 
 def test_my_and_your_are_contrasted_with_the_personas_own_lines(dialogues):
@@ -327,23 +356,154 @@ def test_my_and_your_are_contrasted_with_the_personas_own_lines(dialogues):
 # dose
 # ---------------------------------------------------------------------------
 
-def test_every_value_is_asked_for_at_least_the_preregistered_floor(dialogues):
-    """The arithmetic, recomputed from the constants and ONE measured input
-    (the mean rendered length) by a route that does not call
-    `expected_exposures`: the share of dialogues asking each slot is counted
-    from the build instead of derived from `SHAPE_SHARES`."""
+@pytest.fixture(scope="module")
+def replay(dialogues, build_recall, tmp_path_factory):
+    """The module's build packed, and the REAL sampler replayed over it."""
+    out = tmp_path_factory.mktemp("recall_replay")
+    assert build_recall.main(["--out-dir", str(out), "--conversations", str(N)]) == 0
+    hazard = build_recall.window_hazard(str(out), "recall", dialogues, steps=150,
+                                        batch_size=160, seq_len=256, align_frac=0.75,
+                                        align_lookahead=1024)
+    return out, hazard
+
+
+def test_every_slot_is_asked_for_at_least_the_preregistered_floor(dialogues, replay):
+    """Read from a replay of the sampler, NOT from characters / mean length.
+
+    The arithmetic counts every dialogue whole. The sampler does not deliver
+    that: the answer is a dialogue's last turn, and the dialogue a window's far
+    edge truncates loses exactly its answer. The first version of this test
+    asserted the floor against the arithmetic and passed while the replay had
+    every pet name under it.
+
+    The floor is held on the per-slot MEAN here because 150 steps cannot resolve
+    a single value (a count near a hundred, scaled up); the per-value minimum on
+    the default build is printed by `build_recall.py --hazard-steps` and quoted
+    in `snnchat.recall`.
+    """
     r = recall.DOSE_RECIPE
     assert (r["max_steps"], r["batch_size"], r["seq_len"]) == (14_000, 160, 256)
-    assert r["mix_weight"] == 0.06
+    assert r["mix_weight"] == 0.06 and recall.MIN_EXPOSURES == 600
+    _out, hazard = replay
+    dose = hazard["dose"]
+    assert dose["seq_len_is_the_recipes"] and dose["min_exposures"] == 600
+    assert dose["recipe_windows"] == 14_000 * 160 * 0.06
+    assert dose["scale"] == pytest.approx(dose["recipe_windows"] / (150 * 160))
+
     mean = sum(recall.rendered_length(d.turns) for d in dialogues) / len(dialogues)
+    upper = recall.expected_exposures(mean)
     seen = r["max_steps"] * r["batch_size"] * r["seq_len"] * r["mix_weight"] / mean
-    analytic = recall.expected_exposures(mean)
     for slot in recall.SLOTS:
+        row = dose["per_slot"][slot]
+        assert row["with_evidence"]["mean"] >= recall.MIN_EXPOSURES, (slot, row)
+        assert row["with_evidence"]["mean"] < row["asked"]["mean"]
+        # `expected_exposures` is what it says it is: the dialogue count, by a
+        # route that does not call it, and an UPPER estimate of the real dose.
         asks = sum(d.slot == slot and d.value is not None for d in dialogues) / len(dialogues)
-        per_value = seen * asks / len(recall.VALUES[slot])
-        assert per_value >= recall.MIN_EXPOSURES, (slot, per_value)
-        assert analytic[slot] == pytest.approx(per_value, rel=0.05), slot
-    assert recall.MIN_EXPOSURES == 600
+        # `asks` is a binomial share of N dialogues; four of its standard
+        # deviations, which for the least-asked slot (`object`) is about 0.11.
+        rel = 4 * ((1 - asks) / (len(dialogues) * asks)) ** 0.5
+        assert upper[slot] == pytest.approx(seen * asks / len(recall.VALUES[slot]), rel=rel)
+        per_value = dose["per_value"][slot]
+        assert list(per_value) == list(recall.VALUES[slot])
+        assert statistics.fmean(a for a, _e in per_value.values()) == \
+            pytest.approx(row["asked"]["mean"])
+        assert all(e <= a for a, e in per_value.values())
+    # Over all values the sampler delivers well under the dialogue count. Pooled,
+    # because `name` alone sits within a few per cent of its own upper estimate
+    # (half its `contrast` answers are mid-dialogue, where no far edge cuts them)
+    # and 150 steps cannot resolve that.
+    delivered = sum(dose["per_slot"][s]["asked"]["mean"] * len(recall.VALUES[s])
+                    for s in recall.SLOTS)
+    assert delivered < 0.9 * sum(upper[s] * len(recall.VALUES[s]) for s in recall.SLOTS)
+
+
+def test_the_replayed_dose_counts_exactly_the_answers_that_are_targets(dialogues, replay,
+                                                                        build_recall):
+    """`window_hazard`'s window edges, by a route that does not use them: mark
+    every answer position in the stream and sum the marks over each window's
+    TARGET slice, `offset + 1 .. offset + seq_len` inclusive."""
+    from snnchat.data import ChatCorpus
+
+    out, hazard = replay
+    corpus = ChatCorpus(str(out))
+    sampler = build_recall._RecordingSampler(corpus, {"recall": 1.0}, 160, 256, 0,
+                                             align_frac=0.75, align_lookahead=1024)
+    stream = sampler.arrays[0]
+    answer, statement, _echo = build_recall._spans(dialogues)
+    keep = answer < len(stream)
+    is_answer = np.zeros(len(stream) + 1, dtype=np.int64)
+    is_answer[answer[keep]] = 1
+    starts_at = np.full(len(stream) + 1, -1, dtype=np.int64)
+    starts_at[answer[keep]] = statement[keep]
+
+    answers = cut = 0
+    for step in range(150):
+        sampler._windows(step)
+        for o in sampler.last_offsets:
+            targets = slice(int(o) + 1, int(o) + 256 + 1)
+            answers += int(is_answer[targets].sum())
+            here = starts_at[targets]
+            cut += int(((here >= 0) & (here < o)).sum())
+    assert (answers, cut) == (hazard["total"]["answers"], hazard["total"]["cut"])
+    asked = sum(a for slot in recall.SLOTS for a, _e in hazard["dose"]["per_value"][slot].values())
+    assert asked == pytest.approx(answers * hazard["dose"]["scale"])
+
+
+def test_slot_weights_are_the_ones_the_dose_was_tuned_with(dialogues):
+    # Pinned for the reason the shape shares are: the replayed dose in
+    # `snnchat.recall` was measured under exactly these.
+    assert recall.SLOT_WEIGHTS == {"name": 0.19, "pet": 0.24, "colour": 0.10,
+                                   "food": 0.18, "animal": 0.20, "object": 0.09}
+    plain = [d for d in dialogues if d.shape != "contrast"]
+    for slot in recall.SLOTS:
+        share = sum(d.slot == slot for d in plain) / len(plain)
+        assert share == pytest.approx(recall.SLOT_WEIGHTS[slot], abs=0.012), slot
+    contrast = [d for d in dialogues if d.shape == "contrast"]
+    total = sum(recall.SLOT_WEIGHTS[s] for s in recall.CONTRAST_SLOTS)
+    for slot in recall.CONTRAST_SLOTS:
+        share = sum(d.slot == slot for d in contrast) / len(contrast)
+        assert share == pytest.approx(recall.SLOT_WEIGHTS[slot] / total, abs=0.03), slot
+
+
+def test_two_fact_pairs_the_two_slots_that_share_a_value_list(dialogues):
+    """colour + object is the only pairing a model cannot solve by knowing which
+    list the asked value is in. Under a uniform partner draw it was the rarest
+    pairing there was."""
+    two_fact = [d for d in dialogues if d.shape == "two_fact"]
+    sharing = [d for d in two_fact if d.slot in ("colour", "object")]
+    paired = [d for d in sharing if {f[0] for f in d.told} == {"colour", "object"}]
+    # BINDING_PAIR_FRACTION, plus the uniform draw's one-in-five.
+    assert recall.BINDING_PAIR_FRACTION == 0.5
+    assert 0.5 < len(paired) / len(sharing) < 0.7
+    assert len(paired) / len(two_fact) > 0.08
+    for d in paired:
+        assert d.told[0][1] != d.told[1][1]                     # two DIFFERENT colours
+    # ... and only there: any other asked slot still draws its partner evenly.
+    rest = [d for d in two_fact if d.slot not in ("colour", "object")]
+    for slot in recall.SLOTS:
+        eligible = [d for d in rest if d.slot != slot]
+        share = sum(slot in {f[0] for f in d.told} for d in eligible) / len(eligible)
+        assert share == pytest.approx(0.2, abs=0.03), slot
+
+
+def test_a_joined_two_fact_acknowledgement_does_not_point_at_the_asked_fact(dialogues):
+    """One user turn states both facts and ONE acknowledgement follows. If the
+    echoing acknowledgement always repeated the asked value, "copy from the
+    acknowledgement" would solve the shape that exists to defeat it -- and the
+    pooled echo rate would not move."""
+    asked = other = 0
+    for d in dialogues:
+        if d.shape != "two_fact" or len(d.turns) != 4 or not d.echo:
+            continue
+        ack = d.turns[1][1]
+        mine = _has(ack, d.value)
+        theirs = any(_has(ack, v) for s, v, _a in d.told if (s, v) != (d.slot, d.value))
+        assert mine != theirs, d.turns                          # exactly one of the two
+        asked += mine
+        other += theirs
+    assert asked + other > 500
+    assert 0.42 < asked / (asked + other) < 0.58
 
 
 def test_the_length_ceiling_redraws_the_wording_and_never_the_facts(monkeypatch):
@@ -356,10 +516,10 @@ def test_the_length_ceiling_redraws_the_wording_and_never_the_facts(monkeypatch)
     forced: list[tuple] = []
     real = recall._phrase
 
-    def too_long_once(rng, shape, asked, other, echo):
-        args = (shape, asked, other, echo)
+    def too_long_once(rng, shape, asked, other, echo, fillers):
+        args = (shape, asked, other, echo, fillers)
         calls.append(args)
-        d = real(rng, shape, asked, other, echo)
+        d = real(rng, shape, asked, other, echo, fillers)
         if not forced or forced[-1] != args:
             forced.append(args)
             d = dataclasses.replace(d, turns=d.turns + (("user", "x" * 300),))
@@ -368,8 +528,8 @@ def test_the_length_ceiling_redraws_the_wording_and_never_the_facts(monkeypatch)
     monkeypatch.setattr(recall, "_phrase", too_long_once)
     ds = recall.build_recall_dialogues(300, seed=1)
     assert len(forced) == len(ds) == 300 and len(calls) >= 600
-    for d, (shape, asked, _other, _echo) in zip(ds, forced):
-        assert (d.shape, d.slot, d.aux) == (shape, asked[0], asked[2])
+    for d, (shape, asked, _other, _echo, fillers) in zip(ds, forced):
+        assert (d.shape, d.slot, d.aux, d.fillers) == (shape, asked[0], asked[2], fillers)
         assert d.value in (asked[1], None)
         assert recall.rendered_length(d.turns) <= recall.MAX_RENDERED_CHARS
 
@@ -389,7 +549,7 @@ def _instances(templates, slot) -> set[str]:
     return {recall.fill(t, v, a) for t in templates for v in recall.VALUES[slot] for a in auxes}
 
 
-def test_the_committed_probes_trained_frames_are_train_templates():
+def test_the_committed_probes_trained_frames_are_train_templates(dialogues):
     """`scripts/chat/memory_probe.py` stays byte-unchanged and its distance-0
     told rate is ship-candidate bar (i). Eight of its ten items are frames this
     source trains, in the probe's exact words and with in-list values; the town
@@ -411,6 +571,13 @@ def test_the_committed_probes_trained_frames_are_train_templates():
                        for s, q in frames), establish
     assert trained == 8
     assert {u for u, _b in recall.TRAIN_FILLERS} >= set(probe.FILLERS)
+    # The probe's distance-2 condition sends FILLERS[0] then FILLERS[1]. That
+    # exact pair, in that order, is trained on both sides of the told/untold
+    # pairing -- not merely each filler somewhere.
+    for shape in ("filler", "untold"):
+        between = {tuple(t for r, t in d.turns if r == "user")[-3:-1]
+                   for d in dialogues if d.shape == shape and d.fillers == 2}
+        assert tuple(probe.FILLERS[:2]) in between, shape
 
 
 def test_expected_answer_is_the_canonical_form():

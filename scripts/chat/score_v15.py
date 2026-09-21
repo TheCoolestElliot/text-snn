@@ -47,7 +47,7 @@ THE GUARDS, listed individually in the output
   strictly fewer than hits.
 * `confabulation` -- S1 untold: replies naming ANY value of the slot are no
   more than replies in the "haven't told me" family. Read it beside hazard (a)
-  in `snnchat/recall.py`: 0.1241 of trained answers had their evidence cut off
+  in `snnchat/recall.py`: 0.1260 of trained answers had their evidence cut off
   by the window, which trains exactly this.
 * `bpc_<source>` -- held-out bpc on soda, stories_topic and tinystories, whose
   mix weights did not change, is not WORSE than the same-index incumbent seed

@@ -1,7 +1,7 @@
 """Pack the user-fact recall source: state a fact, get asked for it back.
 
     python scripts/chat/build_recall.py --out-dir <packed corpus dir>
-    python scripts/chat/build_recall.py --out-dir <dir> --hazard-steps 2000
+    python scripts/chat/build_recall.py --out-dir <dir> --hazard-steps 8000
 
 Adds ONE new file pair to the directory it is pointed at (`recall.bin`,
 `recall.val.bin`) and registers it in that directory's `manifest.json`. Nothing
@@ -41,6 +41,18 @@ over the freshly packed bin (its `_align` is subclassed to record the offsets it
 chose; the recorded offsets are checked to reproduce `_windows` exactly) and
 counts, among answers whose value's first character is a prediction target, how
 many have their establishing value outside the window.
+
+THE SAME REPLAY IS THE DOSE
+---------------------------
+`snnchat.recall.MIN_EXPOSURES` is a floor on how often each trained value is the
+asked-for answer in one run. Dividing the characters trained on by the mean
+dialogue length overstates it, because a window's far edge truncates a dialogue
+and the answer is the dialogue's last turn. So the replay also counts, per
+value, the answers that really are prediction targets -- all of them, and those
+whose establishing value is inside the window with them -- and scales the count
+from the windows replayed to the windows the recipe draws from this source.
+That scaled count is an estimate of the run's EXPECTED dose; one training run's
+own count for one value scatters about it like a Poisson count.
 
 Not part of the research protocol; no number here is a reported figure.
 """
@@ -111,10 +123,13 @@ def describe(dialogues) -> dict:
             "max_chars": max(ls, default=0),
         }
 
-    # Realised dose: how often each trained value IS the asked-for answer in
-    # this build, scaled from the build's size to the recipe's. The analytic
-    # figure from `expected_exposures` is its expectation; the realised minimum
-    # over values is what a bar on "every value" should be read against.
+    # How often each trained value is the asked-for answer in this BUILD, scaled
+    # by the number of passes the recipe makes over it. Like `expected_exposures`
+    # (its expectation) this counts every dialogue whole, and the sampler does
+    # not deliver that: an answer is its dialogue's last turn, so the dialogue a
+    # window's far edge truncates loses exactly its answer. It is an UPPER
+    # estimate and is not what `MIN_EXPOSURES` is read against -- `window_hazard`
+    # counts the dose the sampler really delivers.
     asked: dict[tuple[str, str], int] = {(s, v): 0 for s in SLOTS for v in VALUES[s]}
     for d in dialogues:
         if d.value is not None:
@@ -139,9 +154,8 @@ def describe(dialogues) -> dict:
             "recipe": dict(DOSE_RECIPE),
             "recipe_chars_from_this_source": recipe_chars,
             "passes": recipe_chars / sum(lengths),
-            "expected_exposures_per_value": expected_exposures(mean),
-            "realised_exposures_per_value": realised,
-            "min_exposures": MIN_EXPOSURES,
+            "upper_estimate_per_value": expected_exposures(mean),
+            "upper_estimate_in_this_build": realised,
         },
     }
 
@@ -226,9 +240,15 @@ def window_hazard(data_dir: str, name: str, dialogues, *, steps: int,
         raise AssertionError(f"sampler resolved {sampler.names}, expected [{name!r}]")
     stream = sampler.arrays[0]
     answer, statement, echo = _spans(dialogues)
+    keys = [(s, v) for s in SLOTS for v in VALUES[s]]
+    index = {key: i for i, key in enumerate(keys)}
+    code = np.asarray([index[(d.slot, d.value)] for d in dialogues if d.value is not None],
+                      dtype=np.int64)
     keep = answer < len(stream)                 # drop the held-out tail
-    answer, statement, echo = answer[keep], statement[keep], echo[keep]
+    answer, statement, echo, code = answer[keep], statement[keep], echo[keep], code[keep]
     span = np.arange(seq_len + 1, dtype=np.int64)
+    asked = np.zeros(len(keys), dtype=np.int64)
+    with_evidence = np.zeros(len(keys), dtype=np.int64)
 
     tally = {kind: {"answers": 0, "cut": 0, "no_evidence": 0, "windows": 0}
              for kind in ("aligned", "random")}
@@ -247,10 +267,36 @@ def window_hazard(data_dir: str, name: str, dialogues, *, steps: int,
             cut = statement[a:b] < o
             t["cut"] += int(cut.sum())
             t["no_evidence"] += int((cut & (echo[a:b] < o)).sum())
+            np.add.at(asked, code[a:b], 1)
+            np.add.at(with_evidence, code[a:b][~cut], 1)
 
     total = {k: sum(t[k] for t in tally.values()) for k in ("answers", "cut", "no_evidence",
                                                             "windows")}
+    # The dose, from the same replay. `DOSE_RECIPE` trains on max_steps *
+    # batch_size * mix_weight windows of this source in expectation; the replay
+    # drew `total["windows"]` of them, and a count scales by the ratio. It is the
+    # recipe's dose only when the replayed windows are the recipe's length.
+    recipe_windows = (DOSE_RECIPE["max_steps"] * DOSE_RECIPE["batch_size"]
+                      * DOSE_RECIPE["mix_weight"])
+    scale = recipe_windows / total["windows"]
+    dose: dict = {"recipe_windows": recipe_windows, "replayed_windows": total["windows"],
+                  "scale": scale, "seq_len_is_the_recipes": seq_len == DOSE_RECIPE["seq_len"],
+                  "min_exposures": MIN_EXPOSURES, "per_slot": {}, "per_value": {}}
+    for slot in SLOTS:
+        rows = {}
+        for label, counts in (("asked", asked), ("with_evidence", with_evidence)):
+            scaled = [float(counts[index[(slot, v)]]) * scale for v in VALUES[slot]]
+            rows[label] = {"min": min(scaled), "mean": statistics.fmean(scaled),
+                           "max": max(scaled)}
+            rows[f"{label}_under_floor"] = [v for v, c in zip(VALUES[slot], scaled)
+                                            if c < MIN_EXPOSURES]
+        rows["values"] = len(VALUES[slot])
+        dose["per_slot"][slot] = rows
+        dose["per_value"][slot] = {
+            v: [float(asked[index[(slot, v)]]) * scale,
+                float(with_evidence[index[(slot, v)]]) * scale] for v in VALUES[slot]}
     return {
+        "dose": dose,
         "steps": steps, "batch_size": batch_size, "seq_len": seq_len,
         "align_frac": align_frac, "align_lookahead": align_lookahead, "sampler_seed": seed,
         "by_window": tally, "total": total,
@@ -352,11 +398,13 @@ def main(argv: list[str] | None = None) -> int:
     dose = report["dose"]
     print(f"  dose under the recipe ({dose['recipe_chars_from_this_source'] / 1e6:.1f} M chars "
           f"from this source, {dose['passes']:.2f} passes over this build):")
+    print("    (dialogues x passes: an UPPER estimate; --hazard-steps replays the sampler "
+          "and prints the dose it delivers)")
     for slot in SLOTS:
-        r = dose["realised_exposures_per_value"][slot]
-        print(f"    {slot:>7}: {r['values']:>3} values, expected "
-              f"{dose['expected_exposures_per_value'][slot]:,.0f} asked each, realised "
-              f"min {r['min']:,.0f} / max {r['max']:,.0f} (floor {MIN_EXPOSURES})")
+        r = dose["upper_estimate_in_this_build"][slot]
+        print(f"    {slot:>7}: {r['values']:>3} values, at most "
+              f"{dose['upper_estimate_per_value'][slot]:,.0f} asked each in expectation, "
+              f"in this build min {r['min']:,.0f} / max {r['max']:,.0f}")
 
     tok = _RawAwareTokenizer()
     stats = _pack_source(args.name, (list(d.turns) for d in dialogues), out_dir, tok)
@@ -391,6 +439,22 @@ def main(argv: list[str] | None = None) -> int:
               f"{hazard['no_evidence_rate']:.4f}")
         for kind, t in hazard["by_window"].items():
             print(f"    {kind:>8} windows {t['windows']:,}: {t['cut']:,}/{t['answers']:,} cut")
+        replayed = hazard["dose"]
+        print(f"  dose the sampler delivers, scaled to the recipe's "
+              f"{replayed['recipe_windows']:,.0f} windows of this source (floor "
+              f"{MIN_EXPOSURES}; per value, min / mean / max):")
+        for slot in SLOTS:
+            r = replayed["per_slot"][slot]
+            a, e = r["asked"], r["with_evidence"]
+            print(f"    {slot:>7}: asked {a['min']:,.0f} / {a['mean']:,.0f} / {a['max']:,.0f}; "
+                  f"with the establishing value in the window {e['min']:,.0f} / "
+                  f"{e['mean']:,.0f} / {e['max']:,.0f}")
+            if r["with_evidence_under_floor"]:
+                print(f"    WARNING: under the floor of {MIN_EXPOSURES} with evidence in view: "
+                      f"{', '.join(r['with_evidence_under_floor'])}")
+        if not replayed["seq_len_is_the_recipes"]:
+            print(f"    WARNING: replayed at L{args.seq_len}, not the recipe's "
+                  f"L{int(DOSE_RECIPE['seq_len'])}; the scaled dose is not the recipe's")
         entry["hazard_evidence_cut"] = hazard
         _register(manifest_path, args.name, entry, tok.vocab_size, replace_own=True)
     return 0

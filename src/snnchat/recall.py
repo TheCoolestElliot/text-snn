@@ -59,7 +59,8 @@ and (b) spell it. (b) is made as cheap as the lists allow:
   favourite animals, so that in a two-fact dialogue a reply containing the
   OTHER fact's value is unambiguously a role swap;
 * few enough per slot that each clears `MIN_EXPOSURES` under the pre-registered
-  recipe -- see `expected_exposures`. The committed
+  recipe, with the slots drawn at `SLOT_WEIGHTS` -- see the measured dose at
+  `MIN_EXPOSURES`. The committed
   `experiments/chat/_quality/subject_frequency.json` is why the dose is counted
   in times ASKED: at matched exposure, being asked for predicts a hit and being
   read does not (`partial_asked_given_seen` against `partial_seen_given_asked`).
@@ -81,16 +82,16 @@ The other 25 % of windows start at a random offset and some of those do cut an
 establishing turn off (`MixtureSampler._windows` draws the alignment decision
 once per batch row, for every source alike; there is no per-source setting).
 That hazard is real and it is measured rather than argued. On the default
-250,000-dialogue build (seed 0), replaying 2,000 steps of the real sampler at
+250,000-dialogue build (seed 0), replaying 8,000 steps of the real sampler at
 B160 x L256, `align_frac` 0.75, `align_lookahead` 1024:
 
     trained answers whose establishing value is outside the window
-        52,686 / 424,599 = 0.1241
+        206,985 / 1,643,105 = 0.1260
     ... with no value-repeating acknowledgement inside it either
-        49,061 / 424,599 = 0.1155
-    of the 52,686, in random-offset windows: 52,685 (of 126,814 answers there)
+        193,157 / 1,643,105 = 0.1176
+    all 206,985 are in random-offset windows (of 490,861 answers there)
 
-    python scripts/chat/build_recall.py --out-dir <an empty dir> --hazard-steps 2000
+    python scripts/chat/build_recall.py --out-dir <an empty dir> --hazard-steps 8000
 
 The counts are over windows that overlap, so no interval is attached; the
 figure is a description of the sampler, not an estimate compared with a bar.
@@ -100,6 +101,24 @@ statement means the window opened inside that same dialogue), and no inference
 context lacks a `<|bos|>`; whether the model uses that cue is not measured
 here. And it is not fixable from this file: it needs per-source alignment in
 `snnchat.data`.
+
+WHY DISTANCES 1 AND 2 ARE BOTH TRAINED, TOLD AND UNTOLD
+-------------------------------------------------------
+`scripts/chat/memory_probe_v2.py` sweeps the number of fact-free exchanges
+between the statement and the question over 0, 1 and 2, and the round's decision
+rule reads distance 2 against distance 0 as DECAY ("below half: carried-state
+training is next"). That reading is only available if the shape at distance 2 is
+one the model has been trained on; a dialogue with two filler exchanges fits a
+window whole (every dialogue does), so a miss there that came from never having
+seen two fillers in a row would have been booked as a reach problem. The
+`filler` shape therefore carries one or two exchanges with equal probability,
+drawn with the FACTS and not with the wording, so the ceiling cannot quietly
+make distance 2 a short-values-only shape. The same goes for the
+probe's control: a quarter of `untold` dialogues put one or two filler exchanges
+before a question that no statement answers, because otherwise every trained
+filler is followed by a told answer and "a filler is in context" becomes a cue to
+produce a value. The first build of this file trained neither (one filler,
+always answerable); the chat-v15 review caught it before any checkpoint existed.
 
 WHY THE ACKNOWLEDGEMENT USUALLY DOES NOT REPEAT THE VALUE
 ---------------------------------------------------------
@@ -123,6 +142,7 @@ __all__ = [
     "ACK_ECHO_FRACTION",
     "ANSWERS",
     "AUX",
+    "BINDING_PAIR_FRACTION",
     "CONTRAST_SLOTS",
     "DOSE_RECIPE",
     "HELDOUT_AUX",
@@ -137,10 +157,13 @@ __all__ = [
     "SHAPES",
     "SHAPE_SHARES",
     "SLOTS",
+    "SLOT_WEIGHTS",
     "TRAIN_FILLERS",
     "TRAIN_QUESTIONS",
     "TRAIN_STATEMENTS",
+    "UNTOLD_AFTER_FACT",
     "UNTOLD_ANSWERS",
+    "UNTOLD_COLD",
     "UNTOLD_MARKER",
     "VALUES",
     "YOUR_QUESTIONS",
@@ -373,7 +396,7 @@ _ACKS_ECHO: dict[str, tuple[str, ...]] = {
     "pet": ("{v} is a lovely name for a {x}.", "I bet {v} is a good {x}.",
             "Say hello to {v} for me."),
     "colour": ("{v} is a nice colour.", "I like {v} too.", "Ah, {v}. Good choice."),
-    "food": ("Yum, {v} sounds good.", "I hear {v} is tasty.", "Mmm, {v}. Good choice."),
+    "food": ("Yum, {v}!", "I like {v} too.", "Mmm, {v}. Good choice."),
     "animal": ("The {v} is a great animal.", "I like the {v} too.",
                "Ah, the {v}. Good choice."),
     "object": ("{a} {v} {x} sounds nice.", "Your {v} {x} sounds lovely.",
@@ -395,10 +418,12 @@ _ACKS_PLAIN_NAME: tuple[str, ...] = ("Nice to meet you.", "Hello! Nice to meet y
 ACK_ECHO_FRACTION = 0.4
 
 #: (user, bot) exchanges that carry no fact, placed between the statement and
-#: the question in the `filler` shape. Short on purpose -- the dialogue has to
-#: stay under `MAX_RENDERED_CHARS`. The first three user turns are the committed
+#: the question in the `filler` shape and before the question in a quarter of
+#: the `untold` one. Short on purpose -- a dialogue with two of them has to stay
+#: under `MAX_RENDERED_CHARS`. The first three user turns are the committed
 #: probe's `FILLERS`, so its distance-1 and distance-2 conditions are phrased in
-#: distribution even though this file only ever trains one filler exchange.
+#: distribution; two exchanges in one dialogue are always two DIFFERENT ones, as
+#: the probe's are.
 TRAIN_FILLERS: tuple[tuple[str, str], ...] = (
     ("how are you?", "I'm good, thank you."),
     ("that is interesting", "I'm glad you think so."),
@@ -447,16 +472,19 @@ _YOUR_ANSWERS: dict[str, tuple[str, ...]] = {
 #:
 #: * `single`   -- statement, acknowledgement, question, answer: the committed
 #:   probe's distance 0.
-#: * `filler`   -- the same with one short unrelated exchange in between.
+#: * `filler`   -- the same with ONE or TWO short unrelated exchanges in between,
+#:   equally often: the probe's distances 1 and 2.
 #: * `two_fact` -- two facts from different slots (as two turns, or as one turn
 #:   joined with " and "), then a question about ONE of them, first or second
 #:   with equal probability. This is the only shape in which "say the value that
 #:   is in context" is wrong half the time, so it is what teaches binding a value
 #:   to its slot.
 #: * `untold`   -- the question with no establishing fact, answered with an
-#:   `UNTOLD_ANSWERS` line. Half are asked cold (the probe's control condition);
-#:   half follow a fact about a DIFFERENT slot, so "a fact is in context" does not
-#:   become the cue to produce a value.
+#:   `UNTOLD_ANSWERS` line. Half follow a fact about a DIFFERENT slot, so "a fact
+#:   is in context" does not become the cue to produce a value; a quarter are
+#:   asked cold and a quarter after one or two filler exchanges (the probe's
+#:   control condition at distance 0 and at distances 1 and 2). See
+#:   `UNTOLD_AFTER_FACT`.
 #: * `contrast` -- a told fact, then "what is YOUR name" (persona line) and "what
 #:   is MY name" (the told value) in either order: the distinction section 10 of
 #:   QUALITY_v8 found unresolved, in one window.
@@ -474,6 +502,44 @@ SHAPE_SHARES: dict[str, float] = {
     "untold": 0.15,
     "contrast": 0.15,
 }
+
+#: How an `untold` dialogue opens, as shares of that shape: after a fact about a
+#: DIFFERENT slot, cold, or (the remainder) after one or two filler exchanges
+#: with no statement anywhere. The last is the probe's untold control at
+#: distances 1 and 2. Without it a filler exchange is followed by a told answer
+#: every time it is trained, and "a filler is in context" is a learnable cue to
+#: produce a value.
+UNTOLD_AFTER_FACT = 0.5
+UNTOLD_COLD = 0.25
+
+#: Probability with which each slot is the ASKED one (renormalised over
+#: `CONTRAST_SLOTS` for the `contrast` shape). A judgement, tuned against the
+#: sampler replay `scripts/chat/build_recall.py --hazard-steps` prints and not
+#: derived: a uniform draw gives each of the twelve colours over four times the
+#: dose of each of the forty pet names, and leaves the pet names under
+#: `MIN_EXPOSURES`. `pet` carries the most because it is the one large list the
+#: `contrast` shape cannot add to (the persona has no pet).
+SLOT_WEIGHTS: dict[str, float] = {
+    "name": 0.19,
+    "pet": 0.24,
+    "colour": 0.10,
+    "food": 0.18,
+    "animal": 0.20,
+    "object": 0.09,
+}
+
+#: `colour` and `object` draw from ONE value list, so a two-fact dialogue that
+#: pairs them ("my favourite colour is blue" / "i have a red bicycle") is the
+#: only kind in which knowing which LIST the asked value comes from does not
+#: give the answer away: the value has to be bound to its role. Every other
+#: pairing can be solved by type. When the asked slot is one of the two, the
+#: other fact is its partner with this probability instead of a uniform draw
+#: over the remaining slots. A judgement, not a measurement. On the default
+#: build it makes 5,647 of 49,929 two-fact dialogues (0.113) such a pair, where
+#: the uniform partner draw would make it the rarest pairing there is;
+#: `build_recall_dialogues(250_000, 0)`, counting `told` slots.
+BINDING_PAIR_FRACTION = 0.5
+_BINDING_PARTNER: dict[str, str] = {"colour": "object", "object": "colour"}
 
 #: Hard ceiling on a dialogue's RENDERED length: `<|bos|>` plus, per turn, a role
 #: marker, the text and `<|eot|>`. See the module docstring.
@@ -496,12 +562,40 @@ DOSE_RECIPE: dict[str, float] = {
 #: `subject_frequency.json`, whose rarely-asked nouns score at the floor however
 #: often they are read.
 #:
+#: It is read against a REPLAY OF THE SAMPLER, not against characters divided by
+#: the mean dialogue length. The division counts every dialogue whole, and the
+#: sampler does not deliver that: an answer is its dialogue's last turn, and the
+#: dialogue a window's far edge truncates loses exactly its answer. The first
+#: build of this file claimed the floor from the division ("least-asked value
+#: 664"); replayed, its pet names were asked about 620 times each and had their
+#: establishing value in the window with the answer about 550 times -- under the
+#: floor, which the chat-v15 review found before any checkpoint existed.
+#: `SLOT_WEIGHTS` is the repair: the lists are unchanged and the draw stopped
+#: giving each colour four times a pet name's dose.
+#:
 #: Measured on the default build (250,000 dialogues, seed 0; mean rendered
-#: length 137.5, which makes the recipe's share of this source 1.00 passes over
-#: it): `expected_exposures` gives name 804, pet 730, food 965, animal 965,
-#: colour 3,215, object 2,433 per value, and the least-asked single value in the
-#: realised build is a pet name at 664. `scripts/chat/build_recall.py` prints
-#: both for whatever it packs and records them in the manifest entry.
+#: length 141.7, so the recipe makes 0.97 passes over it), 8,000 replayed steps
+#: scaled to the recipe's 14,000 x 160 x 0.06 = 134,400 windows of this source.
+#: Per value, min / mean / max over the slot's values:
+#:
+#:              asked-for answer       ... with its establishing value
+#:              is a target            in the same window
+#:     name      754 /   820 /   870     678 /   743 /   791
+#:     pet       792 /   846 /   901     697 /   745 /   797
+#:     colour  1,460 / 1,500 / 1,599   1,239 / 1,281 / 1,374
+#:     food      768 /   823 /   892     665 /   713 /   768
+#:     animal    809 /   870 /   936     678 /   732 /   795
+#:     object  1,086 / 1,135 / 1,220     965 / 1,009 / 1,081
+#:
+#:     python scripts/chat/build_recall.py --out-dir <an empty dir> --hazard-steps 8000
+#:
+#: The second pair of columns is the one the floor is held against: an answer
+#: trained with its evidence cut off is an exposure to confabulation, not to
+#: recall. These are estimates of the run's EXPECTED dose. One training run's own
+#: count for one value scatters about its expectation like a Poisson count, so a
+#: value expected 665 times can land under 600 in a particular run; and
+#: `colour` and `object` spell the same twelve words, so for a colour WORD the
+#: two rows add.
 MIN_EXPOSURES = 600
 
 
@@ -514,7 +608,9 @@ class RecallDialogue:
     the ASKED fact (`value` is None for `untold`), `told` lists every fact a
     user turn states, `statement_turn` indexes the user turn that states the
     asked value (None for `untold`) and `answer_turn` the bot turn that answers
-    the my-side question.
+    the my-side question. `fillers` counts the fact-free exchanges standing
+    between the statement and the question (for `untold`: before the question) --
+    the probe's DISTANCE.
     """
 
     shape: str
@@ -526,6 +622,7 @@ class RecallDialogue:
     echo: bool
     statement_turn: int | None
     answer_turn: int
+    fillers: int = 0
 
 
 def _article(word: str) -> str:
@@ -629,6 +726,10 @@ def _check_tables() -> None:
                 raise AssertionError(f"{slot}: untold answer without {UNTOLD_MARKER!r}")
     if abs(sum(SHAPE_SHARES.values()) - 1.0) > 1e-12 or tuple(SHAPE_SHARES) != SHAPES:
         raise AssertionError("SHAPE_SHARES must cover SHAPES in order and sum to 1")
+    if abs(sum(SLOT_WEIGHTS.values()) - 1.0) > 1e-12 or tuple(SLOT_WEIGHTS) != SLOTS:
+        raise AssertionError("SLOT_WEIGHTS must cover SLOTS in order and sum to 1")
+    if not 0.0 < UNTOLD_AFTER_FACT + UNTOLD_COLD < 1.0:
+        raise AssertionError("the untold shape must keep a share that follows fillers")
 
     # Disjoint across slots, so a reply holding another slot's value is a swap
     # and nothing else. `object` is exempt by construction: it IS the colours.
@@ -704,13 +805,22 @@ def _ack(rng: random.Random, fact: tuple[str, str, str | None], echo: bool) -> s
     return rng.choice(plain)
 
 
+def _filler_turns(rng: random.Random, fillers: int) -> list[tuple[str, str]]:
+    """`fillers` DISTINCT fact-free exchanges, as alternating user/bot turns."""
+    return [turn for user, bot in rng.sample(TRAIN_FILLERS, fillers)
+            for turn in (("user", user), ("bot", bot))]
+
+
 def _phrase(rng: random.Random, shape: str, asked: tuple[str, str, str | None],
-            other: tuple[str, str, str | None] | None, echo: bool) -> RecallDialogue:
-    """Choose the WORDING of a dialogue whose shape, facts and echo are fixed.
+            other: tuple[str, str, str | None] | None, echo: bool,
+            fillers: int = 0) -> RecallDialogue:
+    """Choose the WORDING of a dialogue whose shape, facts, echo and distance are fixed.
 
     Split from the draw of the facts so that the length ceiling can redraw this
     and only this. Redrawing the value too would thin out the long values
-    ("whiskers", "spaghetti") and the dose per value would stop being uniform.
+    ("whiskers", "spaghetti") and the dose per value would stop being uniform;
+    redrawing the NUMBER of filler exchanges would make distance 2 a shape only
+    short values ever have.
     """
     slot, value, aux = asked
     statement = fill(rng.choice(TRAIN_STATEMENTS[slot]), value, aux)
@@ -726,10 +836,11 @@ def _phrase(rng: random.Random, shape: str, asked: tuple[str, str, str | None],
             turns += [("user", fill(rng.choice(TRAIN_STATEMENTS[o_slot]), o_value, o_aux)),
                       ("bot", _ack(rng, other, echo))]
             told.append(other)
+        turns += _filler_turns(rng, fillers)
         turns += [("user", question),
                   ("bot", _say(rng.choice(UNTOLD_ANSWERS[slot]), slot, "", aux))]
         return RecallDialogue(shape, slot, None, aux, tuple(turns), tuple(told), echo,
-                              None, len(turns) - 1)
+                              None, len(turns) - 1, fillers)
 
     answer = _say(rng.choice(ANSWERS[slot]), slot, value, aux)
     if shape == "two_fact":
@@ -754,8 +865,7 @@ def _phrase(rng: random.Random, shape: str, asked: tuple[str, str, str | None],
         turns += [("user", statement), ("bot", _ack(rng, asked, echo))]
         told.append(asked)
 
-    if shape == "filler":
-        turns += [(role, text) for role, text in zip(("user", "bot"), rng.choice(TRAIN_FILLERS))]
+    turns += _filler_turns(rng, fillers)
 
     mine = [("user", question), ("bot", answer)]
     if shape == "contrast":
@@ -772,7 +882,7 @@ def _phrase(rng: random.Random, shape: str, asked: tuple[str, str, str | None],
         turns += mine
         answer_turn = len(turns) - 1
     return RecallDialogue(shape, slot, value, aux, tuple(turns), tuple(told), echo,
-                          statement_turn, answer_turn)
+                          statement_turn, answer_turn, fillers)
 
 
 def _draw(rng: random.Random) -> RecallDialogue:
@@ -782,24 +892,36 @@ def _draw(rng: random.Random) -> RecallDialogue:
         if u < 0.0:
             shape = name
             break
-    slot = rng.choice(CONTRAST_SLOTS if shape == "contrast" else SLOTS)
+    eligible = CONTRAST_SLOTS if shape == "contrast" else SLOTS
+    slot = rng.choices(eligible, weights=[SLOT_WEIGHTS[s] for s in eligible])[0]
     asked = _draw_fact(rng, slot)
-    other = None
-    if shape == "two_fact" or (shape == "untold" and rng.random() < 0.5):
+    other, fillers = None, 0
+    # Which `untold` sub-shape: after a fact about another slot, cold, or after
+    # filler exchanges -- in that order along [0, 1).
+    sub = rng.random() if shape == "untold" else 1.0
+    if shape == "filler" or (shape == "untold" and sub >= UNTOLD_AFTER_FACT + UNTOLD_COLD):
+        fillers = 1 if rng.random() < 0.5 else 2
+    if shape == "two_fact" or sub < UNTOLD_AFTER_FACT:
         # `untold` never pairs `colour` with `object`: they share a value list,
         # and "my favourite colour is blue" followed by an untold bicycle would
         # put a legal bicycle answer in context. `two_fact` DOES pair them, with
-        # different colours -- that is the hardest binding item there is.
+        # different colours -- that is the hardest binding item there is, and
+        # `BINDING_PAIR_FRACTION` is there so that it is not also the rarest.
         banned = {slot}
-        if shape == "untold" and slot in ("colour", "object"):
-            banned |= {"colour", "object"}
-        other = _draw_fact(rng, rng.choice([s for s in SLOTS if s not in banned]))
+        if shape == "untold" and slot in _BINDING_PARTNER:
+            banned |= set(_BINDING_PARTNER)
+        if (shape == "two_fact" and slot in _BINDING_PARTNER
+                and rng.random() < BINDING_PAIR_FRACTION):
+            other_slot = _BINDING_PARTNER[slot]
+        else:
+            other_slot = rng.choice([s for s in SLOTS if s not in banned])
+        other = _draw_fact(rng, other_slot)
         while other[1] == asked[1]:
             other = _draw_fact(rng, other[0])
     echo = rng.random() < ACK_ECHO_FRACTION
 
     for _ in range(1000):
-        dialogue = _phrase(rng, shape, asked, other, echo)
+        dialogue = _phrase(rng, shape, asked, other, echo, fillers)
         if rendered_length(dialogue.turns) <= MAX_RENDERED_CHARS:
             _assert_clean(dialogue.turns)
             return dialogue
@@ -830,23 +952,30 @@ def build_recall_conversations(
 
 def expected_exposures(mean_chars: float, recipe: dict[str, float] | None = None
                        ) -> dict[str, float]:
-    """slot -> expected times EACH trained value is the asked-for answer in one run.
+    """slot -> an UPPER estimate of the times each trained value is asked for in one run.
 
-    The arithmetic the value lists are sized against, from the constants and one
-    measured input:
+    The dialogue-count arithmetic, from the constants and one measured input:
 
         characters trained on   = max_steps * batch_size * seq_len
         of which this source    = ... * mix_weight
-        dialogues seen          = ... / mean_chars        (rendered, measured)
-        ... asking for `slot`   = ... * sum over told shapes of
-                                        SHAPE_SHARES[shape] / (slots eligible)
+        dialogues' worth        = ... / mean_chars        (rendered, measured)
+        ... asking for `slot`   = ... * sum over told shapes of SHAPE_SHARES[shape]
+                                        * SLOT_WEIGHTS[slot] / (weight eligible)
         ... for one value       = ... / len(VALUES[slot])
 
     `untold` contributes nothing: it asks and no value is the answer. A
     two-fact dialogue counts once, for the fact that is ASKED -- the other is
-    read, and read is not what predicts a hit. Dialogues cut by a window edge
-    are counted whole, so this is an upper estimate by roughly the share of a
-    window its last, truncated dialogue takes.
+    read, and read is not what predicts a hit.
+
+    NOT what `MIN_EXPOSURES` is held against. Every dialogue is counted whole
+    here, and a window's far edge truncates one; since the answer is the last
+    turn, what the truncated dialogue loses is its answer. On the default build
+    the sampler delivers between 0.78 (animal, whose answer puts the value
+    latest) and 0.92 (name) of this figure, and less again with the evidence in
+    view: see `MIN_EXPOSURES` for the replayed numbers and
+    `scripts/chat/build_recall.py::window_hazard` for the replay. This stays
+    because it says in closed form what a change to a list, a share or the
+    recipe costs, and the replay's test checks it IS an upper estimate.
     """
     r = DOSE_RECIPE if recipe is None else recipe
     chars = r["max_steps"] * r["batch_size"] * r["seq_len"] * r["mix_weight"]
@@ -859,6 +988,7 @@ def expected_exposures(mean_chars: float, recipe: dict[str, float] | None = None
                 continue
             eligible = CONTRAST_SLOTS if shape == "contrast" else SLOTS
             if slot in eligible:
-                share += SHAPE_SHARES[shape] / len(eligible)
+                share += (SHAPE_SHARES[shape] * SLOT_WEIGHTS[slot]
+                          / sum(SLOT_WEIGHTS[s] for s in eligible))
         out[slot] = dialogues * share / len(VALUES[slot])
     return out
