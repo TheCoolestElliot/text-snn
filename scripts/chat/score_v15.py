@@ -220,8 +220,9 @@ def check_bands(chat_root: Path) -> int:
 
 def mcnemar(b: int, c: int) -> float:
     """Two-sided exact McNemar on the discordant pairs. The same arithmetic as
-    `memory_probe.mcnemar`, restated so that this file imports no torch-loading
-    script; `tests/test_snnchat_v15.py` holds the two equal."""
+    `memory_probe.mcnemar`, restated so that the scorer does not import a probe
+    script (and with it the sampler); `tests/test_snnchat_v15.py` holds the two
+    equal on a grid."""
     n = b + c
     if n == 0:
         return 1.0
