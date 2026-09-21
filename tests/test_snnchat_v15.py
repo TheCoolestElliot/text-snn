@@ -22,6 +22,7 @@ import hashlib
 import importlib.util
 import json
 import pathlib
+import shutil
 import subprocess
 import sys
 import types
@@ -417,10 +418,14 @@ def _cell(told=20, control=0, *, told_only=None, control_only=0, wrong=2, swap=0
 def _artifacts(score, run, **over):
     """A seed that clears everything; `over` replaces one piece at a time."""
     ref = score.INCUMBENT_VAL[score.REFERENCE[run]]
-    picks = ([{"kind": "social", "hit": 1.0, "text": "Hello there, friend!"}] * 20
-             + [{"kind": "identity", "hit": 1.0, "text": "I'm a small model."}] * 15
+    # One dict PER pick. `[{...}] * 20` is twenty names for one dict, and a test
+    # that flips "one" pick then flips them all -- which is how the social and
+    # identity bars first escaped a mutation.
+    picks = ([{"kind": "social", "hit": 1.0, "text": "Hello there, friend!"} for _ in range(20)]
+             + [{"kind": "identity", "hit": 1.0, "text": "I'm a small model."} for _ in range(15)]
              + [{"kind": "identity", "hit": 0.0, "text": "Hmm, let me think."}]
-             + [{"kind": "topic", "hit": 0.0, "text": "Once upon a time there was a cat."}] * 64)
+             + [{"kind": "topic", "hit": 0.0, "text": "Once upon a time there was a cat."}
+                for _ in range(64)])
     art = {
         "committed": {"summary": {"0": {"n": 80, "told": [16, 80], "untold": [4, 80],
                                         "discordant": [0, 12]}},
@@ -550,6 +555,8 @@ def test_each_guard_alone_stops_a_ship_candidate(score):
         flip = [p for p in picks if p["kind"] == kind and p["hit"] >= 1.0][0]
         flip["hit"] = 0.0
         art["battery"]["report"]["baseline_picks"] = picks
+        assert sum(p["hit"] for p in picks if p["kind"] == kind) == {"social": 19,
+                                                                     "identity": 14}[kind]
         _fails_only(score, run, art, guard)      # 19/20, and 14/16
 
 
@@ -849,6 +856,7 @@ class _FakeChild:
 
     fail: set = set()
     diverge: set = set()
+    bad_exit: set = set()
     launched: list = []
 
     def __init__(self, cmd, *, stdout, **_kw):
@@ -887,13 +895,16 @@ class _FakeChild:
             out = arg("--out-root") / "score_v15.json" if "--out-root" in cmd else arg("--out")
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(json.dumps({"complete": True}), encoding="utf-8")
+            if out.name in self.bad_exit:
+                self.rc = 5          # the artifact is there; the exit code is not 0
 
     def wait(self, timeout=None):
         return self.rc
 
 
-def _execute(driver, world, *, run=None, fail=(), diverge=()):
+def _execute(driver, world, *, run=None, fail=(), diverge=(), bad_exit=()):
     _FakeChild.fail, _FakeChild.diverge, _FakeChild.launched = set(fail), set(diverge), []
+    _FakeChild.bad_exit = set(bad_exit)
     args = types.SimpleNamespace(out_root=str(world.out), data_dir=str(world.data),
                                  chat_root=str(world.chat), device="cpu", force=False)
     plan = driver.build_plan(args, _REF_CFG)
@@ -951,6 +962,25 @@ def test_a_failed_seed_is_reported_and_the_other_still_runs(driver, world):
     assert results["score:chat-v15-recall-s1"]["result"] == "ok"
     scored = [c[c.index("--ckpt") + 1] for c in launched if "--ckpt" in c]
     assert not any("recall-s0" in c for c in scored)
+
+
+def test_an_artifact_from_a_child_that_exited_nonzero_is_not_a_result(driver, world):
+    rc, status, launched = _execute(driver, world, bad_exit={"battery.json"})
+    results = {s["stage"]: s for s in status["stages"]}
+    assert rc == 1 and status["state"] == "FAILED"
+    assert results["score:chat-v15-recall-s0"]["result"] == "failed"
+    assert "rc=5" in results["score:chat-v15-recall-s0"]["error"]
+    assert results["train:chat-v15-recall-s1"]["result"] == "ok"
+    # one probe dying does not cost the stage its other readouts
+    after = [pathlib.Path(c[2]).name for c in launched if "recall-s0" in " ".join(c)]
+    assert after[-2:] == ["quality.py", "echo_holdout.py"]
+    assert str(world.out / "scores" / "chat-v15-recall-s0" / "heldout_n256.json")         in results["score:chat-v15-recall-s0"]["artifacts"]
+
+    # ... and a probe that cannot read SHIPPED stops the round before it trains.
+    shutil.rmtree(world.out)
+    rc, status, launched = _execute(driver, world, bad_exit={"binding_probe.json"})
+    assert rc == 1 and [s["stage"] for s in status["stages"]] == ["preflight", "floors"]
+    assert not any(c[2].endswith("train.py") for c in launched)
 
 
 def test_a_divergence_event_is_surfaced_in_the_status_file(driver, world):
