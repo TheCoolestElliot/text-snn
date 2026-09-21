@@ -41,7 +41,7 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["story_prime", "prime_topic"]
+__all__ = ["story_prime", "prime_topic", "tier_subject"]
 
 #: The corpus's own opening-and-introducing clause. Measured, see the module
 #: docstring. The trailing space matters: the model continues mid-sentence.
@@ -80,6 +80,97 @@ def prime_topic(prompt: str) -> str | None:
     if not m:
         return None
     words = [w for w in re.findall(r"[a-z]+", m.group(1).lower()) if len(w) > 2]
+    if not words:
+        return None
+    head = words[-1]
+    if head in _NOT_A_SUBJECT:
+        return None
+    return head
+
+
+#: Words that open a clause MODIFYING the noun before them: "a penguin who loves
+#: fish", "a dragon named Pip". Everything from the first of these on describes
+#: the subject and is not the subject, so `tier_subject` cuts the phrase there.
+_MODIFIES_THE_SUBJECT = frozenset("""
+who whom whose which that where when named called
+""".split())
+
+#: Words that mean the captured phrase is NOT one simple noun phrase, so its
+#: last word cannot be trusted to be its head. Admitted by CLASS, the way
+#: `snnchat.coherence._FUNCTION_WORDS` is, not by which prompts were tried:
+#: conjunctions ("a penguin and make it funny", "a boy and his kite" -- two
+#: candidates for the subject, or a second request), prepositions ("a day at
+#: the beach" -- the grammatical head and the topical word are different nouns),
+#: pronouns and possessives, a determiner in mid-phrase (a second noun phrase has
+#: begun), auxiliaries (a clause with no relativiser: "a penguin is sad"), and
+#: the trailing adverbs a request ends on ("... a penguin tonight").
+_NOT_ONE_NOUN_PHRASE = frozenset("""
+and or but so then nor yet
+in on at of to for with from by into onto over under near inside outside behind
+through without across around after before
+it he she they him her his hers its their them my your our me you us we i
+a an the this these those some any
+is are was were be been being has have had can could will would do does did
+now tonight too again instead also
+""".split())
+
+
+def tier_subject(prompt: str) -> str | None:
+    """The one word `RerankParams.subject_tier` may build a tier on, or None.
+
+    WHY THIS IS NOT `prime_topic`
+    -----------------------------
+    `prime_topic` returns the LAST word of everything after "about", which is
+    the head when the phrase is one noun phrase and is something else entirely
+    when it is not: "a penguin and make it funny" gives "funny", "a penguin who
+    loves fish" gives "fish", "a dragon who lives in a cave" gives "cave". For a
+    PRIME that is a poor opening sentence. For the subject tier it is worse than
+    no subject at all, because the tier is built from this ONE word: every
+    draft that says "funny" outranks every draft about a penguin, which is the
+    defect the subject rule exists to remove, reintroduced for any request with
+    a trailing clause. The weighted tier has no such failure -- "penguin" still
+    carries the largest weight in the sum -- so the safe answer to "I am not
+    sure what the subject is" is None, and None is the weighted tier
+    (`snnchat.rerank.echo_tier`).
+
+    So this is deliberately CONSERVATIVE, and wrong only toward None:
+
+    1.  The phrase is cut at the first word that opens a clause modifying the
+        noun (`_MODIFIES_THE_SUBJECT`): "a penguin who loves fish" -> "penguin".
+    2.  If what is left contains any word of `_NOT_ONE_NOUN_PHRASE`, the answer
+        is None. "a boy and his kite" is None here although `prime_topic` says
+        "kite": there are two candidates and the tier takes exactly one.
+    3.  Otherwise the head of what is left, exactly as `prime_topic` takes it.
+
+    On a bare "story about a X" request -- every prompt of every probe list in
+    `scripts/chat/echo_holdout.py` -- the two functions agree, and
+    `tests/test_snnchat.py::test_the_tier_subject_is_the_prime_topic_on_every_bare_request`
+    holds that, so nothing measured on those lists depends on which was called.
+
+    WHAT IT STILL GETS WRONG: a closed word list cannot see an open-class word
+    in the wrong place. "a story about a penguin quickly" gives "quickly". And a
+    multi-word name gives its last word ("New York" -> "york"), which is harmless
+    for a whole-word match -- a draft that names New York names "york" -- and
+    would not be for a prime.
+
+    `prime_topic` is left exactly as it was: `story_prime` and
+    `scripts/chat/prime_probe.py` measured it as it is.
+    """
+    if not _STORY_RE.search(prompt):
+        return None
+    m = _ABOUT_RE.search(prompt)
+    if not m:
+        return None
+    # EVERY word, including the one- and two-letter ones `prime_topic` drops:
+    # "in", "at", "it", "or" and "is" are exactly the evidence being looked for.
+    phrase: list[str] = []
+    for w in re.findall(r"[a-z]+", m.group(1).lower()):
+        if w in _MODIFIES_THE_SUBJECT:
+            break
+        phrase.append(w)
+    if any(w in _NOT_ONE_NOUN_PHRASE for w in phrase):
+        return None
+    words = [w for w in phrase if len(w) > 2]
     if not words:
         return None
     head = words[-1]

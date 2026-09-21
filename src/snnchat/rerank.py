@@ -103,8 +103,11 @@ does, those drafts are the tier and the score chooses among them. **If none
 does, the tier is the whole length-partitioned pool** -- not the frame-word tier
 -- so that the score chooses among everyone, which is what it would have done
 before the partition existed. The subject is supplied by the caller;
-`ChatSession` takes it from `snnchat.prime.prime_topic`, which returns None for
-anything that is not a "story about X" request, and None is the old rule.
+`ChatSession` takes it from `snnchat.prime.tier_subject`, which returns None for
+anything that is not a "story about X" request AND for any request whose "X" is
+not one simple noun phrase ("a penguin and make it funny"), and None is the old
+rule. The tier is built on ONE word, so a wrong word is worse than no word; see
+that function's docstring for the case that made it separate from `prime_topic`.
 
 Off by default, and off nests the old behaviour exactly:
 `tests/test_snnchat.py::test_the_subject_tier_is_off_by_default_and_off_is_the_old_rule`.
@@ -1203,7 +1206,14 @@ def select(
             and any(c.null_context != rp.null for c in cands)):
         _score_null(model, cands, rp, device)
     for c in cands:
-        c.score = (c.logp_cond - rp.lam * c.logp_null) / max(len(c.scored), 1)
+        # A `logp_null` measured under ANOTHER null context is not this score's
+        # term. It can only be here when this call is decided (otherwise the
+        # pass above just re-measured it), so it cannot move the winner -- but
+        # `score` is displayed, and a number computed from the wrong context is
+        # worse than the unmeasured 0.0 that `null_scored=False` already admits
+        # to. `fill_null_scores` replaces it with the real one.
+        null = c.logp_null if c.null_context == rp.null else 0.0
+        c.score = (c.logp_cond - rp.lam * null) / max(len(c.scored), 1)
         # At lambda = 0 the term is not part of the score and was never measured
         # before this change either, so there is nothing outstanding to fill.
         # Otherwise the question is whether it HAS been measured, not whether

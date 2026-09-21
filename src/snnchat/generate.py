@@ -501,7 +501,7 @@ class ChatSession:
         """
         import dataclasses
 
-        from snnchat.prime import prime_topic
+        from snnchat.prime import tier_subject
         from snnchat.rerank import final_ids, prompt_content_words
         from snnchat.rerank import rerank as _rerank
 
@@ -517,11 +517,14 @@ class ChatSession:
         # want to depend on.
         echo_words = prompt_content_words(prompt) if rp.echo else None
         # The subject tier needs to be told what the subject IS, and it is told
-        # by the same extractor `snnchat.prime` builds a story prime from, so
-        # the two cannot disagree about what a request was about. It returns
-        # None for anything that is not a "story about X" request, and None is
-        # the weighted tier -- so every other prompt is decided as before.
-        subject = prime_topic(prompt) if rp.echo and rp.subject_tier else None
+        # by `snnchat.prime.tier_subject` -- NOT by `prime_topic`, which takes
+        # the last word after "about" and so answers "funny" for "a story about
+        # a penguin and make it funny". A tier built on that one word hands the
+        # turn to drafts that never mention the penguin. `tier_subject` returns
+        # None whenever the phrase is not one simple noun phrase, and for
+        # anything that is not a "story about X" request, and None is the
+        # weighted tier -- so every such prompt is decided as before.
+        subject = tier_subject(prompt) if rp.echo and rp.subject_tier else None
         winner, cands = _rerank(self.sampler.model, logits, self._state, params, rp,
                                 device=self.sampler.device,
                                 tok=self.tok, echo_words=echo_words, subject=subject)

@@ -2467,7 +2467,7 @@ def test_the_subject_tier_is_off_by_default_and_off_is_the_old_rule():
 
 
 def test_the_subject_tier_without_a_subject_is_the_old_rule():
-    """`prime_topic` returns None for most prompts, and None must not mean "a
+    """`tier_subject` returns None for most prompts, and None must not mean "a
     subject nobody matched" -- that would hand every non-story turn to the
     score alone and silently switch the echo partition off."""
     from snnchat.rerank import RerankParams, echo_tier
@@ -2655,7 +2655,7 @@ def test_selecting_twice_from_one_pool_is_two_independent_reranks(tiny_model):
 def test_the_session_passes_a_subject_only_when_both_flags_are_on(tiny_model, monkeypatch):
     """`ChatSession` is the one place the subject comes from. It must reach
     `rerank` for a story request with both flags on, and be None otherwise --
-    including for a prompt `prime_topic` does not recognise."""
+    including for a prompt `tier_subject` does not recognise."""
     import snnchat.rerank as rr
 
     seen = []
@@ -2682,3 +2682,163 @@ def test_the_session_passes_a_subject_only_when_both_flags_are_on(tiny_model, mo
     assert subject_for(story) is None, "the default is off"
     assert subject_for("what is the capital of france", echo=True, subject_tier=True) is None
     assert len(seen) == 5
+
+
+# --------------------------------------------------------------------------
+# what the subject tier is told the subject is
+# --------------------------------------------------------------------------
+
+#: Requests whose "about X" is more than one noun phrase, with what the tier may
+#: be told. `prime_topic` answers the LAST word on every one of them, which is
+#: listed so the test says what it is guarding against rather than implying it.
+_CLAUSE_PROMPTS = (
+    # (prompt, tier_subject, prime_topic)
+    ("tell me a story about a penguin who loves fish", "penguin", "fish"),
+    ("tell me a story about a dragon who lives in a cave", "dragon", "cave"),
+    ("tell me a story about a penguin that is sad", "penguin", "sad"),
+    ("tell me a story about a rabbit named Pip", "rabbit", "pip"),
+    ("Tell me a story about a little Penguin which sings", "penguin", "sings"),
+    # Not ONE noun phrase, so no subject: the weighted tier decides as before.
+    ("tell me a story about a penguin and make it funny", None, "funny"),
+    ("tell me a story about a boy and his kite", None, "kite"),
+    ("tell me a story about a day at the beach", None, "beach"),
+    ("tell me a story about a penguin with a red hat", None, "hat"),
+    ("tell me a story about a penguin tonight", None, "tonight"),
+    ("tell me a story about a penguin is sad", None, "sad"),
+    ("tell me a story about that", None, None),
+)
+
+
+def test_the_tier_subject_is_never_a_word_from_a_trailing_clause():
+    """The tier is built on ONE word. "a penguin and make it funny" must not
+    make that word "funny": every draft that says "funny" would then outrank
+    every draft about a penguin."""
+    from snnchat.prime import prime_topic, tier_subject
+
+    for prompt, subject, last_word in _CLAUSE_PROMPTS:
+        assert tier_subject(prompt) == subject, prompt
+        # `prime_topic` is unchanged, and is the wrong answer on all but the last.
+        assert prime_topic(prompt) == last_word, prompt
+
+    # Everything `prime_topic` is silent on, this is silent on too.
+    for negative in ("hello", "name three animals", "tell me a story",
+                     "what is the capital of France?", "tell me about a penguin"):
+        assert tier_subject(negative) is None, negative
+    # A multi-word noun phrase is still one noun phrase.
+    assert tier_subject("tell me a story about a birthday cake") == "cake"
+    assert tier_subject("a story about a very big red balloon, please") == "balloon"
+
+
+def test_the_tier_subject_is_the_prime_topic_on_every_bare_request():
+    """Every committed pool was drawn on a bare "story about a X" prompt, and
+    `score_v14.py` re-derives the subject of each. If the two extractors
+    disagreed on any of them, the exploratory numbers would describe a subject
+    the session no longer passes."""
+    import importlib.util
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    from snnchat.prime import prime_topic, tier_subject
+
+    root = _Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "_eh_subject", root / "scripts" / "chat" / "echo_holdout.py")
+    mod = importlib.util.module_from_spec(spec)
+    _sys.modules["_eh_subject"] = mod
+    spec.loader.exec_module(mod)
+
+    seen = 0
+    for rows in mod.SETS.values():
+        for prompt, _words in rows:
+            assert tier_subject(prompt) == prime_topic(prompt) is not None, prompt
+            seen += 1
+    assert seen == 100
+
+
+def test_a_trailing_clause_does_not_hand_the_turn_to_an_off_topic_draft(
+        tiny_model, monkeypatch):
+    """The failure, end to end through `ChatSession`: with the subject tier ON,
+    "a penguin and make it funny" must not select a draft for saying "funny"
+    over a far likelier draft about the penguin."""
+    import snnchat.rerank as rr
+
+    tok = ChatTokenizer()
+    prompt = "tell me a story about a penguin and make it funny"
+
+    def pool():
+        return [_drafted(tok, "Once there was a penguin who slid on the ice "
+                              "and laughed all day.", -10.0),
+                _drafted(tok, "Tim saw a funny hat. It was a very funny day "
+                              "for Tim and his mom.", -40.0)]
+
+    # The premise: a tier on the clause word really does pick the wrong draft.
+    cands = pool()
+    rp = rr.RerankParams(n=2, lam=0.0, subject_tier=True)
+    wrong = rr.select(None, cands, rp, device=torch.device("cpu"), tok=tok,
+                      echo_words=rr.prompt_content_words(prompt), subject="funny")
+    assert wrong is cands[1]
+
+    drawn = []
+
+    def fake_sampler(*_args, **_kwargs):
+        drawn.append(pool())
+        return drawn[-1]
+
+    monkeypatch.setattr(rr, "sample_candidates", fake_sampler)
+    session = ChatSession(tiny_model, tok, device="cpu",
+                          params=SamplingParams(seed=0, max_new=16), rerank=rp)
+    session.send(prompt)
+    assert session.last_winner is drawn[-1][0]
+    assert [c.subject_hit for c in drawn[-1]] == [False, False], "no subject was passed"
+
+    # And a clause that MODIFIES the subject keeps the tier, on the right word.
+    session = ChatSession(tiny_model, tok, device="cpu",
+                          params=SamplingParams(seed=0, max_new=16), rerank=rp)
+    session.send("tell me a story about a penguin who loves fish")
+    assert [c.subject_hit for c in drawn[-1]] == [True, False]
+    assert session.last_winner is drawn[-1][0]
+
+
+def test_the_subject_is_found_in_a_capitalised_draft_and_without_echo_words():
+    """Two paths a mutation run found nothing standing on. `echoes` takes
+    LOWERED text, so a sentence-initial "Penguins" is only a hit because
+    `select` lowers it; and a direct caller may pass a subject with no
+    `echo_words` at all, which must still annotate."""
+    from snnchat.rerank import RerankParams, select
+
+    tok = ChatTokenizer()
+    rp = RerankParams(n=2, lam=0.0, subject_tier=True)
+    for words in (None, [], ["penguin", "story", "tell"]):
+        capital = _drafted(tok, "Penguins live on the ice and slide.", -50.0)
+        fluent = _drafted(tok, "Once there was a little bird.", -10.0)
+        won = select(None, [capital, fluent], rp, device=torch.device("cpu"), tok=tok,
+                     echo_words=words, subject="penguin")
+        assert capital.subject_hit and not fluent.subject_hit, words
+        assert fluent.score > capital.score
+        assert won is capital, words
+
+
+def test_a_null_term_from_another_context_is_not_displayed_as_this_score(tiny_model):
+    """`select` under one null context and then, DECIDED, under another: the
+    winner cannot move, but `score` is shown by `/candidates`, and it must not
+    be computed from the other context's `logp_null` while `null_scored` says
+    the term was never measured."""
+    import snnchat.rerank as rr
+
+    tok = ChatTokenizer()
+    cpu = torch.device("cpu")
+    two = [*_frame_pool(tok), _drafted(tok, "A penguin swam in the sea.", -55.0)]
+    first = rr.RerankParams(n=4, lam=0.6, subject_tier=True, null="bot_only")
+    _select(two, first, subject="penguin", model=tiny_model)
+    assert all(c.null_context == "bot_only" and c.logp_null < 0.0 for c in two)
+
+    decided = rr.RerankParams(n=4, lam=0.6)           # the weighted tier: one draft
+    assert decided.null == "empty_user"
+    won = _select(two, decided, subject="penguin", model=tiny_model)
+    assert won is two[0]
+    for c in two:
+        assert not c.null_scored and c.null_context == "bot_only"
+        assert c.score == c.logp_cond / len(c.scored)
+    rr.fill_null_scores(tiny_model, two, decided, cpu)
+    assert all(c.null_scored and c.null_context == "empty_user" for c in two)
+    assert all(c.score != c.logp_cond / len(c.scored) for c in two)
