@@ -2842,3 +2842,107 @@ def test_a_null_term_from_another_context_is_not_displayed_as_this_score(tiny_mo
     rr.fill_null_scores(tiny_model, two, decided, cpu)
     assert all(c.null_scored and c.null_context == "empty_user" for c in two)
     assert all(c.score != c.logp_cond / len(c.scored) for c in two)
+
+
+# --------------------------------------------------------------------------
+# the subject tier's REPL toggle
+# --------------------------------------------------------------------------
+
+
+def _session_built_by(repl, argv, monkeypatch):
+    """The keyword arguments `run_chat` hands `ChatSession`, and the parsed args.
+
+    `ChatSession` is replaced by a recorder that stops `run_chat` where it
+    stands, so nothing is loaded, drawn or printed."""
+
+    class _Stop(Exception):
+        pass
+
+    seen = {}
+
+    def recorder(_model, _tok, **kwargs):
+        seen.update(kwargs)
+        raise _Stop
+
+    monkeypatch.setattr(repl, "ChatSession", recorder)
+    args = repl.build_parser().parse_args(argv)
+    cfg = type("Cfg", (), {"device": "cpu"})()
+    with pytest.raises(_Stop):
+        repl.run_chat(None, cfg, {}, args)
+    return seen, args
+
+
+def test_the_subject_tier_flag_is_off_by_default_and_reaches_the_session(monkeypatch):
+    """Off nests the shipped REPL exactly: the `RerankParams` built with no flag
+    is the one the code built before the flag existed, field for field. With
+    `--subject-tier` it differs in that one field and the session receives it.
+
+    Mutations: `run_chat` not passing `subject_tier` (the flag never arrives);
+    the flag's `action` flipped to `store_false` (the default is no longer off).
+    """
+    import dataclasses
+
+    from snnchat.rerank import RerankParams
+
+    repl = _chat_repl()
+    seen, args = _session_built_by(repl, [], monkeypatch)
+    assert args.subject_tier is False
+    old = RerankParams(n=args.rerank, lam=args.rerank_lambda,
+                       min_chars=args.rerank_min_chars,
+                       temperature_spread=args.rerank_spread,
+                       steer_every=args.steer_every, echo=bool(args.rerank_echo))
+    assert seen["rerank"] == old and seen["rerank"].subject_tier is False
+
+    seen, args = _session_built_by(repl, ["--subject-tier"], monkeypatch)
+    assert args.subject_tier is True
+    assert seen["rerank"].subject_tier is True
+    assert dataclasses.replace(seen["rerank"], subject_tier=False) == old
+
+
+def test_subject_on_survives_a_rebuilt_rerank(capsys):
+    """THE KNOWN TRAP: `/rerank <n>` rebuilds `RerankParams`, and once dropped
+    `echo` doing it. `/subject on` then `/rerank 64` must still be on; so must
+    `/subject on`, `/rerank 1` (the object is gone), `/rerank 64`; and `/subject
+    off` must survive the same two routes, under a `--subject-tier` start.
+
+    Mutations: the `/rerank` branch not passing `subject_tier` to the new object
+    (the first assertion after `/rerank 64` goes red); `/subject` not recording
+    the choice on `args` (the `/rerank 1` route goes red).
+    """
+    from types import SimpleNamespace
+
+    from snnchat.rerank import RerankParams
+
+    repl = _chat_repl()
+    args = repl.build_parser().parse_args([])
+    session = SimpleNamespace(params=SamplingParams(), rerank=RerankParams(n=256, lam=0.6))
+
+    assert repl._command("/subject on", session, args) is False
+    assert session.rerank.subject_tier is True and args.subject_tier is True
+    assert "subject-tier" in session.rerank.describe()
+    repl._command("/rerank 64", session, args)
+    assert (session.rerank.n, session.rerank.subject_tier) == (64, True)
+    repl._command("/echo off", session, args)
+    repl._command("/rerank 32", session, args)
+    assert (session.rerank.echo, session.rerank.subject_tier) == (False, True)
+    repl._command("/rerank 1", session, args)
+    assert session.rerank is None
+    repl._command("/rerank 64", session, args)
+    assert session.rerank.subject_tier is True
+
+    repl._command("/subject off", session, args)
+    assert session.rerank.subject_tier is False and args.subject_tier is False
+    repl._command("/rerank 16", session, args)
+    assert session.rerank.subject_tier is False
+    # Turned on while reranking is off: it takes effect when reranking returns.
+    repl._command("/rerank 1", session, args)
+    repl._command("/subject on", session, args)
+    assert "takes effect at /rerank" in capsys.readouterr().out
+    repl._command("/rerank 8", session, args)
+    assert session.rerank.subject_tier is True
+
+    started_on = repl.build_parser().parse_args(["--subject-tier"])
+    session = SimpleNamespace(params=SamplingParams(), rerank=None)
+    repl._command("/rerank 8", session, started_on)
+    assert session.rerank.subject_tier is True
+    assert "/subject" in repl.HELP
