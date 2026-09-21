@@ -1072,6 +1072,9 @@ def main(argv=None) -> int:
         raise SystemExit(f"the pools were drawn at different lambdas: {labels}")
     label = labels[0]
     story = [d for d in draws if d.kind == "story"]
+    # `v14_pools.py --set clause`: requests with a clause after the noun. Scored,
+    # and kept OUT of the pooled bars -- P2's lists were fixed before it existed.
+    clause = [d for d in draws if d.kind == "story_clause"]
 
     checks: Counter = Counter()
     for i in inputs:
@@ -1100,6 +1103,17 @@ def main(argv=None) -> int:
                                  "lack a null term the subject tier needs")
         subsets[f"{label}_all"] = {"definition": "every story draw given",
                                    "of": len(story), **compare(story, label)}
+        if clause:
+            if any(d.drafts[label]["subject"] is None for d in clause):
+                raise ReplayMismatch("a clause draw lacks a null term the subject "
+                                     "tier needs")
+            subsets[f"{label}_clause"] = {
+                "definition": "requests with a clause after the noun (`v14_pools.py "
+                              "--set clause`). NOT in `overall`: the verdicts below "
+                              "are what each bar would read on this set alone",
+                "of": len(clause),
+                "draws_with_a_subject": sum(1 for d in clause if d.subject is not None),
+                **compare(clause, label, breakdown=False)}
 
     blob = {
         "mode": "exploratory" if args.exploratory else "confirmatory",

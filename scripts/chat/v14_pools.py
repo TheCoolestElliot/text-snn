@@ -30,6 +30,52 @@ seed from the same checkpoint is the same draw, so it confirms nothing. The
 default is therefore `--seed-offset 6` (seeds 6..11), and an offset below 6 is
 refused unless `--allow-committed-seeds` says the overlap is intended.
 
+DRAWN AT THE REPL'S SETTINGS, AND WHAT STILL DIFFERS FROM A REPL TURN
+---------------------------------------------------------------------
+The first version of this file inherited `--max-new 300` from
+`echo_holdout.py`. `python scripts/chat.py` drafts 400 characters
+(`SamplingParams.max_new`'s default, and the REPL's own `--max-new`), so every
+pool described a configuration the REPL does not run: a longer draft trims to
+a longer reply, more drafts name the subject or a frame word, both tiers'
+membership and the per-character normaliser move, and with them the share of
+draws on which no draft names the subject -- the draws on which the subject
+rule falls back to the whole pool and differs most from the shipped one. The
+default here is now
+`SamplingParams().max_new`, the candidate count, lambda and `min_chars` are the
+REPL's, and `tests/test_snnchat_v14_scoring.py` holds each against
+`scripts/chat.py`'s parser. The committed `v12_*` pools WERE drawn at 300 and
+`score_v14.py --exploratory` reads them as such; a confirmatory pool records
+its own `max_new` and the scorer takes `n_scored` from the file.
+
+What a pool drawn here still is NOT:
+
+* It is a FIRST turn. The REPL carries membrane state and its loop-penalty
+  history across turns; every draw here starts from `state=None`.
+* The REPL feeds `[BOS]` when the session opens and the turn afterwards, in two
+  forward calls; this feeds `[BOS, <user turn>, BOT]` in one, and hands `rerank`
+  logits of shape [1, V] where the REPL hands [V]. The arithmetic is the same
+  and the GEMM shapes are not, so the last bits of the logits may differ and a
+  sampled character with them. The pool is a draw from the same distribution,
+  not a replay of a REPL transcript.
+* The REPL's sampler seed is None unless `--seed` is given; here it is fixed.
+* With `subject_tier` on, the REPL would run ONE `select`, with the subject.
+  Here the subject rule is a SECOND `select` on candidates the shipped pass
+  may already have null-scored. The winner is the same (`select`'s docstring;
+  `test_selecting_twice_from_one_pool_is_two_independent_reranks`).
+
+THE CLAUSE SET
+--------------
+`--set clause` is twelve requests whose "about X" is more than a bare noun:
+six where `snnchat.prime.tier_subject` cuts a modifying clause and returns the
+noun ("a penguin who loves fish" -> penguin), and six where it declines and
+returns None ("a penguin and make it funny"). Every committed probe list is
+bare "story about a X", on which the subject extractor cannot be wrong, so
+without this set a confirmatory run is blind to the extractor entirely. Its
+draws have kind `story_clause`: `score_v14.py` reports them as their own
+subset and keeps them OUT of the pooled bars, whose prompt lists were fixed
+before this set existed. The six None prompts are subject-less draws, so
+GUARD 1's identity covers them.
+
 THE NON-STORY GUARD SET
 -----------------------
 `--set dodge` draws the twelve non-narrative probes `lambda_dodge.py` uses.
@@ -101,9 +147,34 @@ FORMAT = "v14_pools/1"
 #: subject rule was written down.
 COMMITTED_SEEDS = 6
 
+#: Requests with a clause after the noun: `(prompt, accepted words)`. The
+#: accepted word is the noun the request is about, whatever `tier_subject`
+#: makes of it. The nouns are six of `echo_holdout.HELDOUT`'s, each used twice:
+#: the point of this set is the CLAUSE, and a noun the model cannot write about
+#: would leave the subject tier empty and the set with nothing to show.
+CLAUSE = (
+    # `tier_subject` cuts the modifying clause and keeps the noun.
+    ("tell me a story about a penguin who loves fish", ("penguin",)),
+    ("tell me a story about a wizard that is sad", ("wizard",)),
+    ("tell me a story about a turtle named Pip", ("turtle",)),
+    ("tell me a story about a squirrel who wants a friend", ("squirrel",)),
+    ("tell me a story about a whale called Snow", ("whale",)),
+    ("tell me a story about a bear which is very slow", ("bear",)),
+    # Not one noun phrase: `tier_subject` is None and the weighted tier decides.
+    ("tell me a story about a penguin and make it funny", ("penguin",)),
+    ("tell me a story about a wizard with a red hat", ("wizard",)),
+    ("tell me a story about a turtle in a big pond", ("turtle",)),
+    ("tell me a story about a squirrel and his dog", ("squirrel",)),
+    ("tell me a story about a whale tonight", ("whale",)),
+    ("tell me a story about a bear and make it short", ("bear",)),
+)
+
 #: The story sets are `echo_holdout.SETS`, imported rather than copied so the
 #: prompts cannot drift from the lists every committed number was measured on.
-SET_NAMES = (*sorted(STORY_SETS), "dodge")
+SET_NAMES = (*sorted(STORY_SETS), "clause", "dodge")
+
+#: Drafted characters per candidate: the REPL's. See the module docstring.
+REPL_MAX_NEW = SamplingParams().max_new
 
 
 def probes_for(name: str) -> list[tuple[str, tuple[str, ...], str]]:
@@ -116,6 +187,8 @@ def probes_for(name: str) -> list[tuple[str, tuple[str, ...], str]]:
     if name == "dodge":
         return [(p.prompt, tuple(p.expect), p.kind) for p in PROBES
                 if p.kind in DODGE_KINDS]
+    if name == "clause":
+        return [(prompt, tuple(words), "story_clause") for prompt, words in CLAUSE]
     return [(prompt, tuple(words), "story") for prompt, words in STORY_SETS[name]]
 
 
@@ -179,7 +252,8 @@ def draw(model, tok, prompt: str, seed: int, rp: RerankParams, *, max_new: int,
     """One (prompt, sampler seed): one pool, both winners, every candidate.
 
     The prefix and the call into `rerank` are `echo_holdout.py`'s, so a pool
-    drawn here at a committed seed is the pool that script drew.
+    drawn here at a committed seed AND `max_new=300` is the pool that script
+    drew. What separates it from a REPL turn is in the module docstring.
     """
     if rp.n < 2:
         raise ValueError("a pool of one has no selector to compare")
@@ -188,8 +262,10 @@ def draw(model, tok, prompt: str, seed: int, rp: RerankParams, *, max_new: int,
     ids = torch.tensor([prefix], device=device)
     logits, state, _ = model(ids, state=None)
 
-    # ONE pool. The shipped winner comes from `rerank` itself, called the way
-    # `ChatSession` calls it with the default parameters: no subject.
+    # ONE pool. The shipped winner comes from `rerank` itself, with the
+    # arguments `ChatSession._reranked` passes under the default parameters --
+    # the prompt's content words and NO subject. It is not a `ChatSession` turn;
+    # the module docstring lists what differs.
     _sync(device)
     t0 = time.perf_counter()
     shipped, cands = rerank(model, logits[:, -1, :].float(), state, params, rp,
@@ -313,8 +389,8 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-@torch.no_grad()
-def main(argv=None) -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """Split from `main` so a test can hold the defaults against the REPL's."""
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--ckpt", default="experiments/chat/chat-v3d-aligned/ckpt_best.pt",
@@ -327,7 +403,9 @@ def main(argv=None) -> int:
                     help="permit an offset below 6, i.e. redraw pools already read")
     ap.add_argument("--n", type=int, default=256, help="candidates per draw")
     ap.add_argument("--lam", type=float, default=0.6)
-    ap.add_argument("--max-new", type=int, default=300)
+    ap.add_argument("--max-new", type=int, default=REPL_MAX_NEW,
+                    help="drafted characters per candidate; the default is the "
+                         "REPL's. The committed v12 pools were drawn at 300")
     ap.add_argument("--no-graph", action="store_true",
                     help="disable the captured-graph stepper; same draws, slower")
     ap.add_argument("--no-timing", action="store_true",
@@ -335,7 +413,12 @@ def main(argv=None) -> int:
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default=None,
                     help="default experiments/chat/_quality/v14_<set>_<run>.json.gz")
-    args = ap.parse_args(argv)
+    return ap
+
+
+@torch.no_grad()
+def main(argv=None) -> int:
+    args = build_parser().parse_args(argv)
 
     try:
         seeds = sampler_seeds(args.seeds, args.seed_offset,
@@ -366,6 +449,7 @@ def main(argv=None) -> int:
         "probe_set": args.probe_set,
         "seeds": args.seeds, "seed_offset": args.seed_offset, "sampler_seeds": seeds,
         "n": args.n, "lam": args.lam, "max_new": args.max_new,
+        "repl_max_new": REPL_MAX_NEW,
         "min_chars": rp.min_chars, "null": rp.null,
         "trim_to_sentence": rp.trim_to_sentence,
         "device": str(args.device), "graph": rp.graph,
@@ -377,6 +461,9 @@ def main(argv=None) -> int:
     }
     write_pool(out, blob)
 
+    if args.max_new != REPL_MAX_NEW:
+        print(f"\nNOTE: --max-new {args.max_new} is not the REPL's {REPL_MAX_NEW}; this "
+              "pool does not describe `python scripts/chat.py` at its defaults.")
     same = sum(1 for d in draws if d["shipped_index"] == d["subject_index"])
     print(f"\n{args.probe_set}: {len(probes)} prompts x {len(seeds)} seeds "
           f"(sampler seeds {seeds[0]}..{seeds[-1]}) = {len(draws)} draws, "
