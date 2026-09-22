@@ -1,0 +1,172 @@
+{
+ "state": "DONE",
+ "finished": true,
+ "pid": 6128,
+ "started": "2026-09-21 18:23:42",
+ "stage": null,
+ "stages": [
+  {
+   "stage": "preflight",
+   "started": "2026-09-21 18:23:44",
+   "finished": "2026-09-21 18:23:44",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\driver_record.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "floors",
+   "started": "2026-09-21 18:23:44",
+   "finished": "2026-09-21 18:27:53",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\memory_probe.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\memory_probe_v2_n8.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\binding_probe.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "smoke",
+   "started": "2026-09-21 18:27:53",
+   "finished": "2026-09-21 18:28:21",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\smoke\\chat-v15-smoke\\summary.json"
+   ],
+   "error": null,
+   "smoke": {
+    "mix_line": "mix: alpaca 9%, dolly 6%, oasst1 2%, persona 8%, recall 6%, soda 20%, stories_topic 40%, tinystories 9%",
+    "config_diff": {
+     "differs": {
+      "data_dir": [
+       "data/chat",
+       "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat"
+      ],
+      "max_steps": [
+       14000,
+       20
+      ],
+      "mix": [
+       {
+        "stories_topic": 0.4,
+        "soda": 0.2,
+        "alpaca": 0.15,
+        "tinystories": 0.09,
+        "persona": 0.08,
+        "dolly": 0.06,
+        "oasst1": 0.02
+       },
+       {
+        "stories_topic": 0.4,
+        "soda": 0.2,
+        "alpaca": 0.09,
+        "tinystories": 0.09,
+        "persona": 0.08,
+        "dolly": 0.06,
+        "oasst1": 0.02,
+        "recall": 0.06
+       }
+      ],
+      "out_dir": [
+       "experiments/chat",
+       "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\smoke"
+      ],
+      "run_name": [
+       "chat-v3d-aligned",
+       "chat-v15-smoke"
+      ]
+     },
+     "violations": [],
+     "new_fields_at_default_exempted": []
+    }
+   }
+  },
+  {
+   "stage": "train:chat-v15-recall-s0",
+   "started": "2026-09-21 18:28:21",
+   "finished": "2026-09-21 19:09:35",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\summary.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "train:chat-v15-recall-s1",
+   "started": "2026-09-21 19:09:35",
+   "finished": "2026-09-21 19:50:18",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\summary.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "score:chat-v15-recall-s0",
+   "started": "2026-09-21 19:50:18",
+   "finished": "2026-09-21 19:56:44",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe_v2_n8.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\binding_probe.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe_v2_n256.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\battery.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\heldout_n256.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "score:chat-v15-recall-s1",
+   "started": "2026-09-21 19:56:44",
+   "finished": "2026-09-21 20:03:14",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe_v2_n8.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\binding_probe.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe_v2_n256.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\battery.json",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\heldout_n256.json"
+   ],
+   "error": null
+  },
+  {
+   "stage": "verdict",
+   "started": "2026-09-21 20:03:14",
+   "finished": "2026-09-21 20:03:16",
+   "result": "ok",
+   "artifacts": [
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\score_v15.json"
+   ],
+   "error": null
+  }
+ ],
+ "alerts": [],
+ "previous": [
+  {
+   "state": "PREFLIGHT_OK",
+   "finished": true,
+   "pid": 1696,
+   "started": "2026-09-21 18:23:35",
+   "stage": null,
+   "stages": [
+    {
+     "stage": "preflight",
+     "started": "2026-09-21 18:23:36",
+     "finished": "2026-09-21 18:23:37",
+     "result": "ok",
+     "artifacts": [
+      "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\driver_record.json"
+     ],
+     "error": null
+    }
+   ],
+   "alerts": [],
+   "updated": "2026-09-21 18:23:37"
+  }
+ ],
+ "updated": "2026-09-21 20:03:16"
+}
