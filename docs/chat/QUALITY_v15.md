@@ -223,9 +223,8 @@ called Charlie."*
 | `social` > 19.5/20 | pass — 1.0000 (20/20), 95% CI [0.839, 1.000] | pass — 20/20 |
 | `identity` > 14.5/16 | pass — 1.0000 (16/16), 95% CI [0.806, 1.000] | pass — 16/16 |
 
-Seven of the nine guards passed on s0 and six on s1. `swap` is a straddle on the counts
-(7 < 9 on s0; 6 > 5 on s1) at rates whose intervals overlap entirely — on the
-/80 lattice the guard is decided by one cell — and it is reported as it fired.
+Seven of the nine guards passed on s0 and six on s1. `swap` reads 7 < 9 on s0
+(pass) and 6 > 5 on s1 (FAIL), and is reported as it fired.
 
 **`bpc_soda` is worse on both seeds**, by 1.56× and 1.18× its band. `soda` did
 not change weight; what changed is that `alpaca` gave up 0.06 of the mix and
@@ -394,8 +393,11 @@ the pet's name was `luna`; the model answered the wrong slot with the species),
 *"Your hat is got."* (S3 item 10, s1), *"Your bicycle is running."* (S5, s1)
 name nothing on any list and fall to `other`, so the `wrong_value` counts above
 are floors on the confidently-wrong rate, not ceilings. The `blue` inflation the
-pre-registration predicted on committed item 5 did not show in the untold arm
-(0/80 on both seeds).
+pre-registration predicted on committed item 5 (`my favourite colour is blue`)
+did not show: `untold_hit` is 0/8 on that item on either seed (the untold
+replies are *"You haven't told me your favourite colour yet."* and, on s1,
+*"I don't know your favourite colour. You haven't told me."*); the whole untold
+arm at distance 0 is 0/80 on both.
 
 ## 6. The decision rule did not fire
 
@@ -434,8 +436,9 @@ and would split the floor branch three ways — (1) `floor` with nothing resolvi
 follows; (3) `floor` with a trained-phrasing reading resolving **and**
 `wrong_value` > `hit` on S2 on both seeds → a binding problem, and a
 window-length, carried-state or retrieval round is **not** the next step,
-because the fact is already inside the window and is not being read. This round
-is case (3) on both seeds (59 > 14, 60 > 10). Whether case (3) should *also*
+because the fact is already inside the window and is not being read. Under
+that rule this round would be case (3) on both seeds (59 > 14, 60 > 10); the
+rule is not applied here. Whether case (3) should *also*
 stop the memory programme is the owner's question (§8), not a rule this
 document can write.
 
@@ -467,12 +470,15 @@ document can write.
   (1–2 of 148 over all picks; v15 reads 18/148 and 23/148). The captures are of
   two kinds. A `list` request containing a slot word is read as a statement and
   acknowledged instead of answered: *"name three colours"* → *"Got it."*,
-  *"Okay, I'll remember that."*, *"Thanks for telling me."*; *"can you name an
-  animal?"* → *"I don't know your name. You haven't told me."* A `fact`
-  question is refused as an untold user fact: *"what colour is grass?"* →
-  *"I don't know. You haven't told me what your pony is called."*; *"what
-  colour is the sky?"* → *"I don't know. You haven't told me what your goldfish
-  is called."* For a REPL user this is a new failure on ordinary requests at
+  *"Okay, I'll remember that."*, *"Thanks for telling me."* (sampler seeds 1,
+  3 and 2; the same three texts on both v15 seeds); *"can you name an
+  animal?"* → *"I don't know your name. You haven't told me."* (s0, seeds 0
+  and 2). A `fact` question is refused as an untold user fact: *"what colour
+  is grass?"* → *"I don't know. You haven't told me what your pony is called."*
+  (s0, seed 0); *"what colour is the sky?"* → *"I don't know. You haven't told
+  me what your goldfish is called."* (s1, seeds 2 and 3). Each is a
+  `report.baseline_picks` row of `v15_<run>_battery.json.gz`, keyed by
+  `prompt` and `seed`. For a REPL user this is a new failure on ordinary requests at
   roughly one substantive reply in seven, on top of the wrong-name
   behaviour the round was run to fix. The panel gave this column no threshold
   (§12 item 7 of the pre-registration) and none is invented here.
@@ -524,10 +530,11 @@ built to give it.
    a sample against ~47 alternatives would need a tilt an order of magnitude
    larger — but the model's ability to carry a specific five-character string
    across a turn boundary, which is a question about the neuron and the
-   architecture, not about the mix. That is the "longer windows, carried state
-   and the retrieval envelope are moot" conclusion of the stop rule, reached
-   by a route the stop rule did not take. Whether to spend another round on
-   it, and on which side of the protocol boundary, is his.
+   architecture, not about the mix. By inference — not by the rule, which did
+   not fire (§6) — that would point at the same "longer windows, carried state
+   and the retrieval envelope are moot" conclusion the stop rule reaches, by a
+   route the stop rule did not cover. Whether to spend another round on it,
+   and on which side of the protocol boundary, is his.
 
 ---
 
@@ -552,7 +559,9 @@ the minimum must be at step 14,000:
 
     python -c "import json,sys; e=[json.loads(l) for l in open(sys.argv[1],encoding='utf-8') if '\"eval\"' in l]; print([(r['step'],round(r['weighted'],7)) for r in e], min(e,key=lambda r:r['weighted'])['step'])" <out>/runs/chat-v15-recall-s0/log.jsonl
 
-(or read `v15_<run>_evals.json`, which is those rows extracted in file order).
+(or read `v15_<run>_evals.json`: a dict `{run, source, n_divergence_events,
+evals}` whose `evals` list is those five rows extracted in file order, equal to
+the `log.jsonl` events field for field).
 
 **The replies quoted in §0** — `v15_floors_memory_probe.json` and
 `v15_<run>_memory_probe.json` → `rows` with `distance == 0` and `"elliot" in
