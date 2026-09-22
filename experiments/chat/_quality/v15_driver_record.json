@@ -1,0 +1,1540 @@
+{
+ "history": [
+  {
+   "head": "57c146a0b9a2b3f8dd28e92168136b1a1a29af05",
+   "recorded": "2026-09-21 18:23:37"
+  }
+ ],
+ "prereg": {
+  "head": "57c146a0b9a2b3f8dd28e92168136b1a1a29af05",
+  "blobs": {
+   "docs/chat/PREDICTION_v15.md": "9e27fa0369d10388513578e7f6e990995ce81e31",
+   "src/snnchat/recall.py": "bc1cc38be9490c46e58cfa4d0c36a58916a4eb7b",
+   "scripts/chat/memory_probe.py": "a524c3d7eceeaf40b7862cc1f5d1d33ec84eb560",
+   "scripts/chat/memory_probe_v2.py": "d0488901fe9b28588bcd74b22c656ae729c03970",
+   "scripts/chat/binding_probe.py": "946a7895f1ddc722b939cf8c20073a34134bf129",
+   "scripts/chat/score_v15.py": "4f31f5397fc2a36cbebf164fb707e8e760974a99",
+   "scripts/chat/session15_driver.py": "1d273a6d4365149a5bf1c4e447a0bcd7e0e0420f"
+  },
+  "untracked_code": []
+ },
+ "corpus": {
+  "manifest": "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat\\manifest.json",
+  "sources": [
+   "alpaca",
+   "dolly",
+   "oasst1",
+   "persona",
+   "recall",
+   "soda",
+   "stories_topic",
+   "tinystories"
+  ],
+  "recall": {
+   "chars_total": 35413992,
+   "chars_train": 35272337,
+   "chars_val": 141655,
+   "conversations": 250000,
+   "generator": "snnchat.recall.build_recall_conversations",
+   "hazard_evidence_cut": {
+    "align_frac": 0.75,
+    "align_lookahead": 1024,
+    "batch_size": 160,
+    "by_window": {
+     "aligned": {
+      "answers": 1152244,
+      "cut": 0,
+      "no_evidence": 0,
+      "windows": 960000
+     },
+     "random": {
+      "answers": 490861,
+      "cut": 206985,
+      "no_evidence": 193157,
+      "windows": 320000
+     }
+    },
+    "cut_rate": 0.12597186424482915,
+    "dose": {
+     "min_exposures": 600,
+     "per_slot": {
+      "animal": {
+       "asked": {
+        "max": 935.655,
+        "mean": 869.5260000000001,
+        "min": 809.3399999999999
+       },
+       "asked_under_floor": [],
+       "values": 40,
+       "with_evidence": {
+        "max": 794.745,
+        "mean": 732.3277499999999,
+        "min": 677.67
+       },
+       "with_evidence_under_floor": []
+      },
+      "colour": {
+       "asked": {
+        "max": 1599.465,
+        "mean": 1499.5749999999998,
+        "min": 1459.815
+       },
+       "asked_under_floor": [],
+       "values": 12,
+       "with_evidence": {
+        "max": 1373.925,
+        "mean": 1280.965,
+        "min": 1239.0
+       },
+       "with_evidence_under_floor": []
+      },
+      "food": {
+       "asked": {
+        "max": 892.29,
+        "mean": 823.37325,
+        "min": 768.39
+       },
+       "asked_under_floor": [],
+       "values": 40,
+       "with_evidence": {
+        "max": 767.76,
+        "mean": 713.3489999999999,
+        "min": 665.175
+       },
+       "with_evidence_under_floor": []
+      },
+      "name": {
+       "asked": {
+        "max": 870.4499999999999,
+        "mean": 819.669375,
+        "min": 753.795
+       },
+       "asked_under_floor": [],
+       "values": 48,
+       "with_evidence": {
+        "max": 791.385,
+        "mean": 743.23375,
+        "min": 677.67
+       },
+       "with_evidence_under_floor": []
+      },
+      "object": {
+       "asked": {
+        "max": 1219.575,
+        "mean": 1134.58625,
+        "min": 1086.435
+       },
+       "asked_under_floor": [],
+       "values": 12,
+       "with_evidence": {
+        "max": 1081.29,
+        "mean": 1009.3825,
+        "min": 965.055
+       },
+       "with_evidence_under_floor": []
+      },
+      "pet": {
+       "asked": {
+        "max": 901.425,
+        "mean": 846.3997499999999,
+        "min": 792.3299999999999
+       },
+       "asked_under_floor": [],
+       "values": 40,
+       "with_evidence": {
+        "max": 796.74,
+        "mean": 745.1535,
+        "min": 697.095
+       },
+       "with_evidence_under_floor": []
+      }
+     },
+     "per_value": {
+      "animal": {
+       "badger": [
+        883.89,
+        742.035
+       ],
+       "bear": [
+        891.3449999999999,
+        744.87
+       ],
+       "butterfly": [
+        861.42,
+        719.145
+       ],
+       "camel": [
+        898.0649999999999,
+        756.3149999999999
+       ],
+       "cow": [
+        917.0699999999999,
+        786.03
+       ],
+       "crocodile": [
+        812.805,
+        681.03
+       ],
+       "deer": [
+        858.48,
+        726.7049999999999
+       ],
+       "dolphin": [
+        843.255,
+        703.29
+       ],
+       "duck": [
+        863.31,
+        731.01
+       ],
+       "eagle": [
+        935.655,
+        794.745
+       ],
+       "elephant": [
+        853.9649999999999,
+        710.64
+       ],
+       "fox": [
+        859.11,
+        729.645
+       ],
+       "frog": [
+        899.85,
+        760.62
+       ],
+       "giraffe": [
+        809.3399999999999,
+        677.67
+       ],
+       "goat": [
+        865.0949999999999,
+        734.79
+       ],
+       "hedgehog": [
+        908.145,
+        765.03
+       ],
+       "hippo": [
+        889.665,
+        754.9499999999999
+       ],
+       "horse": [
+        857.64,
+        722.61
+       ],
+       "jaguar": [
+        875.6999999999999,
+        732.27
+       ],
+       "kangaroo": [
+        828.03,
+        690.165
+       ],
+       "koala": [
+        881.475,
+        745.29
+       ],
+       "lion": [
+        870.135,
+        735.8399999999999
+       ],
+       "llama": [
+        842.9399999999999,
+        713.475
+       ],
+       "monkey": [
+        900.795,
+        757.05
+       ],
+       "otter": [
+        860.16,
+        721.665
+       ],
+       "owl": [
+        867.1949999999999,
+        737.8349999999999
+       ],
+       "panda": [
+        878.115,
+        735.2099999999999
+       ],
+       "penguin": [
+        871.605,
+        730.905
+       ],
+       "pig": [
+        887.355,
+        750.54
+       ],
+       "rhino": [
+        867.8249999999999,
+        723.765
+       ],
+       "seal": [
+        881.16,
+        744.555
+       ],
+       "shark": [
+        857.01,
+        729.015
+       ],
+       "snake": [
+        860.265,
+        718.41
+       ],
+       "spider": [
+        855.9599999999999,
+        722.0849999999999
+       ],
+       "squirrel": [
+        849.555,
+        710.115
+       ],
+       "swan": [
+        882.42,
+        747.81
+       ],
+       "tiger": [
+        881.265,
+        741.8249999999999
+       ],
+       "whale": [
+        829.185,
+        695.52
+       ],
+       "wolf": [
+        861.525,
+        728.175
+       ],
+       "zebra": [
+        883.26,
+        740.4599999999999
+       ]
+      },
+      "colour": {
+       "black": [
+        1460.235,
+        1239.0
+       ],
+       "blue": [
+        1599.465,
+        1373.925
+       ],
+       "brown": [
+        1508.01,
+        1294.125
+       ],
+       "gold": [
+        1506.33,
+        1282.68
+       ],
+       "green": [
+        1474.3049999999998,
+        1257.06
+       ],
+       "orange": [
+        1512.105,
+        1287.615
+       ],
+       "pink": [
+        1459.815,
+        1241.835
+       ],
+       "purple": [
+        1468.215,
+        1255.695
+       ],
+       "red": [
+        1558.3049999999998,
+        1339.905
+       ],
+       "silver": [
+        1493.205,
+        1273.86
+       ],
+       "white": [
+        1465.59,
+        1258.32
+       ],
+       "yellow": [
+        1489.32,
+        1267.56
+       ]
+      },
+      "food": {
+       "apples": [
+        787.185,
+        682.0799999999999
+       ],
+       "bananas": [
+        850.29,
+        741.0899999999999
+       ],
+       "beans": [
+        776.37,
+        666.12
+       ],
+       "bread": [
+        835.485,
+        729.12
+       ],
+       "burgers": [
+        799.89,
+        689.64
+       ],
+       "cake": [
+        880.74,
+        765.135
+       ],
+       "cheese": [
+        838.9499999999999,
+        729.435
+       ],
+       "cookies": [
+        892.29,
+        767.76
+       ],
+       "curry": [
+        876.54,
+        756.63
+       ],
+       "donuts": [
+        860.055,
+        741.72
+       ],
+       "dumplings": [
+        832.86,
+        715.995
+       ],
+       "eggs": [
+        832.125,
+        720.51
+       ],
+       "grapes": [
+        772.5899999999999,
+        667.17
+       ],
+       "ham": [
+        815.745,
+        712.845
+       ],
+       "ice cream": [
+        790.86,
+        678.51
+       ],
+       "jam": [
+        809.9699999999999,
+        709.6949999999999
+       ],
+       "lasagna": [
+        777.3149999999999,
+        675.675
+       ],
+       "lemons": [
+        807.03,
+        692.895
+       ],
+       "mango": [
+        821.31,
+        715.47
+       ],
+       "melon": [
+        824.145,
+        721.35
+       ],
+       "muffins": [
+        827.1899999999999,
+        719.355
+       ],
+       "noodles": [
+        845.4599999999999,
+        732.48
+       ],
+       "nuts": [
+        818.265,
+        710.22
+       ],
+       "olives": [
+        820.4699999999999,
+        710.115
+       ],
+       "pancakes": [
+        781.305,
+        671.16
+       ],
+       "peas": [
+        813.12,
+        707.595
+       ],
+       "pizza": [
+        825.8249999999999,
+        718.1999999999999
+       ],
+       "plums": [
+        857.43,
+        743.8199999999999
+       ],
+       "popcorn": [
+        836.64,
+        720.0899999999999
+       ],
+       "pretzels": [
+        835.0649999999999,
+        720.405
+       ],
+       "rice": [
+        848.295,
+        743.61
+       ],
+       "salad": [
+        768.39,
+        665.175
+       ],
+       "soup": [
+        818.895,
+        714.63
+       ],
+       "spaghetti": [
+        798.0,
+        681.4499999999999
+       ],
+       "stew": [
+        861.525,
+        752.64
+       ],
+       "sushi": [
+        840.9449999999999,
+        730.17
+       ],
+       "tacos": [
+        816.9,
+        708.3299999999999
+       ],
+       "toast": [
+        862.89,
+        742.35
+       ],
+       "waffles": [
+        791.28,
+        680.7149999999999
+       ],
+       "yogurt": [
+        785.295,
+        682.605
+       ]
+      },
+      "name": {
+       "adam": [
+        795.6899999999999,
+        723.135
+       ],
+       "alice": [
+        832.9649999999999,
+        759.045
+       ],
+       "amy": [
+        838.3199999999999,
+        762.0899999999999
+       ],
+       "anna": [
+        815.3249999999999,
+        743.61
+       ],
+       "ben": [
+        789.0749999999999,
+        717.675
+       ],
+       "billy": [
+        869.0849999999999,
+        790.23
+       ],
+       "carl": [
+        783.8249999999999,
+        715.26
+       ],
+       "chloe": [
+        862.26,
+        779.52
+       ],
+       "david": [
+        809.655,
+        725.865
+       ],
+       "elliot": [
+        856.485,
+        775.74
+       ],
+       "emma": [
+        858.165,
+        785.8199999999999
+       ],
+       "eva": [
+        838.2149999999999,
+        764.1899999999999
+       ],
+       "fred": [
+        868.98,
+        787.5
+       ],
+       "george": [
+        812.175,
+        732.5849999999999
+       ],
+       "greg": [
+        817.8449999999999,
+        736.89
+       ],
+       "harry": [
+        801.15,
+        728.805
+       ],
+       "helen": [
+        805.56,
+        727.4399999999999
+       ],
+       "ian": [
+        840.63,
+        770.0699999999999
+       ],
+       "ivy": [
+        797.5799999999999,
+        726.0749999999999
+       ],
+       "jack": [
+        758.31,
+        687.9599999999999
+       ],
+       "jenny": [
+        800.52,
+        725.865
+       ],
+       "john": [
+        830.76,
+        752.01
+       ],
+       "julia": [
+        753.795,
+        677.67
+       ],
+       "kate": [
+        865.8299999999999,
+        789.0749999999999
+       ],
+       "kevin": [
+        836.43,
+        754.3199999999999
+       ],
+       "laura": [
+        845.145,
+        767.55
+       ],
+       "leo": [
+        822.255,
+        743.0849999999999
+       ],
+       "lily": [
+        787.92,
+        714.2099999999999
+       ],
+       "lucy": [
+        870.4499999999999,
+        791.385
+       ],
+       "matt": [
+        846.615,
+        765.555
+       ],
+       "megan": [
+        809.13,
+        732.48
+       ],
+       "mia": [
+        833.91,
+        758.1
+       ],
+       "molly": [
+        833.49,
+        756.0
+       ],
+       "nick": [
+        809.55,
+        733.53
+       ],
+       "noah": [
+        800.31,
+        725.865
+       ],
+       "oliver": [
+        786.765,
+        708.12
+       ],
+       "paul": [
+        846.0899999999999,
+        770.6999999999999
+       ],
+       "peter": [
+        769.3349999999999,
+        694.47
+       ],
+       "ron": [
+        798.9449999999999,
+        729.855
+       ],
+       "ryan": [
+        822.4649999999999,
+        741.3
+       ],
+       "sarah": [
+        763.665,
+        689.3249999999999
+       ],
+       "sophie": [
+        819.525,
+        737.52
+       ],
+       "steve": [
+        867.8249999999999,
+        781.8299999999999
+       ],
+       "tim": [
+        834.12,
+        760.1999999999999
+       ],
+       "tom": [
+        856.8,
+        777.8399999999999
+       ],
+       "victor": [
+        780.15,
+        709.485
+       ],
+       "wendy": [
+        803.67,
+        725.025
+       ],
+       "zoe": [
+        797.37,
+        723.345
+       ]
+      },
+      "object": {
+       "black": [
+        1145.76,
+        1020.0749999999999
+       ],
+       "blue": [
+        1167.3899999999999,
+        1043.595
+       ],
+       "brown": [
+        1099.77,
+        974.61
+       ],
+       "gold": [
+        1197.105,
+        1063.125
+       ],
+       "green": [
+        1129.905,
+        1006.2149999999999
+       ],
+       "orange": [
+        1100.82,
+        979.545
+       ],
+       "pink": [
+        1088.115,
+        965.055
+       ],
+       "purple": [
+        1100.295,
+        977.4449999999999
+       ],
+       "red": [
+        1219.575,
+        1081.29
+       ],
+       "silver": [
+        1086.435,
+        971.985
+       ],
+       "white": [
+        1148.805,
+        1021.545
+       ],
+       "yellow": [
+        1131.06,
+        1008.105
+       ]
+      },
+      "pet": {
+       "alfie": [
+        818.265,
+        721.77
+       ],
+       "archie": [
+        823.8299999999999,
+        721.4549999999999
+       ],
+       "bella": [
+        849.87,
+        743.1899999999999
+       ],
+       "bruno": [
+        840.105,
+        736.785
+       ],
+       "buddy": [
+        874.86,
+        770.6999999999999
+       ],
+       "charlie": [
+        822.4649999999999,
+        726.495
+       ],
+       "coco": [
+        827.505,
+        733.11
+       ],
+       "daisy": [
+        839.16,
+        733.845
+       ],
+       "dexter": [
+        863.625,
+        760.305
+       ],
+       "duke": [
+        868.14,
+        767.655
+       ],
+       "felix": [
+        874.65,
+        770.6999999999999
+       ],
+       "fluffy": [
+        802.8299999999999,
+        705.39
+       ],
+       "gizmo": [
+        867.405,
+        760.8299999999999
+       ],
+       "goldie": [
+        842.73,
+        738.675
+       ],
+       "jasper": [
+        901.425,
+        796.74
+       ],
+       "kiki": [
+        849.555,
+        746.865
+       ],
+       "lola": [
+        871.395,
+        769.02
+       ],
+       "luna": [
+        847.77,
+        751.485
+       ],
+       "max": [
+        809.76,
+        718.935
+       ],
+       "mittens": [
+        836.3249999999999,
+        735.0
+       ],
+       "monty": [
+        858.27,
+        759.4649999999999
+       ],
+       "murphy": [
+        830.235,
+        729.12
+       ],
+       "nala": [
+        856.38,
+        752.01
+       ],
+       "nemo": [
+        838.2149999999999,
+        744.555
+       ],
+       "ollie": [
+        870.975,
+        764.4
+       ],
+       "otis": [
+        837.9,
+        744.555
+       ],
+       "pip": [
+        844.62,
+        742.035
+       ],
+       "poppy": [
+        880.635,
+        776.895
+       ],
+       "ralph": [
+        856.0649999999999,
+        753.375
+       ],
+       "rex": [
+        825.0899999999999,
+        726.285
+       ],
+       "rocky": [
+        868.4549999999999,
+        769.86
+       ],
+       "rusty": [
+        841.68,
+        736.155
+       ],
+       "simba": [
+        857.01,
+        754.635
+       ],
+       "smokey": [
+        825.3,
+        720.615
+       ],
+       "teddy": [
+        894.915,
+        784.245
+       ],
+       "tilly": [
+        808.185,
+        711.165
+       ],
+       "toby": [
+        863.2049999999999,
+        759.99
+       ],
+       "whiskers": [
+        792.3299999999999,
+        697.095
+       ],
+       "winnie": [
+        857.43,
+        757.5749999999999
+       ],
+       "ziggy": [
+        817.425,
+        713.16
+       ]
+      }
+     },
+     "recipe_windows": 134400.0,
+     "replayed_windows": 1280000,
+     "scale": 0.105,
+     "seq_len_is_the_recipes": true
+    },
+    "no_evidence_rate": 0.11755609045070156,
+    "sampler_seed": 0,
+    "seq_len": 256,
+    "steps": 8000,
+    "total": {
+     "answers": 1643105,
+     "cut": 206985,
+     "no_evidence": 193157,
+     "windows": 1280000
+    }
+   },
+   "seconds": 8.8,
+   "seed": 0
+  }
+ },
+ "recipe_diff": {
+  "differs": {
+   "data_dir": [
+    "data/chat",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat"
+   ],
+   "mix": [
+    {
+     "stories_topic": 0.4,
+     "soda": 0.2,
+     "alpaca": 0.15,
+     "tinystories": 0.09,
+     "persona": 0.08,
+     "dolly": 0.06,
+     "oasst1": 0.02
+    },
+    {
+     "stories_topic": 0.4,
+     "soda": 0.2,
+     "alpaca": 0.09,
+     "tinystories": 0.09,
+     "persona": 0.08,
+     "dolly": 0.06,
+     "oasst1": 0.02,
+     "recall": 0.06
+    }
+   ],
+   "out_dir": [
+    "experiments/chat",
+    "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs"
+   ],
+   "run_name": [
+    "chat-v3d-aligned",
+    "chat-v15-recall-s0"
+   ]
+  },
+  "violations": [],
+  "new_fields_at_default_exempted": []
+ },
+ "reference": "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v3d-aligned\\config.json",
+ "parent": "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v2-anneal\\ckpt_best.pt",
+ "mix": {
+  "stories_topic": 0.4,
+  "soda": 0.2,
+  "alpaca": 0.09,
+  "tinystories": 0.09,
+  "persona": 0.08,
+  "dolly": 0.06,
+  "oasst1": 0.02,
+  "recall": 0.06
+ },
+ "recorded": "2026-09-21 18:23:44",
+ "plan": [
+  {
+   "stage": "preflight",
+   "commands": []
+  },
+  {
+   "stage": "floors",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v3d-aligned\\ckpt_best.pt",
+     "--seeds",
+     "8",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\memory_probe.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe_v2.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v3d-aligned\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\memory_probe_v2_n8.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\binding_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v3d-aligned\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\floors\\binding_probe.json"
+    ]
+   ]
+  },
+  {
+   "stage": "smoke",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\train.py",
+     "--data-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat",
+     "--seq-len",
+     "256",
+     "--batch-size",
+     "160",
+     "--bot-loss-weight",
+     "3.0",
+     "--align-frac",
+     "0.75",
+     "--align-lookahead",
+     "1024",
+     "--d-model",
+     "1024",
+     "--n-layers",
+     "4",
+     "--arch",
+     "twocomp_threshold",
+     "--beta",
+     "0.5",
+     "--threshold",
+     "1.0",
+     "--surrogate-alpha",
+     "2.0",
+     "--w-init",
+     "0.1",
+     "--thr-log-init",
+     "0.0",
+     "--beta-slow",
+     "0.95",
+     "--spread-tau",
+     "--tau-min",
+     "3.0",
+     "--tau-max",
+     "600.0",
+     "--lr",
+     "0.0005",
+     "--weight-decay",
+     "0.1",
+     "--beta1",
+     "0.9",
+     "--beta2",
+     "0.95",
+     "--grad-clip",
+     "1.0",
+     "--warmup-steps",
+     "200",
+     "--max-steps",
+     "20",
+     "--lr-schedule",
+     "cosine",
+     "--lr-final-frac",
+     "0.05",
+     "--dtype",
+     "fp32",
+     "--fused",
+     "--cuda-graph",
+     "--device",
+     "cuda",
+     "--seed",
+     "0",
+     "--no-deterministic",
+     "--run-name",
+     "chat-v15-smoke",
+     "--out-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\smoke",
+     "--eval-every",
+     "3500",
+     "--eval-batches",
+     "30",
+     "--eval-batch-size",
+     "48",
+     "--ckpt-every",
+     "1000",
+     "--log-every",
+     "250",
+     "--sample-every",
+     "3500",
+     "--init-from",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v2-anneal\\ckpt_best.pt",
+     "--no-resume",
+     "--budget-minutes",
+     "75",
+     "--mix",
+     "stories_topic=0.4",
+     "soda=0.2",
+     "alpaca=0.09",
+     "tinystories=0.09",
+     "persona=0.08",
+     "dolly=0.06",
+     "oasst1=0.02",
+     "recall=0.06"
+    ]
+   ]
+  },
+  {
+   "stage": "train:chat-v15-recall-s0",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\train.py",
+     "--data-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat",
+     "--seq-len",
+     "256",
+     "--batch-size",
+     "160",
+     "--bot-loss-weight",
+     "3.0",
+     "--align-frac",
+     "0.75",
+     "--align-lookahead",
+     "1024",
+     "--d-model",
+     "1024",
+     "--n-layers",
+     "4",
+     "--arch",
+     "twocomp_threshold",
+     "--beta",
+     "0.5",
+     "--threshold",
+     "1.0",
+     "--surrogate-alpha",
+     "2.0",
+     "--w-init",
+     "0.1",
+     "--thr-log-init",
+     "0.0",
+     "--beta-slow",
+     "0.95",
+     "--spread-tau",
+     "--tau-min",
+     "3.0",
+     "--tau-max",
+     "600.0",
+     "--lr",
+     "0.0005",
+     "--weight-decay",
+     "0.1",
+     "--beta1",
+     "0.9",
+     "--beta2",
+     "0.95",
+     "--grad-clip",
+     "1.0",
+     "--warmup-steps",
+     "200",
+     "--max-steps",
+     "14000",
+     "--lr-schedule",
+     "cosine",
+     "--lr-final-frac",
+     "0.05",
+     "--dtype",
+     "fp32",
+     "--fused",
+     "--cuda-graph",
+     "--device",
+     "cuda",
+     "--seed",
+     "0",
+     "--no-deterministic",
+     "--run-name",
+     "chat-v15-recall-s0",
+     "--out-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs",
+     "--eval-every",
+     "3500",
+     "--eval-batches",
+     "30",
+     "--eval-batch-size",
+     "48",
+     "--ckpt-every",
+     "1000",
+     "--log-every",
+     "250",
+     "--sample-every",
+     "3500",
+     "--init-from",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v2-anneal\\ckpt_best.pt",
+     "--no-resume",
+     "--budget-minutes",
+     "75",
+     "--mix",
+     "stories_topic=0.4",
+     "soda=0.2",
+     "alpaca=0.09",
+     "tinystories=0.09",
+     "persona=0.08",
+     "dolly=0.06",
+     "oasst1=0.02",
+     "recall=0.06"
+    ]
+   ]
+  },
+  {
+   "stage": "train:chat-v15-recall-s1",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\train.py",
+     "--data-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-data\\chat",
+     "--seq-len",
+     "256",
+     "--batch-size",
+     "160",
+     "--bot-loss-weight",
+     "3.0",
+     "--align-frac",
+     "0.75",
+     "--align-lookahead",
+     "1024",
+     "--d-model",
+     "1024",
+     "--n-layers",
+     "4",
+     "--arch",
+     "twocomp_threshold",
+     "--beta",
+     "0.5",
+     "--threshold",
+     "1.0",
+     "--surrogate-alpha",
+     "2.0",
+     "--w-init",
+     "0.1",
+     "--thr-log-init",
+     "0.0",
+     "--beta-slow",
+     "0.95",
+     "--spread-tau",
+     "--tau-min",
+     "3.0",
+     "--tau-max",
+     "600.0",
+     "--lr",
+     "0.0005",
+     "--weight-decay",
+     "0.1",
+     "--beta1",
+     "0.9",
+     "--beta2",
+     "0.95",
+     "--grad-clip",
+     "1.0",
+     "--warmup-steps",
+     "200",
+     "--max-steps",
+     "14000",
+     "--lr-schedule",
+     "cosine",
+     "--lr-final-frac",
+     "0.05",
+     "--dtype",
+     "fp32",
+     "--fused",
+     "--cuda-graph",
+     "--device",
+     "cuda",
+     "--seed",
+     "1",
+     "--no-deterministic",
+     "--run-name",
+     "chat-v15-recall-s1",
+     "--out-dir",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs",
+     "--eval-every",
+     "3500",
+     "--eval-batches",
+     "30",
+     "--eval-batch-size",
+     "48",
+     "--ckpt-every",
+     "1000",
+     "--log-every",
+     "250",
+     "--sample-every",
+     "3500",
+     "--init-from",
+     "C:\\Elliot's Stuff\\SNN\\Text SNN\\experiments\\chat\\chat-v2-anneal\\ckpt_best.pt",
+     "--no-resume",
+     "--budget-minutes",
+     "75",
+     "--mix",
+     "stories_topic=0.4",
+     "soda=0.2",
+     "alpaca=0.09",
+     "tinystories=0.09",
+     "persona=0.08",
+     "dolly=0.06",
+     "oasst1=0.02",
+     "recall=0.06"
+    ]
+   ]
+  },
+  {
+   "stage": "score:chat-v15-recall-s0",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--seeds",
+     "8",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe_v2.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe_v2_n8.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\binding_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\binding_probe.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe_v2.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--shipped-decoder",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\memory_probe_v2_n256.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\quality.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--seeds",
+     "4",
+     "--n",
+     "16",
+     "--no-dependence",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\battery.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\echo_holdout.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--set",
+     "heldout",
+     "--seeds",
+     "6",
+     "--n",
+     "256",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s0\\heldout_n256.json"
+    ]
+   ]
+  },
+  {
+   "stage": "score:chat-v15-recall-s1",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--seeds",
+     "8",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe_v2.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe_v2_n8.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\binding_probe.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\binding_probe.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\memory_probe_v2.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--shipped-decoder",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\memory_probe_v2_n256.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\quality.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--seeds",
+     "4",
+     "--n",
+     "16",
+     "--no-dependence",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\battery.json"
+    ],
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\echo_holdout.py",
+     "--ckpt",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+     "--device",
+     "cuda",
+     "--set",
+     "heldout",
+     "--seeds",
+     "6",
+     "--n",
+     "256",
+     "--out",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\scores\\chat-v15-recall-s1\\heldout_n256.json"
+    ]
+   ]
+  },
+  {
+   "stage": "verdict",
+   "commands": [
+    [
+     "C:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+     "-u",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15\\scripts\\chat\\score_v15.py",
+     "--out-root",
+     "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out"
+    ]
+   ]
+  }
+ ]
+}

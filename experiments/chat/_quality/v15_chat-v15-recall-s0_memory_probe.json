@@ -1,0 +1,3215 @@
+{
+  "ckpt": "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s0\\ckpt_best.pt",
+  "seeds": 8,
+  "n": 8,
+  "lam": 0.6,
+  "items": 10,
+  "summary": {
+    "0": {
+      "n": 80,
+      "told": [
+        9,
+        80
+      ],
+      "untold": [
+        0,
+        80
+      ],
+      "told_ci": [
+        0.060326944976638874,
+        0.20018196765122948
+      ],
+      "discordant": [
+        0,
+        9
+      ],
+      "mcnemar_p": 0.00390625
+    },
+    "1": {
+      "n": 80,
+      "told": [
+        13,
+        80
+      ],
+      "untold": [
+        1,
+        80
+      ],
+      "told_ci": [
+        0.09749829588935616,
+        0.25842882156072267
+      ],
+      "discordant": [
+        0,
+        12
+      ],
+      "mcnemar_p": 0.00048828125
+    },
+    "2": {
+      "n": 80,
+      "told": [
+        6,
+        80
+      ],
+      "untold": [
+        3,
+        80
+      ],
+      "told_ci": [
+        0.03482530178294854,
+        0.15411995722826188
+      ],
+      "discordant": [
+        3,
+        6
+      ],
+      "mcnemar_p": 0.5078125
+    }
+  },
+  "rows": [
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Pete.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Zoe.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Pete.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Megan.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Julia.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Emma.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ron.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ron.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Nick.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ivy.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ian.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your name is Tim.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Max.",
+      "untold": "Your dog is called Mittens."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Rocky.",
+      "untold": "Your dog is called Rocky."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Daisy.",
+      "untold": "I don't know. You haven't told me what colour your is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Lily.",
+      "untold": "I don't know. You haven't told me what your rabbit is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Duke.",
+      "untold": "I don't know. You haven't told me what your rabbit is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Ziggy.",
+      "untold": "Your dog is called Polly."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Pickles.",
+      "untold": "I don't know. You haven't told me what your dog is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Rex.",
+      "untold": "Your dog is called Coco."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "You haven't told me about your cat yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Tilly.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Dexter.",
+      "untold": "I don't know. You haven't told me what colour your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Murphy.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Teddy.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Monty.",
+      "untold": "You haven't told me about your cat yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is gold.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is red.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is gold.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is gold.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is purple.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your usual sounds lovely.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your red ball is red.",
+      "untold": "I don't know your favourite food. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your pony is called Luna.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. I guess what happened too.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You haven't told me your favourite animal yet.",
+      "untold": "You haven't told me your favourite colour your ball is."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your cat is gold.",
+      "untold": "I don't know. What would you like to talk about?"
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your gold is called Coco.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your umbrella is brown.",
+      "untold": "No one too known. What about you?"
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what colour your kite is.",
+      "untold": "I don't know, I'm afraid."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what colour your cat is.",
+      "untold": "Not much, honestly. I chat, and I tell short stories."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Not a hat it color.",
+      "untold": "Good to know."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You haven't told me about your cat yet.",
+      "untold": "I don't know. You haven't told me what your parrot is called."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what colour your hat is.",
+      "untold": "Not much, what's up with you?"
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what colour your hat is.",
+      "untold": "I don't know. What would you like to do?"
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what colour your cat is called.",
+      "untold": "Good to know."
+    },
+    {
+      "distance": 0,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what you did all.",
+      "untold": "Not much, what's up with you?"
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is waffles.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is eggs.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "You told me your favourite food is pizza.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is pizza.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is pizza.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is curry.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is pizza.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your favourite food is plumise.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is yellow.",
+      "untold": "I don't know. You haven't told me what colour your bicycle your bird is really saying."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is blue.",
+      "untold": "I don't know. You haven't told me what colour your coat."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is yellow.",
+      "untold": "I don't know. You haven't told me what colour your bicycle is."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is black.",
+      "untold": "I don't know. You haven't told me what colour your cup is in."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is blue.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your bicycle is gold.",
+      "untold": "I don't know. You haven't told me what colour your coat is."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is olives.",
+      "untold": "I don't know. You haven't told me what colour your coat is."
+    },
+    {
+      "distance": 0,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is gold.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Sophie.",
+      "untold": "Your name is Peter."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "Your name is Noah."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Lily.",
+      "untold": "Your name is Noah."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Adam.",
+      "untold": "You told me your name is Ian."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Zoe.",
+      "untold": "Your name is Nick."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ryan.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Eva.",
+      "untold": "Your name is Sam."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Megan.",
+      "untold": "Your name is Sophie."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Harry.",
+      "untold": "Your name is Peter."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Tim.",
+      "untold": "Your name is Noah."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Carl.",
+      "untold": "Your name is Noah."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Adam.",
+      "untold": "You told me your name is Ian."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ash.",
+      "untold": "Your name is Nick."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ian.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Hear.",
+      "untold": "Your name is Sam."
+    },
+    {
+      "distance": 1,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Tim.",
+      "untold": "Your name is Sophie."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Max.",
+      "untold": "I don't know. You haven't told me what your turtle is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Duke.",
+      "untold": "Your dog is called Archie."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Tick.",
+      "untold": "I don't know. You haven't told me what your hamster is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Gizmo.",
+      "untold": "I don't know. You haven't told me what your dog is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Rex.",
+      "untold": "I don't know. You haven't told me what your turtle is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Gizmo.",
+      "untold": "Your dog is called Poppy."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Dox.",
+      "untold": "Your cat is called Duke."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Rex.",
+      "untold": "Your dog is called Coco."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Monty.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Tilly.",
+      "untold": "Your dog is called Archie."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Tilly.",
+      "untold": "I don't know. You haven't told me what your goldfish is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Kiki.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Brunon.",
+      "untold": "You told me your cat is called Ziggy."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your cat called Jack.",
+      "untold": "I don't know. You haven't told me what your cat is called."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 1.0,
+      "untold_hit": 1.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "Your cat is called Mittens."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "Your dog is called Charlie."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is brown.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "You told me your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is blue.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is green.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is green.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is gold.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is red.",
+      "untold": "I don't know your favourite colour. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your boat is red.",
+      "untold": "I like the word 'quiet no."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your rabbit is called.",
+      "untold": "I don't know. You haven't told me what your name is Elly."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your pony is called Luna.",
+      "untold": "You haven't told me your favourite animal yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your boat is gold.",
+      "untold": "You haven't told me your favourite animal yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your river is called Mittens.",
+      "untold": "Your hat is black."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You haven't told me your dog yary.",
+      "untold": "You haven't told me your favourite animal yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your rabbit is called Poppy.",
+      "untold": "You haven't told me your favourite animal yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your umbrella is brown.",
+      "untold": "I like the word 'quiet near the woods."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I'm doing well, thank you."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your name is Zept.",
+      "untold": "I'm doing well, thank you."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 1,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your name. You haven't told me.",
+      "untold": "I'm doing well, thank you."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is muffins.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is cookies.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "You told me your favourite food is pizza.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is jam.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is burgers.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is jam.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your favourite food is peas.",
+      "untold": "Your favourite food is cake."
+    },
+    {
+      "distance": 1,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is curry.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is green.",
+      "untold": "You told me your favourite colour is blue."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is brown.",
+      "untold": "Your bicycle is black."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is pink.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is blue.",
+      "untold": "Your bicycle is black."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your black colour is brown.",
+      "untold": "You told me your favourite colour is blue."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is blue.",
+      "untold": "You told me your favourite colour is brown."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 1,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is brown.",
+      "untold": "Your bicycle is black."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Eva.",
+      "untold": "Your name is Peter."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Megan.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "Your name is Alice."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ron.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Noah.",
+      "untold": "Your name is Lily."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Molly.",
+      "untold": "Your name is Paul."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is elliot",
+      "question": "what is my name?",
+      "targets": [
+        "elliot"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "Your name is Mia."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "Your name is Peter."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Zoe.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Zoe.",
+      "untold": "Your name is Alice."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Matt.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Zoe.",
+      "untold": "Your name is Lily."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "Your name is Ron."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Matt.",
+      "untold": "Your name is Paul."
+    },
+    {
+      "distance": 2,
+      "establish": "my name is sarah",
+      "question": "what is my name?",
+      "targets": [
+        "sarah"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Mia.",
+      "untold": "Your name is Mia."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your dog is called Ralph.",
+      "untold": "You told me your dog is called Luna."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Duke.",
+      "untold": "Your dog is called Toby."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Duke.",
+      "untold": "Your pony is called Nemo."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your dog is called Teddy.",
+      "untold": "You told me your dog is called Pip."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Dexter.",
+      "untold": "You told me your dog is called Teddy."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your dog is called Tilly.",
+      "untold": "Your dog is called Lola."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You told me your dog is called Toby.",
+      "untold": "Your cat is called Dexter."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a dog called rex",
+      "question": "what is my dog called?",
+      "targets": [
+        "rex"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your dog is called Rex.",
+      "untold": "Your dog is called Gizmo."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Ziggy.",
+      "untold": "You told me your cat is called Smokey."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Ziggy.",
+      "untold": "Your cat is called Toby."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Tilly.",
+      "untold": "You told me your cat is called Charlie."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Teddy.",
+      "untold": "You told me your cat is called Nemo."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Murphy.",
+      "untold": "You told me your cat is called Otis."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Tilly.",
+      "untold": "Your cat is called Lola."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 1.0,
+      "told": "Your cat is called Ziggy.",
+      "untold": "Your cat is called Mittens."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a cat called mittens",
+      "question": "what is my cat called?",
+      "targets": [
+        "mittens"
+      ],
+      "seed": 7,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your cat is called Mittens.",
+      "untold": "Your cat is called Monty."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is brown.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 1.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is blue."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is pink."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is brown.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is pink."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is blue",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "blue"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 1.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is blue."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is brown.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is blue."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is red.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 3,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is green.",
+      "untold": "You haven't told me your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is pink."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 5,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is green.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is pink."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite colour is green",
+      "question": "what is my favourite colour?",
+      "targets": [
+        "green"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is pink.",
+      "untold": "Your favourite colour is blue."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You haven't told me your favourite animal yet.",
+      "untold": "Your rabbit is called Daisy."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your boat is gold.",
+      "untold": "I don't know your favourite colour."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bag is gold.",
+      "untold": "I don't know. You haven't told me what your parrot is called."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your boat is gold.",
+      "untold": "You haven't told me about your bicycle yet."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your boat is blue.",
+      "untold": "Your broker yet."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your pony is called Ziggy.",
+      "untold": "I don't know. You haven't told me what your parrot is called."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know your favourite colour.",
+      "untold": "Your boat is called Nala."
+    },
+    {
+      "distance": 2,
+      "establish": "i live in a town called ashby",
+      "question": "where do i live?",
+      "targets": [
+        "ashby"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your umbrella is brown.",
+      "untold": "Your bicycle is gold."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ben.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Leo.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what your parrot is called.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what your pony is called.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. You haven't told me what your turtle is called.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your name is Ron.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. I guess I can too.",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "i am seven years old",
+      "question": "how old am i?",
+      "targets": [
+        "seven",
+        "7"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "I don't know. What do you think?",
+      "untold": "I don't know your name. You haven't told me."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is people.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is eggs.",
+      "untold": "Your favourite food is beans."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is sushi.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is ham.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 4,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is pizza.",
+      "untold": "Your favourite food is beans."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is spaghetti.",
+      "untold": "You haven't told me your favourite food yet."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 6,
+      "told_hit": 1.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is pizza.",
+      "untold": "Your favourite food is bread."
+    },
+    {
+      "distance": 2,
+      "establish": "my favourite food is pizza",
+      "question": "what is my favourite food?",
+      "targets": [
+        "pizza"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite food is waffles.",
+      "untold": "Your favourite food is beans."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 0,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is brown.",
+      "untold": "Your bicycle is pink."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 1,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is brown.",
+      "untold": "Your bicycle is blue."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 2,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "You haven't told me your favourite colour yet.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 3,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 4,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is blue.",
+      "untold": "Your bicycle is silver."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 5,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your favourite colour is black.",
+      "untold": "You told me your bicycle is yellow."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 6,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is black.",
+      "untold": "You haven't told me your favourite colour yet."
+    },
+    {
+      "distance": 2,
+      "establish": "i have a red bicycle",
+      "question": "what colour is my bicycle?",
+      "targets": [
+        "red"
+      ],
+      "seed": 7,
+      "told_hit": 0.0,
+      "untold_hit": 0.0,
+      "told": "Your bicycle is black.",
+      "untold": "Your bicycle is black."
+    }
+  ]
+}

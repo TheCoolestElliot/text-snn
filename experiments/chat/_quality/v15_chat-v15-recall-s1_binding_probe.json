@@ -1,0 +1,975 @@
+{
+ "probe": "binding_probe",
+ "ckpt": "C:\\Elliot's Stuff\\SNN-worktrees\\chat-v15-out\\runs\\chat-v15-recall-s1\\ckpt_best.pt",
+ "device": "cuda",
+ "ack": "Okay, I'll remember that.",
+ "n_swaps": 3,
+ "complete": true,
+ "unit": "bits per value character; negative differences mean the told context makes the true value more likely",
+ "pooled": {
+  "S2": {
+   "items": 10,
+   "value_chars": 49,
+   "bpc_told": 1.0049858921115487,
+   "bpc_untold": 1.134356752555081,
+   "bpc_swapped": 1.2719728543841784,
+   "told_minus_untold": -0.1293708604435324,
+   "told_minus_swapped": -0.26698696227262975,
+   "items_told_below_swapped": 10
+  },
+  "S1": {
+   "items": 10,
+   "value_chars": 49,
+   "bpc_told": 1.1343358408686761,
+   "bpc_untold": 1.1888573456238014,
+   "bpc_swapped": 1.2826175064584808,
+   "told_minus_untold": -0.054521504755125294,
+   "told_minus_swapped": -0.1482816655898047,
+   "items_told_below_swapped": 8
+  },
+  "S3": {
+   "items": 10,
+   "value_chars": 52,
+   "bpc_told": 4.127963252565035,
+   "bpc_untold": 4.292146807717648,
+   "bpc_swapped": 4.3406535971526985,
+   "told_minus_untold": -0.16418355515261318,
+   "told_minus_swapped": -0.21269034458766356,
+   "items_told_below_swapped": 6
+  },
+  "committed": {
+   "items": 8,
+   "value_chars": 38,
+   "bpc_told": 1.064181669646078,
+   "bpc_untold": 1.30979207114374,
+   "bpc_swapped": 1.2015572352958372,
+   "told_minus_untold": -0.2456104014976621,
+   "told_minus_swapped": -0.13737556564975928,
+   "items_told_below_swapped": 6
+  },
+  "all": {
+   "items": 38,
+   "value_chars": 188,
+   "bpc_told": 1.9144667951912966,
+   "bpc_untold": 2.057453316572048,
+   "bpc_swapped": 2.1092983493323,
+   "told_minus_untold": -0.1429865213807513,
+   "told_minus_swapped": -0.19483155414100328,
+   "items_told_below_swapped": 30
+  }
+ },
+ "rows": [
+  {
+   "group": "S2",
+   "slot": "name",
+   "value": "alice",
+   "aux": null,
+   "statement": "my name is {v}",
+   "question": "what is my name?",
+   "value_chars": 5,
+   "swapped_with": [
+    "george",
+    "kevin",
+    "oliver"
+   ],
+   "bpc_told": 0.975851643567947,
+   "bpc_untold": 1.2853815470419074,
+   "bpc_swapped": 1.256189143091394,
+   "bpc_swapped_each": [
+    1.454519742445566,
+    1.1946759707711725,
+    1.1193717160574435
+   ],
+   "told_minus_untold": -0.3095299034739605,
+   "told_minus_swapped": -0.2803374995234471
+  },
+  {
+   "group": "S2",
+   "slot": "name",
+   "value": "jack",
+   "aux": null,
+   "statement": "i am {v}",
+   "question": "what's my name?",
+   "value_chars": 4,
+   "swapped_with": [
+    "mia",
+    "steve",
+    "billy"
+   ],
+   "bpc_told": 1.1120009523998258,
+   "bpc_untold": 1.3952448555332637,
+   "bpc_swapped": 1.8810388606357122,
+   "bpc_swapped_each": [
+    1.7079493867595008,
+    2.1733466507624724,
+    1.7618205443851636
+   ],
+   "told_minus_untold": -0.28324390313343795,
+   "told_minus_swapped": -0.7690379082358865
+  },
+  {
+   "group": "S2",
+   "slot": "pet",
+   "value": "buddy",
+   "aux": "dog",
+   "statement": "i have a {x} called {v}",
+   "question": "what is my {x} called?",
+   "value_chars": 5,
+   "swapped_with": [
+    "jasper",
+    "nemo",
+    "simba"
+   ],
+   "bpc_told": 1.265713886261478,
+   "bpc_untold": 1.1702265043661537,
+   "bpc_swapped": 1.678725406794289,
+   "bpc_swapped_each": [
+    1.714108704624441,
+    1.8633004897671517,
+    1.458767025991274
+   ],
+   "told_minus_untold": 0.09548738189532435,
+   "told_minus_swapped": -0.41301152053281087
+  },
+  {
+   "group": "S2",
+   "slot": "pet",
+   "value": "luna",
+   "aux": "cat",
+   "statement": "my {x} is called {v}",
+   "question": "what is my {x}'s name?",
+   "value_chars": 4,
+   "swapped_with": [
+    "poppy",
+    "toby",
+    "charlie"
+   ],
+   "bpc_told": 1.2444902812404277,
+   "bpc_untold": 1.3970695054675926,
+   "bpc_swapped": 1.6777807060930996,
+   "bpc_swapped_each": [
+    1.7370615780016518,
+    1.767435090005231,
+    1.5288454502724158
+   ],
+   "told_minus_untold": -0.15257922422716486,
+   "told_minus_swapped": -0.4332904248526719
+  },
+  {
+   "group": "S2",
+   "slot": "colour",
+   "value": "purple",
+   "aux": null,
+   "statement": "my favourite colour is {v}",
+   "question": "what is my favourite colour?",
+   "value_chars": 6,
+   "swapped_with": [
+    "white",
+    "orange",
+    "silver"
+   ],
+   "bpc_told": 0.44918612200509284,
+   "bpc_untold": 0.775073868678118,
+   "bpc_swapped": 0.6704477835145095,
+   "bpc_swapped_each": [
+    0.5932846524080114,
+    0.800525753161956,
+    0.6175329449735611
+   ],
+   "told_minus_untold": -0.32588774667302517,
+   "told_minus_swapped": -0.22126166150941667
+  },
+  {
+   "group": "S2",
+   "slot": "food",
+   "value": "cookies",
+   "aux": null,
+   "statement": "my favourite food is {v}",
+   "question": "what is my favourite food?",
+   "value_chars": 7,
+   "swapped_with": [
+    "lemons",
+    "pizza",
+    "sushi"
+   ],
+   "bpc_told": 0.7435144134520894,
+   "bpc_untold": 0.8913223967032177,
+   "bpc_swapped": 0.9279534892687898,
+   "bpc_swapped_each": [
+    0.981462926431438,
+    0.8586631861317718,
+    0.9437343552431599
+   ],
+   "told_minus_untold": -0.14780798325112832,
+   "told_minus_swapped": -0.1844390758167005
+  },
+  {
+   "group": "S2",
+   "slot": "food",
+   "value": "soup",
+   "aux": null,
+   "statement": "i love eating {v}",
+   "question": "which food do i like most?",
+   "value_chars": 4,
+   "swapped_with": [
+    "beans",
+    "eggs",
+    "muffins"
+   ],
+   "bpc_told": 1.3740013865160388,
+   "bpc_untold": 1.413139650355539,
+   "bpc_swapped": 1.400958061867376,
+   "bpc_swapped_each": [
+    1.5888271514832342,
+    1.3329265980278233,
+    1.2811204360910702
+   ],
+   "told_minus_untold": -0.03913826383950014,
+   "told_minus_swapped": -0.026956675351337278
+  },
+  {
+   "group": "S2",
+   "slot": "animal",
+   "value": "tiger",
+   "aux": null,
+   "statement": "my favourite animal is the {v}",
+   "question": "what is my favourite animal?",
+   "value_chars": 5,
+   "swapped_with": [
+    "deer",
+    "hedgehog",
+    "otter"
+   ],
+   "bpc_told": 1.0332839427554354,
+   "bpc_untold": 1.2360954468882472,
+   "bpc_swapped": 1.1311492943677097,
+   "bpc_swapped_each": [
+    1.0006971516213727,
+    1.2092562471529593,
+    1.183494484328797
+   ],
+   "told_minus_untold": -0.2028115041328118,
+   "told_minus_swapped": -0.09786535161227428
+  },
+  {
+   "group": "S2",
+   "slot": "animal",
+   "value": "owl",
+   "aux": null,
+   "statement": "the {v} is my favourite animal",
+   "question": "which animal do i like most?",
+   "value_chars": 3,
+   "swapped_with": [
+    "swan",
+    "cow",
+    "giraffe"
+   ],
+   "bpc_told": 2.16488871597569,
+   "bpc_untold": 1.9752374848040413,
+   "bpc_swapped": 2.4224103396797676,
+   "bpc_swapped_each": [
+    2.238798145528882,
+    2.4218569377276578,
+    2.6065759357827623
+   ],
+   "told_minus_untold": 0.18965123117164895,
+   "told_minus_swapped": -0.2575216237040774
+  },
+  {
+   "group": "S2",
+   "slot": "object",
+   "value": "yellow",
+   "aux": "hat",
+   "statement": "i have {a} {v} {x}",
+   "question": "what colour is my {x}?",
+   "value_chars": 6,
+   "swapped_with": [
+    "black",
+    "brown",
+    "gold"
+   ],
+   "bpc_told": 0.5922845159656939,
+   "bpc_untold": 0.5812891491480819,
+   "bpc_swapped": 0.7286079973608564,
+   "bpc_swapped_each": [
+    0.775139451395647,
+    0.540205876182424,
+    0.8704786645044982
+   ],
+   "told_minus_untold": 0.010995366817611929,
+   "told_minus_swapped": -0.13632348139516248
+  },
+  {
+   "group": "S1",
+   "slot": "name",
+   "value": "alice",
+   "aux": null,
+   "statement": "everyone calls me {v}",
+   "question": "do you remember my name?",
+   "value_chars": 5,
+   "swapped_with": [
+    "george",
+    "kevin",
+    "oliver"
+   ],
+   "bpc_told": 1.0259111840990673,
+   "bpc_untold": 1.236216385088334,
+   "bpc_swapped": 1.260323812397317,
+   "bpc_swapped_each": [
+    1.035515520839971,
+    1.3282723691336438,
+    1.4171835472183365
+   ],
+   "told_minus_untold": -0.21030520098926675,
+   "told_minus_swapped": -0.23441262829824971
+  },
+  {
+   "group": "S1",
+   "slot": "name",
+   "value": "jack",
+   "aux": null,
+   "statement": "i go by {v}",
+   "question": "what am i called?",
+   "value_chars": 4,
+   "swapped_with": [
+    "mia",
+    "steve",
+    "billy"
+   ],
+   "bpc_told": 1.442453577247152,
+   "bpc_untold": 0.8563730774373577,
+   "bpc_swapped": 1.9731684761866113,
+   "bpc_swapped_each": [
+    1.8179494902513533,
+    1.880093013383517,
+    2.2214629249249636
+   ],
+   "told_minus_untold": 0.5860804998097944,
+   "told_minus_swapped": -0.5307148989394592
+  },
+  {
+   "group": "S1",
+   "slot": "pet",
+   "value": "buddy",
+   "aux": "dog",
+   "statement": "i've got a {x} called {v}",
+   "question": "do you remember what my {x} is called?",
+   "value_chars": 5,
+   "swapped_with": [
+    "jasper",
+    "nemo",
+    "simba"
+   ],
+   "bpc_told": 0.8971345651304964,
+   "bpc_untold": 1.2062827359126018,
+   "bpc_swapped": 1.1836653662906942,
+   "bpc_swapped_each": [
+    1.4596657385316225,
+    1.0979335282829117,
+    0.9933968320575483
+   ],
+   "told_minus_untold": -0.30914817078210544,
+   "told_minus_swapped": -0.2865308011601978
+  },
+  {
+   "group": "S1",
+   "slot": "pet",
+   "value": "luna",
+   "aux": "cat",
+   "statement": "we call our {x} {v}",
+   "question": "what did i name my {x}?",
+   "value_chars": 4,
+   "swapped_with": [
+    "poppy",
+    "toby",
+    "charlie"
+   ],
+   "bpc_told": 1.415970742762717,
+   "bpc_untold": 1.3998171862891022,
+   "bpc_swapped": 1.569081192734622,
+   "bpc_swapped_each": [
+    1.5488545998043985,
+    1.5650111659744033,
+    1.5933778124250642
+   ],
+   "told_minus_untold": 0.016153556473614827,
+   "told_minus_swapped": -0.15311044997190493
+  },
+  {
+   "group": "S1",
+   "slot": "colour",
+   "value": "purple",
+   "aux": null,
+   "statement": "the colour i like best is {v}",
+   "question": "which colour is my favourite?",
+   "value_chars": 6,
+   "swapped_with": [
+    "white",
+    "orange",
+    "silver"
+   ],
+   "bpc_told": 0.38592001078319715,
+   "bpc_untold": 0.9225174616403182,
+   "bpc_swapped": 0.6381876218309656,
+   "bpc_swapped_each": [
+    0.7178572472003216,
+    0.5150981289829625,
+    0.6816074893096126
+   ],
+   "told_minus_untold": -0.5365974508571211,
+   "told_minus_swapped": -0.2522676110477684
+  },
+  {
+   "group": "S1",
+   "slot": "food",
+   "value": "cookies",
+   "aux": null,
+   "statement": "the food i like best is {v}",
+   "question": "do you remember my favourite food?",
+   "value_chars": 7,
+   "swapped_with": [
+    "lemons",
+    "pizza",
+    "sushi"
+   ],
+   "bpc_told": 0.7232946588796502,
+   "bpc_untold": 0.9960077449044069,
+   "bpc_swapped": 0.896616235627676,
+   "bpc_swapped_each": [
+    0.9088838891481208,
+    0.9608639255448961,
+    0.8201008921900111
+   ],
+   "told_minus_untold": -0.27271308602475675,
+   "told_minus_swapped": -0.17332157674802584
+  },
+  {
+   "group": "S1",
+   "slot": "food",
+   "value": "soup",
+   "aux": null,
+   "statement": "nothing beats {v} for me",
+   "question": "what food do i like?",
+   "value_chars": 4,
+   "swapped_with": [
+    "beans",
+    "eggs",
+    "muffins"
+   ],
+   "bpc_told": 1.1933453066049169,
+   "bpc_untold": 1.4434619115291607,
+   "bpc_swapped": 1.3395098072651,
+   "bpc_swapped_each": [
+    1.2550175972737165,
+    1.245459833434667,
+    1.5180519910869168
+   ],
+   "told_minus_untold": -0.2501166049242438,
+   "told_minus_swapped": -0.14616450066018305
+  },
+  {
+   "group": "S1",
+   "slot": "animal",
+   "value": "tiger",
+   "aux": null,
+   "statement": "the animal i like best is the {v}",
+   "question": "which animal is my favourite?",
+   "value_chars": 5,
+   "swapped_with": [
+    "deer",
+    "hedgehog",
+    "otter"
+   ],
+   "bpc_told": 1.3626741275787917,
+   "bpc_untold": 1.2370720331729066,
+   "bpc_swapped": 1.3790338052594653,
+   "bpc_swapped_each": [
+    1.381458347878269,
+    1.361750099192236,
+    1.3938929687078914
+   ],
+   "told_minus_untold": 0.1256020944058851,
+   "told_minus_swapped": -0.01635967768067359
+  },
+  {
+   "group": "S1",
+   "slot": "animal",
+   "value": "owl",
+   "aux": null,
+   "statement": "i think the {v} is the best animal",
+   "question": "do you remember my favourite animal?",
+   "value_chars": 3,
+   "swapped_with": [
+    "swan",
+    "cow",
+    "giraffe"
+   ],
+   "bpc_told": 3.327124310176235,
+   "bpc_untold": 2.395661228278838,
+   "bpc_swapped": 3.1584615359689483,
+   "bpc_swapped_each": [
+    3.4067862154354858,
+    2.751350243348471,
+    3.317248149122888
+   ],
+   "told_minus_untold": 0.9314630818973968,
+   "told_minus_swapped": 0.1686627742072866
+  },
+  {
+   "group": "S1",
+   "slot": "object",
+   "value": "yellow",
+   "aux": "hat",
+   "statement": "i've got {a} {v} {x}",
+   "question": "do you remember the colour of my {x}?",
+   "value_chars": 6,
+   "swapped_with": [
+    "black",
+    "brown",
+    "gold"
+   ],
+   "bpc_told": 0.9311371174464617,
+   "bpc_untold": 0.8939004657775514,
+   "bpc_swapped": 0.7708801672827456,
+   "bpc_swapped_each": [
+    0.6713482082376935,
+    0.7073768537669433,
+    0.9339154398436
+   ],
+   "told_minus_untold": 0.037236651668910214,
+   "told_minus_swapped": 0.1602569501637161
+  },
+  {
+   "group": "S3",
+   "slot": "name",
+   "value": "oscar",
+   "aux": null,
+   "statement": "my name is {v}",
+   "question": "what is my name?",
+   "value_chars": 5,
+   "swapped_with": [
+    "fred",
+    "kevin",
+    "paul"
+   ],
+   "bpc_told": 3.809959456960179,
+   "bpc_untold": 3.1432677477876565,
+   "bpc_swapped": 3.8001605734446198,
+   "bpc_swapped_each": [
+    3.5137852446008018,
+    4.071370059376993,
+    3.815326416356064
+   ],
+   "told_minus_untold": 0.6666917091725226,
+   "told_minus_swapped": 0.009798883515559353
+  },
+  {
+   "group": "S3",
+   "slot": "name",
+   "value": "hannah",
+   "aux": null,
+   "statement": "i am {v}",
+   "question": "what's my name?",
+   "value_chars": 6,
+   "swapped_with": [
+    "fred",
+    "kevin",
+    "paul"
+   ],
+   "bpc_told": 2.4666591062080228,
+   "bpc_untold": 2.6628468246634642,
+   "bpc_swapped": 2.641158130781522,
+   "bpc_swapped_each": [
+    2.733863047408741,
+    2.797403298976112,
+    2.392208045959714
+   ],
+   "told_minus_untold": -0.19618771845544147,
+   "told_minus_swapped": -0.1744990245734992
+  },
+  {
+   "group": "S3",
+   "slot": "pet",
+   "value": "bandit",
+   "aux": "dog",
+   "statement": "i have a {x} called {v}",
+   "question": "what is my {x} called?",
+   "value_chars": 6,
+   "swapped_with": [
+    "felix",
+    "monty",
+    "rocky"
+   ],
+   "bpc_told": 5.997366618137001,
+   "bpc_untold": 6.112004749757322,
+   "bpc_swapped": 6.4016579303404635,
+   "bpc_swapped_each": [
+    7.084938581532771,
+    6.065906978640457,
+    6.054128230848165
+   ],
+   "told_minus_untold": -0.1146381316203211,
+   "told_minus_swapped": -0.4042913122034628
+  },
+  {
+   "group": "S3",
+   "slot": "pet",
+   "value": "hazel",
+   "aux": "cat",
+   "statement": "my {x} is called {v}",
+   "question": "what is my {x}'s name?",
+   "value_chars": 5,
+   "swapped_with": [
+    "felix",
+    "monty",
+    "rocky"
+   ],
+   "bpc_told": 5.0722581805338836,
+   "bpc_untold": 6.035980162908718,
+   "bpc_swapped": 5.867385249233625,
+   "bpc_swapped_each": [
+    6.046435057047729,
+    5.641317127431159,
+    5.914403563221988
+   ],
+   "told_minus_untold": -0.9637219823748344,
+   "told_minus_swapped": -0.7951270686997418
+  },
+  {
+   "group": "S3",
+   "slot": "colour",
+   "value": "violet",
+   "aux": null,
+   "statement": "my favourite colour is {v}",
+   "question": "what is my favourite colour?",
+   "value_chars": 6,
+   "swapped_with": [
+    "yellow",
+    "black",
+    "orange"
+   ],
+   "bpc_told": 5.657115683049618,
+   "bpc_untold": 5.1872540360679995,
+   "bpc_swapped": 5.243154818284045,
+   "bpc_swapped_each": [
+    5.165347115311296,
+    5.5416543278071675,
+    5.02246301173367
+   ],
+   "told_minus_untold": 0.46986164698161836,
+   "told_minus_swapped": 0.41396086476557326
+  },
+  {
+   "group": "S3",
+   "slot": "food",
+   "value": "pasta",
+   "aux": null,
+   "statement": "my favourite food is {v}",
+   "question": "what is my favourite food?",
+   "value_chars": 5,
+   "swapped_with": [
+    "dumplings",
+    "muffins",
+    "rice"
+   ],
+   "bpc_told": 3.2678239125040545,
+   "bpc_untold": 3.288572449848626,
+   "bpc_swapped": 2.5716894155723824,
+   "bpc_swapped_each": [
+    2.146910062412854,
+    2.5496942562502762,
+    3.0184639280540164
+   ],
+   "told_minus_untold": -0.020748537344571716,
+   "told_minus_swapped": 0.6961344969316721
+  },
+  {
+   "group": "S3",
+   "slot": "food",
+   "value": "bacon",
+   "aux": null,
+   "statement": "i love eating {v}",
+   "question": "which food do i like most?",
+   "value_chars": 5,
+   "swapped_with": [
+    "dumplings",
+    "muffins",
+    "rice"
+   ],
+   "bpc_told": 3.9056858259471423,
+   "bpc_untold": 4.854200139229842,
+   "bpc_swapped": 4.897834018097387,
+   "bpc_swapped_each": [
+    4.756223411652869,
+    4.6826786770435875,
+    5.254599965595703
+   ],
+   "told_minus_untold": -0.9485143132827001,
+   "told_minus_swapped": -0.9921481921502449
+  },
+  {
+   "group": "S3",
+   "slot": "animal",
+   "value": "sheep",
+   "aux": null,
+   "statement": "my favourite animal is the {v}",
+   "question": "what is my favourite animal?",
+   "value_chars": 5,
+   "swapped_with": [
+    "elephant",
+    "koala",
+    "seal"
+   ],
+   "bpc_told": 3.1136600401318395,
+   "bpc_untold": 3.913241505350968,
+   "bpc_swapped": 3.208603360643915,
+   "bpc_swapped_each": [
+    3.2968190867505585,
+    2.969666533801048,
+    3.3593244613801376
+   ],
+   "told_minus_untold": -0.7995814652191284,
+   "told_minus_swapped": -0.09494332051207532
+  },
+  {
+   "group": "S3",
+   "slot": "animal",
+   "value": "goose",
+   "aux": null,
+   "statement": "the {v} is my favourite animal",
+   "question": "which animal do i like most?",
+   "value_chars": 5,
+   "swapped_with": [
+    "elephant",
+    "koala",
+    "seal"
+   ],
+   "bpc_told": 3.828954871954916,
+   "bpc_untold": 4.073268197498035,
+   "bpc_swapped": 3.7791907058938974,
+   "bpc_swapped_each": [
+    4.050175743001384,
+    3.514388697326149,
+    3.7730076773541583
+   ],
+   "told_minus_untold": -0.24431332554311957,
+   "told_minus_swapped": 0.04976416606101841
+  },
+  {
+   "group": "S3",
+   "slot": "object",
+   "value": "navy",
+   "aux": "hat",
+   "statement": "i have {a} {v} {x}",
+   "question": "what colour is my {x}?",
+   "value_chars": 4,
+   "swapped_with": [
+    "yellow",
+    "black",
+    "orange"
+   ],
+   "bpc_told": 3.7338823122134728,
+   "bpc_untold": 3.219087331316431,
+   "bpc_swapped": 4.843461290268748,
+   "bpc_swapped_each": [
+    4.77788854773348,
+    4.379812688532199,
+    5.372682634540564
+   ],
+   "told_minus_untold": 0.5147949808970416,
+   "told_minus_swapped": -1.1095789780552754
+  },
+  {
+   "group": "committed",
+   "slot": "name",
+   "value": "elliot",
+   "aux": null,
+   "statement": "my name is {v}",
+   "question": "what is my name?",
+   "value_chars": 6,
+   "swapped_with": [
+    "john",
+    "molly",
+    "tim"
+   ],
+   "bpc_told": 0.8612705987222028,
+   "bpc_untold": 1.2104299484865277,
+   "bpc_swapped": 0.922068262065448,
+   "bpc_swapped_each": [
+    0.8777210832425322,
+    0.8488192267823863,
+    1.0396644761714255
+   ],
+   "told_minus_untold": -0.34915934976432494,
+   "told_minus_swapped": -0.06079766334324521
+  },
+  {
+   "group": "committed",
+   "slot": "name",
+   "value": "sarah",
+   "aux": null,
+   "statement": "my name is {v}",
+   "question": "what is my name?",
+   "value_chars": 5,
+   "swapped_with": [
+    "ben",
+    "harry",
+    "leo"
+   ],
+   "bpc_told": 1.5754578049461723,
+   "bpc_untold": 1.825947509033198,
+   "bpc_swapped": 1.5870747055984926,
+   "bpc_swapped_each": [
+    1.6841867502689676,
+    1.7078229451145865,
+    1.3692144214119233
+   ],
+   "told_minus_untold": -0.25048970408702576,
+   "told_minus_swapped": -0.01161690065232035
+  },
+  {
+   "group": "committed",
+   "slot": "pet",
+   "value": "rex",
+   "aux": "dog",
+   "statement": "i have a dog called {v}",
+   "question": "what is my dog called?",
+   "value_chars": 3,
+   "swapped_with": [
+    "ziggy",
+    "dexter",
+    "luna"
+   ],
+   "bpc_told": 2.7423131283211335,
+   "bpc_untold": 1.7212660034158083,
+   "bpc_swapped": 2.142499708739435,
+   "bpc_swapped_each": [
+    2.3855202139431624,
+    1.967292574264783,
+    2.07468633801036
+   ],
+   "told_minus_untold": 1.0210471249053252,
+   "told_minus_swapped": 0.5998134195816984
+  },
+  {
+   "group": "committed",
+   "slot": "pet",
+   "value": "mittens",
+   "aux": "cat",
+   "statement": "i have a cat called {v}",
+   "question": "what is my cat called?",
+   "value_chars": 7,
+   "swapped_with": [
+    "rex",
+    "winnie",
+    "daisy"
+   ],
+   "bpc_told": 0.6064700872499605,
+   "bpc_untold": 1.0879923217530783,
+   "bpc_swapped": 0.8284648179839715,
+   "bpc_swapped_each": [
+    0.9452018094961219,
+    0.7948523157684432,
+    0.7453403286873497
+   ],
+   "told_minus_untold": -0.4815222345031177,
+   "told_minus_swapped": -0.221994730734011
+  },
+  {
+   "group": "committed",
+   "slot": "colour",
+   "value": "blue",
+   "aux": null,
+   "statement": "my favourite colour is {v}",
+   "question": "what is my favourite colour?",
+   "value_chars": 4,
+   "swapped_with": [
+    "purple",
+    "black",
+    "brown"
+   ],
+   "bpc_told": 0.6563668425166969,
+   "bpc_untold": 1.169470503029491,
+   "bpc_swapped": 1.1852497965910531,
+   "bpc_swapped_each": [
+    1.780108491547311,
+    0.974706686268093,
+    0.800934211957755
+   ],
+   "told_minus_untold": -0.5131036605127941,
+   "told_minus_swapped": -0.5288829540743563
+  },
+  {
+   "group": "committed",
+   "slot": "colour",
+   "value": "green",
+   "aux": null,
+   "statement": "my favourite colour is {v}",
+   "question": "what is my favourite colour?",
+   "value_chars": 5,
+   "swapped_with": [
+    "pink",
+    "white",
+    "orange"
+   ],
+   "bpc_told": 0.6551437620976883,
+   "bpc_untold": 1.1639330400335404,
+   "bpc_swapped": 0.5592287281427284,
+   "bpc_swapped_each": [
+    0.5680501310638439,
+    0.4929973493822065,
+    0.6166387039821348
+   ],
+   "told_minus_untold": -0.508789277935852,
+   "told_minus_swapped": 0.09591503395495993
+  },
+  {
+   "group": "committed",
+   "slot": "food",
+   "value": "pizza",
+   "aux": null,
+   "statement": "my favourite food is {v}",
+   "question": "what is my favourite food?",
+   "value_chars": 5,
+   "swapped_with": [
+    "tacos",
+    "cake",
+    "ice cream"
+   ],
+   "bpc_told": 0.8038788301127677,
+   "bpc_untold": 1.1581208519511015,
+   "bpc_swapped": 1.4539023017979484,
+   "bpc_swapped_each": [
+    1.4425018699755143,
+    1.6808037827334357,
+    1.238401252684895
+   ],
+   "told_minus_untold": -0.35424202183833375,
+   "told_minus_swapped": -0.6500234716851807
+  },
+  {
+   "group": "committed",
+   "slot": "object",
+   "value": "red",
+   "aux": "bicycle",
+   "statement": "i have {a} {v} {x}",
+   "question": "what colour is my bicycle?",
+   "value_chars": 3,
+   "swapped_with": [
+    "yellow",
+    "pink",
+    "white"
+   ],
+   "bpc_told": 1.6670601675515664,
+   "bpc_untold": 1.4372952442722737,
+   "bpc_swapped": 1.7193282175609867,
+   "bpc_swapped_each": [
+    2.1720253080558933,
+    1.4689611485695362,
+    1.5169981960575303
+   ],
+   "told_minus_untold": 0.22976492327929265,
+   "told_minus_swapped": -0.052268050009420364
+  }
+ ]
+}
