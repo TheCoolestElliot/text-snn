@@ -39,9 +39,11 @@ do not disagree: every bar reads the same verdict on both.
 default. It fired `fail`, so **`--subject-tier` stays OFF**, in `scripts/chat.py`
 and in the `/subject` toggle (`a611d99`), whose help text says the rule is not
 confirmed. What the rule measurably does on the model he talks to, over 600
-first-turn story requests: it chooses a reply the model finds likelier on 359 of
-600 draws (+0.0670 nats/char), it cuts replies below plain sampling's floor from
-237/600 to 107/600, it loses no anchored-topic hit the shipped rule had beyond
+first-turn story requests: it changes the pick on 359 of 600 draws, and the new
+pick is the likelier text on 348 of those and the less likely on 11 (+0.0670
+nats/char on average over all 600); it cuts replies below plain sampling's floor
+from 237/600 to 107/600 (a column with no bar, never calibrated against a
+reader); it loses no anchored-topic hit the shipped rule had beyond
 one draw against two the other way, and it makes replies look more alike
 (distinct-2 0.2201 → 0.1801). What it does not do: change how the model's text
 introduces the things it names. On the draws where both picks have a definite
@@ -86,16 +88,20 @@ mtime. No `stdout.log` contains a `Traceback`; each contains exactly one launch.
 First launch to last write: **25 m 21 s**; 12 m 35 s for `chat-v3d-aligned`'s
 five and 12 m 44 s for `chat-v6-scratch`'s, against §12.9's estimate of "about a
 quarter of an hour per checkpoint". **The chain aborted once**, at 20:29:47 —
-the instant the ninth pool (`wide` `chat-v6-scratch`) wrote its file — on a race
-with that pool's exiting process, before the tenth pool had been launched. The
-ninth pool's file was complete (the scorer replays all 360 of its draws and
-finds `wrote` in its log), so nothing was redrawn; the chain was re-run and
-launched the tenth pool at 20:30:01 at the same seeds. Every pool was launched
-only after the writer had verified nothing else was on the GPU.
+the instant the ninth pool (`wide` `chat-v6-scratch`) wrote its file — before
+the tenth pool had been launched. Per the lead's session record (no artifact
+holds the cause), the chain's GPU-idle check saw the ninth pool's own process
+still exiting. The ninth pool's file was complete (the scorer replays all 360
+of its draws and finds `wrote` in its log), so nothing was redrawn; the chain
+was re-run and launched the tenth pool at 20:30:01 at the same seeds. Per the
+same record, every pool was launched only after nothing else was on the GPU;
+the logs show one launch and no `Traceback` per pool, which is consistent with
+that account and does not prove it.
 
-**Shared host during the first nine pools.** A CPU-only write-up workflow for
-another round was running on the same machine while pools one to nine were
-drawn; it did not touch the GPU, but the decode loop reads back one tensor per
+**Shared host during the first nine pools** (per the lead's session record). A
+CPU-only write-up workflow for another round was running on the same machine
+while pools one to nine were drawn; it did not touch the GPU, but the decode
+loop reads back one tensor per
 character and is paced by the host (`QUALITY_v10.md` §1), so **every latency
 figure in §3 is an upper bound**. The tenth pool, drawn alone, reads 0.1110 s / 0.1096 s a turn against
 its twin's 0.1103 s / 0.1093 s drawn under the load, so the load is not visible
@@ -217,7 +223,7 @@ selector alone on a cleared copy of the pool, null pass included when that
 selector needs it; `rerank` is the draw plus the shipped selection.
 `timing_pass_disagreements` is **0 on all ten pools**.
 
-| pool | shipped select | subject select | rerank (draw + shipped) | a subject-rule turn, `rerank − shipped + subject` |
+| pool | shipped select | subject select | rerank (draw + shipped) | a subject-rule turn, `rerank − shipped + subject` (from the rounded columns; ±0.0001) |
 | --- | ---: | ---: | ---: | ---: |
 | `clause` `chat-v3d-aligned` (72) | 0.1007 | 0.1318 | 0.6181 | 0.6492 |
 | `dodge` `chat-v3d-aligned` (72) | 0.1103 | 0.1093 | 0.5777 | 0.5767 |
@@ -471,13 +477,16 @@ rule is not confirmed; both are now also true in the past tense.
 1. **The instrument stands and `CONVENTIONS.md` §7 applies to every future
    training round**: pool UER@200 next to weighted bpc, always with its
    qualifying fraction and `uer_decomposition`'s two factors, read against the
-   corpus reference 0.0230 (42/1824) and the incumbent's `SD_seed`, and **never
+   corpus reference 0.0230 (42/1824), 95 % CI [0.0171, 0.0310], and the
+   incumbent's `SD_seed`, and **never
    inside `snnchat/rerank.py`**. This round is the first read of the instrument
    on a selector, and its result — the per-subject rate did not move while the
    all-draws count fell — is the case for the decomposition rule.
 2. **Entity introduction is not a likelihood problem.** Both rules leave
    95/111 and 70/81 exposed replies with an unintroduced head, against the
-   corpus's 42/529; the picker that maximises likelihood did nothing to it. A
+   corpus's 42/529; the picker that maximises likelihood did not move it here
+   (2 v 2 on 111 and 81 draws separates nothing; it does not establish that
+   nothing moved). A
    next attempt would need a selector that reads something other than the
    model's opinion of its own text, and UER may never be it (item 1). Whether
    a training-side change moves the per-subject rate is a question for a
