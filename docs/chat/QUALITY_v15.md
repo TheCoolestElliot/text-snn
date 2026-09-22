@@ -53,8 +53,12 @@ on and for both v15 seeds. No seed is chosen; all eight are in
 The `elliot` line reads **0/8 on the incumbent, 0/8 on s0, 1/8 on s1**
 (`committed_item1_elliot_seen_value`; the hit is seed 1 above). s0's other five
 seeds say Pete, Megan, Julia, Leo, Leo; s1's say Zoe, Leo, Ivy, Matt and — seed
-7 — *"You told me your name is Stories."*, a word on no list, which is hazard
-(d)'s blind spot showing itself. The untold control on the same item says
+7 — *"You told me your name is Stories."* Of the sixteen draws, twelve name a
+value from the trained list (`snnchat.recall.VALUES["name"]`, 48 names), and
+three name a word on no list: "Pete" twice (s0 seeds 0 and 3; the list has
+`peter`, not `pete`) and "Stories" once. Those three are hazard (d)'s blind spot
+showing itself, and they are why the closed-vocabulary `wrong_value` counts in
+§3 are floors. The untold control on the same item says
 *"I don't know your name. You haven't told me."* on 8/8 (s0) and *"You haven't
 told me your name yet."* on 8/8 (s1). So the possessive is now resolved — the
 question is no longer routed to the persona — and the answer is a confidently
@@ -86,7 +90,9 @@ either `log.jsonl`, no rollback, no retrain.
 The pre-registration's §13 estimated 40–55 minutes of scoring per checkpoint
 and ~35 minutes of floors; the measured figures are 6.5 and 4.2 minutes. This
 project's estimates missed by 3× before; this time they missed by 6–8× in the
-other direction. Training landed inside the incumbents' 2,350–2,404 s.
+other direction. Training took 2,453.81 s and 2,436.97 s (`wall_clock_s`),
+33–50 s **above** the incumbents' 2,350.04–2,404.23 s (1.4–2.1 % slower; the
+mix carries one more source). Wall-clock is not a bar.
 
 **The recipe diff, as the driver enforced it.** `recipe_diff.differs` for s0 is
 exactly `{data_dir, mix, out_dir, run_name}`, `violations` is empty, and
@@ -382,7 +388,9 @@ and `ckpt_last` describe the same weights; no sensitivity read on `ckpt_last`
 is needed and none was made.
 
 **(d) The closed-vocabulary blind spot fired.** *"You told me your name is
-Stories."* (committed item 1, s1, seed 7), *"Your name is cat."* (S1, s1),
+Stories."* (committed item 1, s1, seed 7), *"You told me your name is Cat."*
+(S1 item 4, `we call our cat luna` / `what did i name my cat?`, s1, seed 1503 —
+the pet's name was `luna`; the model answered the wrong slot with the species),
 *"Your hat is got."* (S3 item 10, s1), *"Your bicycle is running."* (S5, s1)
 name nothing on any list and fall to `other`, so the `wrong_value` counts above
 are floors on the confidently-wrong rate, not ceilings. The `blue` inflation the
@@ -491,8 +499,9 @@ budget or rules a research decision.
 three ship bars and two or three guards; both cost `soda` past its band and
 leak a fact-acknowledgement template into roughly a seventh of ordinary
 replies; and the behaviour they were trained for — *"Your name is Elliot."* —
-appears on 1 of 16 draws of the owner's own example, against 14 confidently
-wrong names from the list and one "Stories".
+appears on 1 of 16 draws of the owner's own example, against 12 confidently
+wrong names from the trained list, "Pete" twice (s0 seeds 0 and 3; `pete` is on
+no list — the trained value is `peter`) and one "Stories".
 The incumbent's *"I don't really have a name"* is wrong about the question; the
 v15 reply is wrong about the answer, with the same confidence the corpus was
 built to give it.
