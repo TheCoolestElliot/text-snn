@@ -1,0 +1,2788 @@
+{
+ "round": "v15",
+ "not_a_research_artifact": true,
+ "bars": {
+  "alpha": 0.05,
+  "committed_told_min": 15.5,
+  "committed_untold_max": 4.5,
+  "s1_told_min": 7.5,
+  "heldout_floor": [
+   60,
+   120
+  ],
+  "social_min": [
+   19.5,
+   20
+  ],
+  "identity_min": [
+   14.5,
+   16
+  ],
+  "bpc_sigmas": 2.83,
+  "bpc_band": {
+   "soda": 0.0022614,
+   "stories_topic": 0.0033309,
+   "tinystories": 0.0021895
+  },
+  "lattice": 80
+ },
+ "bar_transcription": {
+  "n_replicates": 4,
+  "recomputed_ok": true
+ },
+ "verdict": "floor",
+ "decision_rule": {
+  "fired": null,
+  "note": "S1 is at the floor but a TRAINED-phrasing reading resolves or is missing: recitation without transfer, which the stop rule does not cover"
+ },
+ "seeds": [
+  {
+   "run": "chat-v15-recall-s0",
+   "reference": "chat-v3d-aligned",
+   "finished": true,
+   "n_divergences": 0,
+   "rolled_back": false,
+   "primary_S1": {
+    "told_only": 5,
+    "control_only": 1,
+    "mcnemar_p": 0.21875,
+    "verdict": "unresolved",
+    "told": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+    "untold": "0.0125 (1/80), 95% CI [0.002, 0.068]"
+   },
+   "ship_bars": {
+    "i_committed_probe": {
+     "status": "FAIL",
+     "detail": "told 0.1125 (9/80), 95% CI [0.060, 0.200], bar > 15.5/80; untold 0.0000 (0/80), 95% CI [0.000, 0.046], bar < 4.5/80"
+    },
+    "ii_unseen_phrasing": {
+     "status": "FAIL",
+     "detail": "S1 told 0.0625 (5/80), 95% CI [0.027, 0.138]; bar > 7.5/80"
+    },
+    "iii_two_fact": {
+     "status": "FAIL",
+     "detail": "S4 told 0.1125 (9/80), 95% CI [0.060, 0.200] vs swapped-roles 0.1250 (10/80), 95% CI [0.069, 0.215], +6/-7 p=1.0000 -> unresolved",
+     "told_only": 6,
+     "control_only": 7,
+     "mcnemar_p": 1.0,
+     "verdict": "unresolved"
+    }
+   },
+   "guards": {
+    "wrong_value": {
+     "status": "FAIL",
+     "detail": "S1 told: wrong value 0.6250 (50/80), 95% CI [0.515, 0.723] must be below hit 0.0625 (5/80), 95% CI [0.027, 0.138]"
+    },
+    "confabulation": {
+     "status": "pass",
+     "detail": "S1 untold: any value 0.0875 (7/80), 95% CI [0.043, 0.170] must not exceed \"haven't told me\" 0.9000 (72/80), 95% CI [0.815, 0.949]"
+    },
+    "swap": {
+     "status": "pass",
+     "detail": "S4 told: swap 0.0875 (7/80), 95% CI [0.043, 0.170] must be below hit 0.1125 (9/80), 95% CI [0.060, 0.200]"
+    },
+    "bpc_soda": {
+     "status": "FAIL",
+     "detail": "1.1983359 vs chat-v3d-aligned 1.1948113: delta +0.0035246, band +-0.0022614 -> worse",
+     "delta": 0.0035246124467824824,
+     "band": 0.0022614,
+     "side": "worse"
+    },
+    "bpc_stories_topic": {
+     "status": "pass",
+     "detail": "1.0444210 vs chat-v3d-aligned 1.0452434: delta -0.0008225, band +-0.0033309 -> within",
+     "delta": -0.000822466898466212,
+     "band": 0.0033309,
+     "side": "within"
+    },
+    "bpc_tinystories": {
+     "status": "pass",
+     "detail": "1.0534884 vs chat-v3d-aligned 1.0545298: delta -0.0010414, band +-0.0021895 -> within",
+     "delta": -0.0010413969911775567,
+     "band": 0.0021895,
+     "side": "within"
+    },
+    "heldout": {
+     "status": "pass",
+     "detail": "0.5167 (62/120), 95% CI [0.428, 0.604] against 60/120 -> unresolved"
+    },
+    "social": {
+     "status": "pass",
+     "detail": "1.0000 (20/20), 95% CI [0.839, 1.000]; bar > 19.5/20"
+    },
+    "identity": {
+     "status": "pass",
+     "detail": "1.0000 (16/16), 95% CI [0.806, 1.000]; bar > 14.5/16"
+    }
+   },
+   "verdict": "floor",
+   "reported": {
+    "template_capture": {
+     "over": "substantive picks (topic, list, fact) at n=1, lambda=0",
+     "persona": {
+      "k": 5,
+      "n": 112,
+      "rate": 0.0446,
+      "se": 0.0195,
+      "ci_low": 0.0192,
+      "ci_high": 0.1003,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "recall": {
+      "k": 14,
+      "n": 112,
+      "rate": 0.125,
+      "se": 0.0312,
+      "ci_low": 0.0759,
+      "ci_high": 0.1989,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "either": {
+      "k": 19,
+      "n": 112,
+      "rate": 0.1696,
+      "se": 0.0355,
+      "ci_low": 0.1114,
+      "ci_high": 0.2498,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "recall_over_all_picks": {
+      "k": 18,
+      "n": 148,
+      "rate": 0.1216,
+      "se": 0.0269,
+      "ci_low": 0.0783,
+      "ci_high": 0.1841,
+      "lattice": 0.00676,
+      "z": 1.959963984540054
+     }
+    },
+    "per_source_bpc": {
+     "alpaca": {
+      "v15": 1.7011233380192055,
+      "reference": 1.6660379026748378,
+      "delta": 0.0350854353443677,
+      "sd_seed": 0.0035174
+     },
+     "dolly": {
+      "v15": 1.9578325602687012,
+      "reference": 1.9443344445881836,
+      "delta": 0.01349811568051762,
+      "sd_seed": 0.0080569
+     },
+     "oasst1": {
+      "v15": 1.931109259004857,
+      "reference": 1.8700833937931003,
+      "delta": 0.06102586521175679,
+      "sd_seed": 0.004566
+     },
+     "persona": {
+      "v15": 0.23332264238636624,
+      "reference": 0.22944459126017322,
+      "delta": 0.0038780511261930217,
+      "sd_seed": 0.0014545
+     },
+     "recall": {
+      "v15": 0.36735846267570643,
+      "reference": null,
+      "delta": null,
+      "sd_seed": null
+     },
+     "soda": {
+      "v15": 1.1983358991676538,
+      "reference": 1.1948112867208713,
+      "delta": 0.0035246124467824824,
+      "sd_seed": 0.0007991
+     },
+     "stories_topic": {
+      "v15": 1.0444209735934813,
+      "reference": 1.0452434404919475,
+      "delta": -0.000822466898466212,
+      "sd_seed": 0.001177
+     },
+     "tinystories": {
+      "v15": 1.0534883690328811,
+      "reference": 1.0545297660240587,
+      "delta": -0.0010413969911775567,
+      "sd_seed": 0.0007737
+     }
+    },
+    "weighted_bpc_not_comparable": 1.102150080853282,
+    "strata": {
+     "S1_d0": {
+      "told": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+      "control": "0.0125 (1/80), 95% CI [0.002, 0.068]",
+      "told_only": 5,
+      "control_only": 1,
+      "mcnemar_p": 0.21875,
+      "verdict": "unresolved",
+      "told_k": 5,
+      "told_categories": {
+       "hit": 5,
+       "other": 11,
+       "refusal": 14,
+       "wrong_value": 50
+      },
+      "control_categories": {
+       "hit": 1,
+       "other": 3,
+       "refusal": 70,
+       "wrong_value": 6
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 15,
+        "n": 80,
+        "rate": 0.1875,
+        "ci": [
+         0.1171,
+         0.2866
+        ]
+       },
+       "echo_off": {
+        "k": 5,
+        "n": 80,
+        "rate": 0.0625,
+        "ci": [
+         0.027,
+         0.1381
+        ]
+       },
+       "discordant": {
+        "on_only": 10,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.001953125
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 3,
+        "n": 15,
+        "rate": 0.2,
+        "ci": [
+         0.0705,
+         0.4519
+        ]
+       },
+       "ack_did_not": {
+        "k": 2,
+        "n": 65,
+        "rate": 0.0308,
+        "ci": [
+         0.0085,
+         0.1054
+        ]
+       }
+      }
+     },
+     "S2_d0": {
+      "told": "0.1750 (14/80), 95% CI [0.107, 0.273]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 14,
+      "control_only": 0,
+      "mcnemar_p": 0.0001220703125,
+      "verdict": "above",
+      "told_k": 14,
+      "told_categories": {
+       "hit": 14,
+       "other": 6,
+       "refusal": 1,
+       "wrong_value": 59
+      },
+      "control_categories": {
+       "refusal": 72,
+       "wrong_value": 8
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 22,
+        "n": 80,
+        "rate": 0.275,
+        "ci": [
+         0.1892,
+         0.3814
+        ]
+       },
+       "echo_off": {
+        "k": 9,
+        "n": 80,
+        "rate": 0.1125,
+        "ci": [
+         0.0603,
+         0.2002
+        ]
+       },
+       "discordant": {
+        "on_only": 13,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.000244140625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 8,
+        "n": 22,
+        "rate": 0.3636,
+        "ci": [
+         0.1973,
+         0.5705
+        ]
+       },
+       "ack_did_not": {
+        "k": 6,
+        "n": 58,
+        "rate": 0.1034,
+        "ci": [
+         0.0483,
+         0.2079
+        ]
+       }
+      }
+     },
+     "S2_d1": {
+      "told": "0.1625 (13/80), 95% CI [0.098, 0.258]",
+      "control": "0.0250 (2/80), 95% CI [0.007, 0.087]",
+      "told_only": 13,
+      "control_only": 2,
+      "mcnemar_p": 0.00738525390625,
+      "verdict": "above",
+      "told_k": 13,
+      "told_categories": {
+       "hit": 13,
+       "other": 13,
+       "refusal": 4,
+       "wrong_value": 50
+      },
+      "control_categories": {
+       "hit": 2,
+       "other": 8,
+       "refusal": 39,
+       "wrong_value": 31
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 22,
+        "n": 80,
+        "rate": 0.275,
+        "ci": [
+         0.1892,
+         0.3814
+        ]
+       },
+       "echo_off": {
+        "k": 9,
+        "n": 80,
+        "rate": 0.1125,
+        "ci": [
+         0.0603,
+         0.2002
+        ]
+       },
+       "discordant": {
+        "on_only": 13,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.000244140625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 6,
+        "n": 22,
+        "rate": 0.2727,
+        "ci": [
+         0.1315,
+         0.4815
+        ]
+       },
+       "ack_did_not": {
+        "k": 7,
+        "n": 58,
+        "rate": 0.1207,
+        "ci": [
+         0.0597,
+         0.2288
+        ]
+       }
+      }
+     },
+     "S2_d2": {
+      "told": "0.1125 (9/80), 95% CI [0.060, 0.200]",
+      "control": "0.0375 (3/80), 95% CI [0.013, 0.104]",
+      "told_only": 8,
+      "control_only": 2,
+      "mcnemar_p": 0.109375,
+      "verdict": "unresolved",
+      "told_k": 9,
+      "told_categories": {
+       "hit": 9,
+       "other": 10,
+       "refusal": 4,
+       "wrong_value": 57
+      },
+      "control_categories": {
+       "hit": 3,
+       "other": 11,
+       "refusal": 20,
+       "wrong_value": 46
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 22,
+        "n": 80,
+        "rate": 0.275,
+        "ci": [
+         0.1892,
+         0.3814
+        ]
+       },
+       "echo_off": {
+        "k": 9,
+        "n": 80,
+        "rate": 0.1125,
+        "ci": [
+         0.0603,
+         0.2002
+        ]
+       },
+       "discordant": {
+        "on_only": 13,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.000244140625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 6,
+        "n": 22,
+        "rate": 0.2727,
+        "ci": [
+         0.1315,
+         0.4815
+        ]
+       },
+       "ack_did_not": {
+        "k": 3,
+        "n": 58,
+        "rate": 0.0517,
+        "ci": [
+         0.0177,
+         0.1414
+        ]
+       }
+      }
+     },
+     "S3_d0": {
+      "told": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 0,
+      "control_only": 0,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 0,
+      "told_categories": {
+       "other": 5,
+       "refusal": 3,
+       "wrong_value": 72
+      },
+      "control_categories": {
+       "refusal": 72,
+       "wrong_value": 8
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "echo_off": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "discordant": {
+        "on_only": 0,
+        "off_only": 0
+       },
+       "mcnemar_p": 1.0
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 0,
+        "n": 0,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0
+        ]
+       },
+       "ack_did_not": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       }
+      }
+     },
+     "S4_d0": {
+      "told": "0.1125 (9/80), 95% CI [0.060, 0.200]",
+      "control": "0.1250 (10/80), 95% CI [0.069, 0.215]",
+      "told_only": 6,
+      "control_only": 7,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 9,
+      "told_categories": {
+       "hit": 9,
+       "other": 4,
+       "refusal": 2,
+       "swap": 7,
+       "wrong_value": 58
+      },
+      "control_categories": {
+       "hit": 10,
+       "other": 4,
+       "swap": 11,
+       "wrong_value": 55
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 19,
+        "n": 80,
+        "rate": 0.2375,
+        "ci": [
+         0.1576,
+         0.3414
+        ]
+       },
+       "echo_off": {
+        "k": 11,
+        "n": 80,
+        "rate": 0.1375,
+        "ci": [
+         0.0785,
+         0.2297
+        ]
+       },
+       "discordant": {
+        "on_only": 10,
+        "off_only": 2
+       },
+       "mcnemar_p": 0.03857421875
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 3,
+        "n": 19,
+        "rate": 0.1579,
+        "ci": [
+         0.0552,
+         0.3757
+        ]
+       },
+       "ack_did_not": {
+        "k": 6,
+        "n": 61,
+        "rate": 0.0984,
+        "ci": [
+         0.0459,
+         0.1984
+        ]
+       }
+      }
+     },
+     "S5_d0": {
+      "told": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 0,
+      "control_only": 0,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 0,
+      "told_categories": {
+       "other": 56,
+       "refusal": 24
+      },
+      "control_categories": {
+       "other": 21,
+       "persona_capture": 5,
+       "refusal": 54
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "echo_off": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "discordant": {
+        "on_only": 0,
+        "off_only": 0
+       },
+       "mcnemar_p": 1.0
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 0,
+        "n": 0,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0
+        ]
+       },
+       "ack_did_not": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       }
+      }
+     }
+    },
+    "S1_d0_per_item": {
+     "told": {
+      "1": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "2": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "3": "0.1250 (1/8), 95% CI [0.022, 0.471]",
+      "4": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "5": "0.2500 (2/8), 95% CI [0.071, 0.591]",
+      "6": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "7": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "8": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "9": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "10": "0.2500 (2/8), 95% CI [0.071, 0.591]"
+     },
+     "near_trained_items": [
+      1,
+      3,
+      10
+     ],
+     "told_without_near_trained": "0.0357 (2/56), 95% CI [0.010, 0.121]"
+    },
+    "n256_pass": {
+     "S1_d0": "0.0750 (6/80), 95% CI [0.035, 0.154]",
+     "S2_d0": "0.2125 (17/80), 95% CI [0.137, 0.314]",
+     "S3_d0": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+     "S4_d0": "0.1500 (12/80), 95% CI [0.088, 0.244]",
+     "S5_d0": "0.0000 (0/80), 95% CI [0.000, 0.046]"
+    },
+    "binding": {
+     "S2": {
+      "items": 10,
+      "value_chars": 49,
+      "bpc_told": 1.024441822593606,
+      "bpc_untold": 1.1077667886734837,
+      "bpc_swapped": 1.2471384566439883,
+      "told_minus_untold": -0.0833249660798776,
+      "told_minus_swapped": -0.2226966340503822,
+      "items_told_below_swapped": 9
+     },
+     "S1": {
+      "items": 10,
+      "value_chars": 49,
+      "bpc_told": 1.064846994875762,
+      "bpc_untold": 1.1367902649465895,
+      "bpc_swapped": 1.1745120410652337,
+      "told_minus_untold": -0.07194327007082757,
+      "told_minus_swapped": -0.1096650461894717,
+      "items_told_below_swapped": 7
+     },
+     "S3": {
+      "items": 10,
+      "value_chars": 52,
+      "bpc_told": 4.326772736287591,
+      "bpc_untold": 4.225359700094449,
+      "bpc_swapped": 4.58601834348266,
+      "told_minus_untold": 0.10141303619314179,
+      "told_minus_swapped": -0.2592456071950693,
+      "items_told_below_swapped": 8
+     },
+     "committed": {
+      "items": 8,
+      "value_chars": 38,
+      "bpc_told": 1.0035686518049571,
+      "bpc_untold": 1.0695560414942156,
+      "bpc_swapped": 1.1417494522950138,
+      "told_minus_untold": -0.06598738968925844,
+      "told_minus_swapped": -0.13818080049005665,
+      "items_told_below_swapped": 6
+     },
+     "all": {
+      "items": 38,
+      "value_chars": 188,
+      "bpc_told": 1.944164591018841,
+      "bpc_untold": 1.9699209021759314,
+      "bpc_swapped": 2.1304271672130892,
+      "told_minus_untold": -0.025756311157090428,
+      "told_minus_swapped": -0.18626257619424824,
+      "items_told_below_swapped": 30
+     }
+    },
+    "committed_d0": {
+     "told": "0.1125 (9/80), 95% CI [0.060, 0.200]",
+     "untold": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+     "told_only": 9,
+     "control_only": 0,
+     "mcnemar_p": 0.00390625,
+     "verdict": "above"
+    },
+    "committed_item1_elliot_seen_value": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+    "committed_probe_ceiling": "64/80: items 7 and 8 (town, age) are held-out frames snnchat.recall never trains"
+   }
+  },
+  {
+   "run": "chat-v15-recall-s1",
+   "reference": "chat-v3d-aligned-s1",
+   "finished": true,
+   "n_divergences": 0,
+   "rolled_back": false,
+   "primary_S1": {
+    "told_only": 5,
+    "control_only": 0,
+    "mcnemar_p": 0.0625,
+    "verdict": "unresolved",
+    "told": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+    "untold": "0.0000 (0/80), 95% CI [0.000, 0.046]"
+   },
+   "ship_bars": {
+    "i_committed_probe": {
+     "status": "FAIL",
+     "detail": "told 0.1750 (14/80), 95% CI [0.107, 0.273], bar > 15.5/80; untold 0.0000 (0/80), 95% CI [0.000, 0.046], bar < 4.5/80"
+    },
+    "ii_unseen_phrasing": {
+     "status": "FAIL",
+     "detail": "S1 told 0.0625 (5/80), 95% CI [0.027, 0.138]; bar > 7.5/80"
+    },
+    "iii_two_fact": {
+     "status": "FAIL",
+     "detail": "S4 told 0.0625 (5/80), 95% CI [0.027, 0.138] vs swapped-roles 0.0625 (5/80), 95% CI [0.027, 0.138], +4/-4 p=1.0000 -> unresolved",
+     "told_only": 4,
+     "control_only": 4,
+     "mcnemar_p": 1.0,
+     "verdict": "unresolved"
+    }
+   },
+   "guards": {
+    "wrong_value": {
+     "status": "FAIL",
+     "detail": "S1 told: wrong value 0.5000 (40/80), 95% CI [0.393, 0.607] must be below hit 0.0625 (5/80), 95% CI [0.027, 0.138]"
+    },
+    "confabulation": {
+     "status": "pass",
+     "detail": "S1 untold: any value 0.0375 (3/80), 95% CI [0.013, 0.104] must not exceed \"haven't told me\" 0.9375 (75/80), 95% CI [0.862, 0.973]"
+    },
+    "swap": {
+     "status": "FAIL",
+     "detail": "S4 told: swap 0.0750 (6/80), 95% CI [0.035, 0.154] must be below hit 0.0625 (5/80), 95% CI [0.027, 0.138]"
+    },
+    "bpc_soda": {
+     "status": "FAIL",
+     "detail": "1.1965445 vs chat-v3d-aligned-s1 1.1938855: delta +0.0026590, band +-0.0022614 -> worse",
+     "delta": 0.0026590352305000398,
+     "band": 0.0022614,
+     "side": "worse"
+    },
+    "bpc_stories_topic": {
+     "status": "pass",
+     "detail": "1.0437006 vs chat-v3d-aligned-s1 1.0435722: delta +0.0001284, band +-0.0033309 -> within",
+     "delta": 0.00012841180172595834,
+     "band": 0.0033309,
+     "side": "within"
+    },
+    "bpc_tinystories": {
+     "status": "pass",
+     "detail": "1.0528564 vs chat-v3d-aligned-s1 1.0531219: delta -0.0002655, band +-0.0021895 -> within",
+     "delta": -0.0002654762417084733,
+     "band": 0.0021895,
+     "side": "within"
+    },
+    "heldout": {
+     "status": "pass",
+     "detail": "0.4917 (59/120), 95% CI [0.404, 0.580] against 60/120 -> unresolved"
+    },
+    "social": {
+     "status": "pass",
+     "detail": "1.0000 (20/20), 95% CI [0.839, 1.000]; bar > 19.5/20"
+    },
+    "identity": {
+     "status": "pass",
+     "detail": "1.0000 (16/16), 95% CI [0.806, 1.000]; bar > 14.5/16"
+    }
+   },
+   "verdict": "floor",
+   "reported": {
+    "template_capture": {
+     "over": "substantive picks (topic, list, fact) at n=1, lambda=0",
+     "persona": {
+      "k": 7,
+      "n": 112,
+      "rate": 0.0625,
+      "se": 0.0229,
+      "ci_low": 0.0306,
+      "ci_high": 0.1234,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "recall": {
+      "k": 17,
+      "n": 112,
+      "rate": 0.1518,
+      "se": 0.0339,
+      "ci_low": 0.097,
+      "ci_high": 0.2297,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "either": {
+      "k": 24,
+      "n": 112,
+      "rate": 0.2143,
+      "se": 0.0388,
+      "ci_low": 0.1484,
+      "ci_high": 0.2991,
+      "lattice": 0.00893,
+      "z": 1.959963984540054
+     },
+     "recall_over_all_picks": {
+      "k": 23,
+      "n": 148,
+      "rate": 0.1554,
+      "se": 0.0298,
+      "ci_low": 0.1058,
+      "ci_high": 0.2224,
+      "lattice": 0.00676,
+      "z": 1.959963984540054
+     }
+    },
+    "per_source_bpc": {
+     "alpaca": {
+      "v15": 1.7050562946066865,
+      "reference": 1.6686341527722628,
+      "delta": 0.036422141834423716,
+      "sd_seed": 0.0035174
+     },
+     "dolly": {
+      "v15": 1.9626417557228726,
+      "reference": 1.9636568355466317,
+      "delta": -0.0010150798237591463,
+      "sd_seed": 0.0080569
+     },
+     "oasst1": {
+      "v15": 1.8978097488345989,
+      "reference": 1.8732680538666773,
+      "delta": 0.02454169496792158,
+      "sd_seed": 0.004566
+     },
+     "persona": {
+      "v15": 0.23365938441675563,
+      "reference": 0.23155319888296425,
+      "delta": 0.0021061855337913826,
+      "sd_seed": 0.0014545
+     },
+     "recall": {
+      "v15": 0.36760854369064516,
+      "reference": null,
+      "delta": null,
+      "sd_seed": null
+     },
+     "soda": {
+      "v15": 1.1965445164107569,
+      "reference": 1.1938854811802568,
+      "delta": 0.0026590352305000398,
+      "sd_seed": 0.0007991
+     },
+     "stories_topic": {
+      "v15": 1.0437006147057508,
+      "reference": 1.0435722029040249,
+      "delta": 0.00012841180172595834,
+      "sd_seed": 0.001177
+     },
+     "tinystories": {
+      "v15": 1.0528564245150407,
+      "reference": 1.0531219007567492,
+      "delta": -0.0002654762417084733,
+      "sd_seed": 0.0007737
+     }
+    },
+    "weighted_bpc_not_comparable": 1.1014652575802506,
+    "strata": {
+     "S1_d0": {
+      "told": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 5,
+      "control_only": 0,
+      "mcnemar_p": 0.0625,
+      "verdict": "unresolved",
+      "told_k": 5,
+      "told_categories": {
+       "hit": 5,
+       "other": 24,
+       "persona_capture": 1,
+       "refusal": 10,
+       "wrong_value": 40
+      },
+      "control_categories": {
+       "other": 3,
+       "refusal": 74,
+       "wrong_value": 3
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 12,
+        "n": 80,
+        "rate": 0.15,
+        "ci": [
+         0.0879,
+         0.2441
+        ]
+       },
+       "echo_off": {
+        "k": 8,
+        "n": 80,
+        "rate": 0.1,
+        "ci": [
+         0.0515,
+         0.1851
+        ]
+       },
+       "discordant": {
+        "on_only": 4,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.125
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 2,
+        "n": 12,
+        "rate": 0.1667,
+        "ci": [
+         0.047,
+         0.448
+        ]
+       },
+       "ack_did_not": {
+        "k": 3,
+        "n": 68,
+        "rate": 0.0441,
+        "ci": [
+         0.0151,
+         0.1219
+        ]
+       }
+      }
+     },
+     "S2_d0": {
+      "told": "0.1250 (10/80), 95% CI [0.069, 0.215]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 10,
+      "control_only": 0,
+      "mcnemar_p": 0.001953125,
+      "verdict": "above",
+      "told_k": 10,
+      "told_categories": {
+       "hit": 10,
+       "other": 5,
+       "refusal": 5,
+       "wrong_value": 60
+      },
+      "control_categories": {
+       "other": 1,
+       "refusal": 70,
+       "wrong_value": 9
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 19,
+        "n": 80,
+        "rate": 0.2375,
+        "ci": [
+         0.1576,
+         0.3414
+        ]
+       },
+       "echo_off": {
+        "k": 12,
+        "n": 80,
+        "rate": 0.15,
+        "ci": [
+         0.0879,
+         0.2441
+        ]
+       },
+       "discordant": {
+        "on_only": 7,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.015625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 6,
+        "n": 19,
+        "rate": 0.3158,
+        "ci": [
+         0.1536,
+         0.5399
+        ]
+       },
+       "ack_did_not": {
+        "k": 4,
+        "n": 61,
+        "rate": 0.0656,
+        "ci": [
+         0.0258,
+         0.1568
+        ]
+       }
+      }
+     },
+     "S2_d1": {
+      "told": "0.1125 (9/80), 95% CI [0.060, 0.200]",
+      "control": "0.0125 (1/80), 95% CI [0.002, 0.068]",
+      "told_only": 9,
+      "control_only": 1,
+      "mcnemar_p": 0.021484375,
+      "verdict": "above",
+      "told_k": 9,
+      "told_categories": {
+       "hit": 9,
+       "other": 10,
+       "refusal": 4,
+       "wrong_value": 57
+      },
+      "control_categories": {
+       "hit": 1,
+       "other": 9,
+       "refusal": 43,
+       "wrong_value": 27
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 19,
+        "n": 80,
+        "rate": 0.2375,
+        "ci": [
+         0.1576,
+         0.3414
+        ]
+       },
+       "echo_off": {
+        "k": 12,
+        "n": 80,
+        "rate": 0.15,
+        "ci": [
+         0.0879,
+         0.2441
+        ]
+       },
+       "discordant": {
+        "on_only": 7,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.015625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 4,
+        "n": 19,
+        "rate": 0.2105,
+        "ci": [
+         0.0851,
+         0.4333
+        ]
+       },
+       "ack_did_not": {
+        "k": 5,
+        "n": 61,
+        "rate": 0.082,
+        "ci": [
+         0.0355,
+         0.1779
+        ]
+       }
+      }
+     },
+     "S2_d2": {
+      "told": "0.1750 (14/80), 95% CI [0.107, 0.273]",
+      "control": "0.0125 (1/80), 95% CI [0.002, 0.068]",
+      "told_only": 14,
+      "control_only": 1,
+      "mcnemar_p": 0.0009765625,
+      "verdict": "above",
+      "told_k": 14,
+      "told_categories": {
+       "hit": 14,
+       "other": 4,
+       "refusal": 2,
+       "wrong_value": 60
+      },
+      "control_categories": {
+       "hit": 1,
+       "other": 13,
+       "refusal": 27,
+       "wrong_value": 39
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 19,
+        "n": 80,
+        "rate": 0.2375,
+        "ci": [
+         0.1576,
+         0.3414
+        ]
+       },
+       "echo_off": {
+        "k": 12,
+        "n": 80,
+        "rate": 0.15,
+        "ci": [
+         0.0879,
+         0.2441
+        ]
+       },
+       "discordant": {
+        "on_only": 7,
+        "off_only": 0
+       },
+       "mcnemar_p": 0.015625
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 8,
+        "n": 19,
+        "rate": 0.4211,
+        "ci": [
+         0.2314,
+         0.6372
+        ]
+       },
+       "ack_did_not": {
+        "k": 6,
+        "n": 61,
+        "rate": 0.0984,
+        "ci": [
+         0.0459,
+         0.1984
+        ]
+       }
+      }
+     },
+     "S3_d0": {
+      "told": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 0,
+      "control_only": 0,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 0,
+      "told_categories": {
+       "other": 8,
+       "refusal": 8,
+       "wrong_value": 64
+      },
+      "control_categories": {
+       "other": 1,
+       "refusal": 70,
+       "wrong_value": 9
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "echo_off": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "discordant": {
+        "on_only": 0,
+        "off_only": 0
+       },
+       "mcnemar_p": 1.0
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 0,
+        "n": 0,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0
+        ]
+       },
+       "ack_did_not": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       }
+      }
+     },
+     "S4_d0": {
+      "told": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+      "control": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+      "told_only": 4,
+      "control_only": 4,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 5,
+      "told_categories": {
+       "hit": 5,
+       "other": 6,
+       "refusal": 1,
+       "swap": 6,
+       "wrong_value": 62
+      },
+      "control_categories": {
+       "hit": 5,
+       "other": 5,
+       "refusal": 1,
+       "swap": 4,
+       "wrong_value": 65
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 30,
+        "n": 80,
+        "rate": 0.375,
+        "ci": [
+         0.2769,
+         0.4845
+        ]
+       },
+       "echo_off": {
+        "k": 11,
+        "n": 80,
+        "rate": 0.1375,
+        "ci": [
+         0.0785,
+         0.2297
+        ]
+       },
+       "discordant": {
+        "on_only": 19,
+        "off_only": 0
+       },
+       "mcnemar_p": 3.814697265625e-06
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 3,
+        "n": 30,
+        "rate": 0.1,
+        "ci": [
+         0.0346,
+         0.2562
+        ]
+       },
+       "ack_did_not": {
+        "k": 2,
+        "n": 50,
+        "rate": 0.04,
+        "ci": [
+         0.011,
+         0.1346
+        ]
+       }
+      }
+     },
+     "S5_d0": {
+      "told": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "control": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+      "told_only": 0,
+      "control_only": 0,
+      "mcnemar_p": 1.0,
+      "verdict": "unresolved",
+      "told_k": 0,
+      "told_categories": {
+       "other": 64,
+       "refusal": 16
+      },
+      "control_categories": {
+       "other": 18,
+       "persona_capture": 6,
+       "refusal": 56
+      },
+      "ack_echo": {
+       "echo_on": {
+        "k": 1,
+        "n": 80,
+        "rate": 0.0125,
+        "ci": [
+         0.0022,
+         0.0675
+        ]
+       },
+       "echo_off": {
+        "k": 0,
+        "n": 80,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0458
+        ]
+       },
+       "discordant": {
+        "on_only": 1,
+        "off_only": 0
+       },
+       "mcnemar_p": 1.0
+      },
+      "told_hit_by_ack": {
+       "ack_carried_value": {
+        "k": 0,
+        "n": 1,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.7935
+        ]
+       },
+       "ack_did_not": {
+        "k": 0,
+        "n": 79,
+        "rate": 0.0,
+        "ci": [
+         0.0,
+         0.0464
+        ]
+       }
+      }
+     }
+    },
+    "S1_d0_per_item": {
+     "told": {
+      "1": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "2": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "3": "0.1250 (1/8), 95% CI [0.022, 0.471]",
+      "4": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "5": "0.5000 (4/8), 95% CI [0.215, 0.785]",
+      "6": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "7": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "8": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "9": "0.0000 (0/8), 95% CI [0.000, 0.324]",
+      "10": "0.0000 (0/8), 95% CI [0.000, 0.324]"
+     },
+     "near_trained_items": [
+      1,
+      3,
+      10
+     ],
+     "told_without_near_trained": "0.0714 (4/56), 95% CI [0.028, 0.170]"
+    },
+    "n256_pass": {
+     "S1_d0": "0.1625 (13/80), 95% CI [0.098, 0.258]",
+     "S2_d0": "0.0625 (5/80), 95% CI [0.027, 0.138]",
+     "S3_d0": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+     "S4_d0": "0.0375 (3/80), 95% CI [0.013, 0.104]",
+     "S5_d0": "0.0000 (0/80), 95% CI [0.000, 0.046]"
+    },
+    "binding": {
+     "S2": {
+      "items": 10,
+      "value_chars": 49,
+      "bpc_told": 1.0049858921115487,
+      "bpc_untold": 1.134356752555081,
+      "bpc_swapped": 1.2719728543841784,
+      "told_minus_untold": -0.1293708604435324,
+      "told_minus_swapped": -0.26698696227262975,
+      "items_told_below_swapped": 10
+     },
+     "S1": {
+      "items": 10,
+      "value_chars": 49,
+      "bpc_told": 1.1343358408686761,
+      "bpc_untold": 1.1888573456238014,
+      "bpc_swapped": 1.2826175064584808,
+      "told_minus_untold": -0.054521504755125294,
+      "told_minus_swapped": -0.1482816655898047,
+      "items_told_below_swapped": 8
+     },
+     "S3": {
+      "items": 10,
+      "value_chars": 52,
+      "bpc_told": 4.127963252565035,
+      "bpc_untold": 4.292146807717648,
+      "bpc_swapped": 4.3406535971526985,
+      "told_minus_untold": -0.16418355515261318,
+      "told_minus_swapped": -0.21269034458766356,
+      "items_told_below_swapped": 6
+     },
+     "committed": {
+      "items": 8,
+      "value_chars": 38,
+      "bpc_told": 1.064181669646078,
+      "bpc_untold": 1.30979207114374,
+      "bpc_swapped": 1.2015572352958372,
+      "told_minus_untold": -0.2456104014976621,
+      "told_minus_swapped": -0.13737556564975928,
+      "items_told_below_swapped": 6
+     },
+     "all": {
+      "items": 38,
+      "value_chars": 188,
+      "bpc_told": 1.9144667951912966,
+      "bpc_untold": 2.057453316572048,
+      "bpc_swapped": 2.1092983493323,
+      "told_minus_untold": -0.1429865213807513,
+      "told_minus_swapped": -0.19483155414100328,
+      "items_told_below_swapped": 30
+     }
+    },
+    "committed_d0": {
+     "told": "0.1750 (14/80), 95% CI [0.107, 0.273]",
+     "untold": "0.0000 (0/80), 95% CI [0.000, 0.046]",
+     "told_only": 14,
+     "control_only": 0,
+     "mcnemar_p": 0.0001220703125,
+     "verdict": "above"
+    },
+    "committed_item1_elliot_seen_value": "0.1250 (1/8), 95% CI [0.022, 0.471]",
+    "committed_probe_ceiling": "64/80: items 7 and 8 (town, age) are held-out frames snnchat.recall never trains"
+   }
+  }
+ ],
+ "floors_shipped": {
+  "memory_probe_v2": {
+   "S1": {
+    "0": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "refusal": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "persona_capture": {
+       "k": 10,
+       "n": 80,
+       "rate": 0.125,
+       "ci": [
+        0.0693,
+        0.215
+       ]
+      },
+      "any_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "category": {
+       "hit": 1,
+       "other": 67,
+       "persona_capture": 10,
+       "refusal": 2
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "persona_capture": {
+       "k": 37,
+       "n": 80,
+       "rate": 0.4625,
+       "ci": [
+        0.3575,
+        0.571
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 43,
+       "persona_capture": 37
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 1
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "echo_off": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "discordant": {
+       "on_only": 1,
+       "off_only": 0
+      },
+      "mcnemar_p": 1.0
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 1,
+       "n": 2,
+       "rate": 0.5,
+       "ci": [
+        0.0945,
+        0.9055
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 78,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0469
+       ]
+      }
+     }
+    }
+   },
+   "S2": {
+    "0": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "persona_capture": {
+       "k": 21,
+       "n": 80,
+       "rate": 0.2625,
+       "ci": [
+        0.1786,
+        0.3682
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 58,
+       "persona_capture": 21,
+       "refusal": 1
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "refusal": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "persona_capture": {
+       "k": 38,
+       "n": 80,
+       "rate": 0.475,
+       "ci": [
+        0.3692,
+        0.583
+       ]
+      },
+      "any_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "category": {
+       "other": 40,
+       "persona_capture": 38,
+       "refusal": 1,
+       "wrong_value": 1
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 3,
+       "n": 80,
+       "rate": 0.0375,
+       "ci": [
+        0.0128,
+        0.1045
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 3,
+       "off_only": 0
+      },
+      "mcnemar_p": 0.25
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 3,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.5615
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 77,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0475
+       ]
+      }
+     }
+    },
+    "1": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "persona_capture": {
+       "k": 20,
+       "n": 80,
+       "rate": 0.25,
+       "ci": [
+        0.1681,
+        0.3548
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 58,
+       "persona_capture": 20,
+       "refusal": 2
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "persona_capture": {
+       "k": 40,
+       "n": 80,
+       "rate": 0.5,
+       "ci": [
+        0.393,
+        0.607
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 40,
+       "persona_capture": 40
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 3,
+       "n": 80,
+       "rate": 0.0375,
+       "ci": [
+        0.0128,
+        0.1045
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 3,
+       "off_only": 0
+      },
+      "mcnemar_p": 0.25
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 3,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.5615
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 77,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0475
+       ]
+      }
+     }
+    },
+    "2": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "persona_capture": {
+       "k": 32,
+       "n": 80,
+       "rate": 0.4,
+       "ci": [
+        0.2996,
+        0.5095
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 47,
+       "persona_capture": 32,
+       "refusal": 1
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "persona_capture": {
+       "k": 47,
+       "n": 80,
+       "rate": 0.5875,
+       "ci": [
+        0.478,
+        0.6889
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 33,
+       "persona_capture": 47
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 3,
+       "n": 80,
+       "rate": 0.0375,
+       "ci": [
+        0.0128,
+        0.1045
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 3,
+       "off_only": 0
+      },
+      "mcnemar_p": 0.25
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 3,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.5615
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 77,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0475
+       ]
+      }
+     }
+    }
+   },
+   "S3": {
+    "0": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "refusal": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "persona_capture": {
+       "k": 23,
+       "n": 80,
+       "rate": 0.2875,
+       "ci": [
+        0.1999,
+        0.3946
+       ]
+      },
+      "any_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "category": {
+       "other": 54,
+       "persona_capture": 23,
+       "refusal": 2,
+       "wrong_value": 1
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "refusal": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "persona_capture": {
+       "k": 38,
+       "n": 80,
+       "rate": 0.475,
+       "ci": [
+        0.3692,
+        0.583
+       ]
+      },
+      "any_value": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "category": {
+       "other": 40,
+       "persona_capture": 38,
+       "refusal": 1,
+       "wrong_value": 1
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 1,
+       "off_only": 0
+      },
+      "mcnemar_p": 1.0
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 1,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.7935
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 79,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0464
+       ]
+      }
+     }
+    }
+   },
+   "S4": {
+    "0": {
+     "n": 80,
+     "control_kind": "swapped",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 1,
+       "n": 80,
+       "rate": 0.0125,
+       "ci": [
+        0.0022,
+        0.0675
+       ]
+      },
+      "persona_capture": {
+       "k": 28,
+       "n": 80,
+       "rate": 0.35,
+       "ci": [
+        0.2545,
+        0.4592
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 51,
+       "persona_capture": 28,
+       "refusal": 1
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "refusal": {
+       "k": 3,
+       "n": 80,
+       "rate": 0.0375,
+       "ci": [
+        0.0128,
+        0.1045
+       ]
+      },
+      "persona_capture": {
+       "k": 27,
+       "n": 80,
+       "rate": 0.3375,
+       "ci": [
+        0.2435,
+        0.4464
+       ]
+      },
+      "any_value": {
+       "k": 2,
+       "n": 80,
+       "rate": 0.025,
+       "ci": [
+        0.0069,
+        0.0866
+       ]
+      },
+      "category": {
+       "other": 48,
+       "persona_capture": 27,
+       "refusal": 3,
+       "wrong_value": 2
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 7,
+       "n": 80,
+       "rate": 0.0875,
+       "ci": [
+        0.043,
+        0.1698
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 7,
+       "off_only": 0
+      },
+      "mcnemar_p": 0.015625
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 7,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.3543
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 73,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.05
+       ]
+      }
+     }
+    }
+   },
+   "S5": {
+    "0": {
+     "n": 80,
+     "control_kind": "untold",
+     "told": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "persona_capture": {
+       "k": 5,
+       "n": 80,
+       "rate": 0.0625,
+       "ci": [
+        0.027,
+        0.1381
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 75,
+       "persona_capture": 5
+      }
+     },
+     "control": {
+      "hit": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "swap": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "wrong_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "refusal": {
+       "k": 8,
+       "n": 80,
+       "rate": 0.1,
+       "ci": [
+        0.0515,
+        0.1851
+       ]
+      },
+      "persona_capture": {
+       "k": 25,
+       "n": 80,
+       "rate": 0.3125,
+       "ci": [
+        0.2215,
+        0.4207
+       ]
+      },
+      "any_value": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "category": {
+       "other": 47,
+       "persona_capture": 25,
+       "refusal": 8
+      }
+     },
+     "discordant": {
+      "control_only": 0,
+      "told_only": 0
+     },
+     "mcnemar_p": 1.0,
+     "ack_echo": {
+      "echo_on": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "echo_off": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      },
+      "discordant": {
+       "on_only": 0,
+       "off_only": 0
+      },
+      "mcnemar_p": 1.0
+     },
+     "told_hit_by_ack": {
+      "ack_carried_value": {
+       "k": 0,
+       "n": 0,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0
+       ]
+      },
+      "ack_did_not": {
+       "k": 0,
+       "n": 80,
+       "rate": 0.0,
+       "ci": [
+        0.0,
+        0.0458
+       ]
+      }
+     }
+    }
+   }
+  },
+  "binding": {
+   "S2": {
+    "items": 10,
+    "value_chars": 49,
+    "bpc_told": 2.7151071951210457,
+    "bpc_untold": 2.894153348947291,
+    "bpc_swapped": 2.9266301268744215,
+    "told_minus_untold": -0.1790461538262451,
+    "told_minus_swapped": -0.21152293175337578,
+    "items_told_below_swapped": 8
+   },
+   "S1": {
+    "items": 10,
+    "value_chars": 49,
+    "bpc_told": 2.8392400255953,
+    "bpc_untold": 3.0262797575411473,
+    "bpc_swapped": 2.8530248094459556,
+    "told_minus_untold": -0.18703973194584744,
+    "told_minus_swapped": -0.013784783850655735,
+    "items_told_below_swapped": 6
+   },
+   "S3": {
+    "items": 10,
+    "value_chars": 52,
+    "bpc_told": 3.6556551303258353,
+    "bpc_untold": 3.7307695585272023,
+    "bpc_swapped": 3.7231853970324695,
+    "told_minus_untold": -0.07511442820136693,
+    "told_minus_swapped": -0.0675302667066342,
+    "items_told_below_swapped": 5
+   },
+   "committed": {
+    "items": 8,
+    "value_chars": 38,
+    "bpc_told": 2.736080537398655,
+    "bpc_untold": 2.72610472899395,
+    "bpc_swapped": 2.883140231894495,
+    "told_minus_untold": 0.009975808404705244,
+    "told_minus_swapped": -0.14705969449584,
+    "items_told_below_swapped": 7
+   },
+   "all": {
+    "items": 38,
+    "value_chars": 188,
+    "bpc_told": 3.0118518138999644,
+    "bpc_untold": 3.1260277604421174,
+    "bpc_swapped": 3.118979049666903,
+    "told_minus_untold": -0.11417594654215302,
+    "told_minus_swapped": -0.10712723576693861,
+    "items_told_below_swapped": 26
+   }
+  }
+ }
+}

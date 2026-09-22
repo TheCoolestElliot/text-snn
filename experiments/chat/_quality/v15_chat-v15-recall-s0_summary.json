@@ -1,0 +1,77 @@
+{
+  "run_name": "chat-v15-recall-s0",
+  "steps": 14000,
+  "params": 4417637,
+  "wall_clock_s": 2453.81,
+  "peak_vram_gib": 3.831,
+  "val": {
+    "alpaca": 1.7011233380192055,
+    "dolly": 1.9578325602687012,
+    "oasst1": 1.931109259004857,
+    "persona": 0.23332264238636624,
+    "recall": 0.36735846267570643,
+    "soda": 1.1983358991676538,
+    "stories_topic": 1.0444209735934813,
+    "tinystories": 1.0534883690328811,
+    "weighted": 1.102150080853282
+  },
+  "description": {
+    "params": 4417637,
+    "d_model": 1024,
+    "n_layers": 4,
+    "vocab_size": 101,
+    "arch": "twocomp_threshold",
+    "slow_pole_tau": [
+      {
+        "layer": 0,
+        "tau_min": 1.39,
+        "tau_median": 2.68,
+        "tau_max": 7943.76
+      },
+      {
+        "layer": 1,
+        "tau_min": 1.08,
+        "tau_median": 13.09,
+        "tau_max": 3125.41
+      },
+      {
+        "layer": 2,
+        "tau_min": 1.09,
+        "tau_median": 9.74,
+        "tau_max": 428.25
+      },
+      {
+        "layer": 3,
+        "tau_min": 1.01,
+        "tau_median": 7.16,
+        "tau_max": 334.85
+      }
+    ],
+    "slow_pole_tau_init": [
+      {
+        "layer": 0,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 1,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 2,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      },
+      {
+        "layer": 3,
+        "tau_min": 3.0,
+        "tau_median": 42.32,
+        "tau_max": 600.02
+      }
+    ]
+  }
+}
