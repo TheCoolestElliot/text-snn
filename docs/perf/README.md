@@ -90,3 +90,27 @@ dropped. A time-first `[L,B,d]` layout would permute GEMM rows and every reducti
 
 Decision #7's fp64 clip is the precedent for what adopting any of these costs: a run trained
 after it cannot be compared bitwise against a figure that predates it.
+
+## 5. Chat decode: the GPU was waiting on the host
+
+Measured 2026-10-08 on the shipped `chat-v6-scratch/ckpt_best.pt`, REPL defaults (n = 256,
+`max_new` 400), six fixed prompts, seed 1234: **0.483 → 0.373 s per reply (1.29×)**, and the
+six replies are **byte-identical** before and after. Two changes, neither touching arithmetic:
+
+* **The loop breaker stopped re-deriving dead rows.** The pool loop runs until the *last* of
+  256 rows stops, ~350 characters, against a much shorter median reply, and every character
+  re-ran `loop_penalty_target` on every row. A stopped row's history never grows, so its target
+  is a constant; `_penalty_pairs` now caches it (cleared on any steering permutation). 542K →
+  294K calls for the six replies.
+* **The forward runs while the host works.** The decode step is captured as two graphs, forward
+  then sampler, because only the sampler reads the loop-break penalty. `sample_candidates`
+  queues the forward as soon as `feed` exists on the device and reads `nxt` back through a
+  pinned non-blocking copy and an event, so the host's per-row bookkeeping overlaps the
+  forward instead of following it. The split materialises the intermediate `last`, which
+  changes no kernel and no input.
+
+Held by `test_graph_and_eager_draw_the_same_text` and the rest of `tests/test_snnchat.py`
+(123 pass on the GPU). What is left per character is roughly equal parts the alive rows'
+loop-breaker checks, the eager `multinomial`, and graph replay. A numpy-vectorised loop
+detector was tried and dropped: at n = 256 and a 48-slot window it was no faster on ordinary
+text and 2.6× *slower* on a looping pool, which is the case the breaker exists for.

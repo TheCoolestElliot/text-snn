@@ -1,4 +1,4 @@
-"""One captured CUDA graph for the whole per-character decode step.
+"""Captured CUDA graphs for the whole per-character decode step.
 
 WHY THIS EXISTS
 ---------------
@@ -34,6 +34,13 @@ WHAT IS AND IS NOT INSIDE THE GRAPH
 Inside: the embedding, the K projections, the K scans, the head, the loop-break
 penalty add, `_filter`'s truncation, and both softmaxes. All of it deterministic
 given its inputs.
+
+It is captured as TWO graphs replayed back to back -- the forward (`advance`)
+and the sampler (`sample`) -- because only the sampler reads the loop-break
+penalty, and the penalty is the one input the host has to work out after the
+previous draw lands. Splitting there lets `rerank.sample_candidates` queue the
+forward before it waits, so the GPU runs it while the host does its per-row
+bookkeeping instead of idling through it.
 
 Outside: `torch.multinomial` and everything that reads a value on the host.
 Deliberately. Capturing the draw would mean capturing RNG state, which changes
@@ -119,6 +126,7 @@ class DecodeStepper:
         #: every character would cost more than the penalty saves.
         self._dirty: list[int] = []
         self._graph: torch.cuda.CUDAGraph | None = None
+        self._sampler: torch.cuda.CUDAGraph | None = None
         self._probs: torch.Tensor | None = None
         self._logprobs: torch.Tensor | None = None
         self._capture(params, temps)
@@ -134,21 +142,27 @@ class DecodeStepper:
         side.wait_stream(torch.cuda.current_stream())
         with torch.cuda.stream(side), torch.no_grad():
             for _ in range(3):
-                _run_step(model, self._feed, self._state, self._penalty, params, temps)
+                last, _, _ = _run_forward(model, self._feed, self._state)
+                _run_sampler(last, self._penalty, params, temps)
         torch.cuda.current_stream().wait_stream(side)
 
+        # Two graphs, not one, so the forward can be in flight while the host
+        # works out the loop-break penalty that only the sampler reads -- see
+        # `advance`. The split materialises `last`, which the single graph
+        # held as an intermediate: same kernels, same inputs, same bits.
         graph = torch.cuda.CUDAGraph()
         with torch.no_grad(), torch.cuda.graph(graph):
-            probs, logprobs, new_state = _run_step(
-                model, self._feed, self._state, self._penalty, params, temps
-            )
+            last, logprobs, new_state = _run_forward(model, self._feed, self._state)
             # The state update is INSIDE the capture, so a replay is
-            # self-advancing and one character costs exactly one replay. Copying
-            # afterwards would put K more launches back into the loop this
-            # module exists to empty.
+            # self-advancing. Copying afterwards would put K more launches back
+            # into the loop this module exists to empty.
             for k, s in enumerate(new_state):
                 self._state[k].copy_(s)
+        sampler = torch.cuda.CUDAGraph()
+        with torch.no_grad(), torch.cuda.graph(sampler, pool=graph.pool()):
+            probs = _run_sampler(last, self._penalty, params, temps)
         self._graph = graph
+        self._sampler = sampler
         self._probs = probs
         self._logprobs = logprobs
 
@@ -204,8 +218,25 @@ class DecodeStepper:
         the next call**. Callers read them before stepping again, which the
         sampling loop does naturally; anything that needs to keep one clones it.
         """
+        self.advance(feed)
+        return self.sample()
+
+    @torch.no_grad()
+    def advance(self, feed: torch.Tensor) -> None:
+        """The forward half of `step`: enqueue it and return without waiting.
+
+        It reads `feed` and the state and not the penalty, so a caller can
+        launch it as soon as `feed` exists on the device and spend the GPU's
+        time computing the next `penalise` on the host. `sample` must follow
+        before the outputs are read.
+        """
         self._feed.copy_(feed.reshape(self.n, 1))
         self._graph.replay()
+
+    @torch.no_grad()
+    def sample(self) -> tuple[torch.Tensor, torch.Tensor]:
+        """The sampler half of `step`, under the penalty as it stands now."""
+        self._sampler.replay()
         return self._probs, self._logprobs
 
 
@@ -215,16 +246,20 @@ def _state_width(model) -> int:
     return int(probe[0].shape[-1])
 
 
-def _run_step(model, feed, state, penalty, params, temps):
-    """The body that is captured. Pure function of its tensor inputs."""
+def _run_forward(model, feed, state):
+    """The first captured body. Pure function of its tensor inputs; no penalty."""
     logits, new_state, _ = model(feed, state=state)
     last = logits[:, -1, :].float()
-    probs = F.softmax(_filter(last + penalty, params, temps), dim=-1)
     # The RAW log-probabilities, before temperature and truncation: the score in
     # `snnchat.rerank` compares replies under the model, not under the sampler's
     # truncated view of it. Computed here so the loop does not launch it.
     logprobs = F.log_softmax(last, dim=-1)
-    return probs, logprobs, new_state
+    return last, logprobs, new_state
+
+
+def _run_sampler(last, penalty, params, temps):
+    """The second captured body: penalty, truncation, softmax."""
+    return F.softmax(_filter(last + penalty, params, temps), dim=-1)
 
 
 def _sampler_key(params: SamplingParams, temps: torch.Tensor | None):
