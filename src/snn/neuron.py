@@ -54,6 +54,7 @@ from snn.kernels import (
     lif_forward_kernel,
 )
 from snn.surrogate import atan_spike
+from snn.wholescan import lif_scan_whole, wholescan_selected
 
 __all__ = [
     "lif_scan_eager",
@@ -273,5 +274,13 @@ def lif_scan(cur: Tensor, v0: Tensor, beta: float, thr: float, alpha: float,
     _check_shapes(cur, v0, reset)
     _check_fp32(cur, v0)
     if fused and cur.is_cuda and jiterator_available():
+        # One NVRTC kernel for the whole scan instead of one jiterator kernel per
+        # timestep, where that is supported and has been verified BIT-IDENTICAL
+        # to `FusedLIFScan` in this process (`snn.wholescan`). Nested inside the
+        # jiterator condition on purpose: the whole-scan path is only ever taken
+        # where the per-timestep one could have been, so it is always checkable
+        # against it. `SNN_SCAN_IMPL=jiterator` turns it off.
+        if wholescan_selected(f"lif_{reset}", cur, v0):
+            return lif_scan_whole(cur, v0, beta, thr, alpha, reset)
         return FusedLIFScan.apply(cur, v0, beta, thr, alpha, RESET_CODES[reset])
     return lif_scan_eager(cur, v0, beta, thr, alpha, reset)

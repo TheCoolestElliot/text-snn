@@ -22,6 +22,23 @@ points.
 
 ``:4096:8`` means "8 workspaces of 4096 KiB", the value PyTorch's own
 determinism documentation prescribes for CUDA >= 10.2.
+
+WHY A SECOND VARIABLE IS SET BESIDE IT
+--------------------------------------
+``CUDA_CACHE_MAXSIZE`` is a start-up cost, not a determinism setting, and it
+changes no number. On this driver every CUDA module torch or cuBLAS loads is
+"finalised" by the driver the first time a kernel in it is touched, CPU-bound at
+~6-10 MB/s, and the result is kept in ``%APPDATA%\\NVIDIA\\ComputeCache``. The
+default cap is 1 GiB; this project's working set plus the residue of earlier
+driver builds exceeds it, so entries are evicted by age and every cold process
+re-pays 13-17 s (measured 2026-09-21: warm-up 14.8-18.2 s against 1.5 s, chat
+REPL launch to first reply 22.9 s against 4.3 s). Cache keys are
+content-addressed and 35 of 35 entries produced independently were
+sha256-identical, so a hit and a miss run the same code. 4 GiB is the
+documented maximum. The driver reads the variable when the CUDA context is
+created, so setting it here also covers the entry points that import torch
+before this module. ``setdefault``, so a value in the user's environment wins.
+See docs/perf/README.md.
 """
 
 from __future__ import annotations
@@ -39,6 +56,8 @@ from typing import Any
 # --- must precede `import torch` and any CUDA context creation. See docstring.
 CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", CUBLAS_WORKSPACE_CONFIG)
+CUDA_CACHE_MAXSIZE = str(4 * 1024**3)
+os.environ.setdefault("CUDA_CACHE_MAXSIZE", CUDA_CACHE_MAXSIZE)
 
 import numpy as np  # noqa: E402  (deliberately after the env var)
 import torch  # noqa: E402

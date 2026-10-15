@@ -507,10 +507,18 @@ def twocomp_scan(cur: Tensor, v0: Tensor, w: Tensor, beta_s: Tensor,
     silently accepted a bf16 membrane.
     """
     from snn.kernels import jiterator_available
+    from snn.wholescan import twocomp_scan_whole, wholescan_selected
 
     _check(cur, v0, w, beta_s)
     _check_fp32(cur, v0, w, beta_s)
     if fused and cur.is_cuda and jiterator_available():
+        # One NVRTC kernel for the whole scan, where supported and verified
+        # BIT-IDENTICAL to the Function below in this process (`snn.wholescan`,
+        # which also owns the no-grad split for that path). Imported here rather
+        # than at module level because `snn.wholescan` imports this module's
+        # source text. `SNN_SCAN_IMPL=jiterator` turns it off.
+        if wholescan_selected("twocomp", cur, v0, w, beta_s):
+            return twocomp_scan_whole(cur, v0, w, beta_s, beta_f, thr, alpha)
         if not torch.is_grad_enabled():
             # Nothing downstream can ask for a gradient, so the two [B, L, d]
             # tensors the backward would need are pure cost. See

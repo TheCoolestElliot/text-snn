@@ -483,9 +483,17 @@ def twocomp_detach_scan(cur: Tensor, v0: Tensor, w: Tensor, beta_s: Tensor,
     not be if one of them silently accepted a bf16 membrane.
     """
     from snn.kernels import jiterator_available
+    from snn.wholescan import twocomp_detach_scan_whole, wholescan_selected
 
     _check(cur, v0, w, beta_s)
     _check_fp32(cur, v0, w, beta_s)
     if fused and cur.is_cuda and jiterator_available():
+        # One NVRTC kernel for the whole scan, where supported and verified
+        # BIT-IDENTICAL to the Function below in this process (`snn.wholescan`).
+        # That path also has the no-grad forward this arm never had. Imported here
+        # rather than at module level because `snn.wholescan` imports this
+        # module's source text. `SNN_SCAN_IMPL=jiterator` turns it off.
+        if wholescan_selected("twocomp_detach", cur, v0, w, beta_s):
+            return twocomp_detach_scan_whole(cur, v0, w, beta_s, beta_f, thr, alpha)
         return FusedTwoCompDetachScan.apply(cur, v0, w, beta_s, beta_f, thr, alpha)
     return twocomp_detach_scan_eager(cur, v0, w, beta_s, beta_f, thr, alpha)

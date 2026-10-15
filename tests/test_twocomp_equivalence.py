@@ -70,6 +70,12 @@ requires_fused = pytest.mark.skipif(
     reason="needs a CUDA device with a working jiterator",
 )
 
+# Every CUDA test below runs TWICE: once with `twocomp_scan(..., fused=True)`
+# dispatching to the per-timestep jiterator Function and once to the whole-scan
+# NVRTC kernels (`snn.wholescan`; the fixture and its reason are in conftest.py).
+# Both are the fused path, and each is held to the eager reference on its own.
+pytestmark = pytest.mark.usefixtures("scan_impl")
+
 ALPHA = 2.0
 THR = 1.0
 
@@ -826,8 +832,14 @@ def test_the_inference_path_is_bit_identical(shape):
 
 @pytest.mark.cuda
 @requires_fused
-def test_the_dispatcher_takes_the_inference_path_only_without_grad(monkeypatch):
+def test_the_dispatcher_takes_the_inference_path_only_without_grad(monkeypatch, scan_impl):
     """Correct and never taken saves nothing; taken under grad breaks training."""
+    if scan_impl == "wholescan":
+        pytest.skip(
+            "this asserts the per-timestep dispatcher's routing between two "
+            "objects the whole-scan path calls neither of; its own routing is "
+            "tests/test_wholescan_equivalence.py::"
+            "test_the_dispatchers_route_on_grad_mode")
     import snn.twocomp as tc
 
     calls = {"infer": 0, "apply": 0}

@@ -1,0 +1,931 @@
+{
+  "audit": "12_wholescan_mutations",
+  "protocol": "outside Phase 1-5; see docs/perf/WHOLESCAN.md",
+  "verified_tree": {
+    "head": "b18a6d5aab9ecbce3b2d55f968d06b76754af5a2",
+    "head_short": "b18a6d5",
+    "guarded_sources": [
+      "src/snn/kernels.py",
+      "src/snn/surrogate.py",
+      "src/snn/twocomp.py",
+      "src/snn/twocomp_detach.py",
+      "src/snn/wholescan.py"
+    ],
+    "dirty_paths": [],
+    "tree_clean_under_src_snn": true
+  },
+  "gates": {
+    "tests/test_neuron_equivalence.py -k not jiterator": {
+      "pass": true,
+      "n_passed": 68,
+      "seconds": 13.0
+    },
+    "tests/test_twocomp_detach_equivalence.py -k not jiterator": {
+      "pass": true,
+      "n_passed": 30,
+      "seconds": 18.2
+    },
+    "tests/test_twocomp_equivalence.py -k not jiterator": {
+      "pass": true,
+      "n_passed": 30,
+      "seconds": 22.6
+    },
+    "tests/test_wholescan_equivalence.py": {
+      "pass": true,
+      "n_passed": 132,
+      "seconds": 64.1
+    },
+    "tests/test_wholescan_equivalence.py -k test_every_output_and_gradient_is_bit_identical": {
+      "pass": true,
+      "n_passed": 18,
+      "seconds": 13.1
+    }
+  },
+  "not_applicable_from_08": {
+    "T19": "mutates FusedTwoCompartmentScan.backward's Python (the vs_prev shift); whole-scan counterpart W04",
+    "T20": "mutates FusedTwoCompartmentScan.backward's return order; counterpart W09/W08",
+    "D11": "mutates FusedTwoCompDetachScan.backward's Python (the vs_prev shift); whole-scan counterpart W04",
+    "D12": "mutates FusedTwoCompDetachScan.backward's return order; counterpart W09/W08"
+  },
+  "n_mutations": 87,
+  "mutations": {
+    "W01": {
+      "block": "W",
+      "description": "consecutive timesteps are L apart instead of d (t*d -> t*L)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 7.7,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 warning in 5.99s"
+    },
+    "W02": {
+      "block": "W",
+      "description": "the batch stride drops L (base = b*d + c)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 4.8,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 warning in 3.09s"
+    },
+    "W03": {
+      "block": "W",
+      "description": "the slow half's offset into [B, 2d] is dropped (ks = kf)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.71s"
+    },
+    "W04": {
+      "block": "W",
+      "description": "grad_beta_s uses vs_t instead of vs_{t-1} (k - d -> k)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.71s"
+    },
+    "W05": {
+      "block": "W",
+      "description": "the t == 0 branch is off by one (t > 0 -> t > 1)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.6,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.89s"
+    },
+    "W06": {
+      "block": "W",
+      "description": "the initial slow state is ignored at t == 0 (vs_{-1} = 0)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.5,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.78s"
+    },
+    "W07": {
+      "block": "W",
+      "description": "vs_{-1} is read from the FAST half of v0",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.64s"
+    },
+    "W08": {
+      "block": "W",
+      "description": "the two product outputs are swapped in the kernel",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.70s"
+    },
+    "W09": {
+      "block": "W",
+      "description": "the two per-channel gradients are returned swapped",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.6,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:128: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed in 8.87s"
+    },
+    "W10": {
+      "block": "W",
+      "description": "grad_w's product takes its operand from vs_{t-1} instead of vs_t",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.69s"
+    },
+    "W11": {
+      "block": "W",
+      "description": "grad_beta_s's product takes the wrong adjoint (e1 for e2)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.5,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.73s"
+    },
+    "W12": {
+      "block": "W",
+      "description": "drop noinline: every trampoline becomes inline",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]",
+      "gate_seconds": 9.1,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed, 1 warning in 7.37s"
+    },
+    "W12b": {
+      "block": "W",
+      "description": "drop noinline -- scored against the NUMERIC comparison alone, with the source-text tests deselected, so the catch is a gradient and not a grep",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py -k test_every_output_and_gradient_is_bit_identical",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]",
+      "gate_seconds": 8.9,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed, 114 deselected, 1 warning in 7.22s"
+    },
+    "W13": {
+      "block": "W",
+      "description": "the LIF time loop calls the functor directly, bypassing the trampoline",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py -k test_every_output_and_gradient_is_bit_identical",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]",
+      "gate_seconds": 8.9,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_none-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed, 114 deselected, 1 warning in 7.23s"
+    },
+    "W14": {
+      "block": "W",
+      "description": "the twocomp time loop calls the functor directly, bypassing the trampoline",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py -k test_every_output_and_gradient_is_bit_identical",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 114 deselected, 1 warning in 8.69s"
+    },
+    "W27": {
+      "block": "W",
+      "description": "the NVRTC flags drift from jiterator's (contraction switched off)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py -k test_every_output_and_gradient_is_bit_identical",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 4.8,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 114 deselected, 1 warning in 3.10s"
+    },
+    "W15": {
+      "block": "W",
+      "description": "LIF: the grad path never writes v_pre (save flag ignored)",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 4.9,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 warning in 3.16s"
+    },
+    "W16": {
+      "block": "W",
+      "description": "twocomp: the grad path never writes vs_seq",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.6,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.88s"
+    },
+    "W17": {
+      "block": "W",
+      "description": "LIF: the no-grad path writes v_pre anyway, through the dummy pointer",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 4.8,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 warning in 3.13s"
+    },
+    "W18": {
+      "block": "W",
+      "description": "the LIF Function asks for a no-save forward and then needs v_pre",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 5.0,
+      "gate_output_tail": "\nsrc\\snn\\wholescan.py:610: AttributeError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 3.28s"
+    },
+    "W22": {
+      "block": "W",
+      "description": "v_final is written with the compartments swapped",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.5,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.75s"
+    },
+    "W23": {
+      "block": "W",
+      "description": "the slow adjoint starts from the FAST half of the cotangent",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]",
+      "gate_seconds": 10.4,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[twocomp-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 12 passed, 1 warning in 8.66s"
+    },
+    "W24": {
+      "block": "W",
+      "description": "the LIF backward runs forward in time",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]",
+      "gate_seconds": 4.9,
+      "gate_output_tail": "\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_every_output_and_gradient_is_bit_identical[lif_hard-3x17x5]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 warning in 3.16s"
+    },
+    "W19": {
+      "block": "W",
+      "description": "the backward takes the cotangent's pointer without making it contiguous",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_strided_small_tensors_and_expanded_cotangents_are_repaired[lif_hard]",
+      "gate_seconds": 22.1,
+      "gate_output_tail": "\nsrc\\snn\\wholescan.py:621: ValueError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_strided_small_tensors_and_expanded_cotangents_are_repaired[lif_hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 94 passed in 20.41s"
+    },
+    "W20": {
+      "block": "W",
+      "description": "the raw launch stops refusing strided tensors",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_non_contiguous_current_takes_the_per_timestep_path[lif_hard]",
+      "gate_seconds": 21.2,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:534: Failed\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_non_contiguous_current_takes_the_per_timestep_path[lif_hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 88 passed in 19.44s"
+    },
+    "W21": {
+      "block": "W",
+      "description": "the dispatcher lets a strided current through to the whole-scan path",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_non_contiguous_current_takes_the_per_timestep_path[lif_hard]",
+      "gate_seconds": 21.6,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:526: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_non_contiguous_current_takes_the_per_timestep_path[lif_hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 88 passed in 19.91s"
+    },
+    "W25": {
+      "block": "W",
+      "description": "the run-time self-check always passes",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_without_the_barrier_it_is_not_bit_identical[lif_none]",
+      "gate_seconds": 21.0,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:372: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_without_the_barrier_it_is_not_bit_identical[lif_none]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 72 passed in 19.28s"
+    },
+    "W26": {
+      "block": "W",
+      "description": "the run-time comparison degrades from bit patterns to torch.equal",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_the_run_time_comparison_is_bitwise_not_numeric",
+      "gate_seconds": 22.4,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:803: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_the_run_time_comparison_is_bitwise_not_numeric\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 114 passed in 20.62s"
+    },
+    "W28": {
+      "block": "W",
+      "description": "shapes that overflow the kernel's 32-bit arguments are no longer refused",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_shapes_beyond_the_launch_limits_are_not_selected",
+      "gate_seconds": 21.5,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:613: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_shapes_beyond_the_launch_limits_are_not_selected\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 102 passed in 19.79s"
+    },
+    "W29": {
+      "block": "W",
+      "description": "SNN_SCAN_IMPL is ignored",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_the_environment_variable_selects_and_a_typo_raises",
+      "gate_seconds": 21.7,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:651: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_the_environment_variable_selects_and_a_typo_raises\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 104 passed in 19.94s"
+    },
+    "W30": {
+      "block": "W",
+      "description": "the self-check draws its inputs from the GLOBAL cuda RNG",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_the_self_check_does_not_touch_the_global_rng",
+      "gate_seconds": 50.3,
+      "gate_output_tail": "\ntests\\test_wholescan_equivalence.py:924: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_the_self_check_does_not_touch_the_global_rng\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 123 passed in 48.53s"
+    },
+    "W31": {
+      "block": "W",
+      "description": "the self-check is allowed to run inside a CUDA-graph capture",
+      "file": "wholescan.py",
+      "gate": "tests/test_wholescan_equivalence.py",
+      "caught": true,
+      "caught_by": "tests/test_wholescan_equivalence.py::test_a_capture_that_comes_first_records_the_per_timestep_path",
+      "gate_seconds": 21.6,
+      "gate_output_tail": "\nC:\\Users\\Ellio\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\torch\\cuda\\graphs.py:126: AcceleratorError\n=========================== short test summary info ===========================\nFAILED tests/test_wholescan_equivalence.py::test_a_capture_that_comes_first_records_the_per_timestep_path\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 87 passed in 19.92s"
+    },
+    "F-M01": {
+      "block": "F",
+      "description": "drop the -v_pre*sg term from the hard-reset derivative",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.36s"
+    },
+    "F-M02": {
+      "block": "F",
+      "description": "sign-flip the -v_pre*sg term in the hard-reset derivative",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.35s"
+    },
+    "F-M03": {
+      "block": "F",
+      "description": "drop thr from the soft-reset derivative",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_backward[wholescan-shape0-soft]",
+      "gate_seconds": 7.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:339: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_backward[wholescan-shape0-soft]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 31 passed, 63 deselected in 5.67s"
+    },
+    "F-M04": {
+      "block": "F",
+      "description": "give detached the derivative of hard",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-detached]",
+      "gate_seconds": 6.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-detached]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 23 passed, 63 deselected in 5.42s"
+    },
+    "F-M05": {
+      "block": "F",
+      "description": "give hard the derivative of detached",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.37s"
+    },
+    "F-M06": {
+      "block": "F",
+      "description": "none reset derivative 1 -> 0",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-none]",
+      "gate_seconds": 6.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-none]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 24 passed, 63 deselected in 5.40s"
+    },
+    "F-M07": {
+      "block": "F",
+      "description": "drop beta from grad_v_prev",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.34s"
+    },
+    "F-M08": {
+      "block": "F",
+      "description": "grad_v_prev divides by beta instead of multiplying",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.9,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.39s"
+    },
+    "F-M09": {
+      "block": "F",
+      "description": "drop the grad_spike*sg term",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.37s"
+    },
+    "F-M10": {
+      "block": "F",
+      "description": "drop the grad_v_next*dv term",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.50s"
+    },
+    "F-M11": {
+      "block": "F",
+      "description": "straight-through: sg = 1 instead of the surrogate",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.57s"
+    },
+    "F-M12": {
+      "block": "F",
+      "description": "omit the threshold shift in x",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.7,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.26s"
+    },
+    "F-M13": {
+      "block": "F",
+      "description": "> instead of >= in the BACKWARD kernel only",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.0,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.46s"
+    },
+    "F-M14": {
+      "block": "F",
+      "description": "backward compares x against thr instead of 0",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.29s"
+    },
+    "F-M15": {
+      "block": "F",
+      "description": "> instead of >= in the FORWARD kernel",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 6.6,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:266: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.07s"
+    },
+    "F-M16": {
+      "block": "F",
+      "description": "hard reset does not reset",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]",
+      "gate_seconds": 4.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:205: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed, 63 deselected in 2.94s"
+    },
+    "F-M17": {
+      "block": "F",
+      "description": "soft reset subtracts the spike, not thr*spike",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-soft]",
+      "gate_seconds": 4.3,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:205: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-soft]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 2 passed, 63 deselected in 2.85s"
+    },
+    "F-M18": {
+      "block": "F",
+      "description": "let NVRTC contract the membrane update into an FMA",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_membrane_is_bit_identical[wholescan-hard]",
+      "gate_seconds": 6.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:236: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_membrane_is_bit_identical[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 17 passed, 63 deselected in 4.81s"
+    },
+    "F-M19": {
+      "block": "F",
+      "description": "forward decays the current instead of the membrane",
+      "file": "kernels.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]",
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:205: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed, 63 deselected in 2.71s"
+    },
+    "F-M20": {
+      "block": "F",
+      "description": "pi instead of pi/2 in the CUDA surrogate",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.6,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.76s"
+    },
+    "F-M21": {
+      "block": "F",
+      "description": "2x surrogate gain in the CUDA source",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.1,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.46s"
+    },
+    "F-M22": {
+      "block": "F",
+      "description": "CUDA surrogate loses its square in the denominator",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]",
+      "gate_seconds": 7.4,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_threshold_comparison_is_inclusive[wholescan-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 21 passed, 63 deselected in 5.84s"
+    },
+    "F-M23": {
+      "block": "F",
+      "description": "eager atan_grad loses its factor of 1/2",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_surrogate_matches_analytic",
+      "gate_seconds": 3.4,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:181: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 63 deselected in 2.01s"
+    },
+    "F-M24": {
+      "block": "F",
+      "description": "eager atan_value drops the 1/pi",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_surrogate_matches_analytic",
+      "gate_seconds": 3.5,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:181: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_surrogate_matches_analytic - as...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 63 deselected in 2.03s"
+    },
+    "F-M25": {
+      "block": "F",
+      "description": "atan_spike reverts to the unparenthesised straight-through form",
+      "file": "surrogate.py",
+      "gate": "tests/test_neuron_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]",
+      "gate_seconds": 4.4,
+      "gate_output_tail": "\ntests\\test_neuron_equivalence.py:205: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_neuron_equivalence.py::test_forward[wholescan-shape0-hard]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed, 63 deselected in 2.84s"
+    },
+    "F-T01": {
+      "block": "F",
+      "description": "the slow compartment resets too (reverts to EXP_002's N2)",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 4.3,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 2.82s"
+    },
+    "F-T02": {
+      "block": "F",
+      "description": "the fast compartment does not reset",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 2.77s"
+    },
+    "F-T03": {
+      "block": "F",
+      "description": "> instead of >= in the FORWARD threshold",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 4.7,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:337: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 3.24s"
+    },
+    "F-T04": {
+      "block": "F",
+      "description": "the mix drops w_c and adds the compartments raw",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 4.3,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 2.81s"
+    },
+    "F-T05": {
+      "block": "F",
+      "description": "let NVRTC contract the MIX into an FMA",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary[wholescan]",
+      "gate_seconds": 5.6,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:307: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed, 28 deselected in 3.83s"
+    },
+    "F-T06": {
+      "block": "F",
+      "description": "the two decays are swapped between the compartments",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 5.2,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 3.26s"
+    },
+    "F-T07": {
+      "block": "F",
+      "description": "the slow pole decays the current instead of the membrane",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 5.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 3.33s"
+    },
+    "F-T08": {
+      "block": "F",
+      "description": "v_pre reports the fast compartment instead of the mix",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary[wholescan]",
+      "gate_seconds": 5.4,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:307: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_the_mix_is_bit_identical_at_the_kernel_boundary[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed, 28 deselected in 3.72s"
+    },
+    "F-T09": {
+      "block": "F",
+      "description": "drop the -vf*sgd term from the fast-pole derivative",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 6.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.77s"
+    },
+    "F-T10": {
+      "block": "F",
+      "description": "backward recovers vf with the wrong sign",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_backward[wholescan-shape0]",
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:450: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_backward[wholescan-shape0] - A...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed, 28 deselected in 4.21s"
+    },
+    "F-T11": {
+      "block": "F",
+      "description": "sign-flip the mix term in the slow adjoint",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_backward[wholescan-shape0]",
+      "gate_seconds": 5.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:450: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_backward[wholescan-shape0] - A...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 9 passed, 28 deselected in 4.07s"
+    },
+    "F-T12": {
+      "block": "F",
+      "description": "current is treated as entering only the fast compartment",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 6.3,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.40s"
+    },
+    "F-T13": {
+      "block": "F",
+      "description": "drop beta_s from the slow adjoint chain",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 5.5,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 3.86s"
+    },
+    "F-T14": {
+      "block": "F",
+      "description": "drop beta_f from the fast adjoint chain",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 5.9,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.10s"
+    },
+    "F-T15": {
+      "block": "F",
+      "description": "> instead of >= in the BACKWARD kernel only",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 6.6,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.61s"
+    },
+    "F-T16": {
+      "block": "F",
+      "description": "drop the grad_spike*sgd term from the fast adjoint",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 6.5,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.48s"
+    },
+    "F-T17": {
+      "block": "F",
+      "description": "grad_w is accumulated from the wrong adjoint",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 6.0,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 4.09s"
+    },
+    "F-T18": {
+      "block": "F",
+      "description": "grad_beta_s is accumulated from the wrong adjoint",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 5.8,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:345: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 28 deselected in 3.91s"
+    },
+    "F-T21": {
+      "block": "F",
+      "description": "the eager reference resets the slow compartment",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 4.5,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 2.87s"
+    },
+    "F-T22": {
+      "block": "F",
+      "description": "the eager reference mixes before decaying the fast pole",
+      "file": "twocomp.py",
+      "gate": "tests/test_twocomp_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0]",
+      "gate_seconds": 4.7,
+      "gate_output_tail": "\ntests\\test_twocomp_equivalence.py:225: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_equivalence.py::test_forward[wholescan-shape0] - As...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 28 deselected in 3.01s"
+    },
+    "F-D01": {
+      "block": "F",
+      "description": "restore the adopted arm's unbounded reset term",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]",
+      "gate_seconds": 4.6,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:318: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed, 26 deselected in 2.96s"
+    },
+    "F-D02": {
+      "block": "F",
+      "description": "the backward forgets the reset entirely (reverts to 'none')",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]",
+      "gate_seconds": 4.4,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:327: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed, 26 deselected in 2.77s"
+    },
+    "F-D03": {
+      "block": "F",
+      "description": "dL/dv regains a reset path through the mixed membrane",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]",
+      "gate_seconds": 5.0,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:417: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 7 passed, 26 deselected in 3.04s"
+    },
+    "F-D04": {
+      "block": "F",
+      "description": "dL/dv drops the surrogate, becoming straight-through",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]",
+      "gate_seconds": 5.6,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:417: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 7 passed, 26 deselected in 3.67s"
+    },
+    "F-D05": {
+      "block": "F",
+      "description": "sign-flip the mix term in the slow adjoint",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched[wholescan]",
+      "gate_seconds": 5.1,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:526: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_spike_pathway_is_untouched[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 10 passed, 26 deselected in 3.45s"
+    },
+    "F-D06": {
+      "block": "F",
+      "description": "drop the grad_spike*sgd term from the fast adjoint",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]",
+      "gate_seconds": 4.8,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:417: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 7 passed, 26 deselected in 3.05s"
+    },
+    "F-D07": {
+      "block": "F",
+      "description": "current is treated as entering only the fast compartment",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]",
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:417: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 7 passed, 26 deselected in 2.79s"
+    },
+    "F-D08": {
+      "block": "F",
+      "description": "drop beta_f from the fast adjoint chain",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]",
+      "gate_seconds": 3.8,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:318: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_chain_factor_is_bounded_by_beta_f[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed, 26 deselected in 2.57s"
+    },
+    "F-D09": {
+      "block": "F",
+      "description": "> instead of >= in the BACKWARD kernel only",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_the_backward_threshold_comparison_is_inclusive[wholescan]",
+      "gate_seconds": 4.2,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:370: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_the_backward_threshold_comparison_is_inclusive[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 passed, 26 deselected in 2.66s"
+    },
+    "F-D10": {
+      "block": "F",
+      "description": "the eager reference does not detach (it IS the adopted arm)",
+      "file": "twocomp_detach.py",
+      "gate": "tests/test_twocomp_detach_equivalence.py -k not jiterator",
+      "caught": true,
+      "caught_by": "tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]",
+      "gate_seconds": 4.3,
+      "gate_output_tail": "\ntests\\test_twocomp_detach_equivalence.py:417: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_twocomp_detach_equivalence.py::test_threshold_comparison_is_inclusive_end_to_end[wholescan]\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 7 passed, 26 deselected in 2.97s"
+    }
+  },
+  "n_caught": 87,
+  "n_caught_by_block": {
+    "W": "32/32",
+    "F": "55/55"
+  },
+  "escaped": [],
+  "all_caught": true,
+  "source_restored_clean": true
+}

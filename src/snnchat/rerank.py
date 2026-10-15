@@ -857,6 +857,7 @@ def sample_candidates(
 
     out: list[list[int]] = [[] for _ in range(n)]
     recent: list[list[int]] = [[] for _ in range(n)]
+    frozen: dict[int, int | None] = {}     # see `_penalty_pairs`
     stopped: list[int | None] = [None] * n
     logp = torch.zeros(n, device=device, dtype=torch.float32)
     alive = torch.ones(n, dtype=torch.bool, device=device)
@@ -865,6 +866,12 @@ def sample_candidates(
     stop_set = set(stop_ids)
     stop_t = torch.tensor(sorted(stop_set), device=device)
     zero = torch.zeros(n, device=device, dtype=torch.float32)
+    # The one per-character read-back lands here through a non-blocking copy
+    # and an event, rather than `nxt.tolist()`, so that waiting for it does not
+    # also wait for the forward `stepper.advance` queued behind it.
+    pinned = device.type == "cuda"
+    nxt_host = torch.empty(n, dtype=torch.int64, pin_memory=pinned)
+    landed = torch.cuda.Event() if pinned else None
     eot = torch.full((n,), EOT, dtype=torch.int64, device=device)
 
     # The first distribution comes from the caller's logits rather than from a
@@ -889,6 +896,7 @@ def sample_candidates(
                 order = idx.tolist()
                 out = [list(out[s]) for s in order]
                 recent = [list(recent[s]) for s in order]
+                frozen.clear()
 
         nxt = torch.multinomial(probs, 1, generator=gen).squeeze(-1)      # [n]
         raw = logprobs.gather(1, nxt[:, None]).squeeze(1)
@@ -896,8 +904,24 @@ def sample_candidates(
 
         is_stop = (nxt[:, None] == stop_t[None, :]).any(dim=1)
         alive = alive & ~is_stop
+        # Dead rows are fed EOT: harmless, since their state is never read
+        # again, and it keeps the batch rectangular so the scan stays one call.
+        feed = torch.where(alive, nxt, eot)
 
-        nxt_cpu = nxt.tolist()                     # THE ONE SYNC PER CHARACTER
+        if stepper is not None:
+            # THE ONE SYNC PER CHARACTER, overlapped: the forward for the next
+            # character needs only `feed`, so it is queued before the host
+            # waits for `nxt`, and runs while the host does the row bookkeeping
+            # and the loop breaker below. Only the sampler reads the penalty.
+            # If every row has just stopped the forward was not needed; it
+            # advances a state nothing reads again (`prime` overwrites it).
+            nxt_host.copy_(nxt, non_blocking=True)
+            landed.record()
+            stepper.advance(feed)
+            landed.synchronize()
+            nxt_cpu = nxt_host.tolist()
+        else:
+            nxt_cpu = nxt.tolist()                 # THE ONE SYNC PER CHARACTER
         for r in range(n):
             if not alive_cpu[r]:
                 continue
@@ -914,13 +938,11 @@ def sample_candidates(
         if n_alive == 0:
             break
 
-        # Dead rows are fed EOT: harmless, since their state is never read
-        # again, and it keeps the batch rectangular so the scan stays one call.
-        feed = torch.where(alive, nxt, eot)
-        pairs = _penalty_pairs(recent, params) if params.loop_penalty > 0.0 else []
+        pairs = (_penalty_pairs(recent, params, alive_cpu, frozen)
+                 if params.loop_penalty > 0.0 else [])
         if stepper is not None:
             stepper.penalise(pairs, params.loop_penalty)
-            probs, logprobs = stepper.step(feed)
+            probs, logprobs = stepper.sample()
         else:
             logits, state = _feed(model, feed[:, None], state)
             work = logits.clone()
@@ -940,17 +962,31 @@ def sample_candidates(
     ]
 
 
-def _penalty_pairs(recent: list[list[int]], params: SamplingParams):
+def _penalty_pairs(recent: list[list[int]], params: SamplingParams,
+                   alive: list[bool] | None = None, frozen: dict | None = None):
     """`[(row, token_id), ...]` the loop breaker wants suppressed next character.
 
     A list rather than a tensor write per row: in non-degenerate text it is
     empty, which is the property `snnchat.generate`'s module docstring claims
     for the loop breaker and which a per-row device write would have quietly
     cost anyway.
+
+    `alive` and `frozen` are a cache and change nothing about the answer. A
+    stopped row's `recent` never grows again, so its target is a constant;
+    `frozen` keeps it, keyed by row, after the first time it is asked for. That
+    matters because the loop runs until the LAST row stops -- ~350 characters
+    against a ~170-character median reply at n = 256 -- and re-deriving every
+    dead row's constant was ~0.4 ms of host time per character with the GPU
+    waiting on it. The caller clears `frozen` whenever it permutes the rows.
     """
     pairs = []
     for r, rec in enumerate(recent):
-        target = loop_penalty_target(rec, params)
+        if alive is None or alive[r]:
+            target = loop_penalty_target(rec, params)
+        elif r in frozen:
+            target = frozen[r]
+        else:
+            target = frozen[r] = loop_penalty_target(rec, params)
         if target is not None:
             pairs.append((r, target))
     return pairs

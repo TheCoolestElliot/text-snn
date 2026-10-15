@@ -33,6 +33,7 @@ if _SRC not in sys.path:
 
 from snn.kernels import jiterator_available  # noqa: E402
 from snn.neuron import lif_scan, lif_scan_eager  # noqa: E402
+from snn.wholescan import use_scan_impl, wholescan_available  # noqa: E402
 
 requires_fused = pytest.mark.skipif(
     not (torch.cuda.is_available() and jiterator_available()),
@@ -48,6 +49,21 @@ US_PER_KERNEL = 14.5
 
 # Reported so the numbers in the Phase-2 write-up come from a run, not a memory.
 MEASURED: dict[str, float] = {}
+
+
+@pytest.fixture(autouse=True)
+def _per_timestep_scan():
+    """Pin `lif_scan(..., fused=True)` to the per-timestep jiterator path.
+
+    Every count in this file is a claim about THAT path -- "one kernel per
+    timestep", 14.5 us per launch -- and the numbers it produced are quoted in the
+    Phase-2 report. `lif_scan` now defaults to one NVRTC kernel for the whole scan
+    (`snn.wholescan`), which makes "kernels per timestep" 1/L and would turn these
+    assertions into failures about nothing. The whole-scan path's own count is
+    asserted at the bottom of the file, where it opts back in.
+    """
+    with use_scan_impl("jiterator"):
+        yield
 
 
 def count_cuda_kernels(fn, warmup: int = 3) -> dict:
@@ -367,6 +383,66 @@ def test_matches_metrics_helper():
     mine = count_cuda_kernels(run)["total"]
     theirs = metrics.count_cuda_kernels(run)["total"]
     assert abs(mine - theirs) <= 2, (mine, theirs)
+
+
+# --------------------------------------------------------------------------
+# the whole-scan path: one kernel per LAYER, not per timestep
+# --------------------------------------------------------------------------
+
+requires_wholescan = pytest.mark.skipif(
+    not (torch.cuda.is_available() and jiterator_available() and wholescan_available()),
+    reason="needs a CUDA device with working jiterator and NVRTC whole-scan kernels",
+)
+
+
+@pytest.mark.cuda
+@requires_wholescan
+def test_wholescan_forward_is_one_kernel():
+    """The whole forward scan is ONE launch, whatever L is.
+
+    Asserted at two lengths because the claim is about the scaling, not the
+    number: the per-timestep path above issues L kernels plus a constant, and
+    this one must issue a constant and nothing else.
+    """
+    B, d = 8, 128
+    totals = {}
+    for L in (32, 128):
+        cur, v0 = _tensors(B, L, d)
+        with use_scan_impl("wholescan"), torch.no_grad():
+            got = count_cuda_kernels(
+                lambda: lif_scan(cur, v0, BETA, THR, ALPHA, RESET, fused=True)
+            )
+        scan = sum(v for k, v in got["by_name"].items() if "wholescan_lif_fwd" in k)
+        assert scan == 1, (L, got["by_name"])
+        assert not any("lif_forward" in k for k in got["by_name"]), got["by_name"]
+        totals[L] = got["total"]
+    MEASURED["wholescan_forward_total_L128"] = totals[128]
+    assert totals[32] == totals[128] == 1, totals
+
+
+@pytest.mark.cuda
+@requires_wholescan
+def test_wholescan_backward_is_one_kernel():
+    """Forward + backward through the scan is two launches plus autograd's own.
+
+    "Autograd's own" is the `sum` of each output and the expanded cotangents
+    being made contiguous -- a constant, asserted independent of L rather than
+    pinned to a number that belongs to `_fwd_bwd`, not to the scan.
+    """
+    B, d = 8, 128
+    totals = {}
+    for L in (32, 128):
+        cur, v0 = _tensors(B, L, d, requires_grad=True)
+        with use_scan_impl("wholescan"):
+            got = count_cuda_kernels(lambda: _fwd_bwd(cur, v0, True))
+        fwd = sum(v for k, v in got["by_name"].items() if "wholescan_lif_fwd" in k)
+        bwd = sum(v for k, v in got["by_name"].items() if "wholescan_lif_bwd" in k)
+        assert (fwd, bwd) == (1, 1), (L, got["by_name"])
+        assert not any("lif_backward" in k for k in got["by_name"]), got["by_name"]
+        totals[L] = got["total"]
+    MEASURED["wholescan_fwdbwd_total_L128"] = totals[128]
+    assert totals[32] == totals[128], totals
+    assert totals[128] <= 8, totals
 
 
 def test_report_measured_numbers():

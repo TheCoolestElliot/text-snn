@@ -1,0 +1,1041 @@
+{
+  "bench": "wholescan_ab",
+  "protocol": "outside Phase 1-5; see docs/perf/WHOLESCAN.md",
+  "head": "8f1f6c1",
+  "torch": "2.12.1+cu130",
+  "gpu": "NVIDIA GeForce RTX 5060, 617.42",
+  "steps": 240,
+  "windows": 6,
+  "rounds": 3,
+  "runs": {
+    "e25_snn_d512_s0": {
+      "arch": "snn",
+      "d_model": 512,
+      "n_layers": 2,
+      "batch_size": 128,
+      "seq_len": 256,
+      "train_steps_per_leg": 240,
+      "summary": {
+        "weights_and_optimiser_bit_identical": true,
+        "eval_bpc_equals_committed_final_test_json": true,
+        "committed_bpc": {
+          "fresh": 2.273872258304913,
+          "carried": 2.257471102255831
+        },
+        "jiterator": {
+          "train_ms_per_step": 19.932,
+          "train_ms_per_step_range": [
+            19.867,
+            20.233
+          ],
+          "train_peak_gib": 0.828,
+          "eval_fresh_ms_per_batch": 18.14,
+          "eval_carried_ms_per_batch": 19.1,
+          "eval_peak_gib": 0.686
+        },
+        "wholescan": {
+          "train_ms_per_step": 15.386,
+          "train_ms_per_step_range": [
+            15.17,
+            16.081
+          ],
+          "train_peak_gib": 0.722,
+          "eval_fresh_ms_per_batch": 6.81,
+          "eval_carried_ms_per_batch": 6.52,
+          "eval_peak_gib": 0.498
+        },
+        "speedup": {
+          "train": 1.295,
+          "eval_fresh": 2.664,
+          "eval_carried": 2.929,
+          "train_peak_ratio": 0.872,
+          "eval_peak_ratio": 0.726
+        }
+      },
+      "legs": {
+        "train": [
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 18.71,
+            "ms_per_step_windows": [
+              24.188,
+              19.027,
+              20.233,
+              22.922,
+              20.416,
+              19.271
+            ],
+            "ms_per_step": 20.233,
+            "peak_alloc_gib": 0.609,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {}
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.29,
+            "ms_per_step_windows": [
+              15.233,
+              15.098,
+              15.17,
+              14.886,
+              15.823,
+              16.164
+            ],
+            "ms_per_step": 15.17,
+            "peak_alloc_gib": 0.629,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.07,
+            "ms_per_step_windows": [
+              15.864,
+              15.953,
+              16.081,
+              15.938,
+              16.233,
+              16.296
+            ],
+            "ms_per_step": 16.081,
+            "peak_alloc_gib": 0.722,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.24,
+            "ms_per_step_windows": [
+              19.941,
+              20.209,
+              19.857,
+              25.125,
+              19.593,
+              19.867
+            ],
+            "ms_per_step": 19.867,
+            "peak_alloc_gib": 0.828,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.2,
+            "ms_per_step_windows": [
+              20.072,
+              19.543,
+              19.932,
+              19.93,
+              19.96,
+              20.121
+            ],
+            "ms_per_step": 19.932,
+            "peak_alloc_gib": 0.89,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.08,
+            "ms_per_step_windows": [
+              17.043,
+              16.687,
+              15.779,
+              15.139,
+              15.174,
+              15.386
+            ],
+            "ms_per_step": 15.386,
+            "peak_alloc_gib": 0.91,
+            "sha256_model": "5ea6b445f65bbc99cbf580287f8ffb4e17338fb093ebfa9fecb8de58e0307eee",
+            "sha256_optim": "427c3004ac9f5052ed205fab5bd8b3c9694c5df86a4cbe988960aff418d60e08",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          }
+        ],
+        "eval": [
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 2.757,
+              "ms_per_batch": 18.14,
+              "peak_alloc_gib": 0.561
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 3.011,
+              "ms_per_batch": 19.81,
+              "peak_alloc_gib": 0.56
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 1.032,
+              "ms_per_batch": 6.79,
+              "peak_alloc_gib": 0.373
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 0.991,
+              "ms_per_batch": 6.52,
+              "peak_alloc_gib": 0.373
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 1.218,
+              "ms_per_batch": 8.01,
+              "peak_alloc_gib": 0.498
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 1.04,
+              "ms_per_batch": 6.84,
+              "peak_alloc_gib": 0.498
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 2.845,
+              "ms_per_batch": 18.72,
+              "peak_alloc_gib": 0.686
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 2.877,
+              "ms_per_batch": 18.93,
+              "peak_alloc_gib": 0.685
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 2.642,
+              "ms_per_batch": 17.38,
+              "peak_alloc_gib": 0.811
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 2.903,
+              "ms_per_batch": 19.1,
+              "peak_alloc_gib": 0.81
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.273872258304913,
+              "nats": 7850278.19140625,
+              "n_windows": 19456,
+              "seconds": 1.034,
+              "ms_per_batch": 6.81,
+              "peak_alloc_gib": 0.623
+            },
+            "carried": {
+              "bpc": 2.257471102255831,
+              "nats": 7793655.1171875,
+              "n_windows": 19456,
+              "seconds": 0.978,
+              "ms_per_batch": 6.43,
+              "peak_alloc_gib": 0.623
+            }
+          }
+        ]
+      }
+    },
+    "e25_detach_d512_s0": {
+      "arch": "twocomp_detach",
+      "d_model": 512,
+      "n_layers": 2,
+      "batch_size": 128,
+      "seq_len": 256,
+      "train_steps_per_leg": 240,
+      "summary": {
+        "weights_and_optimiser_bit_identical": true,
+        "eval_bpc_equals_committed_final_test_json": true,
+        "committed_bpc": {
+          "fresh": 2.1446435236497927,
+          "carried": 2.1176906639749444
+        },
+        "jiterator": {
+          "train_ms_per_step": 26.094,
+          "train_ms_per_step_range": [
+            24.658,
+            26.434
+          ],
+          "train_peak_gib": 1.574,
+          "eval_fresh_ms_per_batch": 21.9,
+          "eval_carried_ms_per_batch": 23.56,
+          "eval_peak_gib": 1.187
+        },
+        "wholescan": {
+          "train_ms_per_step": 18.478,
+          "train_ms_per_step_range": [
+            17.301,
+            18.561
+          ],
+          "train_peak_gib": 1.346,
+          "eval_fresh_ms_per_batch": 6.81,
+          "eval_carried_ms_per_batch": 7.14,
+          "eval_peak_gib": 0.875
+        },
+        "speedup": {
+          "train": 1.412,
+          "eval_fresh": 3.216,
+          "eval_carried": 3.3,
+          "train_peak_ratio": 0.855,
+          "eval_peak_ratio": 0.737
+        }
+      },
+      "legs": {
+        "train": [
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.24,
+            "ms_per_step_windows": [
+              24.632,
+              24.503,
+              24.658,
+              24.71,
+              24.687,
+              24.533
+            ],
+            "ms_per_step": 24.658,
+            "peak_alloc_gib": 1.386,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.09,
+            "ms_per_step_windows": [
+              17.249,
+              17.301,
+              17.345,
+              17.331,
+              17.188,
+              17.208
+            ],
+            "ms_per_step": 17.301,
+            "peak_alloc_gib": 1.283,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.09,
+            "ms_per_step_windows": [
+              18.919,
+              18.529,
+              18.636,
+              18.561,
+              18.708,
+              18.494
+            ],
+            "ms_per_step": 18.561,
+            "peak_alloc_gib": 1.346,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.26,
+            "ms_per_step_windows": [
+              26.855,
+              26.094,
+              26.032,
+              25.624,
+              26.446,
+              26.725
+            ],
+            "ms_per_step": 26.094,
+            "peak_alloc_gib": 1.574,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.25,
+            "ms_per_step_windows": [
+              26.613,
+              26.5,
+              26.449,
+              26.434,
+              26.274,
+              26.217
+            ],
+            "ms_per_step": 26.434,
+            "peak_alloc_gib": 1.636,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 240,
+            "captured": true,
+            "ensure_ready_s": 0.08,
+            "ms_per_step_windows": [
+              18.594,
+              18.478,
+              18.511,
+              18.577,
+              18.467,
+              18.062
+            ],
+            "ms_per_step": 18.478,
+            "peak_alloc_gib": 1.533,
+            "sha256_model": "3236b9930c143d5fae10ade00631881cf3fb88930eaddfa18f28088a1ae5f2a9",
+            "sha256_optim": "fd41c0a484dfacbf266cd00e5acc0f4fa8be24d94b3e44e237ec4377c8ecd116",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          }
+        ],
+        "eval": [
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 3.145,
+              "ms_per_batch": 20.69,
+              "peak_alloc_gib": 1.062
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 3.388,
+              "ms_per_batch": 22.29,
+              "peak_alloc_gib": 1.061
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 1.032,
+              "ms_per_batch": 6.79,
+              "peak_alloc_gib": 0.75
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 1.085,
+              "ms_per_batch": 7.14,
+              "peak_alloc_gib": 0.749
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 1.035,
+              "ms_per_batch": 6.81,
+              "peak_alloc_gib": 0.875
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 1.035,
+              "ms_per_batch": 6.81,
+              "peak_alloc_gib": 0.874
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 3.477,
+              "ms_per_batch": 22.87,
+              "peak_alloc_gib": 1.187
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 3.581,
+              "ms_per_batch": 23.56,
+              "peak_alloc_gib": 1.186
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 3.328,
+              "ms_per_batch": 21.9,
+              "peak_alloc_gib": 1.312
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 4.452,
+              "ms_per_batch": 29.29,
+              "peak_alloc_gib": 1.311
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 2.1446435236497927,
+              "nats": 7404131.08984375,
+              "n_windows": 19456,
+              "seconds": 1.06,
+              "ms_per_batch": 6.97,
+              "peak_alloc_gib": 1.0
+            },
+            "carried": {
+              "bpc": 2.1176906639749444,
+              "nats": 7311079.4921875,
+              "n_windows": 19456,
+              "seconds": 1.092,
+              "ms_per_batch": 7.18,
+              "peak_alloc_gib": 0.999
+            }
+          }
+        ]
+      }
+    },
+    "e25_detach_d1481_s0": {
+      "arch": "twocomp_detach",
+      "d_model": 1481,
+      "n_layers": 2,
+      "batch_size": 128,
+      "seq_len": 256,
+      "train_steps_per_leg": 80,
+      "summary": {
+        "weights_and_optimiser_bit_identical": true,
+        "eval_bpc_equals_committed_final_test_json": true,
+        "committed_bpc": {
+          "fresh": 1.8948356818941585,
+          "carried": 1.862896336873827
+        },
+        "jiterator": {
+          "train_ms_per_step": 125.029,
+          "train_ms_per_step_range": [
+            124.907,
+            125.69
+          ],
+          "train_peak_gib": 3.583,
+          "eval_fresh_ms_per_batch": 49.31,
+          "eval_carried_ms_per_batch": 49.73,
+          "eval_peak_gib": 2.535
+        },
+        "wholescan": {
+          "train_ms_per_step": 109.308,
+          "train_ms_per_step_range": [
+            109.258,
+            109.483
+          ],
+          "train_peak_gib": 2.979,
+          "eval_fresh_ms_per_batch": 39.12,
+          "eval_carried_ms_per_batch": 39.0,
+          "eval_peak_gib": 1.63
+        },
+        "speedup": {
+          "train": 1.144,
+          "eval_fresh": 1.26,
+          "eval_carried": 1.275,
+          "train_peak_ratio": 0.831,
+          "eval_peak_ratio": 0.643
+        }
+      },
+      "legs": {
+        "train": [
+          {
+            "impl": "jiterator",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.93,
+            "ms_per_step_windows": [
+              127.113,
+              125.013,
+              124.8,
+              124.907,
+              124.719,
+              129.655
+            ],
+            "ms_per_step": 124.907,
+            "peak_alloc_gib": 3.395,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.37,
+            "ms_per_step_windows": [
+              108.159,
+              108.729,
+              108.987,
+              113.908,
+              111.447,
+              109.308
+            ],
+            "ms_per_step": 109.308,
+            "peak_alloc_gib": 2.917,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.38,
+            "ms_per_step_windows": [
+              109.51,
+              109.003,
+              112.739,
+              109.258,
+              113.794,
+              109.191
+            ],
+            "ms_per_step": 109.258,
+            "peak_alloc_gib": 2.979,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.58,
+            "ms_per_step_windows": [
+              124.611,
+              125.271,
+              125.405,
+              125.693,
+              125.69,
+              125.693
+            ],
+            "ms_per_step": 125.69,
+            "peak_alloc_gib": 3.583,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "jiterator",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.58,
+            "ms_per_step_windows": [
+              124.459,
+              124.952,
+              125.016,
+              125.029,
+              126.269,
+              125.123
+            ],
+            "ms_per_step": 125.029,
+            "peak_alloc_gib": 3.645,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "jiterator",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          },
+          {
+            "impl": "wholescan",
+            "steps": 78,
+            "captured": true,
+            "ensure_ready_s": 0.42,
+            "ms_per_step_windows": [
+              110.176,
+              108.586,
+              108.835,
+              109.592,
+              109.483,
+              112.669
+            ],
+            "ms_per_step": 109.483,
+            "peak_alloc_gib": 3.167,
+            "sha256_model": "fdfd1c1c8b914e4c1c9cac011e9930caca2b0e5eea24e4d6a24ba37fa8ab9555",
+            "sha256_optim": "05ea7942f8802ee212b7e5a0b736220d6d7227fe331a1507ed15ee5c7d69d375",
+            "scan_impl_record": {
+              "requested": "wholescan",
+              "env": null,
+              "verified": {
+                "lif_detached": true,
+                "lif_hard": true,
+                "lif_none": true,
+                "lif_soft": true,
+                "twocomp": true,
+                "twocomp_detach": true
+              }
+            }
+          }
+        ],
+        "eval": [
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 7.57,
+              "ms_per_batch": 49.81,
+              "peak_alloc_gib": 2.41
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 7.577,
+              "ms_per_batch": 49.85,
+              "peak_alloc_gib": 2.407
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 5.946,
+              "ms_per_batch": 39.12,
+              "peak_alloc_gib": 1.505
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 5.964,
+              "ms_per_batch": 39.23,
+              "peak_alloc_gib": 1.502
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 5.949,
+              "ms_per_batch": 39.14,
+              "peak_alloc_gib": 1.63
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 5.927,
+              "ms_per_batch": 39.0,
+              "peak_alloc_gib": 1.627
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 7.496,
+              "ms_per_batch": 49.31,
+              "peak_alloc_gib": 2.535
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 7.515,
+              "ms_per_batch": 49.44,
+              "peak_alloc_gib": 2.532
+            }
+          },
+          {
+            "impl": "jiterator",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 7.382,
+              "ms_per_batch": 48.57,
+              "peak_alloc_gib": 2.66
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 7.56,
+              "ms_per_batch": 49.73,
+              "peak_alloc_gib": 2.657
+            }
+          },
+          {
+            "impl": "wholescan",
+            "fresh": {
+              "bpc": 1.8948356818941585,
+              "nats": 6541698.71484375,
+              "n_windows": 19456,
+              "seconds": 5.871,
+              "ms_per_batch": 38.62,
+              "peak_alloc_gib": 1.755
+            },
+            "carried": {
+              "bpc": 1.862896336873827,
+              "nats": 6431431.859375,
+              "n_windows": 19456,
+              "seconds": 5.891,
+              "ms_per_batch": 38.76,
+              "peak_alloc_gib": 1.752
+            }
+          }
+        ]
+      }
+    }
+  },
+  "failures": []
+}

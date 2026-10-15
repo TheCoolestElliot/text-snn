@@ -571,6 +571,19 @@ def test_cublas_workspace_is_set_before_torch_is_imported() -> None:
     assert out.stdout.strip() == ":4096:8"
 
 
+def test_driver_cache_cap_is_raised_but_never_overrides_the_user() -> None:
+    """The cap is a start-up cost, not a number: without it the driver's compute
+    cache evicts and every cold process re-pays 13-17 s. `setdefault`, so a value
+    the user exported must survive the import."""
+    body = "import snn.config; print(os.environ['CUDA_CACHE_MAXSIZE'])"
+    out = _run_clean("os.environ.pop('CUDA_CACHE_MAXSIZE', None); " + body)
+    assert out.returncode == 0, out.stderr
+    assert out.stdout.strip() == str(4 * 1024**3)
+    out = _run_clean("os.environ['CUDA_CACHE_MAXSIZE'] = '123456'; " + body)
+    assert out.returncode == 0, out.stderr
+    assert out.stdout.strip() == "123456"
+
+
 def test_importing_the_package_does_not_touch_torch_or_cuda() -> None:
     """`import snn` must stay free of torch: launch.py and the test collector
     import it in processes that may never use a GPU, and an early CUDA context
